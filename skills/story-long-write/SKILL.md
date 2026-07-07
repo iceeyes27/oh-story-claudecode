@@ -348,6 +348,7 @@ story-architect 属于高层级结构设计 agent。轻量题材定位优先由�
 | 设定/角色不变量/{角色名}.md（启用稳定性验收时） | 角色 | 启用时为核心角色初始化；新角色承担连续剧情功能时补建 | Phase 4 漂移门控审查、`scripts/stability-audit.js` POV 感知扫描 |
 | 追踪/漂移门控/第{N}章.md（启用稳定性验收时） | 章 | Phase 4 每章写完、宣布完成前 | 交接包生成前置（Gate: PASS 才交接）、稳定性审计、回炉复检 |
 | 追踪/交接包/第{N}章_to_第{N+1}章.md（启用稳定性验收时） | 章 | 门控 PASS 后 `scripts/handoff-pack.js --write` 生成 | 下一章写前必读；继承关键词由审计验证 |
+| 追踪/状态库/事件_第X-Y章.jsonl（实验性可选，按 50 章分片） | 事件 | 每章更新追踪文件时 `scripts/state-query.js add` 同步硬状态 | 回炉前 `snapshot N` 查时点状态、批量验收时 `check` 矛盾检测（见 references/state-store.md；缺失不阻塞） |
 | 创作偏好.md（工作区根，跨书） | 作者 | 首次沉淀反馈时创建 | 开书 Phase 1、日更 Step 1、大修（流程与默认值；文风倾向经 设定/文风.md 生效，不进每章回路） |
 | 对标/{书名}/角色/{角色名}.md | 对标书 | analyze 输出 | Phase 4 模块召回（角色参考） |
 | 对标/{书名}/剧情/{剧情线名}.md | 对标书 | analyze 输出 | Phase 4 模块召回（剧情模块参考） |

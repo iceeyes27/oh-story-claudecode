@@ -19,7 +19,7 @@ skills/
 ├── story-review/            # 多视角审查
 ├── story-cover/             # 封面生成
 └── browser-cdp/             # 浏览器操控
-scripts/                       # 开发守卫 / 测试 / 代码生成（21 个脚本的完整索引见 scripts/README.md）
+scripts/                       # 开发守卫 / 测试 / 代码生成（22 个脚本的完整索引见 scripts/README.md）
 ```
 
 每个 skill 由一个 `SKILL.md`（入口）和 `references/` 目录（知识库）组成。

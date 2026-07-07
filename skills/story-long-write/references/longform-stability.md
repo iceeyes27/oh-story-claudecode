@@ -168,3 +168,4 @@ node scripts/archive-stability.js --dry-run  # 只报告会移动什么
 - 不改变缺失文件回退规则：未启用稳定性时，伏笔/时间线/角色状态缺失照旧不阻塞。
 - `check-ai-patterns.js` / `normalize-punctuation.js` / `check-degeneration.js` 管文字质量，本机制管剧情连续性，互不替代，日更 Step 3 依次执行。
 - `/story-review` 的全量审查与本机制互补：审计是增量、确定性、每批必跑；story-review 是全量、语义、按需触发。
+- **结构化状态库（实验性旁路，references/state-store.md）**：`追踪/状态库/` 分片 JSONL 事件流，补两个本机制覆盖不到的能力——"第 N 章时点的世界状态/角色认知"查询（回炉老章节时替代被覆盖的当前值）和事件流矛盾检测（死亡后活动、伏笔未埋先收）。审计管正文与承诺字面一致，`state-query.js check` 管状态时间线自洽，互不重叠；状态库缺失不阻塞任何流程。

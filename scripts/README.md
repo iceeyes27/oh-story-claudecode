@@ -28,6 +28,7 @@
 | `test-prose-net-parity.sh` | 正文兜底「轻量确定性网」三端 parity | CI（调 check-hook-regex-sync） |
 | `test-prose-backstop-hook.sh` | `check-prose-after-write.sh` 回归 | CI |
 | `test-story-continuity.sh` | `detect-story-gaps.sh` 跨批连续性兜底回归 | CI（调 test-codex-hooks） |
+| `test-longform-stability.sh` | 长篇稳定性工具链（`stability-audit.js` + `handoff-pack.js` + `archive-stability.js`）回归：契约 beat/禁词/门控/角色不变量 POV 扫描/交接继承/归档透明回退 | CI |
 | `test-codex-hooks.sh` | Codex hook 合成 stdin/stdout 契约 | CI（也被 test-story-continuity 调） |
 | `test-charcount-portable.sh` | 跨平台字符统计命令在三平台 + Windows 的正确性 | CI（调 check-python-invocation） |
 | `test-hook-encoding-portable.sh` | 部署 hook 在 Windows 中文系统的编码健壮性 | CI（也被 check-hook-locale-safety 调） |

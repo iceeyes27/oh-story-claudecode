@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## Unreleased
+
+> 借鉴社区同类项目机制：情绪债务追踪（Novel-Control-Station-Skill）+ 跨会话偏好记忆 / 三层开书问答 / 断点续写检测（chinese-novelist-skill）+ 长篇稳定性验收（novel-assistant-skill，本仓库下游 fork 的稳定性层适配回灌）
+
+### 新增
+
+- **情绪债务追踪**：新增 `追踪/情绪债务.md`（模板见 `artifact-protocols.md`，更新规则见 `state-tracking.md`「情绪债务追踪」），登记对读者的情绪承诺（打脸/发泄/揭穿/感情确认）与兑现窗口——伏笔管情节信息的揭示，情绪债务管情绪释放的兑现。接入长篇写作全回路：Phase 3 与伏笔/时间线/角色状态一同创建，大纲五检④核对本卷到期债务，写前准备状态筛选把到期/临期债务带入本节速记，每章写完按新立/加压/兑现/过期四规则回写，Phase 5 与日更 Step 3 盘点本轮增量。独立成文件（不并入伏笔.md）以兼容 `detect-story-gaps.sh` 对伏笔状态列的解析；缺失不阻塞（缺失文件回退第 7 条），story-import 显式不做导入反推。
+- **跨会话偏好记忆**：新增工作区根 `创作偏好.md`（模板与回写规则见 `artifact-protocols.md`「创作偏好.md」），按 流程偏好/内容偏好/文风倾向 三小节跨书累积。沉淀触发：同类修改反馈第二次出现或用户明确说「以后都这样」，一次性修改不沉淀；写入后回「已记住」给用户纠正机会。加载时机：长篇开书 Phase 1（L2 默认值+Phase 2 预填）、日更 Step 1（批量/确认习惯）、大修 Step 6、短篇 Phase 1/Phase 4。文风倾向不直接进每章写作回路，开书时按本书适用性写入 `设定/文风.md` 生效，不动既有文风优先级链。
+- **三层递进式开书问答**：长篇 Phase 1 无方向时改为 L1 必答（读者情绪/对标书/作者优势，3 问一次问完）→ L2 可选（平台/字数/频道/更新节奏/雷点，允许整体跳过，默认值依次取 创作偏好 > 选题决策 > 题材惯例）→ L3 深度定制（不主动问，Phase 2 核心设定表按 L1/L2 代填全表请用户确认，想深挖再展开），避免长问卷和挤牙膏式追问。
+- **断点续写检测**：story-long-write 意图不明或「开书」撞非空项目时，先扫 `追踪/上下文.md`、`正文/` 最大章号、细纲余量定位断点阶段（只有选题→Phase 1、有设定无大纲→Phase 3、有大纲无正文→Phase 4、有正文→日更续写），输出断点报告并默认建议从断点继续；「开书」不得直接重跑 Phase 1-5 覆盖既有项目。
+- **长篇稳定性验收（可选机制，默认不启用）**：把长篇连载的稳定性约束从"prompt 自觉"升级为"落盘工件 + 确定性脚本验收"。闭环：写前在细纲加「稳定性契约」小节（B# 必须交付 beat 表 + 可 grep 关键词组 + 禁止事项禁词）→ 写后 LLM 审查落盘 `追踪/漂移门控/第{N}章.md`（Gate: PASS/FAIL + 错误码 Findings + State Delta + 下一章继承关键词）→ Gate PASS 才允许 `scripts/handoff-pack.js --write` 生成 `追踪/交接包/`（失败章节不得交接）→ `scripts/stability-audit.js` 批量确定性验收（beat 关键词/禁词/门控覆盖/角色不变量 POV 感知扫描/跨章继承，报告落盘 `追踪/稳定性审计/`，支持 --json）→ FAIL 按错误码分派 story-architect/character-designer/narrative-writer/consistency-checker 修复直到 PASS。新增 `设定/角色不变量/{角色名}.md`（行为红线「不会：」/认知边界「不能提前知道：」负向约束，可 grep 格式，支持 `POV：角色名` 分段扫描视野，见 `character-invariants.md`）。总览与错误码表见 `longform-stability.md`；接入单章流程步骤 13、日更 Step 2/Step 3 第 8 项、大修 Step 5 稳定性复检。启用条件：**正文超过 10 章自动启用**（写前判定：单章流程步骤 1 / 日更 Step 1；质量优先于 token 成本，写崩重写才是真浪费），用户明确要求可提前启用，明确拒绝则沉淀进 `创作偏好.md` 不再自动开；前 10 章不自动启用（人物/设定尚在成形，边界文件会频繁作废），启用后不回溯旧章节。配套归档防长期积累：`scripts/archive-stability.js` 与「追踪文件归档」同时机（每 50 章/卷末）运行，把活跃窗口（默认最近 20 章，`--keep` 可调）外的门控/交接包/审计报告移入 `追踪/归档/` 对应子目录，移动不删除；归档对验收透明——audit/handoff 脚本自动回退读取归档位置，老章节回炉无需取回，回炉新写的门控以活跃目录为权威。回归测试 `scripts/test-longform-stability.sh`（28 用例，含归档移动/dry-run/透明回退）进三平台 CI。相比 fork 原版的适配：契约并入细纲不新建目录、beat 由"原句逐字出现"放宽为"关键词组命中"以留改稿余地、bash 脚本链重写为 Windows 安全的零依赖 Node。
+
+### 改进
+
+- `story-setup` 的 `CLAUDE.md.tmpl` 文件结构补 `情绪债务.md`/`创作偏好.md`，`上下文.md.tmpl` 待处理线索指向情绪债务；`story-import` 共享副本 `state-tracking.md` 已字节同步。本批未改 hooks/agents 模板结构，无需 bump `agents_version`；已部署项目重新运行 `/story-setup` 可刷新 CLAUDE.md 与上下文模板（旧项目缺 `情绪债务.md`/`创作偏好.md` 走缺失回退，不阻塞）。
+- `CLAUDE.md.tmpl` 文件结构追加稳定性可选目录（`设定/角色不变量/`、`追踪/漂移门控/`/`交接包/`/`稳定性审计/`，标注仅启用长篇稳定性验收时存在），重跑 `sync-opencode.py` 同步 `AGENTS.md.tmpl`（同时补齐此前情绪债务/创作偏好行漏跑的同步）。部署 hooks 无需改动、`agents_version` 不 bump：`check-prose-after-write.sh` 与 Codex `story_codex_hook.py` 的正文判定严格限定 `正文/第N章*.md`，`detect-story-gaps.sh` 只解析 `追踪/伏笔.md`，稳定性工件（含交接包内复制的伏笔行）不会被两端兜底网误扫。
+
 ## v0.6.21
 
 > 短篇写作参考栈瘦身：删掉长篇继承残留，建立短篇专属 format/craft/deslop/题材包体系（#206）

@@ -22,6 +22,8 @@ jobs:
         run: bash scripts/test-ai-patterns.sh
       - name: Degeneration detector regression
         run: bash scripts/test-degeneration.sh
+      - name: Longform stability toolchain regression
+        run: bash scripts/test-longform-stability.sh
       - name: Prose backstop hook regression
         run: bash scripts/test-prose-backstop-hook.sh
       - name: Prose net 3-CLI parity
@@ -75,6 +77,9 @@ jobs:
       - name: Degeneration detector regression
         shell: bash
         run: bash scripts/test-degeneration.sh
+      - name: Longform stability toolchain regression
+        shell: bash
+        run: bash scripts/test-longform-stability.sh
       - name: Prose backstop hook regression
         shell: bash
         run: bash scripts/test-prose-backstop-hook.sh
@@ -124,6 +129,8 @@ jobs:
         run: bash scripts/test-ai-patterns.sh
       - name: Degeneration detector regression
         run: bash scripts/test-degeneration.sh
+      - name: Longform stability toolchain regression
+        run: bash scripts/test-longform-stability.sh
       - name: Prose backstop hook regression
         run: bash scripts/test-prose-backstop-hook.sh
       - name: Prose net 3-CLI parity

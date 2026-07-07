@@ -132,13 +132,13 @@ story_update_check() {
   fi
   case "$last" in ''|*[!0-9]*) last=0;; esac
   if [ "$((now - last))" -ge 86400 ] || [ -z "$latest" ]; then
-    latest=$(curl -fsS --max-time 5 "https://api.github.com/repos/worldwonderer/oh-story-claudecode/releases/latest" 2>/dev/null \
+    latest=$(curl -fsS --max-time 5 "https://api.github.com/repos/iceeyes27/oh-story-claudecode/releases/latest" 2>/dev/null \
       | grep -o '"tag_name"[[:space:]]*:[[:space:]]*"[^"]*"' | head -1 | grep -o '[0-9][0-9.]*' | head -1) || latest=""
     [ -n "$latest" ] && printf '%s\n%s\n' "$now" "$latest" > "$cache" 2>/dev/null || true
   fi
   [ -n "$latest" ] || return 0
   if [ "$latest" != "$cur" ] && [ "$(printf '%s\n%s\n' "$cur" "$latest" | sort -t. -k1,1n -k2,2n -k3,3n | tail -1)" = "$latest" ]; then
-    OUTPUT+="[INFO] 网文工具箱有新版本 v${latest}（当前 v${cur}）。更新：npx skills add worldwonderer/oh-story-claudecode -y -g 后重跑 /story-setup；或对 /story 说“检查更新”。关掉提醒：export STORY_NO_UPDATE_CHECK=1\n"
+    OUTPUT+="[INFO] 网文工具箱有新版本 v${latest}（当前 v${cur}）。更新：npx skills add iceeyes27/oh-story-claudecode -y -g 后重跑 /story-setup；或对 /story 说“检查更新”。关掉提醒：export STORY_NO_UPDATE_CHECK=1\n"
     HAS_CONTENT=true
   fi
 }

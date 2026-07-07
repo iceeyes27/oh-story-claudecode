@@ -40,7 +40,7 @@ permissions:
 jobs:
   publish:
     # Only the canonical repo may publish; skip on forks.
-    if: github.repository == 'worldwonderer/oh-story-claudecode'
+    if: github.repository == 'iceeyes27/oh-story-claudecode'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

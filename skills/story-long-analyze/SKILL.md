@@ -51,7 +51,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
    - 新提取的角色信息与已有角色数据对比，检查一致性
    - 新发现的设定细节与已有设定合并，标注信息来源（新提取 vs 已有）
    - 如有冲突（如同角色已有文件中名字不同），在输出中标注冲突让用户裁定
-5. 避免重复提取已有信息，提升处理效率
+5. 避免重复提取已有信息
 
 ### 原文备份（管道前置步骤）
 
@@ -63,7 +63,6 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 4. 备份完成后验证：
    - 源文件路径模式：确认 `原文/` 目录下的文件数量和大小与源文件一致
    - 对话贴文本模式：确认 `原文.md` 文件非空（>0 bytes）
-5. 此步骤确保即使拆文过程中出现异常，原始材料不会丢失
 
 ### 输出目录结构
 
@@ -102,7 +101,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 └── _progress.md
 ```
 
-> **新增权威产物**：`剧情/README.md` 说明剧情目录内各文件权威范围；`剧情/节奏.md` 是节奏/关键信息推进/情绪触动点的权威索引；`剧情/情绪模块.md` 是读者需求、情绪引擎、套路框架和可复现模块卡的权威索引。`拆文报告.md` 与 `剧情/故事线.md` 只做摘要投影；若摘要与这两个文件冲突，下游写作以 `剧情/节奏.md` / `剧情/情绪模块.md` 为准。
+> **权威产物**：`剧情/README.md` 说明剧情目录内各文件权威范围；`剧情/节奏.md` 是节奏/关键信息推进/情绪触动点的权威索引；`剧情/情绪模块.md` 是读者需求、情绪引擎、套路框架和可复现模块卡的权威索引。`拆文报告.md` 与 `剧情/故事线.md` 只做摘要投影；若摘要与这两个文件冲突，下游写作以 `剧情/节奏.md` / `剧情/情绪模块.md` 为准。
 
 ### 管道主体：Stage 0-6
 
@@ -126,7 +125,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 Stage 0 完成概要 + 章节索引之后、转入 Stage 1 之前，**必须**额外产出一份「章节边界」表写入 `_progress.md`。这是后续 Stage 1（黄金三章原文切片）/ Stage 2（每章传给 chapter-extractor agent）/ Stage 6（文风采样）共用的**唯一切片来源**——避免每个阶段各跑一次 regex 切片，结果可能不一致。
 
 操作：
-- 用 `style-profile-generator.md` Step 4 的章节正则（已含 `千` / `两`，覆盖 1000+ 章长篇）grep 出全部章节行号
+- 用 `style-profile-generator.md` Step 4 的章节正则（含 千/两，覆盖 1000+ 章）grep 出全部章节行号
 - 按 `| 章号 | 标题 | 起始行 | 字数 |` 四列写入 `_progress.md` 的「章节边界」section（见 [pipeline-ops.md](references/pipeline-ops.md) 模板）
 - `_progress.md` 顶部 `schema_version: 2` 同时落盘
 
@@ -158,10 +157,7 @@ Stage 0+1 完成后，管道**自动停靠**，产出快速预览报告并询问
 
 ### Stage 6 文风
 
-Stage 5 完成后追加 Stage 6，生成 `文风.md`：句长分布、标点习惯、对话潜台词模式、情绪交替周期 + 4-6 段原文范例片段。`文风.md` 只负责表达层风格；情绪/节奏意图仍以 `剧情/情绪模块.md` 与 `剧情/节奏.md` 为权威。
-
-按 [references/style-profile-generator.md](references/style-profile-generator.md) 的 6 步 SOP 跑；模板见 [references/style-profile-protocol.md](references/style-profile-protocol.md)。
-
+`文风.md` 只负责表达层风格；情绪/节奏意图仍以 `剧情/情绪模块.md` 与 `剧情/节奏.md` 为权威。
 原文缺失或章节分隔符识别不出 → 在 `文风.md` 的「生成记录」写明 `文风可用：否：{原因}`。Stage 6 失败不阻断管道。
 
 ### Stage 3-4 并行执行
@@ -179,11 +175,7 @@ Stage 4b（角色完整档案）— 串行，依赖 Stage 3 合并后的角色�
 Stage 4c（角色关系提取）— 串行，依赖 4b 角色实体存在
 ```
 
-**依赖来源**（事实依据，非投票）：
-- Stage 3 包含「角色合并（跨章节去重+别名归一）」（见上表 Stage 3 列）—— Stage 4 的角色完整档案构建需要这份合并后实体。
-- material-decomposition.md:218-225「阶段 B：完整档案 — 合并所有章节的角色提及数据」明确依赖 Stage 3 合并产物 → **Stage 4b/4c 必须串行**。
-- material-decomposition.md:278-287 世界观字段表（类型/力量体系/地理/势力/核心规则/特殊设定）的数据源是 Stage 2 章节摘要 + 情节点，**不依赖 Stage 3 输出** → **Stage 4a 可与 Stage 3 并行**。
-- 金手指（material-decomposition.md:268-276）同 4a，来源是 Stage 2 情节点中的能力 / 物品 mention，不需要 Stage 3 角色合并。
+4a 数据源是 Stage 2 摘要故可与 3 并行；4b/4c 依赖 Stage 3 角色合并故串行。
 
 ### 部分失败容忍
 
@@ -279,26 +271,16 @@ ls 章节/*_摘要.md | sed -E 's/.*第([0-9]+)章.*/\1 &/' | sort -n | cut -d' 
 
 Stage 3 / 4a / 4c / 散落情节兜底改为**只读一次 `_章节摘要汇总.md`** 并在上下文中复用，替代每阶段 `glob 章节/*_摘要.md` 重扫（同一份语料的 4-5 次冷读降为 1 次）。
 
-**仅当语料能放进上下文时才生成汇总文件**：>500 章、或合并后 `_章节摘要汇总.md` 过大放不进上下文时**跳过本步骤**，走下方「分块策略」。`_章节摘要汇总.md` 不替代 `章节/*_摘要.md`——单章文件仍是落盘真源，Stage 6 文风采样、人工复核照用单章文件。管道结束（Stage 6 后）删除 `_章节摘要汇总.md`——它是派生临时文件，不随 `拆文库/` 交付（`拆文库/` 会被 story-import 保留为写作工程）。
+**仅当语料能放进上下文时才生成汇总文件**：>500 章、或合并后 `_章节摘要汇总.md` 过大放不进上下文时**跳过本步骤**，走 [material-decomposition.md](references/material-decomposition.md) 分块策略。`_章节摘要汇总.md` 不替代 `章节/*_摘要.md`——单章文件仍是落盘真源，Stage 6 文风采样、人工复核照用单章文件。管道结束（Stage 6 后）删除 `_章节摘要汇总.md`——它是派生临时文件，不随 `拆文库/` 交付（`拆文库/` 会被 story-import 保留为写作工程）。
 
----
-
-## 分块策略
-
-**路由级说明**：Stage 2 使用 chapter-extractor agent 按章节并行，**不分块**。
-
-Stage 3-5 的分块策略（规模分级、智能分块、跨块合并、输出长度上限）的唯一权威定义见 [material-decomposition.md](references/material-decomposition.md)。
+Stage 3-5 分块见 [material-decomposition.md](references/material-decomposition.md)（唯一权威）。
 
 ---
 
 ## 恢复机制
 
-1. 管道启动时检查输出目录是否已有 _progress.md
-2. 如有，读取断点信息（最后处理章节 + 当前阶段 + 最终状态）
-3. **断点状态为 `paused_after_stage1`**（Stage 1 停靠点）→ 跳过 Stage 0/1，直接从 Stage 2 续跑逐章摘要，不重跑已完成的概要与黄金三章。
-4. 其他断点状态 → 从断点所在块的起始章节恢复，覆盖该块已有输出。
-
-`_progress.md` 模板与各状态值说明见 [pipeline-ops.md](references/pipeline-ops.md)。
+启动时检查 _progress.md；`paused_after_stage1` → 直接从 Stage 2 续跑。
+操作步骤（含 schema lazy migration）见 [pipeline-ops.md](references/pipeline-ops.md)。
 
 ---
 
@@ -312,8 +294,6 @@ Stage 3-5 的分块策略（规模分级、智能分块、跨块合并、输出�
 | 准备开写 | story-long-write | `/story-long-write` |
 | 需要市场数据 | story-long-scan | `/story-long-scan` |
 | 更适合短篇 | story-short-scan → story-short-analyze | `/story-short-scan` |
-
-> **选题决策回填**：若项目根有 `选题决策.md`（story-long-scan 产出），拆完汇总报告（Stage 5 跑完）后会自动回填对应选题的"能爆的原因"（见上「Stage 5 后：选题决策回填」）。
 
 ---
 

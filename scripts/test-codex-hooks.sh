@@ -118,7 +118,7 @@ echo "  OK commit advisory"
 mkdir -p "$ROOT/book/追踪"
 cat > "$ROOT/.story-deployed" <<'TXT'
 deployed_at: 2026-06-25T00:00:00Z
-agents_version: 17
+agents_version: 18
 setup_skill_version: 1.2.6
 target_cli: codex
 resolver_strategy: project-local-skill-reference

@@ -54,7 +54,8 @@
 - `agents_version: 14` → 旧版，需重新部署以获取 v0.6.19 部署侧改动（正文兜底 hook、文风指纹来源刷新、Codex/OpenClaw 适配）
 - `agents_version: 15` → 旧版，需重新部署以获取 v0.6.21 短篇写作 Agent 模板与参考栈更新
 - `agents_version: 16` → 旧版，需重新部署以获取 v0.6.22 题材正文提示卡召回与节奏门禁 agent 模板
-- `agents_version: 17` → 当前版本
+- `agents_version: 17` → 旧版，需重新部署以获取 session-start 未完成日更批次提示与文件结构说明更新
+- `agents_version: 18` → 当前版本
 
 ## 版本变更
 
@@ -175,10 +176,16 @@
 - **narrative-writer 短篇例外同步（#206）**：Claude/OpenCode/Codex 三端 agent 模板同步「短篇题材包例外」——短篇需要情绪直给时允许“情绪词 + 体感/动作焊住”，只清除空泛 AI 情绪总结，不再误把短篇爽感写法全部改成纯动作外化。
 - 已部署项目请重新运行 `/story-setup` 刷新 agents/reference bundle；**部署后新开会话**，否则旧会话仍使用 v15 narrative-writer 模板，无法获得以上 v16 的短篇写作规则。
 
-### v17 (当前)
+### v17
 
 - `setup_skill_version` 升级到 `1.2.6`，`.story-deployed` 的 `agents_version` 升级到 `17`。
 - **题材正文提示卡召回（#226）**：narrative-writer Claude/OpenCode/Codex 三端模板接入「题材正文提示卡」召回——先读索引、再只读取 `genre-prose-cards/{题材}.md` 单卡，卡片只内部校准题材味，anti-leak 硬约束保证卡名/题材标签/置信度/合规自评一律不写进正文；文风指纹与 Gate G 去解释腔规则按题材细化。
 - **大纲边界与逐章写法公式（#225/#226）**：narrative-writer 模板只扩写细纲计划内情节点，不足时返回 `outline_underfilled` 欠账报告交主会话补纲；chapter-extractor 模板新增 `chapter_formula` 逐章写法公式产物（情绪流向/节奏配比/结构公式/章尾卡点）。
 - **generic Web AI 部署（#216）**：story-setup 新增 `target_cli=generic` 文件模式，Web AI / 通用 Agent 项目复制 `skills/` 与通用 `AGENTS.md`，不声明平台原生 hooks/custom agents 能力。
 - 已部署项目请重新运行 `/story-setup` 刷新 agents/reference bundle；**部署后新开会话**，否则旧会话仍使用 v16 agent 模板，无法获得以上 v17 改进。
+### v18 (当前)
+
+- `.story-deployed` 的 `agents_version` 升级到 `18`（`setup_skill_version` 保持 `1.2.6`）。
+- **session-start 未完成日更批次提示**：`session-start.sh` 检测活跃书目 `追踪/流水线.md` 的「批次状态：进行中」时，提示未完成批次与断点续跑方式（配合 story-long-write 新增的日更章节流水线状态票，见 `story-long-write/references/artifact-protocols.md`「追踪/流水线.md」）。
+- **文件结构说明更新**：`CLAUDE.md.tmpl` / OpenCode `AGENTS.md.tmpl` 的文件结构补 `追踪/流水线.md`（日更批量状态票）与可选 `设定/世界观不变量.md`（世界规则红线，`stability-audit.js` 违规词扫描）。
+- agents/rules 模板本批无变化；已部署项目重新运行 `/story-setup` 刷新 hooks 与 CLAUDE.md 即可，流水线/世界观不变量文件缺失不阻塞既有流程。

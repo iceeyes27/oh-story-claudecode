@@ -13,6 +13,7 @@ const USAGE = `Usage: node stability-audit.js [--write] [--json] [--dir <book-di
   - 漂移门控存在、Gate: PASS、覆盖全部 B#、含 State Delta
     （Gate_Missing / Gate_Failed / Gate_Incomplete / State_Not_Updated）
   - 角色不变量 POV 感知扫描：行为红线/禁知短语（Motivation_Drift / Knowledge_Leak）
+  - 世界观不变量违规词未出现在正文（Canon_Conflict；设定/世界观不变量.md 存在时才检查）
 相邻章验证：交接包存在、Gate 为 PASS、继承关键词在下一章正文命中
     （Handoff_Missing / Continuity_Missing）
 
@@ -225,6 +226,19 @@ function listInvariants() {
     .filter(Boolean);
 }
 
+// 世界观不变量（可选工件）：设定/世界观不变量.md 的「不得出现：」违规词。
+// 文件缺失返回 null（跳过检查，不 FAIL）；「规则：」行由漂移门控的 LLM 审查核对，脚本不判
+function parseWorldInvariants() {
+  const text = readSafe(path.join(BOOK, '设定', '世界观不变量.md'));
+  if (text === null) return null;
+  const terms = [];
+  for (const line of text.split(/\r?\n/)) {
+    const m = line.match(/不得出现[：:]\s*(.+)$/);
+    if (m) terms.push(...splitTerms(m[1]));
+  }
+  return terms;
+}
+
 const checks = [];
 
 function addCheck(scope, check, problems) {
@@ -235,6 +249,7 @@ function addCheck(scope, check, problems) {
 }
 
 const invariants = listInvariants();
+const worldTerms = parseWorldInvariants();
 
 for (let n = startNum; n <= endNum; n += 1) {
   const scope = `第 ${pad3(n)} 章`;
@@ -322,6 +337,17 @@ for (let n = startNum; n <= endNum; n += 1) {
     }
   }
   addCheck(scope, '角色不变量', invariantProblems);
+
+  // 世界观不变量违规词（全章扫描，不分 POV；文件缺失时整项跳过，向后兼容）
+  if (worldTerms !== null) {
+    const worldProblems = [];
+    for (const term of worldTerms) {
+      if (bodyText.includes(term)) {
+        worldProblems.push({ code: 'Canon_Conflict', message: `正文出现世界观违规词：${term}（规则红线见 设定/世界观不变量.md）` });
+      }
+    }
+    addCheck(scope, '世界观不变量', worldProblems);
+  }
 
   // 跨章交接继承（批量时对相邻对检查）
   if (n > startNum) {

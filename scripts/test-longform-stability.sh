@@ -203,6 +203,28 @@ printf '\n有人低声说：陈叔是幕后人。\n' >> "$BOOK/正文/第001章_
 node "$AUDIT" --dir "$BOOK" --json 1 1 > "$TMP_DIR/forbid.json" 2>/dev/null || true
 expect_grep "Foreshadow_Early_Payoff" "$TMP_DIR/forbid.json" "禁词提前出现 → Foreshadow_Early_Payoff"
 
+# --- 5b. 世界观不变量：文件缺失跳过 / 违规词命中 → Canon_Conflict ---
+build_fixture
+node "$AUDIT" --dir "$BOOK" --json 1 1 > "$TMP_DIR/world-absent.json" 2>/dev/null || true
+if grep -q "世界观不变量" "$TMP_DIR/world-absent.json"; then
+  ko "世界观不变量文件缺失时不应出现该检查项"
+else
+  ok "世界观不变量文件缺失 → 整项跳过"
+fi
+cat > "$BOOK/设定/世界观不变量.md" <<'EOF'
+## 世界观不变量
+
+### 规则红线（LLM 门控审查）
+- 规则：死者不能复活；例外：无
+
+### 违规词（脚本字面匹配）
+- 不得出现：死而复生、还阳
+EOF
+expect_exit 0 "世界观不变量存在且无违规词 → PASS" node "$AUDIT" --dir "$BOOK" 1 1
+printf '\n有人说他死而复生了。\n' >> "$BOOK/正文/第001章_账单风波.md"
+node "$AUDIT" --dir "$BOOK" --json 1 1 > "$TMP_DIR/world.json" 2>/dev/null || true
+expect_grep "Canon_Conflict" "$TMP_DIR/world.json" "世界观违规词命中 → Canon_Conflict"
+
 # --- 6. 细纲缺稳定性契约 → Contract_Missing ---
 build_fixture
 printf '## 细纲（第 1 章）\n- 核心事件：账单风波\n' > "$BOOK/大纲/细纲_第001章.md"

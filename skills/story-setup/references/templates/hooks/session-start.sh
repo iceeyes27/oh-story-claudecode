@@ -55,8 +55,8 @@ if sentinel_exists "$ROOT/.story-deployed"; then
       HAS_CONTENT=true
       ;;
     *)
-      if [ "$AGENTS_VERSION" -lt 17 ]; then
-        OUTPUT+="[WARN] story-setup agents_version=$AGENTS_VERSION 低于 v17。重新运行 /story-setup 刷新 hooks、agents 和 references（部署后需新开会话）。\n\n"
+      if [ "$AGENTS_VERSION" -lt 18 ]; then
+        OUTPUT+="[WARN] story-setup agents_version=$AGENTS_VERSION 低于 v18。重新运行 /story-setup 刷新 hooks、agents 和 references（部署后需新开会话）。\n\n"
         HAS_CONTENT=true
       fi
       ;;
@@ -102,6 +102,15 @@ if [ -n "$BOOK_DIR" ] && [ -f "$BOOK_DIR/追踪/上下文.md" ]; then
   SNAPSHOT=$(head -10 "$BOOK_DIR/追踪/上下文.md")
   OUTPUT+="${SNAPSHOT}\n---\n\n"
   HAS_CONTENT=true
+fi
+
+# 未完成日更批次（追踪/流水线.md 状态票，workflow-daily 据此断点续跑）
+if [ -n "$BOOK_DIR" ] && [ -f "$BOOK_DIR/追踪/流水线.md" ]; then
+  if grep -q "批次状态：进行中" "$BOOK_DIR/追踪/流水线.md" 2>/dev/null; then
+    PIPE_BATCH=$(grep -m1 "^- 批次：" "$BOOK_DIR/追踪/流水线.md" 2>/dev/null | sed 's/^- 批次：//' || true)
+    OUTPUT+="[INFO] 有未完成的日更批次：${PIPE_BATCH:-见 追踪/流水线.md}。说「日更」或「续写」将按状态票从断点续跑。\n"
+    HAS_CONTENT=true
+  fi
 fi
 
 # 未完成拆文（阈值 > 0 才报告）

@@ -61,7 +61,7 @@ write_sentinel() {
   local root="$1"
   cat > "$root/.story-deployed" <<'SENTINEL'
 deployed_at: 2026-05-24T00:00:00Z
-agents_version: 17
+agents_version: 18
 setup_skill_version: 1.2.6
 target_cli: claude-code
 resolver_strategy: project-local-skill-reference
@@ -253,7 +253,7 @@ setup_git_repo "$bad_sentinel_root"
 copy_hooks "$bad_sentinel_root"
 cat > "$bad_sentinel_root/.story-deployed" <<'SENTINEL'
 deployed_at: 2026-05-24T00:00:00Z
-agents_version: 17
+agents_version: 18
 setup_skill_version: 1.2.6
 resolver_strategy: project-local-skill-reference
 references_dir: .claude/skills/story-setup/references/agent-references
@@ -268,14 +268,14 @@ setup_git_repo "$stale_v15_root"
 copy_hooks "$stale_v15_root"
 cat > "$stale_v15_root/.story-deployed" <<'SENTINEL'
 deployed_at: 2026-05-24T00:00:00Z
-agents_version: 16
-setup_skill_version: 1.2.5
+agents_version: 17
+setup_skill_version: 1.2.6
 target_cli: claude-code
 resolver_strategy: project-local-skill-reference
 references_dir: .claude/skills/story-setup/references/agent-references
 SENTINEL
 stale_v15_out="$(run_from_nested "$stale_v15_root" session-start.sh 2>&1 || true)"
-echo "$stale_v15_out" | grep -q '低于 v17' || fail "session-start did not warn for agents_version 16 stale v17 deployment"
+echo "$stale_v15_out" | grep -q '低于 v18' || fail "session-start did not warn for agents_version 17 stale v18 deployment"
 echo "  OK TS5 sentinel diagnostics"
 
 # TS6 — Short project non-mutation
@@ -365,11 +365,11 @@ echo "  OK TS9 settings JSON"
 
 # TS10 — Upgrade notes completeness
 assert_grep 'agents_version: 13|`agents_version: 13`|agents_version`.*13' "$UPGRADING_FILE" "UPGRADING.md must retain agents_version 13 history"
-assert_grep 'agents_version: 17|`agents_version: 17`|agents_version`.*17' "$UPGRADING_FILE" "UPGRADING.md must document agents_version 17"
+assert_grep 'agents_version: 18|`agents_version: 18`|agents_version`.*18' "$UPGRADING_FILE" "UPGRADING.md must document agents_version 18"
 assert_grep 'setup_skill_version.*1\.2\.5' "$UPGRADING_FILE" "UPGRADING.md must document setup_skill_version 1.2.5"
-assert_grep 'AGENTS_VERSION.*-lt 17|AGENTS_VERSION" -lt 17' "$HOOKS_DIR/session-start.sh" "session-start must warn for agents_version 16 under v17 deployment"
-assert_grep 'agents_version.*< 17|版本 < 17' "$SKILL_DIR/SKILL.md" "story-setup redeploy branch must treat agents_version 16 as stale"
-assert_grep 'agents_version.*小于 `17`|小于 .17' "$REPO_ROOT/skills/story-review/SKILL.md" "story-review must treat agents_version 16 as stale"
+assert_grep 'AGENTS_VERSION.*-lt 18|AGENTS_VERSION" -lt 18' "$HOOKS_DIR/session-start.sh" "session-start must warn for agents_version 17 under v18 deployment"
+assert_grep 'agents_version.*< 18|版本 < 18' "$SKILL_DIR/SKILL.md" "story-setup redeploy branch must treat agents_version 17 as stale"
+assert_grep 'agents_version.*小于 `18`|小于 .18' "$REPO_ROOT/skills/story-review/SKILL.md" "story-review must treat agents_version 17 as stale"
 assert_grep '/story-setup' "$UPGRADING_FILE" "UPGRADING.md must tell users to rerun /story-setup"
 assert_grep 'hook.*lib|lib/common\.sh|lib/sentinel\.sh' "$UPGRADING_FILE" "UPGRADING.md must document hook lib repair"
 assert_grep 'reference bundle|Agent Reference|agent-references' "$UPGRADING_FILE" "UPGRADING.md must document reference bundle repair"

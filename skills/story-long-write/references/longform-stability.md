@@ -17,8 +17,9 @@
 首次启用时的初始化动作：
 
 1. 按 `character-invariants.md` 为主角、主要反派、核心配角建 `设定/角色不变量/{角色名}.md`。
-2. 从下一章起，细纲带「稳定性契约」小节（见下）。
-3. 已写章节不回溯补契约；审计范围从启用后的第一章开始。
+2. 已定型的跨章世界规则（能力上限、资源约束、阵法/系统限制）建 `设定/世界观不变量.md`（可选工件，模板见 `character-invariants.md`「世界观不变量」；写不出可靠违规词就先不建，规则定型后再补）。
+3. 从下一章起，细纲带「稳定性契约」小节（见下）。
+4. 已写章节不回溯补契约；审计范围从启用后的第一章开始。
 
 ## 工件一：细纲「稳定性契约」小节（写前）
 
@@ -80,7 +81,7 @@
 
 1. 对照细纲稳定性契约核对每个必须 beat（逐个写进「Beat 核对」，脚本会验证每个 B# 编号在门控文件中出现）。
 2. 对照当前卷纲核对卷目标推进。
-3. 对照 `设定/角色不变量/` 核对动机与认知边界。
+3. 对照 `设定/角色不变量/` 核对动机与认知边界；对照 `设定/世界观不变量.md`（如存在）核对本章是否打破规则红线。
 4. 对照 `追踪/伏笔.md` 核对提前兑现、遗忘、新增未入账。
 5. 对照追踪文件核对状态同步，把本章变化写进 State Delta。
 6. 从本章章尾钩子和活跃线索中提炼「继承关键词」——这是对下一章的机器可验承诺，选词按可 grep 规则。
@@ -92,7 +93,7 @@
 | `Plot_Drift` | S1/S2 | 正文偏离本章核心事件或当前卷目标 | LLM |
 | `Beat_Missing` | S1/S2 | 必须 beat 的关键词组未全部出现在正文 | 脚本 |
 | `Beat_Compressed` | S2 | 必须 beat 被摘要化，没有写成可感场景 | LLM |
-| `Canon_Conflict` | S1 | 与既有设定、时间线、能力限制冲突 | LLM |
+| `Canon_Conflict` | S1 | 与既有设定、时间线、能力限制冲突；世界观不变量违规词出现在正文 | 脚本+LLM |
 | `Motivation_Drift` | S1/S2 | 违反行为红线，或行为缺动机链 | 脚本+LLM |
 | `Knowledge_Leak` | S1 | 角色知道了当前不该知道的信息 | 脚本+LLM |
 | `Foreshadow_Early_Payoff` | S1/S2 | 禁词提前出现 / 伏笔提前兑现泄底 | 脚本+LLM |
@@ -134,7 +135,7 @@ node scripts/stability-audit.js --write {start} {end}
 node scripts/stability-audit.js --json {start} {end}
 ```
 
-逐章检查：细纲稳定性契约存在且有 B# beat、beat 关键词组全部命中正文、禁词未出现、门控存在且 `Gate: PASS`、门控覆盖全部 B#、门控含 State Delta、角色不变量 POV 感知扫描；相邻章检查：交接包存在、其 Gate 为 PASS、继承关键词在下一章正文命中。任一 FAIL 退出码 1，诊断带错误码。
+逐章检查：细纲稳定性契约存在且有 B# beat、beat 关键词组全部命中正文、禁词未出现、门控存在且 `Gate: PASS`、门控覆盖全部 B#、门控含 State Delta、角色不变量 POV 感知扫描、世界观不变量违规词扫描（`设定/世界观不变量.md` 存在时）；相邻章检查：交接包存在、其 Gate 为 PASS、继承关键词在下一章正文命中。任一 FAIL 退出码 1，诊断带错误码。
 
 ## 修复分派与闭环
 
@@ -142,7 +143,7 @@ node scripts/stability-audit.js --json {start} {end}
 
 | 错误码 | 分派 | 处理范围 |
 |--------|------|---------|
-| `Plot_Drift` / `Beat_Compressed` / `Foreshadow_Early_Payoff` | story-architect | 结构裁决：跑题、漏 beat、伏笔提前兑现，先裁定改正文还是改契约 |
+| `Plot_Drift` / `Beat_Compressed` / `Foreshadow_Early_Payoff` / `Canon_Conflict` | story-architect | 结构裁决：跑题、漏 beat、伏笔提前兑现、打破世界规则，先裁定改正文还是改契约/不变量（改规则须在门控 State Delta 记录原因） |
 | `Motivation_Drift` / `Knowledge_Leak` | character-designer | 角色裁决：动机漂移铺垫、认知泄漏改写或不变量修订 |
 | `Beat_Missing` / `Contract_Missing` / `Gate_*` | narrative-writer | 局部正文修补 / 补契约补门控 |
 | `State_Not_Updated` / `Untracked_Addition` / `Continuity_Missing` | consistency-checker | 追踪文件复核同步、继承落实 |

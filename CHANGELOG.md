@@ -8,6 +8,9 @@ All notable changes to this project will be documented in this file.
 
 ### 新增
 
+- **章节流水线状态票（orchestration 断点续跑）**：新增 `追踪/流水线.md`（模板与使用规则见 `artifact-protocols.md`「追踪/流水线.md」）——日更批量把每章流水线步骤（细纲/写前准备/正文落盘/字数验证/章检扫描/追踪更新/门控/交接包）的完成状态逐步落盘，会话中断、compact 或跨会话后按票从**第一个未完成步骤**续跑，不重写已落盘正文；只记当前批次（新批次整文件重置），**续跑以磁盘为准**（票与磁盘不一致先按磁盘修正票）。接入日更全回路：Step 1 断点核对（先于章号重算）、Step 2 批次登记 + 每步回写、Step 4 批次收尾；`session-start.sh` 检测「批次状态：进行中」时提示未完成批次。单章写作不强制使用，文件缺失不阻塞（旧项目 Step 2 起自动创建）。
+- **世界观不变量（规则红线）**：新增可选工件 `设定/世界观不变量.md`（模板见 `character-invariants.md`「世界观不变量」），把跨章世界硬规则（能力上限、资源约束、阵法/系统限制）从设定文档的描述性文字升级为可验收红线——「规则：」行由漂移门控 LLM 审查核对，「不得出现：」违规词行由 `stability-audit.js` 全章字面扫描（不分 POV），命中即 `Canon_Conflict`（升级为 脚本+LLM 双判，修复分派 story-architect 裁决改正文还是改规则；正式改规则须在门控 State Delta 记录原因，防"为救场临时改规则"）。可选不阻塞：文件缺失时审计整项跳过、不 FAIL，向后兼容已启用稳定性验收的项目；首次启用初始化新增第 2 步建档指引。回归测试 `test-longform-stability.sh` 新增 3 用例（缺失跳过/存在无违规 PASS/违规词命中 FAIL），28→31。
+
 - **情绪债务追踪**：新增 `追踪/情绪债务.md`（模板见 `artifact-protocols.md`，更新规则见 `state-tracking.md`「情绪债务追踪」），登记对读者的情绪承诺（打脸/发泄/揭穿/感情确认）与兑现窗口——伏笔管情节信息的揭示，情绪债务管情绪释放的兑现。接入长篇写作全回路：Phase 3 与伏笔/时间线/角色状态一同创建，大纲五检④核对本卷到期债务，写前准备状态筛选把到期/临期债务带入本节速记，每章写完按新立/加压/兑现/过期四规则回写，Phase 5 与日更 Step 3 盘点本轮增量。独立成文件（不并入伏笔.md）以兼容 `detect-story-gaps.sh` 对伏笔状态列的解析；缺失不阻塞（缺失文件回退第 7 条），story-import 显式不做导入反推。
 - **跨会话偏好记忆**：新增工作区根 `创作偏好.md`（模板与回写规则见 `artifact-protocols.md`「创作偏好.md」），按 流程偏好/内容偏好/文风倾向 三小节跨书累积。沉淀触发：同类修改反馈第二次出现或用户明确说「以后都这样」，一次性修改不沉淀；写入后回「已记住」给用户纠正机会。加载时机：长篇开书 Phase 1（L2 默认值+Phase 2 预填）、日更 Step 1（批量/确认习惯）、大修 Step 6、短篇 Phase 1/Phase 4。文风倾向不直接进每章写作回路，开书时按本书适用性写入 `设定/文风.md` 生效，不动既有文风优先级链。
 - **三层递进式开书问答**：长篇 Phase 1 无方向时改为 L1 必答（读者情绪/对标书/作者优势，3 问一次问完）→ L2 可选（平台/字数/频道/更新节奏/雷点，允许整体跳过，默认值依次取 创作偏好 > 选题决策 > 题材惯例）→ L3 深度定制（不主动问，Phase 2 核心设定表按 L1/L2 代填全表请用户确认，想深挖再展开），避免长问卷和挤牙膏式追问。
@@ -18,6 +21,7 @@ All notable changes to this project will be documented in this file.
 
 ### 改进
 
+- **部署侧（`agents_version` 17 → 18）**：`session-start.sh` 新增未完成日更批次提示（读活跃书目 `追踪/流水线.md` 的「批次状态：进行中」）；`CLAUDE.md.tmpl` / OpenCode `AGENTS.md.tmpl` 文件结构补 `追踪/流水线.md` 与可选 `设定/世界观不变量.md`。agents/rules 模板无变化；已部署项目重新运行 `/story-setup` 刷新 hooks 与 CLAUDE.md（部署后新开会话），不重跑仅缺 session-start 提示，写作流程不受影响。升级说明见 `story-setup/UPGRADING.md` v18。
 - `story-setup` 的 `CLAUDE.md.tmpl` 文件结构补 `情绪债务.md`/`创作偏好.md`，`上下文.md.tmpl` 待处理线索指向情绪债务；`story-import` 共享副本 `state-tracking.md` 已字节同步。本批未改 hooks/agents 模板结构，无需 bump `agents_version`；已部署项目重新运行 `/story-setup` 可刷新 CLAUDE.md 与上下文模板（旧项目缺 `情绪债务.md`/`创作偏好.md` 走缺失回退，不阻塞）。
 - `CLAUDE.md.tmpl` 文件结构追加稳定性可选目录（`设定/角色不变量/`、`追踪/漂移门控/`/`交接包/`/`稳定性审计/`，标注仅启用长篇稳定性验收时存在），重跑 `sync-opencode.py` 同步 `AGENTS.md.tmpl`（同时补齐此前情绪债务/创作偏好行漏跑的同步）。部署 hooks 无需改动、`agents_version` 不 bump：`check-prose-after-write.sh` 与 Codex `story_codex_hook.py` 的正文判定严格限定 `正文/第N章*.md`，`detect-story-gaps.sh` 只解析 `追踪/伏笔.md`，稳定性工件（含交接包内复制的伏笔行）不会被两端兜底网误扫。
 

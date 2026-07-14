@@ -310,6 +310,7 @@ story-architect 属于高层级结构设计 agent。轻量题材定位优先由�
 - **大纲/卷纲_第X卷.md**：每卷的爽点节奏+情绪弧线（含章节定位）+人物弧线+伏笔+反转+对标结构坐标（参考 outline-methods.md「大纲三层结构法」 + outline-structure-theory.md「章节定位与张弛 / 对标节奏迁移」 + emotional-arc-design.md「六种弧线速查」 + reversal-toolkit.md「反转类型」）
 - **追踪/伏笔.md** + **追踪/时间线.md** + **追踪/角色状态.md** + **追踪/情绪债务.md**：伏笔状态表+故事时间线+角色状态快照+情绪债务表（对读者的情绪承诺与兑现窗口；参考 plot-core-methods.md「连续性追踪」、state-tracking.md「角色状态快照格式」「情绪债务追踪」）
 - **设定/角色不变量/{角色名}.md**（启用长篇稳定性验收时；正文超过 10 章自动启用）：主角/主要反派/核心配角的行为红线与认知边界，负向约束、可 grep 格式（模板与规则见 references/character-invariants.md；启用条件见 references/longform-stability.md）
+- **设定/世界观不变量.md**（可选，启用稳定性验收时推荐）：跨章世界规则红线（「规则：」行 LLM 门控审查 + 「不得出现：」违规词行脚本扫描），防"为当前剧情临时改规则"（模板见 references/character-invariants.md「世界观不变量」；缺失不阻塞）
 
 前 3 章细纲额外加载 [references/opening-design.md](references/opening-design.md)（黄金三章法则+六大标准）。
 
@@ -407,8 +408,10 @@ story-architect 属于高层级结构设计 agent。轻量题材定位优先由�
 | 追踪/角色状态.md | 全书 | Phase 3 | Phase 4 每章写作前（状态筛选步骤） |
 | 追踪/情绪债务.md | 全书 | Phase 3 起 | Phase 4 每章写作前（状态筛选：到期/临期债务）、每章写完更新 |
 | 设定/角色不变量/{角色名}.md（启用稳定性验收时） | 角色 | 启用时为核心角色初始化；新角色承担连续剧情功能时补建 | Phase 4 漂移门控审查、`scripts/stability-audit.js` POV 感知扫描 |
+| 设定/世界观不变量.md（可选，启用稳定性验收时推荐） | 全书 | 世界规则定型时建档；规则正式升级时更新并记入门控 State Delta | Phase 4 漂移门控审查（规则行）、`scripts/stability-audit.js` 违规词扫描（缺失跳过不 FAIL） |
 | 追踪/漂移门控/第{N}章.md（启用稳定性验收时） | 章 | Phase 4 每章写完、宣布完成前 | 交接包生成前置（Gate: PASS 才交接）、稳定性审计、回炉复检 |
 | 追踪/交接包/第{N}章_to_第{N+1}章.md（启用稳定性验收时） | 章 | 门控 PASS 后 `scripts/handoff-pack.js --write` 生成 | 下一章写前必读；继承关键词由审计验证 |
+| 追踪/流水线.md（日更批量状态票） | 批次 | 日更 Step 2 确定批次范围后创建/重置 | 日更 Step 1 断点续跑（以磁盘为准核对）；每完成一步回写（见 references/workflow-daily.md、artifact-protocols.md「追踪/流水线.md」） |
 | 追踪/状态库/事件_第X-Y章.jsonl（实验性可选，按 50 章分片） | 事件 | 每章更新追踪文件时 `scripts/state-query.js add` 同步硬状态 | 回炉前 `snapshot N` 查时点状态、批量验收时 `check` 矛盾检测（见 references/state-store.md；缺失不阻塞） |
 | 创作偏好.md（工作区根，跨书） | 作者 | 首次沉淀反馈时创建 | 开书 Phase 1、日更 Step 1、大修（流程与默认值；文风倾向经 设定/文风.md 生效，不进每章回路） |
 | 对标/{书名}/角色/{角色名}.md | 对标书 | analyze 输出 | Phase 4 模块召回（角色参考） |
@@ -514,7 +517,7 @@ story-architect 属于高层级结构设计 agent。轻量题材定位优先由�
 10. **元信息扫描**：检查标题行以外的正文，命中 `第[一二三四五六七八九十百千万两0-9]+章|上一章|上章|前一章|本章|这一章|前文|后文|伏笔|细纲|读者` 时必须改写为场景内表达；只有角色在故事世界内真实阅读/讨论“第X章”文本，或真实身为作者/读者并谈论读者身份时例外。
 11. **禁用词扫描**：对照 `references/banned-words.md` 检查本章，一级词（高频AI腔）命中即替换；二级词（低频/语境相关）高频出现时替换，偶发可参考 `references/anti-ai-writing.md` 定性裁定
 12. **更新追踪**：写完后即时更新 `追踪/伏笔.md`（新增/回收伏笔）、`追踪/时间线.md`（记录事件时序）、`追踪/角色状态.md`（如本章引起角色状态变化——身份、能力、关系、公众形象——则更新对应角色条目并追加变更记录）和 `追踪/情绪债务.md`（新立债务登记/加压顺延/兑现移入日志/过期标记，规则见 state-tracking.md「情绪债务追踪」）。本章若首次引入会复用的具名角色/势力，按 Phase 3「细纲后设定补全」规则补建对应 `设定/` 档案。角色状态更新规则详见 state-tracking.md。
-13. **稳定性门控与交接**（启用长篇稳定性验收时执行；正文超过 10 章自动启用，条件见 references/longform-stability.md）：按模板把审查结论写入 `追踪/漂移门控/第{N}章.md`——对照细纲稳定性契约逐个核对 B# beat、对照 `设定/角色不变量/` 核对动机与认知边界、对照追踪文件核对同步，写 State Delta 和下一章继承关键词，结论 `Gate: PASS/FAIL`。然后跑 `node scripts/stability-audit.js {N} {N}` 复核（确定性验证 beat 关键词/禁词/门控/不变量），FAIL 按错误码修复后重写门控再复核；PASS 后运行 `node scripts/handoff-pack.js --write {N}` 生成交接包。有 S1 未修复不得宣布本章完成。未启用时跳过本步。
+13. **稳定性门控与交接**（启用长篇稳定性验收时执行；正文超过 10 章自动启用，条件见 references/longform-stability.md）：按模板把审查结论写入 `追踪/漂移门控/第{N}章.md`——对照细纲稳定性契约逐个核对 B# beat、对照 `设定/角色不变量/` 核对动机与认知边界、对照 `设定/世界观不变量.md`（如存在）核对规则红线、对照追踪文件核对同步，写 State Delta 和下一章继承关键词，结论 `Gate: PASS/FAIL`。然后跑 `node scripts/stability-audit.js {N} {N}` 复核（确定性验证 beat 关键词/禁词/门控/不变量），FAIL 按错误码修复后重写门控再复核；PASS 后运行 `node scripts/handoff-pack.js --write {N}` 生成交接包。有 S1 未修复不得宣布本章完成。未启用时跳过本步。
 14. **中途快照**（长篇写作安全网）：每连续写完 3 章，在继续前执行以下快照操作：
    - 将当前进度写入 `追踪/上下文.md`（只更新进度元信息——当前位置、最近决策、待处理线索——不重复角色状态/伏笔的具体内容）
    - 用 `ls -la 正文/` 确认最近 3 个章节文件已成功写入磁盘且大小正常（>100 bytes）

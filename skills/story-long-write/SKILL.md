@@ -579,6 +579,8 @@ advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界�
 
 质量检查阶段，如果项目已部署 consistency-checker agent（优先检查 `.claude/agents/consistency-checker.md` 是否存在；不存在时再检查 `.opencode/agents/`，再不存在时检查 `.codex/agents/`），spawn `Agent(subagent_type: "consistency-checker", prompt: "项目目录：{dir}\n检查范围：{本次写作的章节}\n检查类型：事实冲突+伏笔断线+角色属性不一致")` 执行一致性检查，获取 S1-S4 分级报告。如 agent 不可用，由主线程参照 quality-checklist.md 直接检查。
 
+> **日更并行路径**：日更批量已在逐章执行时派过后台 consistency-checker（见 references/workflow-daily.md「并行只读审查」）的章节，此处不重复 spawn——收齐后台报告统一处理即可；修改类审查（去AI味）不受影响，仍按下节批末执行。
+
 #### Agent 调用：narrative-writer（去AI味审查）
 
 质量检查阶段，如果项目已部署 narrative-writer agent（优先检查 `.claude/agents/` 下的 `narrative-writer.md` 是否存在；不存在时再检查 `.opencode/agents/`，再不存在时检查 `.codex/agents/`），可 spawn `Agent(subagent_type: "narrative-writer", prompt: "项目目录：{dir}\n任务描述：审查+去AI味\n检查范围：{本次写作的章节}\n删除优先：每条 AI 味项先判能否删除——删后不丢伏笔/钩子/角色/情节/必要信息的直接删，会丢才润色（删除受比例上限与字数下限约束，跌破下限改降AI重写）\n必须检查：先否定再肯定的翻转句式，发现后直接改成后项或动作细节；检查作者解释总结/意义尾巴（他意识到/这意味着/真正重要的是/这次成长），优先删掉或落回场内动作、对话、物件状态；检查像/好像/仿佛/如同等比喻是否成片堆叠，确属堆叠时只留最有功能的少数比喻，其余回到具体画面；检查是否连续使用头皮发紧/眼皮一跳/心口一沉/胃里翻涌等精致戏剧反应，能写普通动作/普通感觉就写普通动作/普通感觉；已有手机/屏幕/公告/门牌/表单/账单/物证/规则行信息，保留为角色看到或处理的场内载体，不改成叙述者解释；任务卡点只在角色本来有要办的事且能卡出信息/关系/代价/选择/伏笔变化时使用，不为自然感或字数补流程")` 执行文字质量审查和去AI味检查。如 agent 不可用，由主线程直接执行。

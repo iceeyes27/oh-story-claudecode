@@ -9,18 +9,20 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 
 ## 路由表
 
-> Codex CLI 中优先使用 `$story-*` 或 `/skills` 触发；Claude Code / OpenCode 继续使用 `/story-*`；OpenClaw 可用 `/skill story-*` 或自然语言点名 skill。下表以 slash command 展示，Codex 可将 `/story-long-write` 等价替换为 `$story-long-write`，OpenClaw 可将其等价替换为 `/skill story-long-write`。
+> **合并精简说明（2026-07-12）**：原 `story-long-*` / `story-short-*` 已合并为 `story-scan` / `story-analyze` / `story-write`（用 mode 参数区分长/短篇）；`shuorenhua` 合并进 `story-deslop`（mode=general）；`Humanizer-zh` + `humanizer` 合并为双语 `humanizer`。旧命令仍可使用，自动路由到对应 skill 的 long/short mode。
+
+> Codex CLI 中优先使用 `$story-*` 或 `/skills` 触发；Claude Code / OpenCode 继续使用 `/story-*`；OpenClaw 可用 `/skill story-*` 或自然语言点名 skill。下表以 slash command 展示，Codex 可将 `/story-write` 等价替换为 `$story-write`，OpenClaw 可将其等价替换为 `/skill story-write`。
 
 | 用户意图 | 关键词示例 | 路由到 |
 |---|---|---|
-| 写长篇 | 开书、写大纲、长篇、连载 | `/story-long-write` |
-| 写短篇 | 短篇、盐言、一万字 | `/story-short-write` |
-| 长篇拆文 | 拆文、分析这本书、黄金三章 | `/story-long-analyze` |
-| 短篇拆文 | 拆短篇、分析这个故事 | `/story-short-analyze` |
-| 长篇扫榜 | 长篇排行、什么火、起点/番茄/晋江 | `/story-long-scan` |
-| 选题决策 | 写什么能爆、帮我选题、选题方向 | `/story-long-scan` |
-| 短篇扫榜 | 短篇排行、知乎盐言排行 | `/story-short-scan` |
-| 去 AI 味 | 去 AI 味、太 AI、去味 | `/story-deslop` |
+| 写长篇 | 开书、写大纲、长篇、连载 | `/story-write` (mode=long) |
+| 写短篇 | 短篇、盐言、一万字 | `/story-write` (mode=short) |
+| 长篇拆文 | 拆文、分析这本书、黄金三章 | `/story-analyze` (mode=long) |
+| 短篇拆文 | 拆短篇、分析这个故事 | `/story-analyze` (mode=short) |
+| 长篇扫榜 | 长篇排行、什么火、起点/番茄/晋江 | `/story-scan` (mode=long) |
+| 选题决策 | 写什么能爆、帮我选题、选题方向 | `/story-scan` (mode=long) |
+| 短篇扫榜 | 短篇排行、知乎盐言排行 | `/story-scan` (mode=short) |
+| 去 AI 味 | 去 AI 味、太 AI、去味、说人话 | `/story-deslop` |
 | 封面 | 封面、封面图 | `/story-cover` |
 | 环境部署 | 准备写书、搭环境、初始化 | `/story-setup` |
 | 浏览器操控 | 浏览器、抓取、登录态 | `/browser-cdp` |
@@ -32,7 +34,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 
 ### 导入续写顺序
 
-用户问"导入续写先 setup 还是 import"时，直接回答：**推荐先 `/story-setup`，新开/刷新会话后 `/story-import`，最后 `/story-long-write 日更` 或 `/story-long-write 写第N章`**。如果用户已经直接触发 `/story-import`，按 story-import 自带环境检测继续：未 setup 时让用户选择先去 setup 或继续串行导入。
+用户问"导入续写先 setup 还是 import"时，直接回答：**推荐先 `/story-setup`，新开/刷新会话后 `/story-import`，最后 `/story-write 日更` 或 `/story-write 写第N章`**。如果用户已经直接触发 `/story-import`，按 story-import 自带环境检测继续：未 setup 时让用户选择先去 setup 或继续串行导入。
 
 ## 路由流程
 

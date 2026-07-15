@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## Unreleased
 
+### 重大变更（2026-07-14）
+
+- **统一命名重构（16→11 skill）**：`story-long-*` / `story-short-*` 六个 skill 合并为 `story-write` / `story-analyze` / `story-scan` 三个统一入口（mode=long/short 按意图自动路由）；`Humanizer-zh` + `humanizer` 合并为双语 `humanizer` 并入仓库。旧 slash 命令（`/story-long-write` 等）作为别名仍可触发。切换前的拆分命名版本保留在 tag `pre-unified-split-naming`。
+- **写作侧定制合入**：story-review 新增「案件型/多章连续性专项检查」；banned-words 新增 通感隐喻正则 / 对仗反义俏皮话 / 抽象裁判金句 三节；check-ai-patterns.js 新增运行时精确禁词加载器（findBannedWordsExact / findSynestheticMetaphor / findAntithesis，支持 `.deslop-whitelist` 豁免）与 ABSTRACT_AUTHORITY 检测——一级禁用词现按 blocking 报告（test-ai-patterns 两处 fixture 期望随之更新）。
+- **基础设施随重构更新**：check-shared-files.sh 豁免表、check-codex-adapter（11 skills）、marketplace.json 插件列表、story-setup 全部部署模板（CLAUDE.md.tmpl / 四端 AGENTS.md.tmpl 路由表、opencode commands 13→10、agents 模板）、sync-opencode.py 与 generate-codex-agents.py 产物已重新生成。
+- 上游同步：#235（Codex hook 空 .active-book 修复）已合入。
+
+
 > 借鉴社区同类项目机制：情绪债务追踪（Novel-Control-Station-Skill）+ 跨会话偏好记忆 / 三层开书问答 / 断点续写检测（chinese-novelist-skill）+ 长篇稳定性验收（novel-assistant-skill，本仓库下游 fork 的稳定性层适配回灌）
 
 ### 新增

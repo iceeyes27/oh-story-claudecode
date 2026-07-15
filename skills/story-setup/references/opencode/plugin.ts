@@ -210,7 +210,7 @@ function proseBlockReason(root: string, abs: string): string | null {
     // 仅在确为短篇工程时拦截（有 设定.md 信号），避免误伤 docs/正文.md 等非作品文件
     if (!fs.existsSync(path.join(bookDir, "设定.md"))) return null
     if (!fs.existsSync(path.join(bookDir, "小节大纲.md"))) {
-      return `⛔ 写正文被拦截：${path.relative(root, abs) || abs} 缺少同目录 小节大纲.md。先按 story-short-write 完成「小节大纲.md」再写正文。`
+      return `⛔ 写正文被拦截：${path.relative(root, abs) || abs} 缺少同目录 小节大纲.md。先按 story-write 完成「小节大纲.md」再写正文。`
     }
     return null
   }
@@ -238,7 +238,7 @@ function proseBlockReason(root: string, abs: string): string | null {
     }
   } catch {}
   if (!found) {
-    return `⛔ 写正文被拦截：第 ${num} 章缺少细纲（${path.relative(root, outlineDir)}/细纲_第${num}章.md）。先按 story-long-write 单章流程补建细纲再写正文。`
+    return `⛔ 写正文被拦截：第 ${num} 章缺少细纲（${path.relative(root, outlineDir)}/细纲_第${num}章.md）。先按 story-write 单章流程补建细纲再写正文。`
   }
   return null
 }

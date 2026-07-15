@@ -9,7 +9,7 @@ if [ -z "$REPO_ROOT" ]; then
   exit 1
 fi
 
-SQ="$REPO_ROOT/skills/story-long-write/scripts/state-query.js"
+SQ="$REPO_ROOT/skills/story-write/scripts/state-query.js"
 TMP_DIR="$(mktemp -d)"
 cleanup() { rm -rf "$TMP_DIR"; }
 trap cleanup EXIT

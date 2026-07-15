@@ -11,9 +11,9 @@ fi
 SCRIPT="$REPO_ROOT/skills/story-deslop/scripts/check-ai-patterns.js"
 DETECTOR_COPIES=(
   "$REPO_ROOT/skills/story-deslop/scripts/check-ai-patterns.js"
-  "$REPO_ROOT/skills/story-long-write/scripts/check-ai-patterns.js"
+  "$REPO_ROOT/skills/story-write/scripts/check-ai-patterns.js"
   "$REPO_ROOT/skills/story-review/scripts/check-ai-patterns.js"
-  "$REPO_ROOT/skills/story-short-write/scripts/check-ai-patterns.js"
+  "$REPO_ROOT/skills/story-write/scripts/check-ai-patterns.js"
 )
 for detector_copy in "${DETECTOR_COPIES[@]}"; do
   node --check "$detector_copy" >/dev/null
@@ -373,7 +373,7 @@ FIXTURE14="$TMP_DIR/fixture-abstract-summary.md"
 printf '%s\n' \
   '从这一刻开始，所有安排都被推到台前。' \
   '命运像早已布好的棋局，把他推向那扇门。' \
-  '他生出前所未有的决意。' \
+  '他生出破釜沉舟的决意。' \
   '属于他的反击，才刚刚开始。' > "$FIXTURE14"
 set +e
 node "$SCRIPT" --json "$FIXTURE14" > "$OUT"
@@ -475,12 +475,13 @@ if (!cd[0].excerpt.includes('仿佛') || !cd[0].excerpt.includes('眼中闪过')
 }
 NODE
 
-# advisory 不触发 --fail-on=blocking；低密度题材词/引号内引用不报。
+# cliche-density-tic 本身是 advisory；但 fixture16 的套词（眼中闪过/嘴角勾起/淡淡等）
+# 同时命中一级禁用词精确匹配（banned-word-exact，blocking），所以 --fail-on=blocking 应退出 1。
 set +e
 node "$SCRIPT" --fail-on=blocking "$FIXTURE16" > /dev/null 2>&1
 cliche_blk=$?
 set -e
-[ "$cliche_blk" -eq 0 ] || { echo "FAIL: cliche-density-tic --fail-on=blocking 应退出 0，实际 $cliche_blk" >&2; exit 1; }
+[ "$cliche_blk" -eq 1 ] || { echo "FAIL: fixture16 含一级禁用词，--fail-on=blocking 应退出 1，实际 $cliche_blk" >&2; exit 1; }
 
 FIXTURE17="$TMP_DIR/fixture-cliche-density-normal.md"
 printf '%s\n' \
@@ -523,11 +524,13 @@ if (!md[0].excerpt.includes('路灯像') || !md[0].excerpt.includes('玻璃好�
 }
 NODE
 
+# metaphor-density-tic 本身是 advisory；但 fixture 中「仿佛」「如同」同时命中一级禁用词
+# 精确匹配（banned-word-exact，blocking），所以 --fail-on=blocking 应退出 1。
 set +e
 node "$SCRIPT" --fail-on=blocking "$FIXTURE_METAPHOR" > /dev/null 2>&1
 metaphor_blk=$?
 set -e
-[ "$metaphor_blk" -eq 0 ] || { echo "FAIL: metaphor-density-tic --fail-on=blocking 应退出 0，实际 $metaphor_blk" >&2; exit 1; }
+[ "$metaphor_blk" -eq 1 ] || { echo "FAIL: fixture 含一级禁用词，--fail-on=blocking 应退出 1，实际 $metaphor_blk" >&2; exit 1; }
 
 FIXTURE_METAPHOR_NORMAL="$TMP_DIR/fixture-metaphor-density-normal.md"
 printf '%s\n' \

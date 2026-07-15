@@ -16,6 +16,7 @@ Detect high-risk AI-flavor prose patterns that need human rewrite:
   - 抽象总结复读 (命运/棋局/这一刻终于明白/才刚刚开始，AI 结尾腔)
   - 套词密度过高 (仿佛/一丝/深吸一口气/平静无波等禁用词聚集)
   - 比喻密度过高 (像/好像/仿佛/如同等比喻标记成片复现)
+  - 抽象裁判金句 (水里/海里/河里“认的是X，不是嘴/威风”、认活路、长骨头等逻辑不落地硬话)
   - 解释链密度过高 (知道/明白/这意味着/必须/需要等判断链聚集)
   - 系统公告公文腔过密 (方括号系统/规则行里硬规则词聚集)
   - 过度精炼短段 (长文本里短叙述段过密且自然连接偏少)
@@ -94,6 +95,16 @@ const METAPHOR_MARKER_PATTERN = /好像|像是|仿佛|宛如|如同|犹如|(?<![
 const METAPHOR_LIKE_PHRASE_PATTERN = /(?:死|水|冰|火|潮水|石头|木头|机器|纸|铁|鬼|死人|刀|针|网|墙)一样/g;
 const METAPHOR_DENSITY_MIN_HITS = 7;
 const METAPHOR_DENSITY_PER_KILO = 3;
+
+// 抽象裁判金句：台词里常见“海里/水里认的是X，不是你嘴上那点Y”这类硬话。
+// 问题不是角色不能说狠话，而是把“水/真/命”写成抽象裁判，逻辑落不到能力、证据或规矩上。
+// 本规则查全行（含台词），因为这类问题常出现在引号内。
+const ABSTRACT_AUTHORITY_PATTERNS = [
+  /(?:海里|水里|江里|河里|海上|水上)[^。！？!?\n]{0,24}认的是[^。！？!?\n]{1,18}，?不是(?:你|他|她|他们|咱们|我们)?[^。！？!?\n]{0,18}(?:嘴|口气|威风|漂亮话|狠话)/g,
+  /认的是[^。！？!?\n]{0,12}水里那口真/g,
+  /认活路/g,
+  /长骨头/g,
+];
 
 // 解释链密度：常见“他知道/他明白/这意味着/必须需要”
 // 连续替读者推理，读感像报告。单个判断词可服务推理；高密度聚集才提示回到角色当下证据。
@@ -313,6 +324,7 @@ function scanProsePatterns(proseLines) {
   findings.push(...findPeriodStutter(proseLines));
   findings.push(...findMicroActionTic(proseLines));
   findings.push(...findActionListTic(proseLines));
+  findings.push(...findAbstractAuthoritySlogan(proseLines));
   findings.push(...findAbstractSummaryTic(proseLines));
   findings.push(...findClicheDensityTic(proseLines));
   findings.push(...findMetaphorDensityTic(proseLines));
@@ -320,6 +332,37 @@ function scanProsePatterns(proseLines) {
   findings.push(...findNoticeFormalityTic(proseLines));
   findings.push(...findOvercompressedProseTic(proseLines));
   findings.push(...findLowConnectiveDensityTic(proseLines));
+  findings.push(...findBannedWordsExact(proseLines));
+  findings.push(...findSynestheticMetaphor(proseLines));
+  findings.push(...findAntithesis(proseLines));
+  return findings;
+}
+
+// 抽象裁判金句：逐句报告，blocking。修法是把抽象裁判落成具体能力/证据/规矩。
+function findAbstractAuthoritySlogan(proseLines) {
+  const findings = [];
+
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+
+    for (const pattern of ABSTRACT_AUTHORITY_PATTERNS) {
+      pattern.lastIndex = 0;
+      let match;
+      while ((match = pattern.exec(text)) !== null) {
+        const hit = match[0];
+        findings.push({
+          line: lineNo,
+          column: match.index + 1,
+          type: 'abstract-authority-slogan',
+          severity: 'blocking',
+          message: '抽象裁判金句：把“水/真/命/骨头/活路”写成裁判但逻辑不落地；改成具体能力、来路证据、行内规矩或组织结果，如“海里讲的是水性，不是嘴上那点威风”。',
+          excerpt: compact(hit),
+        });
+      }
+    }
+  }
+
   return findings;
 }
 
@@ -1008,6 +1051,237 @@ function isInlineSpace(char) {
 
 function trimTrailingNoise(text) {
   return text.replace(/[\s|）)】\]]+$/u, '');
+}
+
+
+// 精确禁词：运行时读取 references/banned-words.md 的「一级禁用词」整段，对所有短语做
+// 精确子串匹配；每命中一次报一条 blocking finding，对应「出现即替换」。与 CLICHE_PATTERNS
+// 密度表互补：密度表管 paraphrase/成片堆砌，本表管被点名的精确禁词。项目根 .deslop-whitelist
+// （一行一词，# 注释）中的子串命中时跳过，避免误伤世界观术语/绰号。
+
+var _bannedExactCache = null;
+function loadBannedExactPhrases() {
+  if (_bannedExactCache) return _bannedExactCache;
+  const result = { phrases: [], error: null };
+  try {
+    const mdPath = path.join(__dirname, '..', 'references', 'banned-words.md');
+    const md = fs.readFileSync(mdPath, 'utf8');
+    const lines = md.split(/\r?\n/);
+    let inPrimary = false;
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (/^##\s/.test(line)) {
+        inPrimary = /^##\s*一级禁用词/.test(line);
+        continue;
+      }
+      if (!inPrimary) continue;
+      if (line === '' || line.startsWith('#') || line.startsWith('<!--')) continue;
+      for (const piece of line.split('、')) {
+        const phrase = piece.trim();
+        if (phrase) result.phrases.push(phrase);
+      }
+    }
+  } catch (error) {
+    result.error = error.message;
+  }
+  _bannedExactCache = result;
+  return result;
+}
+
+
+
+var _synaCache = null;
+function loadSynaPatterns() {
+  if (_synaCache) return _synaCache;
+  const result = { patterns: [], error: null };
+  try {
+    const mdPath = path.join(__dirname, '..', 'references', 'banned-words.md');
+    const md = fs.readFileSync(mdPath, 'utf8');
+    const lines = md.split(/\r?\n/);
+    let inSec = false;
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (/^##\s/.test(line)) {
+        inSec = /^##\s*通感隐喻/.test(line);
+        continue;
+      }
+      if (!inSec) continue;
+      const m = line.match(/^\/(.+)\/$/);
+      if (m) {
+        try { result.patterns.push(new RegExp(m[1], 'g')); } catch (e) { /* skip invalid regex */ }
+      }
+    }
+  } catch (error) {
+    result.error = error.message;
+  }
+  _synaCache = result;
+  return result;
+}
+
+
+
+var _antithesisCache = null;
+function loadAntithesisPatterns() {
+  if (_antithesisCache) return _antithesisCache;
+  const result = { patterns: [], error: null };
+  try {
+    const mdPath = path.join(__dirname, '..', 'references', 'banned-words.md');
+    const md = fs.readFileSync(mdPath, 'utf8');
+    const lines = md.split(/\r?\n/);
+    let inSec = false;
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (/^##\s/.test(line)) {
+        inSec = /^##\s*对仗反义俏皮话/.test(line);
+        continue;
+      }
+      if (!inSec) continue;
+      const m = line.match(/^\/(.+)\/$/);
+      if (m) {
+        try { result.patterns.push(new RegExp(m[1], 'g')); } catch (e) { /* skip invalid regex */ }
+      }
+    }
+  } catch (error) {
+    result.error = error.message;
+  }
+  _antithesisCache = result;
+  return result;
+}
+
+var _whitelistCache = null;
+function loadWhitelist() {
+  if (_whitelistCache) return _whitelistCache;
+  const set = new Set();
+  try {
+    const wlPath = path.resolve(process.cwd(), '.deslop-whitelist');
+    if (fs.existsSync(wlPath)) {
+      const text = fs.readFileSync(wlPath, 'utf8');
+      for (const raw of text.split(/\r?\n/)) {
+        const line = raw.trim();
+        if (line === '' || line.startsWith('#')) continue;
+        set.add(line);
+      }
+    }
+  } catch (error) {
+    // whitelist 读取失败：当作空，不阻断扫描
+  }
+  _whitelistCache = set;
+  return set;
+}
+
+// 白名单子串重叠豁免：若命中点与某个白名单词条在字符上重叠（如禁词「几分」落在「分钟」内），跳过该命中，避免误伤正常复合词。
+function isWhitelistedOverlap(narrative, idx, phraseLen, whitelist) {
+  if (whitelist.size === 0) return false;
+  const start = idx, end = idx + phraseLen;
+  for (const w of whitelist) {
+    const wi = narrative.indexOf(w);
+    if (wi === -1) continue;
+    const we = wi + w.length;
+    if (wi < end && we > start) return true;
+  }
+  return false;
+}
+
+function findBannedWordsExact(proseLines) {
+  const { phrases, error } = loadBannedExactPhrases();
+  if (error || phrases.length === 0) return [];
+  const whitelist = loadWhitelist();
+  const findings = [];
+
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    // 只查引号外叙述；台词/系统播报里出现不算（与碎句号一致豁免）。
+    const narrative = stripQuoted(trimmed);
+    for (const phrase of phrases) {
+      if (whitelist.has(phrase)) continue;
+      let from = 0;
+      let idx;
+      while ((idx = narrative.indexOf(phrase, from)) !== -1) {
+        if (isWhitelistedOverlap(narrative, idx, phrase.length, whitelist)) { from = idx + phrase.length; continue; }
+        findings.push({
+          line: lineNo,
+          column: idx + 1,
+          type: 'banned-word-exact',
+          severity: 'blocking',
+          message: `精确禁词「${phrase}」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。`,
+          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + phrase.length + 8)),
+        });
+        from = idx + phrase.length;
+      }
+    }
+  }
+  return findings;
+}
+
+
+
+// 通感隐喻：运行时读取 references/banned-words.md 的「通感隐喻」整段，把其中 /.../ 正则
+// 编译为 blocking 规则；每命中一次报一条 banned-word-syna finding，对应「出现即改」。
+// 与 一级禁用词精确匹配互补：本类问题多为句式而非固定词，用正则覆盖变体。
+// 项目根 .deslop-whitelist 中的子串仍豁免（沿用 isWhitelistedOverlap）。
+function findSynestheticMetaphor(proseLines) {
+  const { patterns, error } = loadSynaPatterns();
+  if (error || patterns.length === 0) return [];
+  const whitelist = loadWhitelist();
+  const findings = [];
+
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const narrative = stripQuoted(trimmed);
+    for (const re of patterns) {
+      re.lastIndex = 0;
+      let match;
+      while ((match = re.exec(narrative)) !== null) {
+        const hit = match[0];
+        const idx = narrative.indexOf(hit);
+        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
+        findings.push({
+          line: lineNo,
+          column: idx + 1,
+          type: 'banned-word-syna',
+          severity: 'blocking',
+          message: '通感隐喻[' + hit + ']：banned-words.md 通感隐喻规则，感官词抽象化情绪/局势，出现即改；用角色当下可见的动作、物件、对话或具体后果展示，不要同义词轮换。',
+          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+
+
+function findAntithesis(proseLines) {
+  const { patterns, error } = loadAntithesisPatterns();
+  if (error || patterns.length === 0) return [];
+  const whitelist = loadWhitelist();
+  const findings = [];
+
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const narrative = stripQuoted(trimmed);
+    for (const re of patterns) {
+      re.lastIndex = 0;
+      let match;
+      while ((match = re.exec(narrative)) !== null) {
+        const hit = match[0];
+        const idx = narrative.indexOf(hit);
+        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
+        findings.push({
+          line: lineNo,
+          column: idx + 1,
+          type: 'banned-word-antithesis',
+          severity: 'blocking',
+          message: '对仗反义俏皮话[' + hit + ']：banned-words.md 对仗反义俏皮话规则，工整对称反义金句（如"X轻，Y不轻"）是 AI 写作套路，出现即改；改成角色自然口语或具体动作/物件/对话，不要同义词轮换。',
+          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
+        });
+      }
+    }
+  }
+  return findings;
 }
 
 function compact(text) {

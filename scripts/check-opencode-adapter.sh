@@ -107,7 +107,7 @@ assert_grep 'proseAfterWriteNote' "$ROOT/plugin.ts" "OpenCode plugin must surfac
 assert_grep '正文' "$ROOT/plugin.ts" "OpenCode plugin must inspect prose targets"
 assert_grep '@opencode-ai/plugin' "$ROOT/plugin.ts" "OpenCode plugin must import OpenCode plugin types"
 assert_grep 'AGENTS\.md|OpenCode' "$ROOT/AGENTS.md.tmpl" "OpenCode AGENTS template must be present"
-assert_grep 'story-long-write|story-short-write|story-review' "$ROOT/AGENTS.md.tmpl" "OpenCode AGENTS template must mention story skill routing"
+assert_grep 'story-write|story-write|story-review' "$ROOT/AGENTS.md.tmpl" "OpenCode AGENTS template must mention story skill routing"
 
 echo "  OK plugin and instruction anchors"
 echo ""

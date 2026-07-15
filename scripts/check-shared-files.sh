@@ -19,9 +19,9 @@ fi
 # Known intentional differences (basename): these files are expected to differ
 # - output-templates.md: each skill owns output schemas
 # - material-decomposition.md: long/short analyze use different decomposition pipelines
-# - quality-checklist.md: story-short-analyze's copy points to material-decomposition.md
-#   (absent in story-short-write); the two copies are intentionally skill-specific
-# - 5 genre files: story-short-analyze prepends a "## 用作拆文标尺时" analyst-lens
+# - quality-checklist.md: per-skill copies are intentionally skill-specific (analyze's
+#   copy points to material-decomposition.md; write's covers long+short sections)
+# - 5 genre files: story-analyze prepends a "## 用作拆文标尺时" analyst-lens
 #   header (consumed as a reference standard for source-story evaluation, not a writer
 #   playbook). Writer skills don't get the header. Wholesale-ignored here because their
 #   non-analyst copies have not all been confirmed byte-identical.
@@ -32,15 +32,15 @@ genre-catalog.md genre-core-mechanics.md genre-readers.md \
 genre-writing-formulas.md genre-writing-techniques.md \
 AGENTS.md.tmpl"
 
-# Analyst-divergent (basename): the story-short-analyze copy intentionally prepends the
+# Analyst-divergent (basename): the story-analyze copy intentionally prepends the
 # "## 用作拆文标尺时" analyst-lens header, so it is dropped from the comparison set; all
 # OTHER copies (writer skills + agent-references) must still stay byte-identical. Stricter
 # than a wholesale ignore — it still guards writer↔writer drift.
 ANALYST_DIVERGENT_NAMES="character-basics.md character-design-methods.md character-relations.md"
 
-# Genre-style-divergent (basename): the story-short-write copy under references/genre-styles/
+# Genre-style-divergent (basename): the story-write copy under references/genre-styles/
 # is a short-form writer style pack, a different artifact from the long-form
-# references/genre-prose-cards/ card of the same basename (story-long-write + its story-setup
+# references/genre-prose-cards/ card of the same basename (story-write + its story-setup
 # deployment mirror). Drop the genre-styles copy from the comparison; the prose-card copies
 # must still stay byte-identical. Stricter than a wholesale ignore.
 GENRE_STYLE_DIVERGENT_NAMES="双男主.md"
@@ -73,14 +73,14 @@ for base in $dup_names; do
     paths+=("$fpath")
   done < <(find "$SKILLS_DIR" -type f -path '*/references/*' -name "$base" 2>/dev/null)
 
-  # Analyst-divergent basenames: drop the story-short-analyze copy (intentional
+  # Analyst-divergent basenames: drop the story-analyze copy (intentional
   # analyst-lens fork); the remaining copies must still be byte-identical.
   case " $ANALYST_DIVERGENT_NAMES " in
     *" $base "*)
       filtered=()
       for p in ${paths[@]+"${paths[@]}"}; do
         case "$p" in
-          */story-short-analyze/*) ;;
+          */story-analyze/*) ;;
           *) filtered+=("$p") ;;
         esac
       done

@@ -106,9 +106,13 @@ def safe_rel(root: Path, path: Path) -> str:
 def read_active_book(root: Path) -> Path | None:
     active_file = root / ".active-book"
     if active_file.exists():
-        first = active_file.read_text(encoding="utf-8", errors="ignore").splitlines()
-        if first:
-            candidate = (root / first[0].strip()).resolve()
+        lines = active_file.read_text(encoding="utf-8", errors="ignore").splitlines()
+        # A blank/whitespace first line must fall through to discovery, not resolve to
+        # root/"" == root (mirrors the bash oracle common.sh discover_active_book, which
+        # trims then requires non-empty, and the JS hook's firstLine()+truthy guard).
+        declared = lines[0].strip() if lines else ""
+        if declared:
+            candidate = (root / declared).resolve()
             try:
                 candidate.relative_to(root.resolve())
             except Exception:
@@ -417,7 +421,7 @@ def prose_block_reason(root: Path, abs_path: Path) -> str | None:
         if not (book_dir / "设定.md").exists():
             return None
         if not (book_dir / "小节大纲.md").exists():
-            return f"⛔ 写正文被拦截：{safe_rel(root, abs_path)} 缺少同目录 小节大纲.md。先按 story-short-write 完成小节大纲再写正文。"
+            return f"⛔ 写正文被拦截：{safe_rel(root, abs_path)} 缺少同目录 小节大纲.md。先按 story-write 完成小节大纲再写正文。"
         return None
     if parent != "正文":
         return None
@@ -441,7 +445,7 @@ def prose_block_reason(root: Path, abs_path: Path) -> str | None:
                 found = True
                 break
     if not found:
-        return f"⛔ 写正文被拦截：第 {num} 章缺少细纲（{safe_rel(root, outline_dir)}/细纲_第{num}章.md）。先按 story-long-write 单章流程补建细纲再写正文。"
+        return f"⛔ 写正文被拦截：第 {num} 章缺少细纲（{safe_rel(root, outline_dir)}/细纲_第{num}章.md）。先按 story-write 单章流程补建细纲再写正文。"
     return None
 
 

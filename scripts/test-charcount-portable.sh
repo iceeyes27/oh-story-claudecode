@@ -11,8 +11,8 @@
 #   bash scripts/test-charcount-portable.sh           # 用真实解释器
 #   bash scripts/test-charcount-portable.sh --stub     # 模拟 Store 占位程序(exit 49)
 #
-# 注意：下面 PROBE/COUNT 两行必须与技能文档里的命令逐字一致（story-short-write、
-# story-long-write、narrative-writer、style-profile-generator）。check-python-invocation.sh
+# 注意：下面 PROBE/COUNT 两行必须与技能文档里的命令逐字一致（story-write、
+# story-write、narrative-writer、style-profile-generator）。check-python-invocation.sh
 # 守卫文档不回退成裸 python3；本脚本守卫这条命令真的能跑出正确结果。
 set -euo pipefail
 

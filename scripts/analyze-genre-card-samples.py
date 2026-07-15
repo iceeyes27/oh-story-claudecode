@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Analyze local longform genre-card samples across early/mid/late phases.
 
-The script reads the genre card names from story-long-write, samples matching
+The script reads the genre card names from story-write, samples matching
 books from the local Mongo novel database, and emits concise evidence summaries
 for each card. It is intentionally source-neutral in the generated wording so
 cards can use the results as general longform evidence without exposing whether
@@ -22,7 +22,7 @@ from typing import Any, Iterable
 from pymongo import MongoClient
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-CARD_DIR = REPO_ROOT / "skills/story-long-write/references/genre-prose-cards"
+CARD_DIR = REPO_ROOT / "skills/story-write/references/genre-prose-cards"
 DEFAULT_MONGO_URI = "mongodb://192.168.31.139:27017/novel"
 
 TAG_RE = re.compile(r"<[^>]+>")

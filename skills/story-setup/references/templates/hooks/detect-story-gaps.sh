@@ -90,7 +90,7 @@ done
 GLOBAL_PROGRESS_OUTPUT=""
 if [ -d "$ROOT/拆文库" ]; then
   while IFS= read -r -d '' progress_file; do
-    GLOBAL_PROGRESS_OUTPUT+="[WARN] 拆文未完成：${progress_file#$ROOT/}，运行 /story-long-analyze 继续。\n"
+    GLOBAL_PROGRESS_OUTPUT+="[WARN] 拆文未完成：${progress_file#$ROOT/}，运行 /story-analyze 继续。\n"
   done < <(find "$ROOT/拆文库" -name "_progress.md" -print0 2>/dev/null || true)
 fi
 if [ -n "$GLOBAL_PROGRESS_OUTPUT" ]; then

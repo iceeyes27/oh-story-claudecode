@@ -10,9 +10,9 @@ if [ -z "$REPO_ROOT" ]; then
   exit 1
 fi
 
-AUDIT="$REPO_ROOT/skills/story-long-write/scripts/stability-audit.js"
-PACK="$REPO_ROOT/skills/story-long-write/scripts/handoff-pack.js"
-ARCHIVE="$REPO_ROOT/skills/story-long-write/scripts/archive-stability.js"
+AUDIT="$REPO_ROOT/skills/story-write/scripts/stability-audit.js"
+PACK="$REPO_ROOT/skills/story-write/scripts/handoff-pack.js"
+ARCHIVE="$REPO_ROOT/skills/story-write/scripts/archive-stability.js"
 TMP_DIR="$(mktemp -d)"
 cleanup() { rm -rf "$TMP_DIR"; }
 trap cleanup EXIT

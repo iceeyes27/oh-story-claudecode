@@ -93,12 +93,12 @@ case "$BASE" in
     BOOK_DIR="$(dirname "$ABS")"
     # story-import 迁移：已有 拆文库/{书名}/ 分析源时，正文先于小节大纲迁移是正常流程（小节大纲由拆文反推），放行
     [ -d "$ROOT/拆文库/$(basename "$BOOK_DIR")" ] && exit 0
-    # 仅在确为短篇工程时拦截（有 设定.md 信号——story-short-write/import 都先产 设定.md），
+    # 仅在确为短篇工程时拦截（有 设定.md 信号——story-write/import 都先产 设定.md），
     # 避免误伤 docs/正文.md 等非作品文件
     [ -f "$BOOK_DIR/设定.md" ] || exit 0
     if [ ! -f "$BOOK_DIR/小节大纲.md" ]; then
       printf '%s\n' "⛔ 写正文被拦截：${TARGET} 缺少同目录 小节大纲.md。" >&2
-      printf '%s\n' "   先按 story-short-write 完成「小节大纲.md」，再写正文（不允许跳过大纲直接写正文）。" >&2
+      printf '%s\n' "   先按 story-write 完成「小节大纲.md」，再写正文（不允许跳过大纲直接写正文）。" >&2
       printf '%s\n' "   如确需先起草，请先补建 小节大纲.md。" >&2
       exit 2
     fi
@@ -130,7 +130,7 @@ case "$BASE" in
     fi
     if [ -z "$FOUND" ]; then
       printf '%s\n' "⛔ 写正文被拦截：第 ${NUM} 章缺少细纲（${OUTLINE_DIR#$ROOT/}/细纲_第${NUM}章.md）。" >&2
-      printf '%s\n' "   按 story-long-write 单章流程先补建细纲，再写正文（不允许跳过细纲直接写作）。" >&2
+      printf '%s\n' "   按 story-write 单章流程先补建细纲，再写正文（不允许跳过细纲直接写作）。" >&2
       printf '%s\n' "   如确需先起草，请先补建对应细纲文件。" >&2
       exit 2
     fi

@@ -2,7 +2,7 @@
 description: |
   事实一致性与伏笔状态检查专家（只读）。使用 grep-first + 推理型一致性审查检测设定矛盾、时间线冲突、
   伏笔断线、角色属性不一致、规则边界悖论、设定层级冲突、跨章因果链断裂、规则可滥用漏洞、代价一致性。输出 S1-S4 分级冲突报告。
-  被 story-review、story-long-write（Phase 5）、story-short-write（Phase 4）调用。
+  被 story-review、story-write 调用（长篇 Phase 5 / 短篇 Phase 4）。
   不做任何创作判断。
 mode: subagent
 permission:

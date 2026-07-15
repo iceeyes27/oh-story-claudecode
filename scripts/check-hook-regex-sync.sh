@@ -11,7 +11,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 HOOK_FILE="$REPO_ROOT/skills/story-setup/references/templates/hooks/detect-story-gaps.sh"
 COMMON_FILE="$REPO_ROOT/skills/story-setup/references/templates/hooks/lib/common.sh"
-PROTOCOL_FILE="$REPO_ROOT/skills/story-long-write/references/artifact-protocols.md"
+PROTOCOL_FILE="$REPO_ROOT/skills/story-write/references/artifact-protocols.md"
 
 for file in "$HOOK_FILE" "$COMMON_FILE" "$PROTOCOL_FILE"; do
   if [ ! -f "$file" ]; then

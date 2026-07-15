@@ -2,6 +2,8 @@
 
 # oh-story-claudecode
 
+> **2026-07 起本仓库为统一命名版**（story-write / story-analyze / story-scan，mode 区分长短篇）。拆分命名的历史版本见 tag [`pre-unified-split-naming`](../../tree/pre-unified-split-naming)。
+
 网文写作 skill 包，覆盖长篇与短篇网络小说的扫榜、拆文、写作、去AI味、封面图全流程。内置适配 Claude Code、OpenCode、OpenClaw、Codex CLI、workbuddy；能读取项目文件的 Web AI / Agent 环境也可按通用 skills 路径使用。
 
 ## 核心思路

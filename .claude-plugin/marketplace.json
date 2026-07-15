@@ -15,68 +15,83 @@
       "strict": false,
       "version": "1.0.0",
       "category": "novel-writing",
-      "keywords": ["novel", "web-novel", "router", "chinese", "writing", "网文"],
-      "skills": ["./skills/story"]
+      "keywords": [
+        "novel",
+        "web-novel",
+        "router",
+        "chinese",
+        "writing",
+        "网文"
+      ],
+      "skills": [
+        "./skills/story"
+      ]
     },
     {
-      "name": "story-long-scan",
-      "description": "长篇网文扫榜。分析起点、番茄、晋江等平台排行榜数据，提炼市场趋势与热门题材。",
+      "name": "story-scan",
+      "description": "网文扫榜统一入口。分析起点、番茄、晋江、知乎盐言、七猫、黑岩等平台排行榜数据，提炼市场趋势与热门题材（mode=long/short 自动路由）。",
       "source": "./",
       "strict": false,
       "version": "1.0.0",
       "category": "novel-market",
-      "keywords": ["long-novel", "ranking", "market", "trend", "起点", "番茄", "晋江", "chinese"],
-      "skills": ["./skills/story-long-scan"]
+      "keywords": [
+        "novel",
+        "ranking",
+        "market",
+        "trend",
+        "起点",
+        "番茄",
+        "晋江",
+        "chinese",
+        "知乎盐言",
+        "番茄短篇"
+      ],
+      "skills": [
+        "./skills/story-scan"
+      ]
     },
     {
-      "name": "story-long-analyze",
-      "description": "长篇网文拆文。深度拆解爆款长篇小说的黄金三章、人设架构、爽点设计、节奏控制。",
+      "name": "story-analyze",
+      "description": "网文拆文统一入口。深度拆解爆款小说的黄金三章、人设架构、爽点设计、节奏控制、共鸣与爆点（按字数自动路由长/短管道）。",
       "source": "./",
       "strict": false,
       "version": "1.0.0",
       "category": "novel-analysis",
-      "keywords": ["long-novel", "analysis", "breakdown", "golden-three-chapters", "爽文", "chinese"],
-      "skills": ["./skills/story-long-analyze"]
+      "keywords": [
+        "novel",
+        "analysis",
+        "breakdown",
+        "golden-three-chapters",
+        "爽文",
+        "chinese",
+        "structure",
+        "twist",
+        "hook"
+      ],
+      "skills": [
+        "./skills/story-analyze"
+      ]
     },
     {
-      "name": "story-long-write",
-      "description": "长篇网文写作。从大纲到正文，辅助长篇网络小说的创作，包括世界观、人物、情节线管理。",
+      "name": "story-write",
+      "description": "网文写作统一入口。mode=long 长篇逐章推进（世界观/人物/情节线管理），mode=short 短篇情绪驱动创作。",
       "source": "./",
       "strict": false,
       "version": "1.0.0",
       "category": "novel-writing",
-      "keywords": ["long-novel", "writing", "outline", "chapter", "worldbuilding", "chinese"],
-      "skills": ["./skills/story-long-write"]
-    },
-    {
-      "name": "story-short-scan",
-      "description": "短篇网文扫榜。分析知乎盐言故事、番茄短篇等平台热门短篇数据，捕捉风口题材。",
-      "source": "./",
-      "strict": false,
-      "version": "1.0.0",
-      "category": "novel-market",
-      "keywords": ["short-novel", "ranking", "market", "知乎盐言", "番茄短篇", "chinese"],
-      "skills": ["./skills/story-short-scan"]
-    },
-    {
-      "name": "story-short-analyze",
-      "description": "短篇网文拆文。拆解爆款短篇小说的叙事结构、情绪曲线、反转技巧、钩子设计。",
-      "source": "./",
-      "strict": false,
-      "version": "1.0.0",
-      "category": "novel-analysis",
-      "keywords": ["short-novel", "analysis", "structure", "twist", "hook", "chinese"],
-      "skills": ["./skills/story-short-analyze"]
-    },
-    {
-      "name": "story-short-write",
-      "description": "短篇网文写作。辅助短篇小说创作，从构思到成稿，聚焦情绪拉扯与节奏把控。",
-      "source": "./",
-      "strict": false,
-      "version": "1.0.0",
-      "category": "novel-writing",
-      "keywords": ["short-novel", "writing", "emotion", "pacing", "chinese"],
-      "skills": ["./skills/story-short-write"]
+      "keywords": [
+        "novel",
+        "writing",
+        "outline",
+        "chapter",
+        "worldbuilding",
+        "chinese",
+        "emotion",
+        "pacing"
+      ],
+      "skills": [
+        "./skills/story-write"
+      ]
     },
     {
       "name": "story-deslop",
@@ -85,8 +100,18 @@
       "strict": false,
       "version": "1.0.0",
       "category": "novel-polish",
-      "keywords": ["de-ai", "humanize", "deslop", "去AI味", "润色", "去味", "chinese"],
-      "skills": ["./skills/story-deslop"]
+      "keywords": [
+        "de-ai",
+        "humanize",
+        "deslop",
+        "去AI味",
+        "润色",
+        "去味",
+        "chinese"
+      ],
+      "skills": [
+        "./skills/story-deslop"
+      ]
     },
     {
       "name": "browser-cdp",
@@ -95,8 +120,18 @@
       "strict": false,
       "version": "1.0.0",
       "category": "browser-automation",
-      "keywords": ["browser", "cdp", "chrome", "agent-browser", "浏览器", "登录态", "automation"],
-      "skills": ["./skills/browser-cdp"]
+      "keywords": [
+        "browser",
+        "cdp",
+        "chrome",
+        "agent-browser",
+        "浏览器",
+        "登录态",
+        "automation"
+      ],
+      "skills": [
+        "./skills/browser-cdp"
+      ]
     },
     {
       "name": "story-setup",
@@ -105,8 +140,19 @@
       "strict": false,
       "version": "1.0.0",
       "category": "novel-infra",
-      "keywords": ["setup", "deploy", "hooks", "agents", "初始化", "部署", "基础设施", "chinese"],
-      "skills": ["./skills/story-setup"]
+      "keywords": [
+        "setup",
+        "deploy",
+        "hooks",
+        "agents",
+        "初始化",
+        "部署",
+        "基础设施",
+        "chinese"
+      ],
+      "skills": [
+        "./skills/story-setup"
+      ]
     },
     {
       "name": "story-review",
@@ -115,8 +161,21 @@
       "strict": false,
       "version": "1.1.0",
       "category": "novel-quality",
-      "keywords": ["review", "audit", "multi-agent", "rubric", "审查", "评分", "番茄", "起点", "知乎", "chinese"],
-      "skills": ["./skills/story-review"]
+      "keywords": [
+        "review",
+        "audit",
+        "multi-agent",
+        "rubric",
+        "审查",
+        "评分",
+        "番茄",
+        "起点",
+        "知乎",
+        "chinese"
+      ],
+      "skills": [
+        "./skills/story-review"
+      ]
     },
     {
       "name": "story-import",
@@ -125,8 +184,17 @@
       "strict": false,
       "version": "1.0.0",
       "category": "novel-import",
-      "keywords": ["import", "reverse-engineer", "导入", "反推", "迁移", "chinese"],
-      "skills": ["./skills/story-import"]
+      "keywords": [
+        "import",
+        "reverse-engineer",
+        "导入",
+        "反推",
+        "迁移",
+        "chinese"
+      ],
+      "skills": [
+        "./skills/story-import"
+      ]
     },
     {
       "name": "story-cover",
@@ -135,8 +203,16 @@
       "strict": false,
       "version": "1.0.0",
       "category": "novel-cover",
-      "keywords": ["cover", "封面", "image", "GPT-Image", "chinese"],
-      "skills": ["./skills/story-cover"]
+      "keywords": [
+        "cover",
+        "封面",
+        "image",
+        "GPT-Image",
+        "chinese"
+      ],
+      "skills": [
+        "./skills/story-cover"
+      ]
     }
   ]
 }

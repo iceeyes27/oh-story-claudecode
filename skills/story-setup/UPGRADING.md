@@ -1,5 +1,10 @@
 # 升级指南
 
+## 当前版本
+
+- `setup_skill_version: 1.2.7`
+- `agents_version: 18`
+
 ## 升级策略
 
 | 策略 | 适用场景 | 风险 |

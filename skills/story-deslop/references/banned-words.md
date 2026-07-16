@@ -2,7 +2,7 @@
 
 <!--
 version: 2.1.2
-sync-source: skills/story-setup/references/agent-references/banned-words.md
+sync-source: shared-banned-words-v2.1.2
 本文件在 5 个 skill 副本间需保持一致：
   story-deslop / story-write / story-analyze /
   story-review / story-setup(agent-references)

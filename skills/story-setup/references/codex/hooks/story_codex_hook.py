@@ -296,7 +296,7 @@ def continuity_findings(root: Path) -> list[str]:
     """跨批连续性兜底：① 追踪 staleness（写了章但 上下文.md 没跟上 → 续写会断线）；
     ② 章节标题去重（两章同名多半是误复制）。模型无关，回合/会话边界提醒，无问题则静默。
     扫描范围 repo-wide（与缺口检测一致），非活跃书也提醒——有意为之，不按 .active-book 收窄；
-    staleness 用 mtime +1 秒容差，是启发式 advisory（checkout / 带 -p 拷贝可能偏差）。"""
+    staleness 用 mtime +0.25 秒容差，是启发式 advisory（checkout / 带 -p 拷贝可能偏差）。"""
     msgs: list[str] = []
     for book in _discover_all_books(root):
         body_dir = book / "正文"
@@ -309,7 +309,7 @@ def continuity_findings(root: Path) -> list[str]:
                 ctx_m = ctx.stat().st_mtime
             except Exception:
                 ctx_m = 0
-            if newest > ctx_m + 1:
+            if newest > ctx_m + 0.25:
                 latest = max(chapters, key=lambda c: c.stat().st_mtime).name
                 msgs.append(f"[continuity] {safe_rel(root, book)}：正文已更新到「{latest}」但 追踪/上下文.md 更早，续写会断线——补更 上下文.md/伏笔.md 再继续。")
         # ② 标题去重（按文件名 第N章_标题 的标题部分）

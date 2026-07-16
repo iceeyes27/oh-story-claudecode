@@ -356,8 +356,9 @@ for p in sorted(base.glob('*.md')):
     else:
         assert 'edit: allow' in fm, f'{p}: write-capable agent must allow edit'
     assert '.claude/skills/story-setup/references/agent-references/' not in text, f'{p}: leaked Claude reference path'
+    assert '.opencode/skills/story-setup/references/agent-references/' not in text, f'{p}: stale hidden OpenCode reference fallback'
     if p.stem in {'character-designer', 'consistency-checker', 'narrative-writer', 'story-architect'}:
-        assert '.opencode/skills/story-setup/references/agent-references/' in text, f'{p}: missing OpenCode reference path'
+        assert '{项目根}/skills/story-setup/references/agent-references/' in text, f'{p}: missing canonical OpenCode reference path'
 PY
 
 echo "  OK agent templates"
@@ -395,9 +396,12 @@ ZCODE_CORE="$REPO_ROOT/skills/story-setup/references/zcode/hooks/story_hook_core
 cmp -s "$ROOT/story_hook_core.js" "$ZCODE_CORE" || fail "story_hook_core.js drifted from the ZCode copy (must be byte-identical)"
 node --check "$ROOT/story_hook_core.js" || fail "story_hook_core.js is not valid JavaScript"
 assert_grep 'proseNetFindings' "$ROOT/story_hook_core.js" "shared core must carry the light prose net (parity with codex/claude)"
+# #242: runtime behavioral test — actually loads the plugin against the deployed core layout and
+# exercises the before/after/compacting hooks (stronger than the structural greps above).
+node --experimental-strip-types scripts/test-opencode-plugin.mjs
 assert_grep 'AGENTS\.md|OpenCode' "$ROOT/AGENTS.md.tmpl" "OpenCode AGENTS template must be present"
 assert_grep 'story-write|story-write|story-review' "$ROOT/AGENTS.md.tmpl" "OpenCode AGENTS template must mention story skill routing"
 
-echo "  OK plugin and instruction anchors"
+echo "  OK plugin behavior and instruction anchors"
 echo ""
 echo "OK: OpenCode adapter checks passed"

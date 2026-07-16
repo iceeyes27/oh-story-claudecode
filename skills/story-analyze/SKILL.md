@@ -259,7 +259,8 @@ Stage 0+1 完成后，管道**自动停靠**，产出快速预览报告并询问
 **仅当**项目根存在 `选题决策.md` 时：按本书题材，在它的推荐选题里找**题材关键词对得上**的那个——
 - 正好对上一个 → 把该选题的"能爆的原因"从 `待拆文验证` 改成带出处的支撑：「本书拆解支撑：{`拆文报告.md` 的 读者需求/情绪引擎 + `剧情/情绪模块.md` 的可复现模块 Top + `剧情/节奏.md` 的爽点/触动点节奏摘要}（`拆文库/{书名}/拆文报告.md`、`剧情/情绪模块.md`、`剧情/节奏.md`）」。注意还只是假设（只拆了一本，不算坐实）。
 - 对上多个 / 拿不准 → 问用户「《{书名}》对应选题决策里的哪个方向？」
-- 一个都对不上 / `选题决策.md` 里没有"能爆的原因"这栏（旧模板或文件坏了）→ 直接跳过，不提示。
+- 一个都对不上 → 跳过回填，不影响拆文。
+- `选题决策.md` 里没有"能爆的原因"这栏、模板不完整或文件损坏 → 标记 `invalid_topic_decision_contract: true`，提示用户重新运行 `/story-scan long` 生成新版 `选题决策.md`，不做静默回填。
 - 重复拆文不覆盖：只回填还标着 `待拆文验证` 的；已经填过的不动。
 
 没有 `选题决策.md` → 直接跳过，不影响拆文。
@@ -363,7 +364,7 @@ Agent(
 
 以下任一情况，Stage 2 自动退回串行模式，由主线程按 chapter-extractor 方法论逐章处理（结果同样套 output-templates.md 的章节摘要模板，质量不受影响，只是改为串行、速度略慢）：
 
-- **agent 未部署**：agent 目录（优先 `.claude/agents/`，其次 `.opencode/agents/`，再检查 `.codex/agents/`）下的 `chapter-extractor.md` 或 `.codex/agents/chapter-extractor.toml` 不存在。`.claude/agents/` 通常不随仓库提交，由 `/story-setup` 部署；模板源在 `skills/story-setup/references/templates/agents/chapter-extractor.md`，必要时可手动复制部署。
+- **agent 未部署**：agent 目录（优先 `.claude/agents/`，其次 `.opencode/agents/`，再检查 `.codex/agents/`）下的 `chapter-extractor.md` 或 `.codex/agents/chapter-extractor.toml` 不存在。`.claude/agents/` 通常不随仓库提交，由 `/story-setup` 部署；必要时重新运行 `/story-setup` 刷新 agent 模板。
 - **环境不支持 spawn 子代理**：本 skill 正运行在某个子代理上下文中，无法再起下一层 agent。
 
 ### Stage 2 收尾：合并章节摘要（_章节摘要汇总.md）

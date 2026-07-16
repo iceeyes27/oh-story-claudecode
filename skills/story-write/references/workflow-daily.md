@@ -171,7 +171,7 @@
 
 8. **稳定性批量验收（启用长篇稳定性验收时；正文超过 10 章自动启用）**：`node scripts/stability-audit.js --write {start} {end}` 对本批做剧情连续性确定性验收——beat 交付、禁词、漂移门控、角色不变量 POV 感知扫描、跨章交接继承，报告落盘 `追踪/稳定性审计/日更_第{start}章_to_第{end}章.md`。FAIL 按 `references/longform-stability.md`「修复分派与闭环」按错误码分派修复（story-architect/character-designer/narrative-writer/consistency-checker），修复后重写门控、重新交接、重跑审计直到 PASS；未 PASS 不宣布本批完成
 
-> 完整 Phase 5 检查清单见 SKILL.md Phase 5。
+> 完整 Phase 5 检查清单见 [Phase 5：质量检查](../SKILL.md#phase-5质量检查)。
 
 ---
 

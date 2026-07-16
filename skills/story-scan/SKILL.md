@@ -429,7 +429,7 @@ node scripts/jjwxc-rank-scraper.js --type 12 --list-only                 # 只�
 
 ---
 
-### Phase 4：选题决策
+### Phase 5：选题决策
 
 把扫榜结果变成能直接用的选题建议。两种 mode 的产出路径不同：
 
@@ -515,7 +515,7 @@ node scripts/jjwxc-rank-scraper.js --type 12 --list-only                 # 只�
 
 | 文件 | 何时加载 |
 |------|----------|
-| [references/topic-decision.md](references/topic-decision.md) | Phase 4 选题决策：选题四步 + 可行性判断 + 选题决策.md 模板 |
+| [references/topic-decision.md](references/topic-decision.md) | Phase 5 选题决策：选题四步 + 可行性判断 + 选题决策.md 模板 |
 | [references/reader-profiling.md](references/reader-profiling.md) | 需要分析目标读者画像时 |
 | [references/genre-trends.md](references/genre-trends.md) | 查看题材趋势候选、切入约束和样本校验规则时；内置知识模式默认加载 |
 | [references/publishing-guide.md](references/publishing-guide.md) | 平台适配+推荐机制校验+数据指标+简介设计 |

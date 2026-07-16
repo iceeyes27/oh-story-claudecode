@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "网络小说创作工具箱 — 扫榜、拆文、写作全流程 Claude Code skill，覆盖长篇与短篇网文",
-    "version": "0.6.22"
+    "version": "0.6.23"
   },
   "plugins": [
     {
@@ -212,6 +212,23 @@
       ],
       "skills": [
         "./skills/story-cover"
+      ]
+    },
+    {
+      "name": "humanizer",
+      "description": "去除文本中的 AI 写作痕迹（中英双语），自动按输入语言选择模式。",
+      "source": "./",
+      "strict": false,
+      "version": "1.0.0",
+      "category": "novel-polish",
+      "keywords": [
+        "humanize",
+        "de-ai",
+        "bilingual",
+        "去AI痕迹"
+      ],
+      "skills": [
+        "./skills/humanizer"
       ]
     }
   ]

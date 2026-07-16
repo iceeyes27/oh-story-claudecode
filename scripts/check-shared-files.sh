@@ -25,12 +25,12 @@ fi
 #   header (consumed as a reference standard for source-story evaluation, not a writer
 #   playbook). Writer skills don't get the header. Wholesale-ignored here because their
 #   non-analyst copies have not all been confirmed byte-identical.
-# - AGENTS.md.tmpl: CLI-specific project instruction templates differ deliberately
-#   across OpenCode/Codex/OpenClaw and are validated by each CLI adapter check.
+# - AGENTS.md.tmpl / hooks.json: CLI-specific project templates differ deliberately
+#   and are validated by each CLI adapter check.
 IGNORE_NAMES="output-templates.md material-decomposition.md quality-checklist.md \
 genre-catalog.md genre-core-mechanics.md genre-readers.md \
 genre-writing-formulas.md genre-writing-techniques.md \
-AGENTS.md.tmpl"
+AGENTS.md.tmpl hooks.json"
 
 # Analyst-divergent (basename): the story-analyze copy intentionally prepends the
 # "## 用作拆文标尺时" analyst-lens header, so it is dropped from the comparison set; all
@@ -45,14 +45,55 @@ ANALYST_DIVERGENT_NAMES="character-basics.md character-design-methods.md charact
 # must still stay byte-identical. Stricter than a wholesale ignore.
 GENRE_STYLE_DIVERGENT_NAMES="双男主.md"
 
+# Longform-divergent (basename): story-write's copy carries a long-form-only
+# section (长篇循环情绪引擎) that references reader-contract-and-progression.md, which
+# exists only under story-write; syncing it to the agent-references copy would
+# create a dangling reference. Drop the story-write copy from the comparison;
+# the agent-references copies must still stay byte-identical.
+LONGFORM_DIVERGENT_NAMES="emotional-methods.md"
+
 mismatches=0
 checked=0
 
 echo "Shared File Consistency Check"
 echo "=============================="
 
+# Only inspect repository content plus non-ignored additions. Runtime state such
+# as **/.omc/ may live below references/ on a developer machine, but it is not a
+# skill asset and must not make this guard disagree with a clean CI checkout.
+list_asset_files() {
+  local asset_dir="$1"
+  git -C "$REPO_ROOT" ls-files -z --cached --others --exclude-standard -- skills |
+    while IFS= read -r -d '' rel_path; do
+      [ -f "$REPO_ROOT/$rel_path" ] || continue
+      case "$rel_path" in
+        skills/*/"$asset_dir"/*) printf '%s\n' "$REPO_ROOT/$rel_path" ;;
+      esac
+    done
+}
+
+REFERENCE_FILES="$(list_asset_files references)"
+SCRIPT_FILES="$(list_asset_files scripts)"
+
+list_reference_basenames() {
+  local path
+  while IFS= read -r path; do
+    case "$path" in
+      */.gitkeep|*/opencode/*) ;;
+      *) printf '%s\n' "${path##*/}" ;;
+    esac
+  done <<< "$REFERENCE_FILES"
+}
+
+list_script_basenames() {
+  local path
+  while IFS= read -r path; do
+    [ "${path##*/}" = .gitkeep ] || printf '%s\n' "${path##*/}"
+  done <<< "$SCRIPT_FILES"
+}
+
 # Find all reference basenames that appear in 2+ skills
-dup_names="$(find "$SKILLS_DIR" -type f -path '*/references/*' ! -name '.gitkeep' ! -path '*/opencode/*' -exec basename {} \; 2>/dev/null | sort | uniq -d)"
+dup_names="$(list_reference_basenames | sort | uniq -d)"
 
 for base in $dup_names; do
   # Skip known intentional differences
@@ -70,8 +111,8 @@ for base in $dup_names; do
   paths=()
   while IFS= read -r fpath; do
     [ -z "$fpath" ] && continue
-    paths+=("$fpath")
-  done < <(find "$SKILLS_DIR" -type f -path '*/references/*' -name "$base" 2>/dev/null)
+    [ "${fpath##*/}" = "$base" ] && paths+=("$fpath")
+  done <<< "$REFERENCE_FILES"
 
   # Analyst-divergent basenames: drop the story-analyze copy (intentional
   # analyst-lens fork); the remaining copies must still be byte-identical.
@@ -97,6 +138,21 @@ for base in $dup_names; do
       for p in ${paths[@]+"${paths[@]}"}; do
         case "$p" in
           */genre-styles/*) ;;
+          *) filtered+=("$p") ;;
+        esac
+      done
+      paths=(${filtered[@]+"${filtered[@]}"})
+      ;;
+  esac
+
+  # Longform-divergent basenames: drop the story-write copy (intentional
+  # long-form-only fork); the remaining copies must still be byte-identical.
+  case " $LONGFORM_DIVERGENT_NAMES " in
+    *" $base "*)
+      filtered=()
+      for p in ${paths[@]+"${paths[@]}"}; do
+        case "$p" in
+          */story-write/*) ;;
           *) filtered+=("$p") ;;
         esac
       done
@@ -131,14 +187,14 @@ done
 # Script copies are also skill-local assets. If two skills carry the same script
 # basename, treat them as managed copies and require byte identity. This avoids
 # cross-skill file references while still catching drift between duplicated tools.
-script_dup_names="$(find "$SKILLS_DIR" -type f -path '*/scripts/*' ! -name '.gitkeep' -exec basename {} \; 2>/dev/null | sort | uniq -d)"
+script_dup_names="$(list_script_basenames | sort | uniq -d)"
 
 for base in $script_dup_names; do
   paths=()
   while IFS= read -r fpath; do
     [ -z "$fpath" ] && continue
-    paths+=("$fpath")
-  done < <(find "$SKILLS_DIR" -type f -path '*/scripts/*' -name "$base" 2>/dev/null)
+    [ "${fpath##*/}" = "$base" ] && paths+=("$fpath")
+  done <<< "$SCRIPT_FILES"
 
   if [ ${#paths[@]} -lt 2 ]; then
     continue

@@ -1,17 +1,9 @@
 ---
 name: humanizer
 version: 3.0.0
-description: "去除文本中的 AI 写作痕迹（中英双语）。Remove signs of AI-generated writing from text (bilingual). 检测并修复：夸大的象征意义、宣传性语言、以 -ing 结尾的肤浅分析、模糊的归因、破折号过度使用、三段式法则、AI 词汇、否定式排比、过多的连接性短语。自动检测输入语言，中文走中文模式，英文走英文模式，混排双语兼顾。"
-allowed-tools:
-  - Read
-  - Write
-  - Edit
-  - Grep
-  - Glob
-  - AskUserQuestion
-metadata:
-  trigger: 编辑或审阅文本，去除 AI 写作痕迹 / Edit or review text to remove AI writing patterns
-  source: 基于维基百科 Wikipedia:Signs of AI writing，由 WikiProject AI Cleanup 维护
+description: "去除文本中的 AI 写作痕迹（中英双语）。Remove signs of AI-generated writing from text (bilingual). 检测并修复：夸大的象征意义、宣传性语言、以 -ing 结尾的肤浅分析、模糊的归因、破折号过度使用、三段式法则、AI 词汇、否定式排比、过多的连接性短语。自动检测输入语言，中文走中文模式，英文走英文模式，混排双语兼顾。触发方式：/humanizer、「去 AI 痕迹」「humanize」。基于维基百科 Wikipedia:Signs of AI writing（WikiProject AI Cleanup 维护）。"
+allowed-tools: Read, Write, Edit, Grep, Glob, AskUserQuestion
+metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
 ---
 
 # Humanizer: 去除 AI 写作痕迹 / Remove AI Writing Patterns

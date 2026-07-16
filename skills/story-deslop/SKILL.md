@@ -12,7 +12,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 - **`mode = novel`**：网文小说正文去 AI 味。走 7 Gate 系统（禁用词 / 句式 / 心理 / 节奏 / 对话 / 结尾 / 解释腔），配合本地脚本、禁用词表与白名单。
 - **`mode = general`**：通用中文「说人话」。走场景分级（chat / status / docs / public-writing）+ Tier 分级 + 档位 + scope + 误杀防护，适用于非小说正文的中英文改写与审稿。
 
-> Agent 兼容性：检查专业 agent 是否可用时，按 `.claude/agents/{agent}.md` → `.opencode/agents/{agent}.md` → `.codex/agents/{agent}.toml` 的顺序查找。Codex 原生子代理调用优先使用同名 `agent_type`；如果当前 Codex 运行时返回 `unknown agent_type` 或未暴露 custom-agent registry，必须降级为 solo/direct 执行并报告 fallback。Claude/OpenCode 兼容面保留 `subagent_type`。
+> Agent 兼容性：检查专业 agent 是否可用时，按 `.claude/agents/{agent}.md` → `.opencode/agents/{agent}.md` → `.codex/agents/{agent}.toml` 的顺序查找。Codex 原生子代理调用优先使用同名 `agent_type`；如果当前 Codex 运行时返回 `unknown agent_type` 或未暴露 custom-agent registry，必须降级为 solo/direct。检测到 `.zcode/` 时同样直接 solo/direct，因为 ZCode 3.3.4 不执行项目 custom agents；报告 `Fallback: project custom agents unavailable -> solo`。Claude/OpenCode 兼容面保留 `subagent_type`。
 
 ---
 
@@ -473,7 +473,7 @@ node scripts/normalize-punctuation.js <正文文件...>
 
 ## 通用说人话模式（mode = general）
 
-> 适用：非小说正文的中英文 chat / status / docs / public-writing 改写与审稿。配合 `../shuorenhua/references/` 下的完整参考文件执行。
+> 适用：非小说正文的中英文 chat / status / docs / public-writing 改写与审稿。通用规则已内置在本文件；外部参考集不随本仓库分发。
 
 ### When to use
 
@@ -506,7 +506,7 @@ node scripts/normalize-punctuation.js <正文文件...>
 3. 判 Tier：`Tier 1 / Tier 2 / Tier 3`，按问题命中强度判断，不要把 Tier 当作改写力度
 4. 再判档位：`minimal / standard / aggressive`
 5. 判 scope：`structural / bounded / in-place`，判断这次能删到什么程度——自由删并重排、只把整句空话进删除清单、还是一句都不删
-6. 先执行本文件里的最小规则；只要环境里能读 `references/`，默认继续按问题类型补看 [Protected Spans](../shuorenhua/references/protected-spans.md)、[Positive Style Contract](../shuorenhua/references/positive-style.md)、[微操作手册](../shuorenhua/references/operation-manual.md)、[结构反模式](../shuorenhua/references/structures.md) 和相关短语表；如果目标是「改完能直接发」，或文本明显属于 README、release note、论坛帖、issue 回复，再补看 [Scene Packs](../shuorenhua/references/scene-packs.md)、[真实样本评测](../shuorenhua/evals/real-samples.md) 和 [改写示例](../shuorenhua/references/examples.md)
+6. 先执行本文件里的最小规则；如运行环境提供通用参考集，再按问题类型补看 Protected Spans、Positive Style Contract、微操作手册、结构反模式和相关短语表；如果目标是「改完能直接发」，或文本明显属于 README、release note、论坛帖、issue 回复，再补看 Scene Packs、真实样本评测和改写示例。
 7. 回读拆成两步：先做保真回读，再按需做残留味回读
 8. 输出：默认只给单一推荐版本；用户明确要求「先标问题，不改写」时切到 `annotation mode`
 
@@ -551,7 +551,7 @@ node scripts/normalize-punctuation.js <正文文件...>
 
 默认档位：`standard`
 
-更细的下限限制见 [场景禁改表](../shuorenhua/references/scene-guardrails.md)。
+更细的下限限制按「场景禁改表」规则执行。
 
 #### Scene Packs
 
@@ -562,7 +562,7 @@ node scripts/normalize-punctuation.js <正文文件...>
 - `forum-post`：出现 Linux.do / V2EX / 社区帖 / 发帖复盘等信号时，保留维护者的真实观察和社区语气，不改成公告
 - `issue-reply`：出现 issue / PR 回复、bad case、复现、下一版补 benchmark 等信号时，先确认问题和下一步，不做客服式安抚
 
-子场景只负责发布目的和语气收束，不覆盖 protected spans、Tier、档位和回读规则。完整策略见 [Scene Packs](../shuorenhua/references/scene-packs.md)。
+子场景只负责发布目的和语气收束，不覆盖 protected spans、Tier、档位和回读规则。完整策略按 Scene Packs 规则执行。
 
 ### 2. Single-file fallback rules
 
@@ -688,7 +688,7 @@ Scope 表示这次能不能改动句子和段落结构，和 `minimal / standard
 
 ### 4. Tier severity
 
-Tier 表示问题命中强度，与 [严重度分级](../shuorenhua/references/severity.md) 保持一致，不表示改写力度。
+Tier 表示问题命中强度，与严重度分级规则保持一致，不表示改写力度。
 
 #### Tier 1
 
@@ -733,7 +733,7 @@ Tier 表示问题命中强度，与 [严重度分级](../shuorenhua/references/s
 
 不要为了「像人」把文本改得更假。专业文本可以专业，关键是别模板化、别表演化。
 
-完整的保护清单见 [Protected Spans](../shuorenhua/references/protected-spans.md)。
+完整的保护清单按 Protected Spans 规则执行。
 
 ### 6. Positive style targets
 
@@ -747,7 +747,7 @@ Tier 表示问题命中强度，与 [严重度分级](../shuorenhua/references/s
 - 有立场，但立场来自判断或事实，不来自「故作洞见」
 - 有边界，没把握就直说，不替对方做心理判断，也不硬演「我懂了」
 
-更完整的正向目标、分场景校准和「cleaner vs more human」对照见 [Positive Style Contract](../shuorenhua/references/positive-style.md)。
+更完整的正向目标、分场景校准和「cleaner vs more human」对照按 Positive Style Contract 规则执行。
 
 ### 7. Output contract
 
@@ -837,21 +837,21 @@ Tier 表示问题命中强度，与 [严重度分级](../shuorenhua/references/s
 
 ### 通用模式参考导航
 
-- 本文件可以单独兜底；完整模式默认是 `SKILL.md` + `../shuorenhua/references/` 一起工作
-- 想先看「改成什么样才算更像人」：看 [Positive Style Contract](../shuorenhua/references/positive-style.md)
-- 想先看哪些数字、引用、命令、参数不能漂：看 [Protected Spans](../shuorenhua/references/protected-spans.md)
-- 想看中文高频短语：看 [中文禁用短语表](../shuorenhua/references/phrases-zh.md)
-- 想看英文高频短语：看 [English Banned Phrases](../shuorenhua/references/phrases-en.md)
-- 想看句子和段落层面的结构问题：看 [结构反模式](../shuorenhua/references/structures.md)
-- 想按 `Tier 1 / 2 / 3` 校准命中规则：看 [严重度分级](../shuorenhua/references/severity.md)
-- 遇到具体病灶怎么动手：看 [微操作手册](../shuorenhua/references/operation-manual.md)
-- 想确认某个场景什么不能乱动：看 [场景禁改表](../shuorenhua/references/scene-guardrails.md)
-- 想校准误杀边界或做静态回归：看 [边界案例集](../shuorenhua/references/boundary-cases.md)
-- 想看真实样本评测：看 [真实样本评测](../shuorenhua/evals/real-samples.md)
-- 想看默认改写和 `annotation mode` 的对照：看 [改写示例](../shuorenhua/references/examples.md)
-- 想处理没收录进词表的同类变体：先看 [微操作手册](../shuorenhua/references/operation-manual.md) 里的「变体归并」规则，再决定要不要补词
+- 本文件可以单独执行；完整模式可配合外部通用参考集一起工作
+- 想先看「改成什么样才算更像人」：看 Positive Style Contract
+- 想先看哪些数字、引用、命令、参数不能漂：看 Protected Spans
+- 想看中文高频短语：看中文禁用短语表
+- 想看英文高频短语：看 English Banned Phrases
+- 想看句子和段落层面的结构问题：看结构反模式
+- 想按 `Tier 1 / 2 / 3` 校准命中规则：看严重度分级
+- 遇到具体病灶怎么动手：看微操作手册
+- 想确认某个场景什么不能乱动：看场景禁改表
+- 想校准误杀边界或做静态回归：看边界案例集
+- 想看真实样本评测：看真实样本评测
+- 想看默认改写和 `annotation mode` 的对照：看改写示例
+- 想处理没收录进词表的同类变体：先看微操作手册里的「变体归并」规则，再决定要不要补词
 
-默认做法是：先用本文件完成「场景、Tier、档位、输出合同」的主判断，再按问题类型补读 `../shuorenhua/references/`；只有在单文件安装场景里，才停留在本文件的兜底规则。
+默认做法是：先用本文件完成「场景、Tier、档位、输出合同」的主判断，再按问题类型补读可用的外部通用参考集；只有在单文件安装场景里，才停留在本文件的基础规则。
 
 ---
 

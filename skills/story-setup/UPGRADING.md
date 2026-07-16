@@ -19,12 +19,16 @@
 - `.claude/agents/` — 所有 agent 定义
 - `.claude/rules/` — 所有 path-scoped 规则
 - `.claude/skills/story-setup/references/agent-references/` — Agent 参考资料副本
+- `.zcode/skills/{13 known skills}/`、`.zcode/commands/{13 known commands}.md` — 仅覆盖 oh-story 已知名称
+- `.zcode/hooks/story_zcode_hook.js` — ZCode 专用 Hook runner
 
 ### 需合并（不覆盖）
 
 这些文件可能含用户自定义内容：
 - `CLAUDE.md` — 按 marker/section 合并，用户独有 section 保留
 - `.claude/settings.local.json` — hooks 按 command 去重 append，其他配置保留
+- `AGENTS.md` — ZCode/OpenCode/Codex/OpenClaw/generic 按 marker/section 合并
+- `.zcode/config.json` — 仅按事件、matcher 和 process args 去重合并 oh-story Hooks，其他字段保留
 
 ### 不碰
 
@@ -56,6 +60,8 @@
 - `agents_version: 16` → 旧版，需重新部署以获取 v0.6.22 题材正文提示卡召回与节奏门禁 agent 模板
 - `agents_version: 17` → 旧版，需重新部署以获取 session-start 未完成日更批次提示与文件结构说明更新
 - `agents_version: 18` → 当前版本
+
+ZCode 适配不部署项目 Agent，因此从 setup `1.2.6` 升到 `1.2.7` 时 `agents_version` 仍为 `17`；用 `.story-deployed` 的 `target_cli` 和 `setup_skill_version` 判断是否需要补部署 ZCode 资源。
 
 ## 版本变更
 
@@ -183,9 +189,16 @@
 - **大纲边界与逐章写法公式（#225/#226）**：narrative-writer 模板只扩写细纲计划内情节点，不足时返回 `outline_underfilled` 欠账报告交主会话补纲；chapter-extractor 模板新增 `chapter_formula` 逐章写法公式产物（情绪流向/节奏配比/结构公式/章尾卡点）。
 - **generic Web AI 部署（#216）**：story-setup 新增 `target_cli=generic` 文件模式，Web AI / 通用 Agent 项目复制 `skills/` 与通用 `AGENTS.md`，不声明平台原生 hooks/custom agents 能力。
 - 已部署项目请重新运行 `/story-setup` 刷新 agents/reference bundle；**部署后新开会话**，否则旧会话仍使用 v16 agent 模板，无法获得以上 v17 改进。
+
+### setup 1.2.7（ZCode，agents v17）
+
+- 新增 `target_cli=zcode`：部署 `.zcode/skills/`、`.zcode/commands/`、`.zcode/hooks/story_zcode_hook.js`，合并 `.zcode/config.json` 与根 `AGENTS.md`。
+- ZCode 3.3.4 不执行项目/plugin custom agents；不创建 `.zcode/agents/` 或 `.zcode/rules/`，专业角色稳定降级为 solo/direct。
+- ZCode Hook 依赖 PATH 中的 `node`，仅使用受支持的 SessionStart / PreToolUse / PostToolUse 事件；无 PreCompact / SessionEnd 等价能力。
+- 已有 ZCode 项目升级后重新运行 `$story-setup` 并新开 ZCode session；Claude/OpenCode/Codex 的 agents bundle 仍为 v17，无需因本项单独提升 `agents_version`。
 ### v18 (当前)
 
-- `.story-deployed` 的 `agents_version` 升级到 `18`（`setup_skill_version` 保持 `1.2.6`）。
+- `.story-deployed` 的 `agents_version` 升级到 `18`（`setup_skill_version` 随 ZCode 合入为 `1.2.7`）。
 - **session-start 未完成日更批次提示**：`session-start.sh` 检测活跃书目 `追踪/流水线.md` 的「批次状态：进行中」时，提示未完成批次与断点续跑方式（配合 story-long-write 新增的日更章节流水线状态票，见 `story-long-write/references/artifact-protocols.md`「追踪/流水线.md」）。
 - **文件结构说明更新**：`CLAUDE.md.tmpl` / OpenCode `AGENTS.md.tmpl` 的文件结构补 `追踪/流水线.md`（日更批量状态票）与可选 `设定/世界观不变量.md`（世界规则红线，`stability-audit.js` 违规词扫描）。
 - agents/rules 模板本批无变化；已部署项目重新运行 `/story-setup` 刷新 hooks 与 CLAUDE.md 即可，流水线/世界观不变量文件缺失不阻塞既有流程。

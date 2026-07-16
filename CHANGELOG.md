@@ -33,6 +33,13 @@ All notable changes to this project will be documented in this file.
 - **部署侧（`agents_version` 17 → 18）**：`session-start.sh` 新增未完成日更批次提示（读活跃书目 `追踪/流水线.md` 的「批次状态：进行中」）；`CLAUDE.md.tmpl` / OpenCode `AGENTS.md.tmpl` 文件结构补 `追踪/流水线.md` 与可选 `设定/世界观不变量.md`。agents/rules 模板无变化；已部署项目重新运行 `/story-setup` 刷新 hooks 与 CLAUDE.md（部署后新开会话），不重跑仅缺 session-start 提示，写作流程不受影响。升级说明见 `story-setup/UPGRADING.md` v18。
 - `story-setup` 的 `CLAUDE.md.tmpl` 文件结构补 `情绪债务.md`/`创作偏好.md`，`上下文.md.tmpl` 待处理线索指向情绪债务；`story-import` 共享副本 `state-tracking.md` 已字节同步。本批未改 hooks/agents 模板结构，无需 bump `agents_version`；已部署项目重新运行 `/story-setup` 可刷新 CLAUDE.md 与上下文模板（旧项目缺 `情绪债务.md`/`创作偏好.md` 走缺失回退，不阻塞）。
 - `CLAUDE.md.tmpl` 文件结构追加稳定性可选目录（`设定/角色不变量/`、`追踪/漂移门控/`/`交接包/`/`稳定性审计/`，标注仅启用长篇稳定性验收时存在），重跑 `sync-opencode.py` 同步 `AGENTS.md.tmpl`（同时补齐此前情绪债务/创作偏好行漏跑的同步）。部署 hooks 无需改动、`agents_version` 不 bump：`check-prose-after-write.sh` 与 Codex `story_codex_hook.py` 的正文判定严格限定 `正文/第N章*.md`，`detect-story-gaps.sh` 只解析 `追踪/伏笔.md`，稳定性工件（含交接包内复制的伏笔行）不会被两端兜底网误扫。
+## v0.6.23
+
+- **ZCode 原生适配（#211）**：新增 `.zcode-plugin/plugin.json` 与根 `marketplace.json`，把仓库作为一个 `oh-story` plugin 暴露 13 个 Skills、13 个 Commands 和 ZCode Hooks；`story-setup` 新增 `target_cli=zcode`，部署 `.zcode/skills` / `.zcode/commands` / `.zcode/hooks`，安全合并 `.zcode/config.json` 与根 `AGENTS.md`。
+- **严格 Hook 契约**：新增无第三方依赖的 Node runner，覆盖 SessionStart 上下文/连续性恢复、PreToolUse 大纲守卫与 commit advisory、PostToolUse 正文轻量确定性网；非空 stdout 只输出 ZCode 3.3.4 接受的严格 JSON，异常写 stderr 并 fail-open。正文网 parity 从 Claude/OpenCode/Codex 扩到 ZCode。
+- **能力边界透明降级**：ZCode 3.3.4 不执行项目/plugin custom agents，也没有 `.zcode/rules`、PreCompact 或 SessionEnd；6 个依赖专业 Agent 的 Skill 与 story-review 在 ZCode 下明确降级 solo/direct，不伪造平台能力。
+- **验证与文档**：新增 ZCode adapter 静态检查、Hook 合成契约测试和 Windows/macOS/Linux CI；补充 ZCode 3.3.4 官方规范、Issue #211 与参考实现的调研报告。
+- 版本号升级到 `0.6.23`（Claude/ZCode marketplace + `skills/story/VERSION`）；`story-setup` 升级到 `1.2.7`，`agents_version` 保持 `17`（ZCode 不部署项目 Agent）。已部署 ZCode 项目升级时需重新运行 `$story-setup` 并新开 session。
 
 ## v0.6.22
 

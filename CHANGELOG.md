@@ -2,44 +2,39 @@
 
 All notable changes to this project will be documented in this file.
 
-## Unreleased
+## v0.7.0
 
-### 重大变更（2026-07-14）
-
-- **统一命名重构（16→11 skill）**：`story-long-*` / `story-short-*` 六个 skill 合并为 `story-write` / `story-analyze` / `story-scan` 三个统一入口（mode=long/short 按意图自动路由）；`Humanizer-zh` + `humanizer` 合并为双语 `humanizer` 并入仓库。旧 slash 命令（`/story-long-write` 等）作为别名仍可触发。切换前的拆分命名版本保留在 tag `pre-unified-split-naming`。
-- **写作侧定制合入**：story-review 新增「案件型/多章连续性专项检查」；banned-words 新增 通感隐喻正则 / 对仗反义俏皮话 / 抽象裁判金句 三节；check-ai-patterns.js 新增运行时精确禁词加载器（findBannedWordsExact / findSynestheticMetaphor / findAntithesis，支持 `.deslop-whitelist` 豁免）与 ABSTRACT_AUTHORITY 检测——一级禁用词现按 blocking 报告（test-ai-patterns 两处 fixture 期望随之更新）。
-- **基础设施随重构更新**：check-shared-files.sh 豁免表、check-codex-adapter（11 skills）、marketplace.json 插件列表、story-setup 全部部署模板（CLAUDE.md.tmpl / 四端 AGENTS.md.tmpl 路由表、opencode commands 13→10、agents 模板）、sync-opencode.py 与 generate-codex-agents.py 产物已重新生成。
-- 上游同步：#235（Codex hook 空 .active-book 修复）已合入。
-
-
-> 借鉴社区同类项目机制：情绪债务追踪（Novel-Control-Station-Skill）+ 跨会话偏好记忆 / 三层开书问答 / 断点续写检测（chinese-novelist-skill）+ 长篇稳定性验收（novel-assistant-skill，本仓库下游 fork 的稳定性层适配回灌）
+> 多端适配再扩两家（ZCode / Reasonix）· hook 核统一到共享 node 核 + 六端 parity 锁 · 长篇「剧情单元」概念统一并接入拆书产物 · 去 AI 味闸口机器化（毒句式确定性检测 + 欠账门）· 契约体检与脚本加固
 
 ### 新增
 
-- **章节流水线状态票（orchestration 断点续跑）**：新增 `追踪/流水线.md`（模板与使用规则见 `artifact-protocols.md`「追踪/流水线.md」）——日更批量把每章流水线步骤（细纲/写前准备/正文落盘/字数验证/章检扫描/追踪更新/门控/交接包）的完成状态逐步落盘，会话中断、compact 或跨会话后按票从**第一个未完成步骤**续跑，不重写已落盘正文；只记当前批次（新批次整文件重置），**续跑以磁盘为准**（票与磁盘不一致先按磁盘修正票）。接入日更全回路：Step 1 断点核对（先于章号重算）、Step 2 批次登记 + 每步回写、Step 4 批次收尾；`session-start.sh` 检测「批次状态：进行中」时提示未完成批次。单章写作不强制使用，文件缺失不阻塞（旧项目 Step 2 起自动创建）。
-- **日更只读审查后台并行（orchestration 第三项）**：日更逐章执行新增可选「并行只读审查」——第 N 章全部落盘（追踪更新+门控/交接完成）后，以后台方式 spawn consistency-checker 检查该章，主会话不等待、立即写第 N+1 章；报告收敛到 Step 3 新增第 0 步（收齐所有后台报告才能宣布本批完成，S1 先按当前文件复核再修复，修复由主会话统一执行并重做门控/交接）。安全边界：consistency-checker 工具白名单只有 Read/Glob/Grep（机制只读），只审已落盘章节、一章只派一次、任何修改文件的任务不并行；agent 未部署或运行时不支持后台运行时自动跳过，批末统一审查照旧。省墙钟时间不省检查，与「质量优先于 token 成本」一致。
-- **世界观不变量（规则红线）**：新增可选工件 `设定/世界观不变量.md`（模板见 `character-invariants.md`「世界观不变量」），把跨章世界硬规则（能力上限、资源约束、阵法/系统限制）从设定文档的描述性文字升级为可验收红线——「规则：」行由漂移门控 LLM 审查核对，「不得出现：」违规词行由 `stability-audit.js` 全章字面扫描（不分 POV），命中即 `Canon_Conflict`（升级为 脚本+LLM 双判，修复分派 story-architect 裁决改正文还是改规则；正式改规则须在门控 State Delta 记录原因，防"为救场临时改规则"）。可选不阻塞：文件缺失时审计整项跳过、不 FAIL，向后兼容已启用稳定性验收的项目；首次启用初始化新增第 2 步建档指引。回归测试 `test-longform-stability.sh` 新增 3 用例（缺失跳过/存在无违规 PASS/违规词命中 FAIL），28→31。
-
-- **情绪债务追踪**：新增 `追踪/情绪债务.md`（模板见 `artifact-protocols.md`，更新规则见 `state-tracking.md`「情绪债务追踪」），登记对读者的情绪承诺（打脸/发泄/揭穿/感情确认）与兑现窗口——伏笔管情节信息的揭示，情绪债务管情绪释放的兑现。接入长篇写作全回路：Phase 3 与伏笔/时间线/角色状态一同创建，大纲五检④核对本卷到期债务，写前准备状态筛选把到期/临期债务带入本节速记，每章写完按新立/加压/兑现/过期四规则回写，Phase 5 与日更 Step 3 盘点本轮增量。独立成文件（不并入伏笔.md）以兼容 `detect-story-gaps.sh` 对伏笔状态列的解析；缺失不阻塞（缺失文件回退第 7 条），story-import 显式不做导入反推。
-- **跨会话偏好记忆**：新增工作区根 `创作偏好.md`（模板与回写规则见 `artifact-protocols.md`「创作偏好.md」），按 流程偏好/内容偏好/文风倾向 三小节跨书累积。沉淀触发：同类修改反馈第二次出现或用户明确说「以后都这样」，一次性修改不沉淀；写入后回「已记住」给用户纠正机会。加载时机：长篇开书 Phase 1（L2 默认值+Phase 2 预填）、日更 Step 1（批量/确认习惯）、大修 Step 6、短篇 Phase 1/Phase 4。文风倾向不直接进每章写作回路，开书时按本书适用性写入 `设定/文风.md` 生效，不动既有文风优先级链。
-- **三层递进式开书问答**：长篇 Phase 1 无方向时改为 L1 必答（读者情绪/对标书/作者优势，3 问一次问完）→ L2 可选（平台/字数/频道/更新节奏/雷点，允许整体跳过，默认值依次取 创作偏好 > 选题决策 > 题材惯例）→ L3 深度定制（不主动问，Phase 2 核心设定表按 L1/L2 代填全表请用户确认，想深挖再展开），避免长问卷和挤牙膏式追问。
-- **断点续写检测**：story-long-write 意图不明或「开书」撞非空项目时，先扫 `追踪/上下文.md`、`正文/` 最大章号、细纲余量定位断点阶段（只有选题→Phase 1、有设定无大纲→Phase 3、有大纲无正文→Phase 4、有正文→日更续写），输出断点报告并默认建议从断点继续；「开书」不得直接重跑 Phase 1-5 覆盖既有项目。
-- **长篇稳定性验收（可选机制，默认不启用）**：把长篇连载的稳定性约束从"prompt 自觉"升级为"落盘工件 + 确定性脚本验收"。闭环：写前在细纲加「稳定性契约」小节（B# 必须交付 beat 表 + 可 grep 关键词组 + 禁止事项禁词）→ 写后 LLM 审查落盘 `追踪/漂移门控/第{N}章.md`（Gate: PASS/FAIL + 错误码 Findings + State Delta + 下一章继承关键词）→ Gate PASS 才允许 `scripts/handoff-pack.js --write` 生成 `追踪/交接包/`（失败章节不得交接）→ `scripts/stability-audit.js` 批量确定性验收（beat 关键词/禁词/门控覆盖/角色不变量 POV 感知扫描/跨章继承，报告落盘 `追踪/稳定性审计/`，支持 --json）→ FAIL 按错误码分派 story-architect/character-designer/narrative-writer/consistency-checker 修复直到 PASS。新增 `设定/角色不变量/{角色名}.md`（行为红线「不会：」/认知边界「不能提前知道：」负向约束，可 grep 格式，支持 `POV：角色名` 分段扫描视野，见 `character-invariants.md`）。总览与错误码表见 `longform-stability.md`；接入单章流程步骤 13、日更 Step 2/Step 3 第 8 项、大修 Step 5 稳定性复检。启用条件：**正文超过 10 章自动启用**（写前判定：单章流程步骤 1 / 日更 Step 1；质量优先于 token 成本，写崩重写才是真浪费），用户明确要求可提前启用，明确拒绝则沉淀进 `创作偏好.md` 不再自动开；前 10 章不自动启用（人物/设定尚在成形，边界文件会频繁作废），启用后不回溯旧章节。配套归档防长期积累：`scripts/archive-stability.js` 与「追踪文件归档」同时机（每 50 章/卷末）运行，把活跃窗口（默认最近 20 章，`--keep` 可调）外的门控/交接包/审计报告移入 `追踪/归档/` 对应子目录，移动不删除；归档对验收透明——audit/handoff 脚本自动回退读取归档位置，老章节回炉无需取回，回炉新写的门控以活跃目录为权威。回归测试 `scripts/test-longform-stability.sh`（28 用例，含归档移动/dry-run/透明回退）进三平台 CI。相比 fork 原版的适配：契约并入细纲不新建目录、beat 由"原句逐字出现"放宽为"关键词组命中"以留改稿余地、bash 脚本链重写为 Windows 安全的零依赖 Node。
-
-- **结构化状态库（实验性旁路，最小验证）**：新增 `追踪/状态库/`——**按 50 章分片**的 JSONL 事件流（`事件_第001-050章.jsonl`……500 章也只是 10 个小文件，单文件不膨胀，逐行追加 git diff 友好），三种事件：状态（实体字段新值，`存活=死亡` 特殊处理）/ 认知（角色何时获知什么）/ 伏笔（埋设/推进/回收/废弃 + 预计回收章 due）。`scripts/state-query.js` 提供 Markdown 追踪文件做不到的两个能力：`snapshot N` **时点查询**（"第 47 章那一刻的世界状态/角色认知边界"，回炉老章节不被当前值误导）与 `check` **机器矛盾检测**（死亡后活动、伏笔未埋先收、重复回收、分片错位等 error 阻塞；超期伏笔/重复认知 warning 提醒）；另有 `foreshadow N` 时点活跃伏笔、`log --entity` 实体时间线、`add` 校验后自动路由分片写入。**定位为旁路不替代**：`追踪/伏笔.md` 等仍是权威追踪文件，grep 审计链不依赖它，状态库缺失不阻塞任何流程；每章更新追踪文件时同步 2-5 条硬状态事件（只录会被后文引用的：生死/位置跃迁/能力/持有/关系定性/关键获知），情绪氛围类散文性上下文仍留 Markdown。规则见 `references/state-store.md`，回归测试 `scripts/test-state-store.sh`（22 用例）进三平台 CI。
+- **ZCode 3.3.4 原生适配（#234）**：新增 `.zcode-plugin/plugin.json` 与根 `marketplace.json`，把仓库作为 `oh-story` plugin 暴露 11 个 Skills、11 个 Commands 和严格 JSON Hooks；`story-setup` 新增 `target_cli=zcode`，部署 `.zcode/skills` / `.zcode/commands` / `.zcode/hooks`，安全合并 `.zcode/config.json` 与根 `AGENTS.md`。无第三方依赖的 Node hook runner 覆盖 SessionStart 上下文/连续性恢复、PreToolUse 大纲守卫与 commit advisory、PostToolUse 正文轻量确定性网；非空 stdout 只输出 ZCode 接受的严格 JSON，异常写 stderr 并 fail-open。ZCode 3.3.4 不执行项目/plugin custom agents、无 `.zcode/rules`/PreCompact/SessionEnd，涉及专业 Agent 的 Skill 与 story-review 明确降级 solo/direct，不伪造平台能力。
+- **Reasonix 原生支持 Phase 1（#238）**：新增根 `reasonix-plugin.json` plugin manifest（version 钉住 `skills/story/VERSION`）与 README 安装说明；Reasonix 扫描 `.agents/skills`（与 Codex 共用的 `skills/` symlink）发现 11 个 skill，`check-reasonix-adapter.sh` 守卫 manifest。项目级 `story-setup` 部署与 hooks 留待后续阶段，当前涉及专业 Agent 的流程走 solo/direct。
+- **短篇题材风格包按平台语料重建（#231）**：`story-write` 题材风格包从 4 个扩到 10 个（新增世情打脸、民俗怪谈、悬疑、甜宠、双男主、沙雕脑洞），按七猫/知乎/黑岩/点众四平台真实语料重建开头模式、爽点密度、对话风格、情绪模式与结尾模式，并修正世情题材误路由。
 
 ### 改进
 
-- **部署侧（`agents_version` 17 → 18）**：`session-start.sh` 新增未完成日更批次提示（读活跃书目 `追踪/流水线.md` 的「批次状态：进行中」）；`CLAUDE.md.tmpl` / OpenCode `AGENTS.md.tmpl` 文件结构补 `追踪/流水线.md` 与可选 `设定/世界观不变量.md`。agents/rules 模板无变化；已部署项目重新运行 `/story-setup` 刷新 hooks 与 CLAUDE.md（部署后新开会话），不重跑仅缺 session-start 提示，写作流程不受影响。升级说明见 `story-setup/UPGRADING.md` v18。
-- `story-setup` 的 `CLAUDE.md.tmpl` 文件结构补 `情绪债务.md`/`创作偏好.md`，`上下文.md.tmpl` 待处理线索指向情绪债务；`story-import` 共享副本 `state-tracking.md` 已字节同步。本批未改 hooks/agents 模板结构，无需 bump `agents_version`；已部署项目重新运行 `/story-setup` 可刷新 CLAUDE.md 与上下文模板（旧项目缺 `情绪债务.md`/`创作偏好.md` 走缺失回退，不阻塞）。
-- `CLAUDE.md.tmpl` 文件结构追加稳定性可选目录（`设定/角色不变量/`、`追踪/漂移门控/`/`交接包/`/`稳定性审计/`，标注仅启用长篇稳定性验收时存在），重跑 `sync-opencode.py` 同步 `AGENTS.md.tmpl`（同时补齐此前情绪债务/创作偏好行漏跑的同步）。部署 hooks 无需改动、`agents_version` 不 bump：`check-prose-after-write.sh` 与 Codex `story_codex_hook.py` 的正文判定严格限定 `正文/第N章*.md`，`detect-story-gaps.sh` 只解析 `追踪/伏笔.md`，稳定性工件（含交接包内复制的伏笔行）不会被两端兜底网误扫。
-## v0.6.23
+- **长篇「剧情单元」概念统一并接入拆书产物（#246）**：把「剧情条 / 循环卡 / 正式情节循环 / 剧情段」五个混用叫法统一为**剧情单元**（卷纲里记为**剧情单元卡**），字段 循环ID/循环节拍/… → 单元ID/单元节拍/…（「循环」只保留节奏义如爽点循环）。拆书剧情单元接入卷纲/细纲：卷纲剧情单元卡新增「对标剧情参照」，对标节奏迁移改以剧情单元为选段单位，细纲分批边界改为「一批 = 一个剧情单元」，拆文侧 `剧情/README.md` 新增「剧情单元清单」索引（存量书可机械补建）。旧版卷纲/细纲/拆文库无这些字段一律不阻塞、按字段结构回退读取，仅在补纲/改纲时升级。story-write 场景表新增「补纲/扩纲」入口与卷纲锁定定义。
+- **读者契约 + 终局储备推进模型（#237）**：用「读者契约 + 终局储备」双层推进模型替代原「成长预算」，放开单章爽感，治长篇推进过快导致后期无可写；Σ 字数预算契约（密/疏预算、Σ∈[章目标, ×1.1]）不变。
+- **去 AI 味闸口机器化（无状态，#246）**：写后正文网新增确定性毒句式检测（「不是 A 而是 B」全家族、声线反差、否定排比、预告收尾），落盘即自动扫描并推回命中；写下一章前新增「毒句式欠账门」——上一章有未清 blocking 命中且未标 `<!-- 去味:跳过 -->` 豁免时拦截（判据现算自文件本身，不落任何状态文件，node 缺失或解析失败一律放行）。豁免标记冒号全半角均认，同时使写后网跳过该章毒句式推回（其余网照常）。`check-ai-patterns.js` 同步新增 voice-contrast / negation-parade / reverse-not-is / trailer-ending（blocking，经真人语料零误报校准）与 quote-emphasis-tic（advisory）。四端（Claude/OpenCode/Codex/ZCode）共享同一份判定，js↔py 逐字 parity 锁 + 引号占位对齐 check-ai-patterns.js。
 
-- **ZCode 原生适配（#211）**：新增 `.zcode-plugin/plugin.json` 与根 `marketplace.json`，把仓库作为一个 `oh-story` plugin 暴露 13 个 Skills、13 个 Commands 和 ZCode Hooks；`story-setup` 新增 `target_cli=zcode`，部署 `.zcode/skills` / `.zcode/commands` / `.zcode/hooks`，安全合并 `.zcode/config.json` 与根 `AGENTS.md`。
-- **严格 Hook 契约**：新增无第三方依赖的 Node runner，覆盖 SessionStart 上下文/连续性恢复、PreToolUse 大纲守卫与 commit advisory、PostToolUse 正文轻量确定性网；非空 stdout 只输出 ZCode 3.3.4 接受的严格 JSON，异常写 stderr 并 fail-open。正文网 parity 从 Claude/OpenCode/Codex 扩到 ZCode。
-- **能力边界透明降级**：ZCode 3.3.4 不执行项目/plugin custom agents，也没有 `.zcode/rules`、PreCompact 或 SessionEnd；6 个依赖专业 Agent 的 Skill 与 story-review 在 ZCode 下明确降级 solo/direct，不伪造平台能力。
-- **验证与文档**：新增 ZCode adapter 静态检查、Hook 合成契约测试和 Windows/macOS/Linux CI；补充 ZCode 3.3.4 官方规范、Issue #211 与参考实现的调研报告。
-- 版本号升级到 `0.6.23`（Claude/ZCode marketplace + `skills/story/VERSION`）；`story-setup` 升级到 `1.2.7`，`agents_version` 保持 `17`（ZCode 不部署项目 Agent）。已部署 ZCode 项目升级时需重新运行 `$story-setup` 并新开 session。
+### 重构
+
+- **hook 核统一到共享 node 核 + parity 锁（#239 / #243）**：OpenCode 与 ZCode 收敛到同一份 `story_hook_core.js`（ZCode hook 564→198 行），Claude 的 4 个 bash hook 也把内嵌 python 收敛到该共享核（经 `story_hook_cli.js`），消灭此前唯一无守卫且已漂移的手抄实现；Codex 保留 python 实现，由 py↔js 逐字 parity 锁（`test-prose-net-parity.sh` A–E 层）钉住。补 node 缺失/损坏时的 fail-open 回归；大纲拦截保留纯 bash 兜底。
+- **技能契约体检 + fail-fast（#242）**：新增 `check-current-skill-contracts.py` + `current-contract.json`，把版本锚点、Phase、schema、主产物路径与细纲必填项固化成 CI 契约，`agents_version` 成为运行时过期判定的唯一权威；对标主产物（`剧情/情绪模块.md` / `剧情/节奏.md`）缺失改 fail-fast，不再用旧产物静默降级。
+- **仓库脚本加固（#233）**：共享文件/OpenCode 同步检查改只读 + 写安全，适配器生成器原子发布 + 异常回滚，新增四端真实 CLI 安装的兼容 workflow。
+
+### 修复
+
+- **Codex hook 空白 `.active-book` 首行当仓库根（#235）**：`.active-book` 首行为空时不再误把仓库根当活跃书目，对齐 bash oracle。
+
+### 其他
+
+- **去掉部署检查的文档措辞门禁（#240）**：删除「UPGRADING/README 必须写某句话」类脆弱措辞门禁，保留 `agents_version` 阈值等行为锚点。
+
+### 发布准备
+
+- 版本号升级到 `0.7.0`（`.claude-plugin/marketplace.json` + 根 `marketplace.json` + `.zcode-plugin/plugin.json` + `reasonix-plugin.json` + `skills/story/VERSION`）。`.story-deployed` 的 `agents_version` 本周期从 `17` 连续升到 `19`（#242 → 18，#246 → 19），`setup_skill_version` 为 `1.2.7`；本版含 hooks / agent 模板 / 项目规则模板的行为变更，已部署项目需重新运行 `/story-setup`（Codex 用 `$story-setup`）并**新开会话**获取，从 v0.6.22 升级重跑一次即到位。`UPGRADING.md` 新增 v18 / v19 条目，`README` / `README_EN` 版本说明收敛为最近 3 版（更早见 CHANGELOG）。
 
 ## v0.6.22
 
@@ -47,14 +42,14 @@ All notable changes to this project will be documented in this file.
 
 ### 新增
 
-- **题材正文提示卡（#226，合并 #222/#223/#224）**：`story-long-write` 新增 `genre-prose-cards/` 32 张番茄题材腔调卡 + 索引召回规范；写作时按 `设定/题材定位.md` 匹配召回单卡进写手，anti-leak 硬约束保证卡名/题材标签/置信度/条目/合规自评一律不进正文；narrative-writer 三端模板同步接入召回与按题材细化的文风指纹/Gate G 规则，chapter-extractor 模板新增 `chapter_formula` 逐章写法公式产物。
-- **短篇投稿层（#227）**：`story-short-write` 新增 `submission-craft.md`——知乎盐选/小程序/番茄三路平台基调矩阵（视角、矛盾演进、章末钩子、结局质感）、导语门面单独打磨（四维骨架+黄金三角，150-220 字）、付费点卡脖子断点与反推法排细纲；`story-short-analyze` 拆解时顺带记录投稿层进拆文报告。合并前盲评 A/B 四维全胜（register +0.55、structure +0.58）。
+- **题材正文提示卡（#226，合并 #222/#223/#224）**：`story-write` 新增 `genre-prose-cards/` 32 张番茄题材腔调卡 + 索引召回规范；写作时按 `设定/题材定位.md` 匹配召回单卡进写手，anti-leak 硬约束保证卡名/题材标签/置信度/条目/合规自评一律不进正文；narrative-writer 三端模板同步接入召回与按题材细化的文风指纹/Gate G 规则，chapter-extractor 模板新增 `chapter_formula` 逐章写法公式产物。
+- **短篇投稿层（#227）**：`story-write` 新增 `submission-craft.md`——知乎盐选/小程序/番茄三路平台基调矩阵（视角、矛盾演进、章末钩子、结局质感）、导语门面单独打磨（四维骨架+黄金三角，150-220 字）、付费点卡脖子断点与反推法排细纲；`story-analyze` 拆解时顺带记录投稿层进拆文报告。合并前盲评 A/B 四维全胜（register +0.55、structure +0.58）。
 - **deslop 任务卡点与比喻密度（#218）**：任务卡点只在改变信息/情绪/关系/代价/选择压力/伏笔/钩子承接时使用；新增 `metaphor-density-tic` advisory（像/仿佛/如同高密度堆叠检测）；朱雀定位为辅助信号，去 AI 味不越剧情边界。
-- **generic Web AI 部署（#216）**：story-setup 新增 `target_cli=generic` 文件模式（复制 `skills/` + 通用 `AGENTS.md`，不声明平台原生 hooks/custom agents）；`story-long-write` 补通用环境 solo/direct fallback。
+- **generic Web AI 部署（#216）**：story-setup 新增 `target_cli=generic` 文件模式（复制 `skills/` + 通用 `AGENTS.md`，不声明平台原生 hooks/custom agents）；`story-write` 补通用环境 solo/direct fallback。
 
 ### 改进
 
-- **长篇工作流防失控（#225）**：裸调用 `story-long-write` 不再自动进入正文/日更模式；开书流程默认停在大纲；日更批量有界；narrative-writer 只扩写细纲计划内情节点，不足时返回 `outline_underfilled` 欠账报告交主会话补纲；理顺 setup → import → long-write 的续写工程顺序。
+- **长篇工作流防失控（#225）**：裸调用 `story-write` 不再自动进入正文/日更模式；开书流程默认停在大纲；日更批量有界；narrative-writer 只扩写细纲计划内情节点，不足时返回 `outline_underfilled` 欠账报告交主会话补纲；理顺 setup → import → long-write 的续写工程顺序。
 - **全套件文档瘦身（#228）**：13 个 skill 系统审计后删除可证行为不变的冗余——逐字/同义重复、过期目录、失效行号锚、维护性注释、跨体裁死段、悬空指针，53 文件净 −32.9KB；同名副本组全部字节同步；Σ 字数预算契约、anti-leak、hook 锚点零触碰。
 - **deslop 防检测器博弈（#220 / #221）**：吸收社区反 AI 思路但不做讨好检测器的硬规则；新增 `action-list-tic` advisory（监控镜头式动作链）；外部检测器明确为自检参考、不替代人工通读；恢复朱雀 AIGC 检测 CLI 致谢。
 
@@ -68,9 +63,9 @@ All notable changes to this project will be documented in this file.
 
 ### 改进
 
-- **短篇写作 references 清理（#206）**：`story-short-write` 删除 13 个长篇继承残留参考（角色、长篇结构、通用题材读者、开篇、状态追踪等），避免短篇写作继续被长篇规则误导。新增短篇专属基础层：`short-format.md`（硬格式/段落/标点/正文契约）、`short-craft.md`（短篇叙事姿态、情绪直给+体感焊接、三维度揉进、密度控制）、`short-deslop.md`（短篇去 AI 味，只杀真 AI 腔，不杀情绪烈度）。
+- **短篇写作 references 清理（#206）**：`story-write` 删除 13 个长篇继承残留参考（角色、长篇结构、通用题材读者、开篇、状态追踪等），避免短篇写作继续被长篇规则误导。新增短篇专属基础层：`short-format.md`（硬格式/段落/标点/正文契约）、`short-craft.md`（短篇叙事姿态、情绪直给+体感焊接、三维度揉进、密度控制）、`short-deslop.md`（短篇去 AI 味，只杀真 AI 腔，不杀情绪烈度）。
 - **题材包接管短篇风格（#206）**：新增 `genre-styles/追妻火葬场.md`、`复仇打脸.md`、`总裁豪门.md`、`宅斗宫斗.md` 四个短篇题材包，把开头模式、爽点密度、对话风格、情绪模式、结尾模式收束到题材本地；冷门题材仍可降级读取 `genre-writing-formulas.md`。
-- **短篇/拆文 AI 规则边界显式化（#206）**：共享 `output-contract.md` 明确拆文报告质量门仍走 `story-short-analyze/references/anti-ai-writing.md`，短篇成稿去 AI 味走 `story-short-write/references/short-deslop.md`，避免两套规则继续靠“本地 AI 腔规则文件”这种隐式短语耦合。
+- **短篇/拆文 AI 规则边界显式化（#206）**：共享 `output-contract.md` 明确拆文报告质量门仍走 `story-analyze/references/anti-ai-writing.md`，短篇成稿去 AI 味走 `story-write/references/short-deslop.md`，避免两套规则继续靠“本地 AI 腔规则文件”这种隐式短语耦合。
 - **部署模板同步短篇例外（#206）**：`story-setup` 的 narrative-writer Claude/OpenCode/Codex 模板同步短篇题材包例外：短篇需要“情绪词 + 体感/动作焊住”时不强制改成纯动作外化，只清理空泛无体感的 AI 情绪总结。
 
 ### 发布准备
@@ -98,7 +93,7 @@ All notable changes to this project will be documented in this file.
 
 - **Codex CLI 适配 + OpenClaw 兼容（#186, #189）**：`$story-setup` 部署 `.codex/agents/*.toml`（由 Claude agent 模板经 `generate-codex-agents.py` 生成）与 `.codex/hooks.json`；Codex 就地用 repo 时扫 `.agents/skills`（symlink 到 `skills/`，#189 加 symlink 守卫并记 Windows `core.symlinks` 坑）。补齐 OpenClaw skills-only 兼容（单行 frontmatter + `metadata.openclaw` + `story-setup target_cli=openclaw`），并加固 OpenCode/Codex 适配漂移守卫（`check-opencode-adapter.sh` / `check-codex-adapter.sh`）。
 - **自定义文风优先于对标文风（#194）**：每章写作前先读 `设定/文风.md`，含实质内容即进入「自定义文风模式」——它作权威风格基（句长 / 软标点 / 对话潜台词 / 情绪交替），对标 / 拆文 `文风.md` 降为参考（原文锚点 + 句长兜底）；`narrative-writer` 文风指纹新增「来源」字段，用户新增/改 `设定/文风.md` 后用新来源刷新句长带快照、不再被旧对标永久压住（三端模板 + `上下文.md.tmpl`）。
-- **模型退化 + 工程词泄漏检测器（#173）**：新增 `check-degeneration.js`（4 份字节同步），确定性检测弱模型退化——逐字复读/打转、末尾截断、占位/拒绝语（`作为AI`/`我无法续写`/`（此处省略）`/乱码 �）、工程词漏进正文（`细纲`/`情节点`/`本章`/`下一章` 等）；每条 finding 带 `severity: blocking|advisory`（blocking 即重写、tier2 章节/歧义词只提示，对话行里的 tier1 工程词降级 advisory）。接入 `story-long-write`/`story-deslop`/`story-review`/`story-short-write` 收尾复扫，`story-review` 子 Agent prompt 补「继承的开放项」做跨批连续性。
+- **模型退化 + 工程词泄漏检测器（#173）**：新增 `check-degeneration.js`（4 份字节同步），确定性检测弱模型退化——逐字复读/打转、末尾截断、占位/拒绝语（`作为AI`/`我无法续写`/`（此处省略）`/乱码 �）、工程词漏进正文（`细纲`/`情节点`/`本章`/`下一章` 等）；每条 finding 带 `severity: blocking|advisory`（blocking 即重写、tier2 章节/歧义词只提示，对话行里的 tier1 工程词降级 advisory）。接入 `story-write`/`story-deslop`/`story-review`/`story-write` 收尾复扫，`story-review` 子 Agent prompt 补「继承的开放项」做跨批连续性。
 - **碎句号/长段落检测 + 破折号按功能改写（#188）**：`check-ai-patterns.js`（4 份字节同步）新增碎句号（连续短叙述句无呼吸）、长段落（>200 字按镜头断段）检测，与破折号按功能改写建议（打断→动作 beat/短句、拖长音→省略或动作、插入说明→逗号/冒号，不一律改句号）；每条 finding 带 `severity`，混合行（叙述 + 引号内物件）不再被一个引号整行豁免，`story-review` 指定 em-dash 归口 `check-ai-patterns.js` 并与 normalize 去重。
 - **正文兜底 + 跨批连续性确定性网（#195）**：新增 deployed hook `check-prose-after-write.sh`（PostToolUse Write/Edit 落盘后跑硬信号兜底——截断、拒绝语/AI 自指、工程词泄漏、逐行复读、字数欠账），即使主会话漏跑确定性收尾也能兜住；三端（Claude/OpenCode/Codex）轻量网 parity 守卫，Codex 用 Stop 回合末 git 改动集扫描；跨批连续性在会话起点提醒续写断线 / 章节撞名。
 - **OpenCode 子代理模型自动配置（#191）**：`$story-setup` 含 `target_cli=opencode` 时检测 `opencode models` 并按等级为各写作 agent 写入 `model:` 字段，避免低成本 agent 继承主模型造成高额消耗；逐级 AskUserQuestion 选择，支持自定义输入/保留现有/跳过，优先按 `opencode models --verbose` 的成本分级、关键词作回退。
@@ -126,10 +121,10 @@ All notable changes to this project will be documented in this file.
 
 ### 改进
 
-- **对话机械化/论文腔/不分场合修复（#171）**：`narrative-writer` 参考表接入 `dialogue-mastery`（按需读取），审查清单新增对话质量逐项（机械对话/角色科普嘴/说话不分场合）、新增「写完后对话自检」收尾步使对话检查每章必跑；写前意图确认（`story-long-write` 3.3 / `workflow-daily` 2.4）新增「③对话声线基线」按本章基调收敛（高压 beat→搞笑声线让位、信息型配角不当科普嘴、逐句承接对方情绪）；`story-review` Agent2（character-designer）新增对话三症状独立审查。`dialogue-mastery.md`（4 份同步）补「每句回应上一句情绪」「Gate G 同样管台词」「场合例外声线让位」。
+- **对话机械化/论文腔/不分场合修复（#171）**：`narrative-writer` 参考表接入 `dialogue-mastery`（按需读取），审查清单新增对话质量逐项（机械对话/角色科普嘴/说话不分场合）、新增「写完后对话自检」收尾步使对话检查每章必跑；写前意图确认（`story-write` 3.3 / `workflow-daily` 2.4）新增「③对话声线基线」按本章基调收敛（高压 beat→搞笑声线让位、信息型配角不当科普嘴、逐句承接对方情绪）；`story-review` Agent2（character-designer）新增对话三症状独立审查。`dialogue-mastery.md`（4 份同步）补「每句回应上一句情绪」「Gate G 同样管台词」「场合例外声线让位」。
 - **续写文风漂移（逗号结巴体）每章自检（#168）**：`narrative-writer` 新增「写完后文风自检」收尾步，取目标句长带粗测本章句段长/碎句比，漂移即按目标带把碎句合并回中长句重写（以 `文风.md`/原文锚点为准，不模仿可能已漂移的上一章）；目标句长带快照钉进抗 compaction 的 `追踪/上下文.md` 新增「## 文风指纹」区（首次写作从 `文风.md` 快照填入、之后不变），自检优先据上下文指纹判漂，闭合长会话 compaction 后丢失文风路径的盲区。
 - **新名词/设定首次出现给读者锚点（#175）**：`anti-ai-writing.md`（6 份同步）Gate G/模式8 自检后补反向制衡「删解释腔 ≠ 把读者读懵」——新名词/设定首次出现仍要靠角色动作反应/对话半句/场景物理后果一笔带出当下作用，不整段讲来历、也不甩零信息生词，并给「蓝晶」示例区分「锚 vs 解释」。
-- **AI 句式硬门槛 + detector 复扫（#166）**：`narrative-writer`、写作 skill、review/deslop 流程把「先否定再肯定」翻转句式列为硬禁令（文风召回/对标模仿/Gate B 软规则都不能覆盖）；`story-deslop`/`story-long-write`/`story-short-write`/`story-review` 携带本地 `check-ai-patterns.js`，文件模式在预检/交付前 `node scripts/check-ai-patterns.js --check <正文文件…>` 复扫到 0；narrative-writer 无 Bash 工具时只报告已自检、不谎称已运行脚本。detector 收敛误报：`是`-类连词（只是/可是/于是…）、either-or「不是A就是B / 也是B」与句尾反问「…，是吗 / 是吧 / 是嘛」不再被当成翻转句式（4 份同步副本 + 回归用例）。
+- **AI 句式硬门槛 + detector 复扫（#166）**：`narrative-writer`、写作 skill、review/deslop 流程把「先否定再肯定」翻转句式列为硬禁令（文风召回/对标模仿/Gate B 软规则都不能覆盖）；`story-deslop`/`story-write`/`story-write`/`story-review` 携带本地 `check-ai-patterns.js`，文件模式在预检/交付前 `node scripts/check-ai-patterns.js --check <正文文件…>` 复扫到 0；narrative-writer 无 Bash 工具时只报告已自检、不谎称已运行脚本。detector 收敛误报：`是`-类连词（只是/可是/于是…）、either-or「不是A就是B / 也是B」与句尾反问「…，是吗 / 是吧 / 是嘛」不再被当成翻转句式（4 份同步副本 + 回归用例）。
 - **封面：强制收集笔名 + 平台尺寸由裁剪兜底（#176）**：`story-cover` Step 1 缺书名/笔名先 AskUserQuestion 补全、不留空；`GPT_IMAGE_SIZE` 降级为「目标比例提示」（实测多数中转/聚合代理忽略 size，对任意请求都返回约 2:3 竖图）；新增 Step 3.5 居中裁剪+缩放（crop-to-fill），不论出图比例都确定性裁成平台精确像素（番茄 600×800），不变形、不依赖代理是否认 size；提示词书名/笔名留中心安全区（inner ~85%）。
 
 ### 修复
@@ -153,9 +148,9 @@ All notable changes to this project will be documented in this file.
 
 ### 新增 / 改进
 
-- **长篇细纲升级为章节蓝图（#162）**：`story-long-write` 的 `大纲/细纲_第XXX章.md` 保留旧字段（核心事件、目标情绪、章首/章尾钩子、爽点、字数目标），新增内容概括（起因/发展/转折/高潮/结尾）、情节安排（主线/辅线/事件线/感情线/逻辑线）、人物关系和出场顺序、情节细化、结尾设定和钩子。
+- **长篇细纲升级为章节蓝图（#162）**：`story-write` 的 `大纲/细纲_第XXX章.md` 保留旧字段（核心事件、目标情绪、章首/章尾钩子、爽点、字数目标），新增内容概括（起因/发展/转折/高潮/结尾）、情节安排（主线/辅线/事件线/感情线/逻辑线）、人物关系和出场顺序、情节细化、结尾设定和钩子。
 - **日更与导入消费新版蓝图**：日更准备层会显式读取内容概括、多线安排、人物出场、代价/收益与章尾承接；旧版细纲缺新版字段不阻塞，补建/回填未知项统一写 `[待补充]`；`story-import` 只从证据反推新版字段，不编造副线或关系。
-- **细纲蓝图上下游贯通（#162 下游细化）**：把已有 craft reference 接进日更写作/核对闭环，复用现有字段、零新概念——`内容概括` 发展/转折按 `plot-emotion-system` 倒推法做爽点铺垫（不铺=空洞）；`视角/信息差` 经 `出场顺序` 的在场配角放大成差异化反应（`plot-core-methods` 集体震惊）；`情节点功能标签` 即 `commercial-core-methods` 目的词，驱动展开/带过详略。落在 `story-long-write` 写前准备（3.3/2.4）+ 对照细纲核对（每条带修复动作），`story-architect` 模板同步叫法对齐；不新增字段/文件，旧细纲仍非阻塞。
+- **细纲蓝图上下游贯通（#162 下游细化）**：把已有 craft reference 接进日更写作/核对闭环，复用现有字段、零新概念——`内容概括` 发展/转折按 `plot-emotion-system` 倒推法做爽点铺垫（不铺=空洞）；`视角/信息差` 经 `出场顺序` 的在场配角放大成差异化反应（`plot-core-methods` 集体震惊）；`情节点功能标签` 即 `commercial-core-methods` 目的词，驱动展开/带过详略。落在 `story-write` 写前准备（3.3/2.4）+ 对照细纲核对（每条带修复动作），`story-architect` 模板同步叫法对齐；不新增字段/文件，旧细纲仍非阻塞。
 - **短篇小节大纲轻量增强**：`小节大纲.md` 增加结构段/五段功能、人物/关系变化、因果/逻辑链、结尾承接/钩子等字段，但不套长篇完整章节蓝图，避免短篇流程变重。
 - **术语白话化（去自造黑话，语义不变）**：把作者面向的晦涩自造/借用复合词换成白话——蓝图兑现→对照细纲核对、三维度织入→三维度揉进、镜头断段→画面分段、最简记忆包→本节速记、质量门控→质量检查、准备层→写前准备、角色位抽象→看成功能位、五重驱动→五项驱动、孤立情节兜底→散落情节兜底、结构物件→贯穿道具、三现编排→三次出现、few-shot→范例片段、目标函数→目标、字数探针→字数检查 等；保留 功能位/信息团/目的词/戏剧单元/疏密分配 等行业真实术语；跨 skill 字节同构副本同步，本地守卫全绿。
 - **语气标点谱系（#161）**：writer references、`narrative-writer`、`story-review`、`story-deslop` 增加“标点服务语气/人物声线”的规则：质问用问号，爆发峰值少量感叹；犹豫/未尽/打断/拖长改用动作停顿、短句或换行处理，正文产物不再使用 `……` / `——`；同时明确禁止通篇句号化和随机标点堆砌。
@@ -164,7 +159,7 @@ All notable changes to this project will be documented in this file.
 
 ### 修复
 
-- **skill 指令一致性（左右互搏收敛）**：统一 `story-long-write` 日更读取列表与 `workflow-daily.md` 中 `剧情/情绪模块.md` / `剧情/节奏.md` 的缺失措辞——明确 v12 新契约缺失停下修复、仅 legacy 回退，消除与权威「缺失文件回退」规则的冲突；`story` 路由的「查故事资料 / 查资料」改为先做轻量 agent 可用性检查，不可用时降级直接 Read/Grep 并标注 `Fallback: agent unavailable -> direct lookup`，不再无条件直接 spawn。
+- **skill 指令一致性（左右互搏收敛）**：统一 `story-write` 日更读取列表与 `workflow-daily.md` 中 `剧情/情绪模块.md` / `剧情/节奏.md` 的缺失措辞——明确 v12 新契约缺失停下修复、仅 legacy 回退，消除与权威「缺失文件回退」规则的冲突；`story` 路由的「查故事资料 / 查资料」改为先做轻量 agent 可用性检查，不可用时降级直接 Read/Grep 并标注 `Fallback: agent unavailable -> direct lookup`，不再无条件直接 spawn。
 - **标点规范化器边界修复**：`normalize-punctuation.js` 对紧跟开引号 / 开括号（`「『（(“‘`）的 `……` / `——` 删空处理，修复 `「……你回来了。」` 被误改成 `「，你回来了。」`、`「……」` 被改成 `「。」` 的问题；句末拖长、数字区间、冒号落点等既有行为不变（4 份副本保持字节一致）。
 
 ### 发布准备
@@ -194,7 +189,7 @@ All notable changes to this project will be documented in this file.
 
 ### 性能
 
-- **削减 prompt-cache miss**：`story-deslop` / `narrative-writer` / `story-long-analyze` 拆解管道的提示词缓存未命中优化（#142）。
+- **削减 prompt-cache miss**：`story-deslop` / `narrative-writer` / `story-analyze` 拆解管道的提示词缓存未命中优化（#142）。
 
 ### 说明
 
@@ -208,10 +203,10 @@ All notable changes to this project will be documented in this file.
 
 ### 改进
 
-- **story-import（交付物＝写作工程）**：开篇与原则 1 明确「交付物是可续写的写作工程」——`拆文库/` 是工程的一部分（喂给 `对标/`）、非用完即弃的中间产物；Phase 1 新增「1.0 确认意图」，用户意图不明时主动询问「建写作工程 vs 只要拆文库分析」并分流（只要分析直接走 `/story-long-analyze`）。
+- **story-import（交付物＝写作工程）**：开篇与原则 1 明确「交付物是可续写的写作工程」——`拆文库/` 是工程的一部分（喂给 `对标/`）、非用完即弃的中间产物；Phase 1 新增「1.0 确认意图」，用户意图不明时主动询问「建写作工程 vs 只要拆文库分析」并分流（只要分析直接走 `/story-analyze`）。
 - **移除 `[导入反推]` 约定**：删除 story-import 原「原则 3：标注导入来源」及所有 `[导入反推]` 标记/校验项，不确定字段统一改 `[待补充]`（`SKILL.md` + `structure-mapping-long/short` + `character-state-reverse` 同步）。
-- **story-long-analyze 拆文契约补强 + 基调/主题标签枚举扩展**（#136）。
-- **story-short-analyze 门控/计数口径补强**：情节节点计数口径明确（复合合并共用一个 N 编号、密度校验按最终 N 编号总数计）；Phase 7.1 AI 腔自检补源文豁免规则（跳过 `>` 引用行与表格原文直引列，只扫分析师本人措辞）（#136）。
+- **story-analyze 拆文契约补强 + 基调/主题标签枚举扩展**（#136）。
+- **story-analyze 门控/计数口径补强**：情节节点计数口径明确（复合合并共用一个 N 编号、密度校验按最终 N 编号总数计）；Phase 7.1 AI 腔自检补源文豁免规则（跳过 `>` 引用行与表格原文直引列，只扫分析师本人措辞）（#136）。
 - **banned-words 最毒句式补变体**：「不是A，（而）是B」标注「而」可省、省掉也算命中（6 份同步副本一并更新）（#136）。
 
 ### Bug 修复
@@ -221,7 +216,7 @@ All notable changes to this project will be documented in this file.
 ### Demo 与文档
 
 - **拆文 demo 按新契约全量重做**：`demo/拆文库-盘龙`（长篇拆文）、`demo/拆文库-曾将爱意私藏`（短篇拆文，替换原文缺失的「影子拳手」demo）。
-- **新增 story-import 长篇续写工程 demo**：`demo/让你管账号，你高燃混剪炸全网`——番茄前 20 章逆向重建为可续写工程（正文 / 设定 / 大纲 / 追踪 / 参考资料），可直接 `/story-long-write` 日更续写第 21 章。
+- **新增 story-import 长篇续写工程 demo**：`demo/让你管账号，你高燃混剪炸全网`——番茄前 20 章逆向重建为可续写工程（正文 / 设定 / 大纲 / 追踪 / 参考资料），可直接 `/story-write long` 日更续写第 21 章。
 - **README / README_EN**：新增三个 demo 展示块（短篇拆文 / 长篇拆文 / 长篇续写工程）+ 交流群与 Discussions 链接（#131）。
 
 ### 工程
@@ -239,7 +234,7 @@ All notable changes to this project will be documented in this file.
 
 ### 改进
 
-- **story-long-write（细纲后自动建档）**：Phase 3 细纲段新增「细纲后设定补全」——每批细纲建完后扫描会复用的新具名角色/势力/关键设定，自动建 `设定/角色|势力|世界观` 档案 + `追踪/角色状态` 初始条目。按卷纲/细纲判断是否复用，一次性路人不建档；已存在按细纲增量补充、不覆盖；只填细纲已确定信息、留占位符、不杜撰。产物映射表补 `设定/角色|势力` 行；单章流程 step 11 增补「正文里首次引入的会复用角色」按同规则建档。（Closes #123）
+- **story-write（细纲后自动建档）**：Phase 3 细纲段新增「细纲后设定补全」——每批细纲建完后扫描会复用的新具名角色/势力/关键设定，自动建 `设定/角色|势力|世界观` 档案 + `追踪/角色状态` 初始条目。按卷纲/细纲判断是否复用，一次性路人不建档；已存在按细纲增量补充、不覆盖；只填细纲已确定信息、留占位符、不杜撰。产物映射表补 `设定/角色|势力` 行；单章流程 step 11 增补「正文里首次引入的会复用角色」按同规则建档。（Closes #123）
 - **SessionStart hook 中文化**：`detect-story-gaps.sh` 与 `session-start.sh` 面向作者展示的输出改为中文（保留 `[WARN]`/`[INFO]` 级别标记与 `/story-setup` 等命令名），降低非技术中文作者每次会话开始的理解成本。
 - **dialogue-mastery 语言差异化表补全为 7 维**：原表只有 5 行，与同文件自查清单及 character-designer agent 写的「7 维差异化」矛盾；补上「身份影响措辞 / 进度影响态度」两维，4 个字节同步副本（long-write / short-write / agent-references / story-review）一并更新。
 - **文档纠偏**：`README_EN` 安装命令补 `-g` 全局参数 + 全局/局部说明，短篇结构块纠正为真实文件名（`正文.md` / `小节大纲.md` / `拆文库/`，删不存在的 `References/`），对齐 `README.md`；`CONTRIBUTING` 把 CI 描述纠正为实际的 4 个守卫脚本 + `node --check`。
@@ -255,7 +250,7 @@ All notable changes to this project will be documented in this file.
 - **跨平台 python 守卫**：新增 `scripts/check-python-invocation.sh`（禁止 `skills/` 里裸调 `python3`，覆盖 `-c`/`-m`/`<<`/脚本路径，放行探测列表与说明文字）与 `scripts/test-charcount-portable.sh`（构造中文路径 + 已知字数断言，`--stub` 模式塞入 exit-49 假 `python3` 复现 Windows 故障并断言回退到可用解释器）；`cross-platform.yml` 三平台接入，Windows 用 Git Bash 跑 stub 测试。
 - **CI 语法守卫**：`cross-platform.yml` static-check 新增 `node --check`，覆盖全部 `*-scraper.js` + `cdp-utils.js` + `setup-cdp-chrome.js`（此前 0 覆盖，语法回归可直接进主干）。
 - **采集脚本健壮性（7 个 scraper）**：`writeFileSync` 前补 `fs.mkdirSync(OUTDIR,{recursive})`（`--outdir` 指向不存在目录不再 ENOENT 丢数据）；裸 `main()` 统一包 try/catch + `process.exit(1)`；fanqie 额外补 per-category / per-channel try/catch（单品类/单频道失败不中断整轮）。
-- **check-shared-files 精度提升**：`character-basics` / `character-design-methods` / `character-relations` 此前被整体豁免、漂移不报警；改为只排除 story-short-analyze 那份（带分析师视角 header 的有意分叉），其余副本仍强制字节一致，恢复对 writer↔writer 漂移的守卫。
+- **check-shared-files 精度提升**：`character-basics` / `character-design-methods` / `character-relations` 此前被整体豁免、漂移不报警；改为只排除 story-analyze 那份（带分析师视角 header 的有意分叉），其余副本仍强制字节一致，恢复对 writer↔writer 漂移的守卫。
 
 ### 说明
 
@@ -290,13 +285,13 @@ All notable changes to this project will be documented in this file.
 
 ### 改进
 
-- **story-long-scan（选题决策）**：Phase 4 从「在对话里匹配」升级为产出持久的 `选题决策.md`——按「选题四步」给 2-3 个推荐选题（能爆的原因[待拆文验证] / 市场验证 / 差异化定位 / 可行性高·中·低 + 失败风险 + 验证动作 / 篇幅平台）。可行性按现有 `[数据稀疏]`/<15 样本门控封顶（样本不足不给「高」），内置知识模式一律「中」。方法见新增 `references/topic-decision.md`。
-- **story-long-analyze（爆款原因回填）**：Stage 5 汇总报告产出后，若项目根有 `选题决策.md`，按题材关键词匹配回填对应选题的「能爆的原因」（引用本书 写法技巧/可借鉴套路/核心机制，标注为单本假设级支撑）；多匹配问用户、无匹配静默跳过、已填不覆盖。锚定 Stage 5 终态，不受 Stage 6（文风，失败容忍）影响。
-- **story-long-write（消费选题）**：Phase 1 先查项目根 `选题决策.md`——存在则以可行性最高的选题为开书起点 + 看扫榜日期提示数据新鲜度；缺失则提示路径后回退原有选题提问。
-- **story-long-write / story-short-write（按主题索引）**：两个 write SKILL.md 新增「按主题快速定位」横切主题索引（爽点/情绪/节奏/高潮/金手指/感情线/反转/人物/去AI味），每主题给一个权威文件 + 配套文件；爽点按「设计/翻盘/打脸/题材公式」意图分流。检索提升经 A/B 实测（带索引 vs 不带）。
-- **story-long-write（女频长篇）**：新增 `references/female-audience-writing.md`——女频核心原则、文案结构、长线题材骨架、卷级感情节奏、多平台（番茄女生/起点女生/晋江/七猫）写法定位。
-- **流程衔接补全**：story-setup、story-review 补「流程衔接」段（封面/浏览器工具等边缘 skill 不强加）；story `选题决策` 路由 → story-long-scan。
-- **story-short-write**：`output-contract.md` 接入 Phase 2「对标上下文加载」+ 参考资料表（原为孤儿文件）。
+- **story-scan（选题决策）**：Phase 4 从「在对话里匹配」升级为产出持久的 `选题决策.md`——按「选题四步」给 2-3 个推荐选题（能爆的原因[待拆文验证] / 市场验证 / 差异化定位 / 可行性高·中·低 + 失败风险 + 验证动作 / 篇幅平台）。可行性按现有 `[数据稀疏]`/<15 样本门控封顶（样本不足不给「高」），内置知识模式一律「中」。方法见新增 `references/topic-decision.md`。
+- **story-analyze（爆款原因回填）**：Stage 5 汇总报告产出后，若项目根有 `选题决策.md`，按题材关键词匹配回填对应选题的「能爆的原因」（引用本书 写法技巧/可借鉴套路/核心机制，标注为单本假设级支撑）；多匹配问用户、无匹配静默跳过、已填不覆盖。锚定 Stage 5 终态，不受 Stage 6（文风，失败容忍）影响。
+- **story-write（消费选题）**：Phase 1 先查项目根 `选题决策.md`——存在则以可行性最高的选题为开书起点 + 看扫榜日期提示数据新鲜度；缺失则提示路径后回退原有选题提问。
+- **story-write / story-write（按主题索引）**：两个 write SKILL.md 新增「按主题快速定位」横切主题索引（爽点/情绪/节奏/高潮/金手指/感情线/反转/人物/去AI味），每主题给一个权威文件 + 配套文件；爽点按「设计/翻盘/打脸/题材公式」意图分流。检索提升经 A/B 实测（带索引 vs 不带）。
+- **story-write（女频长篇）**：新增 `references/female-audience-writing.md`——女频核心原则、文案结构、长线题材骨架、卷级感情节奏、多平台（番茄女生/起点女生/晋江/七猫）写法定位。
+- **流程衔接补全**：story-setup、story-review 补「流程衔接」段（封面/浏览器工具等边缘 skill 不强加）；story `选题决策` 路由 → story-scan。
+- **story-write**：`output-contract.md` 接入 Phase 2「对标上下文加载」+ 参考资料表（原为孤儿文件）。
 - **术语白话化（去自造比喻）**：可行性灯→可行性高/中/低、开方/处方→选题建议、爆款基因→能爆的原因、粗/细格栅级→直述追踪粒度、逻辑闭环→前后能圆回来、状态语义→状态含义、新范式→新玩法、解构/原子事件→拆解/最小情节点、地图颗粒度→地图详略、好感度×关系阶段矩阵→对照表；`source of truth`→数据源、`Artifact`→产物；story-import `管线`→`管道` 统一。
 - **README**：结构整理——list 化核心思路、前置项目文件结构、收拢知识体系段。
 
@@ -307,26 +302,26 @@ All notable changes to this project will be documented in this file.
 
 ## v0.6.11
 
-> story-short-analyze 输出契约 + Phase 7 门控验收 · 多对标书跨书召回（cross-book-recall）· write skill references 内容整理：反转类型对齐拆文枚举 + 跨书字段映射 + 去重瘦身
+> story-analyze 输出契约 + Phase 7 门控验收 · 多对标书跨书召回（cross-book-recall）· write skill references 内容整理：反转类型对齐拆文枚举 + 跨书字段映射 + 去重瘦身
 
 ### 改进
 
-- **story-short-analyze（短篇拆文）**：新增 `references/output-contract.md` 定义 analyze→write 输出契约——Stage→文件映射、`_meta.json` schema（含 `structure_counts`：beats/hooks/setup_clues/character_archetypes/reusable_structures/reversal_type）、下游消费规范。双副本与 story-short-write byte-equal，`scripts/check-shared-files.sh` 守护。拆文产物维持旧 3 文件名（拆文报告.md / 情节节点.md / 写作手法.md），不触及 story-short-write 既有读取。
-- **story-short-analyze**：Phase 1 加字数探针（`<15000` 短篇 / `15000-20000` 灰区询问 / `>20000` 建议改长篇）+ lightweight resume（读 `_meta.json.last_stage_in_progress` + `stages_completed` 续跑）；题材识别扫不到时显式填 `genre_detected="通用"`。
-- **story-short-analyze**：新增 Phase 7 门控验收——(7.1) 拆文报告 AI 腔自检；(7.2) `structure_counts` 数值/枚举校验（beats≥4 结构段、hooks≥3、reversal_type 在 7 枚举内）；(7.3) `output-templates.md` BLOCK 项扫描。`beats` 明确为结构段数（开端/发展/高潮/结局），情节节点 15-60 密度校验仍归 `情节节点.md`。`reversal_type` 枚举含「无反转」，甜宠/喜剧/报应型不被误伤（setup_clues 跳过阈值）。
-- **story-short-analyze**：8 份 genre/character reference 注入「## 用作拆文标尺时」分析师视角 header（仅 analyze 侧分叉，`IGNORE_NAMES` 标注 intentional，不 cascade 进 writer）。
-- **story-long-write / story-short-write（跨书召回）**：新增 `references/cross-book-recall.md`——项目根 `拆文库/` ≥2 本时启用多对标书跨书召回。三道防线：①副对标 `文风.md` 不读 ②角色/剧情/设定 模块只主对标 + 1 本同题材副对标 ③narrative-writer 输入只主对标。跨题材相关度由 agent 读「题材类型」字段自决（同题材/弱相关/不相关），不维护索引、不引入题材标号。长篇 4 个 + 短篇 2 个 HTML anchor 触发点，sync-source byte-equal 双副本。
-- **story-long-write / story-short-write（references 内容整理）**：`reversal-toolkit.md` 反转类型 5→7，补「认知反转」（追妻/世情主力——全程恨结尾翻成爱）「无反转」（甜宠/喜剧/报应型，走甜度递进或报应兑现），与 analyze `_meta.json.reversal_type` 七值枚举字面对齐。`cross-book-recall.md` 加「拆文字段→写作参考」映射表（structure_counts 各字段回查对应 reference）。
-- **story-long-write**：`narrative-units.md` 并入 `plot-emotion-system.md`（提炼层级零-四级 + 常见误区迁入，情绪模块/戏剧单元/卡片去重），减一份文件。
+- **story-analyze（短篇拆文）**：新增 `references/output-contract.md` 定义 analyze→write 输出契约——Stage→文件映射、`_meta.json` schema（含 `structure_counts`：beats/hooks/setup_clues/character_archetypes/reusable_structures/reversal_type）、下游消费规范。双副本与 story-write byte-equal，`scripts/check-shared-files.sh` 守护。拆文产物维持旧 3 文件名（拆文报告.md / 情节节点.md / 写作手法.md），不触及 story-write 既有读取。
+- **story-analyze**：Phase 1 加字数探针（`<15000` 短篇 / `15000-20000` 灰区询问 / `>20000` 建议改长篇）+ lightweight resume（读 `_meta.json.last_stage_in_progress` + `stages_completed` 续跑）；题材识别扫不到时显式填 `genre_detected="通用"`。
+- **story-analyze**：新增 Phase 7 门控验收——(7.1) 拆文报告 AI 腔自检；(7.2) `structure_counts` 数值/枚举校验（beats≥4 结构段、hooks≥3、reversal_type 在 7 枚举内）；(7.3) `output-templates.md` BLOCK 项扫描。`beats` 明确为结构段数（开端/发展/高潮/结局），情节节点 15-60 密度校验仍归 `情节节点.md`。`reversal_type` 枚举含「无反转」，甜宠/喜剧/报应型不被误伤（setup_clues 跳过阈值）。
+- **story-analyze**：8 份 genre/character reference 注入「## 用作拆文标尺时」分析师视角 header（仅 analyze 侧分叉，`IGNORE_NAMES` 标注 intentional，不 cascade 进 writer）。
+- **story-write / story-write（跨书召回）**：新增 `references/cross-book-recall.md`——项目根 `拆文库/` ≥2 本时启用多对标书跨书召回。三道防线：①副对标 `文风.md` 不读 ②角色/剧情/设定 模块只主对标 + 1 本同题材副对标 ③narrative-writer 输入只主对标。跨题材相关度由 agent 读「题材类型」字段自决（同题材/弱相关/不相关），不维护索引、不引入题材标号。长篇 4 个 + 短篇 2 个 HTML anchor 触发点，sync-source byte-equal 双副本。
+- **story-write / story-write（references 内容整理）**：`reversal-toolkit.md` 反转类型 5→7，补「认知反转」（追妻/世情主力——全程恨结尾翻成爱）「无反转」（甜宠/喜剧/报应型，走甜度递进或报应兑现），与 analyze `_meta.json.reversal_type` 七值枚举字面对齐。`cross-book-recall.md` 加「拆文字段→写作参考」映射表（structure_counts 各字段回查对应 reference）。
+- **story-write**：`narrative-units.md` 并入 `plot-emotion-system.md`（提炼层级零-四级 + 常见误区迁入，情绪模块/戏剧单元/卡片去重），减一份文件。
 
 ### Bug 修复
 
-- 修复 story-short-analyze `beats≥4` 门控形同虚设——原注释标「情节节点数」但情节节点真实下限 15-60，门控永远通过；改为「结构段数」语义，阈值与定义对齐。
-- 修复 story-short-analyze `reversal_type` 硬阻断会误伤无反转题材（甜宠/喜剧/报应型）——枚举补「无反转」并豁免 setup_clues 阈值。
-- 修复 story-short-analyze 字数探针边界 `15000` 重叠（`≤15000` 与 `15000-20000` 都含 15000）——改非重叠 `<15000 / 15000-20000 / >20000`。
+- 修复 story-analyze `beats≥4` 门控形同虚设——原注释标「情节节点数」但情节节点真实下限 15-60，门控永远通过；改为「结构段数」语义，阈值与定义对齐。
+- 修复 story-analyze `reversal_type` 硬阻断会误伤无反转题材（甜宠/喜剧/报应型）——枚举补「无反转」并豁免 setup_clues 阈值。
+- 修复 story-analyze 字数探针边界 `15000` 重叠（`≤15000` 与 `15000-20000` 都含 15000）——改非重叠 `<15000 / 15000-20000 / >20000`。
 - 修复 cross-book-recall 触发条件与 `workflow-daily.md` 优雅降级口径冲突——主对标书字段缺失统一为「字典序第一本并提示」，不 fail-fast。
-- 修复 story-long-write SKILL.md「五种反转类型」section-anchor 在 reversal-toolkit 改 7 类后静默失效——锚点同步为「反转类型」。
-- 清理 story-short-write `style-craft.md` 孤儿（SKILL.md 0 引用、无 agent load；long-write 副本保留仍用）。
+- 修复 story-write SKILL.md「五种反转类型」section-anchor 在 reversal-toolkit 改 7 类后静默失效——锚点同步为「反转类型」。
+- 清理 story-write `style-craft.md` 孤儿（SKILL.md 0 引用、无 agent load；long-write 副本保留仍用）。
 
 ### 验证
 
@@ -338,19 +333,19 @@ All notable changes to this project will be documented in this file.
 
 ## v0.6.10
 
-> story-long-analyze 拆解管道修正 + 拆文产物按主题拆分 + 下游 story-import / story-long-write 同步对齐 · story-deslop rubric 收紧 + 禁用句式批量导入 · 对标书产物术语作者化
+> story-analyze 拆解管道修正 + 拆文产物按主题拆分 + 下游 story-import / story-write 同步对齐 · story-deslop rubric 收紧 + 禁用句式批量导入 · 对标书产物术语作者化
 
 ### 改进
 
-- **story-long-analyze（长篇拆文）**：情节点下限统一到 10（原 SKILL.md 路由层与 chapter-extractor 校验层不一致：路由说 3-40，校验说 10-40——短章会被静默拆得过细或过粗）。5 处漂移位点全部对齐到 10-40。
-- **story-long-analyze**：Stage 6 文风提取的句长/标点统计从「眼测」改为 `python3` 切句脚本（按 `[。！？]` 切句、桶化短/中/长句、统计标点密度）。Stage 6 由主线程跑，Bash 工具可用；句长 confidence 从 low 升到 high。
-- **story-long-analyze**：Stage 4 拆为 4a / 4b / 4c——设定（世界观/金手指/势力）与 Stage 3 并行（数据源是 Stage 2 章节摘要 + 情节点，不依赖 Stage 3）；角色完整档案、角色关系串行依赖 Stage 3 合并后的角色实体。修正原并行图把「角色构建」放在 Stage 3 旁边的错误。
-- **story-long-analyze**：概要.md 拆分两版——Stage 0 写 ~200 字 thin first-pass（基于章节标题 + 抽样开头/结尾），Stage 5 用完整剧情信息写 500-1000 字全书概要，覆盖 Stage 0 的首版。避免 Stage 0 在没读完全书的情况下硬凑高密度概要。
-- **story-long-analyze**：新增 Stage 0.5 章节边界表，写入 `_progress.md`（`schema_version: 2`）。Stage 1/2/6 全部从该表取章节切片，不再各自跑 regex。旧 `_progress.md` 续跑时走 lazy migration——现场跑一次正则重建并写回，不破 `paused_after_stage1` 契约。章节正则补 `千` / `两`，支持 1000+ 章长篇。
-- **story-long-analyze**：chapter-extractor 默认 haiku，质量校验失败（情节点 < 10、原文引用缺失、类型/基调超出枚举、角色名为昵称等 9 条自检）→ 主线程用 sonnet 重 spawn 一次。两份 chapter-extractor 模板（`.claude/agents/` + `skills/story-setup/.../templates/agents/`）内容对齐到自包含版本（不再引用 `output-templates.md`）。
-- **story-long-analyze**：Stage 4 设定按主题拆分多文件输出——`设定/世界观/{背景设定,力量体系,地理,金手指}.md` + `设定/势力/{势力名}.md`，与下游 story-import / story-long-write 项目结构对齐，下游不再做 re-split。
+- **story-analyze（长篇拆文）**：情节点下限统一到 10（原 SKILL.md 路由层与 chapter-extractor 校验层不一致：路由说 3-40，校验说 10-40——短章会被静默拆得过细或过粗）。5 处漂移位点全部对齐到 10-40。
+- **story-analyze**：Stage 6 文风提取的句长/标点统计从「眼测」改为 `python3` 切句脚本（按 `[。！？]` 切句、桶化短/中/长句、统计标点密度）。Stage 6 由主线程跑，Bash 工具可用；句长 confidence 从 low 升到 high。
+- **story-analyze**：Stage 4 拆为 4a / 4b / 4c——设定（世界观/金手指/势力）与 Stage 3 并行（数据源是 Stage 2 章节摘要 + 情节点，不依赖 Stage 3）；角色完整档案、角色关系串行依赖 Stage 3 合并后的角色实体。修正原并行图把「角色构建」放在 Stage 3 旁边的错误。
+- **story-analyze**：概要.md 拆分两版——Stage 0 写 ~200 字 thin first-pass（基于章节标题 + 抽样开头/结尾），Stage 5 用完整剧情信息写 500-1000 字全书概要，覆盖 Stage 0 的首版。避免 Stage 0 在没读完全书的情况下硬凑高密度概要。
+- **story-analyze**：新增 Stage 0.5 章节边界表，写入 `_progress.md`（`schema_version: 2`）。Stage 1/2/6 全部从该表取章节切片，不再各自跑 regex。旧 `_progress.md` 续跑时走 lazy migration——现场跑一次正则重建并写回，不破 `paused_after_stage1` 契约。章节正则补 `千` / `两`，支持 1000+ 章长篇。
+- **story-analyze**：chapter-extractor 默认 haiku，质量校验失败（情节点 < 10、原文引用缺失、类型/基调超出枚举、角色名为昵称等 9 条自检）→ 主线程用 sonnet 重 spawn 一次。两份 chapter-extractor 模板（`.claude/agents/` + `skills/story-setup/.../templates/agents/`）内容对齐到自包含版本（不再引用 `output-templates.md`）。
+- **story-analyze**：Stage 4 设定按主题拆分多文件输出——`设定/世界观/{背景设定,力量体系,地理,金手指}.md` + `设定/势力/{势力名}.md`，与下游 story-import / story-write 项目结构对齐，下游不再做 re-split。
 - **story-import（已有小说导入）**：3.5 拆分步骤识别两种拆文库形态——`设定/世界观/` 子目录存在则 pass-through；只有单文件 `设定/世界观.md` 则走原 re-split 逻辑（早期拆文库或手动写的兜底）。
-- **story-long-write（长篇写作）**：单章准备层读取路径从 `设定/金手指.md 或 世界观.md` 改为 glob `设定/世界观/*.md`，回退到单文件 `设定/世界观.md`、再回退 `设定/金手指.md`，全缺失则跳过不阻塞。项目结构文档同步更新到按主题拆分布局。
+- **story-write（长篇写作）**：单章准备层读取路径从 `设定/金手指.md 或 世界观.md` 改为 glob `设定/世界观/*.md`，回退到单文件 `设定/世界观.md`、再回退 `设定/金手指.md`，全缺失则跳过不阻塞。项目结构文档同步更新到按主题拆分布局。
 - **story-deslop（去 AI 味）**：rubric 全面收紧 + 从两份高信号来源 prompt（prompt_11257 / prompt_78650）批量导入禁用句式。Gate B 新增「不是 A，而是 B」「声音不大，却带着……」并把「如同」并入 仿佛 / 犹如 / 宛若 家族；新增「修饰词清扫」子块（形容词 / 定语 / 副词 / 指示代词 / 量词）；Gate C / D 把「重复语义」拆成 4 桶（形容词 / 近义词 / 含义 / 上下文主语）+ 加「多余场景 / 人物 / 物品描写」子块；Phase 4 报告加「字数协议」（原文 / 修订后 / 净变化 / 上限）+ 3 轮 stop rule + 「再检一次」尾检；Phase 4 明确文件路径模式——直接走 Edit / Write，对话里只 emit ≤200 字样本（避免长章节重发）；narrative-writer spawn 加 anti-recursion guard；明确「嵌入式提醒」模式仅 Phase 1+2。
 - **story-deslop**：banned-words.md 新增「最毒禁用句式」表（毒级 ★★-★★★★★，仅来自两份 source prompt）；一级禁用补充 `如同` / `不容置喙` / `冰冷`；新增「书面腔→口语化」mini-table；新增「比喻分类」表（5 类，来自 prompt_78650）。anti-ai-writing.md 把「段落是否超过 3 句」改为网文段落规则（一句一段，≤4 分句，per prompt_78650）。6 份共享 reference 副本全部同步（涵盖 story-deslop / long-write / short-write / short-analyze / review / story-setup）。
 - **story-setup / 日更文档（术语）**：Stage 6 产物在日更文档和 setup agent 模板里的称呼统一从「文风画像」改成 `文风.md`；把实现层的 metadata 语言换成作者向的「生成记录」契约。既有 agent JSON 字段保持兼容。
@@ -358,10 +353,10 @@ All notable changes to this project will be documented in this file.
 
 ### Bug 修复
 
-- 修复 story-long-analyze 情节点下限漂移导致短章被过细切（路由层 3，校验层 10）。
+- 修复 story-analyze 情节点下限漂移导致短章被过细切（路由层 3，校验层 10）。
 - 修复 chapter-extractor 两份模板内容已经悄悄不一致（一份说「输出对齐 output-templates.md」，另一份说「不依赖外部模板」）。
 - 修复章节正则 `第[一二三四五六七八九十百零0-9]+章` 对 1000+ 章长篇（盘龙 / 诡秘之主等）匹配失败的截断问题。
-- 修复 story-long-write 日更循环读 `设定/金手指.md 或 世界观.md` 的扁平路径——拆文产物已经按主题拆到子目录后，这条扁平读取会 ENOENT 静默失败。
+- 修复 story-write 日更循环读 `设定/金手指.md 或 世界观.md` 的扁平路径——拆文产物已经按主题拆到子目录后，这条扁平读取会 ENOENT 静默失败。
 - 修复 story-deslop 英文触发词 `deslop` 与 `/oh-my-claudecode:ai-slop-cleaner` 冲突——删除该触发词避免误路由。
 - 修复 story-deslop 综合判定规则 off-by-one：「五项 → 六项」（评估表实际包含 6 个指标）。
 - 修复 story-deslop 「15% 上限」陈述与「分级删除上限 15/25/35%」不一致——统一改为「对应等级上限」。
@@ -371,11 +366,11 @@ All notable changes to this project will be documented in this file.
 ### 验证
 
 - F-codes（F1a/F1b/F2/.../F7）和 plan 上下文（`#F3-defer`）等开发期符号不外泄到 skill 文件——`grep -rn` 在 `skills/` 和 `.claude/agents/` 下 0 命中。
-- 情节点下限：`3-40` 在 `skills/story-long-analyze/` 和两份 chapter-extractor 副本下 0 命中；`10-40` 在期望的 6 处全部命中。
+- 情节点下限：`3-40` 在 `skills/story-analyze/` 和两份 chapter-extractor 副本下 0 命中；`10-40` 在期望的 6 处全部命中。
 - `python3` 切句脚本本地用真实中文小样本跑通：`sentences=6; short_lt15=66%; mid_15to30=33%; long_gt30=0%; avg_len=12; punct_density=15%`。
 - 章节正则补全 character class 含 `千` + `两`：`grep -F` 在 `style-profile-generator.md` 行 55 唯一命中。
 - 两份 chapter-extractor 副本 `diff -q` 空输出，byte-identical。
-- 跨 skill 读取路径审计：story-long-write 已无扁平 `设定/世界观.md` / `设定/金手指.md` 单点读，全部走 glob + 回退链；story-import 既能 pass-through 新版子目录形态，也能 re-split 单文件版本。
+- 跨 skill 读取路径审计：story-write 已无扁平 `设定/世界观.md` / `设定/金手指.md` 单点读，全部走 glob + 回退链；story-import 既能 pass-through 新版子目录形态，也能 re-split 单文件版本。
 - `_progress.md` 4 个状态值（`pending` / `paused_after_stage1` / `completed` / `completed_with_errors`）在 `pipeline-ops.md` 全部保留，无回归。
 - `scripts/check-shared-files.sh` 全过（story-deslop 改动涉及 6 份共享 reference 副本，banned-words.md / anti-ai-writing.md 跨 skill 同步）。
 - `scripts/check-story-setup-deployment.sh` / `scripts/static-check.sh` 通过；macos / windows / static-check 三套 CI 全绿。
@@ -416,10 +411,10 @@ All notable changes to this project will be documented in this file.
 
 ### 改进
 
-- **story-import（导入已有小说）**：按篇幅自动分流。长篇走 story-long-analyze 6 阶段管线 + 长篇结构迁移；短篇走 story-short-analyze + 短篇结构迁移（单文件 `正文.md`，不产 `追踪/`、`大纲/` 等长篇专属目录）。判定优先级：用户声明 > 章节结构 > 字数兜底 30000。
-- **story-import**：长篇新增「角色状态反推」7 步算法，从拆书产物反推 `追踪/角色状态.md`，不重读原文。补齐 story-long-write 日更准备层依赖的角色状态文件，避免导入书永久走兜底分支。
-- **story-import**：调用 story-long-analyze 时自动越过 Stage 1 停靠点，以「完整拆解、一次跑完、不要停下询问」模式驱动，确保 Stage 2-5 全套产物落地；停靠询问不透传给用户。
-- **story-import**：skill 自包含化。原先跨 skill 引用 story-long-write / story-short-write 的 references（22+ 处 `../` 路径）全部清除——迁移所需模板（关系/题材定位/卷纲/角色状态）内联到 story-import 自己的 reference 文件，叶子引用文件（state-tracking.md、format-and-structure.md）以本地副本管理。
+- **story-import（导入已有小说）**：按篇幅自动分流。长篇走 story-analyze 6 阶段管线 + 长篇结构迁移；短篇走 story-analyze + 短篇结构迁移（单文件 `正文.md`，不产 `追踪/`、`大纲/` 等长篇专属目录）。判定优先级：用户声明 > 章节结构 > 字数兜底 30000。
+- **story-import**：长篇新增「角色状态反推」7 步算法，从拆书产物反推 `追踪/角色状态.md`，不重读原文。补齐 story-write 日更准备层依赖的角色状态文件，避免导入书永久走兜底分支。
+- **story-import**：调用 story-analyze 时自动越过 Stage 1 停靠点，以「完整拆解、一次跑完、不要停下询问」模式驱动，确保 Stage 2-5 全套产物落地；停靠询问不透传给用户。
+- **story-import**：skill 自包含化。原先跨 skill 引用 story-write / story-write 的 references（22+ 处 `../` 路径）全部清除——迁移所需模板（关系/题材定位/卷纲/角色状态）内联到 story-import 自己的 reference 文件，叶子引用文件（state-tracking.md、format-and-structure.md）以本地副本管理。
 
 ### Bug 修复
 
@@ -431,7 +426,7 @@ All notable changes to this project will be documented in this file.
 - story-import 篇幅分流、角色状态反推、跨 skill 引用清零均经独立验证；`scripts/static-check.sh` 13/13 PASS，`scripts/check-shared-files.sh` 0 mismatches。
 - story-review / story-setup Agent 模板路径审计通过。
 - 起点畅销榜实时采集成功并生成 Markdown。
-- `node --check skills/story-long-scan/scripts/qidian-rank-scraper.js`
+- `node --check skills/story-scan/scripts/qidian-rank-scraper.js`
 - GitHub CI：macOS / Windows / static-check 全绿。
 
 ## v0.6.7
@@ -440,16 +435,16 @@ All notable changes to this project will be documented in this file.
 
 ### 改进
 
-- **story-long-analyze（长篇拆书）**：「快速 / 深度」双模式合并为单一拆解管道。「快速」不再是独立模式，而是管道跑完黄金三章（Stage 1）后的可停靠交付点——产出 `快速预览.md` 并询问是否继续全量拆解。确认后从 Stage 2 续跑，不重跑已完成阶段；`快速预览.md` 与终态 `拆文报告.md` 字段向上兼容。
-- **story-long-analyze**：文档单一事实源。质量阈值、分块策略统一归 `material-decomposition.md`；运维内容（`_progress.md` 模板、错误处理、恢复机制）拆出为独立的 `pipeline-ops.md`。
-- **story-short-analyze（短篇拆书）**：砍掉「标准 / 精细」双档，统一为单一全量拆解。双档在实操中无人遵守，连示范 demo 都没按标准模式产出。
-- **story-short-analyze**：质量阈值收敛到唯一权威文件；管道阶段术语 `Phase 2-6` 对齐为 `Stage 2-6`，与长篇 Stage 体系一致；新增原文备份前置步骤。
+- **story-analyze（长篇拆书）**：「快速 / 深度」双模式合并为单一拆解管道。「快速」不再是独立模式，而是管道跑完黄金三章（Stage 1）后的可停靠交付点——产出 `快速预览.md` 并询问是否继续全量拆解。确认后从 Stage 2 续跑，不重跑已完成阶段；`快速预览.md` 与终态 `拆文报告.md` 字段向上兼容。
+- **story-analyze**：文档单一事实源。质量阈值、分块策略统一归 `material-decomposition.md`；运维内容（`_progress.md` 模板、错误处理、恢复机制）拆出为独立的 `pipeline-ops.md`。
+- **story-analyze（短篇拆书）**：砍掉「标准 / 精细」双档，统一为单一全量拆解。双档在实操中无人遵守，连示范 demo 都没按标准模式产出。
+- **story-analyze**：质量阈值收敛到唯一权威文件；管道阶段术语 `Phase 2-6` 对齐为 `Stage 2-6`，与长篇 Stage 体系一致；新增原文备份前置步骤。
 - 黄金三章深度拆解产物由单文件拆为三个单章文件 `第N章_深度拆解.md`。
-- 同步更新下游 skill：story-long-write、story-import、chapter-extractor agent 模板的拆书术语与文件名引用。
+- 同步更新下游 skill：story-write、story-import、chapter-extractor agent 模板的拆书术语与文件名引用。
 
 ### Bug 修复
 
-- 修复 `story-short-write` 指向「自检模式 / 拆文模式」的悬空引用——这两个入口在 story-short-analyze 中并不存在。
+- 修复 `story-write` 指向「自检模式 / 拆文模式」的悬空引用——这两个入口在 story-analyze 中并不存在。
 - 修复短篇拆书情节节点密度在三处文件给出不一致数值的问题，统一到唯一权威的字数分档表。
 
 ### 验证
@@ -465,14 +460,14 @@ All notable changes to this project will be documented in this file.
 
 ### Bug 修复
 
-- 修复长篇 `/story-long-write 日更` 在多次会话后，同一批次内用户回复“继续”可能跳出 `workflow-daily.md`、直接进入正文续写的问题。
+- 修复长篇 `/story-write 日更` 在多次会话后，同一批次内用户回复“继续”可能跳出 `workflow-daily.md`、直接进入正文续写的问题。
 - 修复日更流程偶发绕过真实项目文件、依赖聊天记忆写作的问题：每章开始前必须确认读取本轮 workflow 内的细纲、上一章正文、上下文、伏笔、时间线和角色状态/设定。
 - 修复 SessionStart hook 把正常开放伏笔（`未埋` / `已埋`）当成问题提示，进而诱发全量伏笔审计和 token 膨胀的问题。
 - 修复 `workflow-daily.md` 中裸 `SKILL.md` section 描述被本地 static-check 误判为断裂 section 引用的问题。
 
 ### 改进
 
-- **story-long-write**：日更批量写作中，“继续 / 续写 / 日更”统一解释为继续当前 daily workflow，不重新进入场景选择，也不跳过状态筛选和意图确认。
+- **story-write**：日更批量写作中，“继续 / 续写 / 日更”统一解释为继续当前 daily workflow，不重新进入场景选择，也不跳过状态筛选和意图确认。
 - **workflow-daily**：正常批量执行时不再逐章询问“是否继续”；仅在细纲缺失、章节号冲突、请求范围超过已有细纲、用户要求改大纲/追踪等真实阻塞时暂停确认。
 - **伏笔处理**：日更流程只处理本轮新增、推进、回收的增量伏笔；全量伏笔审计只由 `/story-review` 或用户明确要求触发。
 - **story-setup**：`agents_version` 升级到 v7，既有项目重新运行 `/story-setup` 后可获得新版 hook/agent/rule。
@@ -485,7 +480,7 @@ All notable changes to this project will be documented in this file.
 - `bash scripts/check-shared-files.sh`
 - `bash scripts/static-check.sh`
 - GitHub CI：macOS / Windows / static-check 全绿
-- tmux + Claude Code 场景实测：构造 42 章长篇项目，执行 `/story-long-write 日更` 写第43章，再回复“继续”写第44章；两轮均保持在 daily workflow，读取必需上下文/伏笔/时间线/角色状态，未触发全量伏笔审计。
+- tmux + Claude Code 场景实测：构造 42 章长篇项目，执行 `/story-write 日更` 写第43章，再回复“继续”写第44章；两轮均保持在 daily workflow，读取必需上下文/伏笔/时间线/角色状态，未触发全量伏笔审计。
 
 ## v0.6.5
 
@@ -499,11 +494,11 @@ All notable changes to this project will be documented in this file.
 
 ### 改进
 
-- **story-short-write / story-long-write**：正文写作改为“三维度织入”，并明确按新动作/新物件/新信息/新对话断段
+- **story-write / story-write**：正文写作改为“三维度织入”，并明确按新动作/新物件/新信息/新对话断段
 - **story-deslop**：将“重复描写去重”纳入 Gate C/D，不再用专项门禁堆叠规则
-- **story-long-write / chapter-extractor / story-long-analyze**：长篇情节点密度统一为 150-200 字/个情节点，每章下限 10 个、上限 40 个
+- **story-write / chapter-extractor / story-analyze**：长篇情节点密度统一为 150-200 字/个情节点，每章下限 10 个、上限 40 个
 - **story-setup**：agents_version 升级到 v5，narrative-writer 模板同步新版场景写法、段落密度和跨平台字数统计规则
-- **story-short-write**：统一短篇 `对标/` 与 `拆文库/` 路径说明：项目根 `拆文库/` 为原始产出，短篇目录 `对标/` 为当前作品引用视图
+- **story-write**：统一短篇 `对标/` 与 `拆文库/` 路径说明：项目根 `拆文库/` 为原始产出，短篇目录 `对标/` 为当前作品引用视图
 
 ### 验证
 
@@ -522,7 +517,7 @@ All notable changes to this project will be documented in this file.
 
 ### 改进
 
-- **story-long-write SKILL.md**：
+- **story-write SKILL.md**：
   - 新增"核心方法"section（4 条原则：先定情绪、验证过的模式、模块组装、只加载必需信息）+ 情绪-题材对照表
   - Phase 1 首问从"写什么类型"改为"让读者什么感觉"
   - Phase 2 开头加入"从目标情绪出发"和"角色位抽象"引导
@@ -536,7 +531,7 @@ All notable changes to this project will be documented in this file.
   - 步骤重编号 1-10 连续无跳跃
   - narrative-writer prompt 注入准备层输出
   - Step 9（更新追踪）新增 `角色状态.md` 更新
-- **story-short-write SKILL.md**：
+- **story-write SKILL.md**：
   - 新增精简版"核心方法"section（3 条原则，不与执行规则重复）
   - Phase 2 引用改为"从目标情绪反推剧情"
   - 创作三检替换为 2 步准备层（记忆+召回 / 指令确认）
@@ -552,9 +547,9 @@ All notable changes to this project will be documented in this file.
 
 ### Bug 修复
 
-- **story-long-write**: `genre-writing-formulas.md` 引用了不存在的 `genre-writing-techniques.md`，改为正确的 `style-craft.md`
-- **story-long-write**: `format-and-structure.md` section 引用 `设计任务第 4 步` 在 long-write SKILL.md 中不存在，改为 `Phase 3 细纲`
-- **story-short-analyze**: 补充缺失的 `anti-ai-writing.md` 和 `banned-words.md`（从 story-deslop 复制）
+- **story-write**: `genre-writing-formulas.md` 引用了不存在的 `genre-writing-techniques.md`，改为正确的 `style-craft.md`
+- **story-write**: `format-and-structure.md` section 引用 `设计任务第 4 步` 在 long-write SKILL.md 中不存在，改为 `Phase 3 细纲`
+- **story-analyze**: 补充缺失的 `anti-ai-writing.md` 和 `banned-words.md`（从 story-deslop 复制）
 
 ### CI 增强 (static-check.sh)
 
@@ -565,12 +560,12 @@ All notable changes to this project will be documented in this file.
 
 ## v0.6.2
 
-> story-short-analyze skill v2.1.0
+> story-analyze skill v2.1.0
 
 ### 新功能
 
 - 新增 **material-decomposition.md** 短篇拆解方法论：情节节点提取、爆点分析、写作手法（POV/对话/时间/信息/意象）、节奏分析、人物功能评估、共鸣分析（9层）
-- story-short-analyze 升级为三件套架构（SKILL.md + material-decomposition.md + output-templates.md），对齐长篇拆文体系深度
+- story-analyze 升级为三件套架构（SKILL.md + material-decomposition.md + output-templates.md），对齐长篇拆文体系深度
 - 新增**故事核**提取（一句话概括核心梗）
 - 新增**爆点性/话题性**分析
 - 新增**共鸣分析**（9层共鸣：情感/价值观/经历/社会现象/文化/普世价值/哲学思考/情感深度/人物深度）
@@ -599,7 +594,7 @@ All notable changes to this project will be documented in this file.
 ### 新功能
 
 - 新增 **chapter-extractor** 章节 Agent（Haiku）：客观白描铁律、动态密度公式（3-40范围）、100+项泛称黑名单（8类），支持并行章节提取
-- story-long-analyze 管线重构：故事框架识别、两步法剧情聚合、3层置信度孤立情节兜底
+- story-analyze 管线重构：故事框架识别、两步法剧情聚合、3层置信度孤立情节兜底
 - 管线鲁棒性：Stage 3-4 并行执行图、计数验证、completed_with_errors 部分失败容忍
 
 ### 改进
@@ -623,7 +618,7 @@ All notable changes to this project will be documented in this file.
 
 ### 新功能
 
-- 新增 **story-explorer** 只读查询 Agent（Haiku）：10 种查询类型（角色状态、伏笔、设定、时间线、进度、上下文加载等），被 story-long-write、story-review、story 路由集成调用
+- 新增 **story-explorer** 只读查询 Agent（Haiku）：10 种查询类型（角色状态、伏笔、设定、时间线、进度、上下文加载等），被 story-write、story-review、story 路由集成调用
 - 新增 **story-import** 逆向导入 Skill：4 阶段流水线（确认来源 → 深度分析 → 结构迁移 → 项目激活），将已有小说反向解析为标准项目目录结构
 - story 路由表新增「查故事资料」和「导入小说」入口
 
@@ -631,7 +626,7 @@ All notable changes to this project will be documented in this file.
 
 - story-setup agents_version 升级到 v3（6 个 Agent）
 - UPGRADING.md 新增 v3 版本记录
-- story-long-write、story-review、workflow-daily 统一 story-explorer 集成模式（部署检测 + 结构化 prompt + 回退机制）
+- story-write、story-review、workflow-daily 统一 story-explorer 集成模式（部署检测 + 结构化 prompt + 回退机制）
 - structure-mapping.md 新增势力/散落情节/悬念映射规则
 
 ### 修复
@@ -661,7 +656,7 @@ All notable changes to this project will be documented in this file.
 
 ### 改进
 
-- 精简 story-short-write SKILL.md 22.8KB→13.7KB，新建 writing-workflow.md
+- 精简 story-write SKILL.md 22.8KB→13.7KB，新建 writing-workflow.md
 - 长篇写作增加创作公式引用、分层摘要协议与扫榜新元素提取
 - reference 文件拆分压缩 + 术语直白化
 

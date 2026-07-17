@@ -18,11 +18,11 @@ Professional authors follow a three-step method:
 
 Built around four pillars: reverse-engineering hits · plot modularization · layered state management · human-AI collaboration.
 
-> Starting in v0.6.23: native ZCode 3.3.4 support — install the repository as a marketplace/plugin with 11 Skills, 11 Commands, and strict-JSON Hooks; `story-setup` now supports `target_cli=zcode` and safely merges `.zcode/config.json` plus the root `AGENTS.md`. ZCode does not currently execute project/plugin custom agents, so specialist-agent workflows explicitly fall back to solo/direct mode.
+> Starting in v0.7.0: two more runtimes — native ZCode 3.3.4 (install the repo as a marketplace/plugin, `story-setup target_cli=zcode`) and Reasonix Phase 1 (skills + native plugin manifest); hook cores unified onto a shared node core with a six-runtime parity lock; long-form unifies the five old names (plot-strand / loop-card / …) into "剧情单元" (plot unit) and feeds decomposition output into volume/chapter outlines; the anti-AI-tone gate is now mechanized — the post-write prose net auto-scans deterministic toxic phrasings, and a "toxic-phrase debt gate" blocks the next chapter until the previous one is cleared (stateless, node-missing fails open, opt out explicitly with `<!-- 去味:跳过 -->`). Deployed projects should rerun `/story-setup` and start a new session.
 >
 > Starting in v0.6.22: long-form prose gains per-genre "prose prompt cards" — 32 番茄-genre voice cards recalled into the writer at draft time (card text never leaks into prose), plus outline-boundary and per-chapter formula gates against padding; short-form adds a submission layer `submission-craft` (Zhihu Yanxuan / mini-program / Fanqie platform tones, lead-in polish, paywall breakpoint design); suite-wide skill docs deduplicated by ~33KB; story-setup adds generic Web AI deployment. Deployed projects should rerun `/story-setup` and start a new session.
 >
-> Starting in v0.6.21: short-form writing reference cleanup — `story-short-write` drops stale long-form inherited references and now uses `short-format` / `short-craft` / `short-deslop` plus four genre packs (wife-chasing crematorium, revenge face-slap, CEO/wealthy family, domestic/palace intrigue) for short-story format, direct emotion, pacing density, and AI-tone cleanup; existing deployed projects should rerun `/story-setup` and start a new session to pick up the updated narrative-writer short-story exception.
+> Starting in v0.6.21: short-form writing reference cleanup — `story-write` drops stale long-form inherited references and now uses `short-format` / `short-craft` / `short-deslop` plus four genre packs (wife-chasing crematorium, revenge face-slap, CEO/wealthy family, domestic/palace intrigue) for short-story format, direct emotion, pacing density, and AI-tone cleanup; existing deployed projects should rerun `/story-setup` and start a new session to pick up the updated narrative-writer short-story exception.
 >
 > For earlier versions, see [CHANGELOG.md](CHANGELOG.md).
 
@@ -113,7 +113,7 @@ npx skills add iceeyes27/oh-story-claudecode -y -g
 >
 > **Generic Web AI / agent users:** If your platform can read a GitHub repo or project files, have the agent read `skills/*/SKILL.md` plus the relevant `references/`. For local project copies, run `story-setup` with `target_cli=generic`; it only writes a generic `AGENTS.md` and `skills/`. Without this project's hooks/custom agents, checks run as skill-level soft constraints or solo/direct fallbacks.
 
-> **Multi-agent collaboration needs setup + a fresh session**: the 7 specialist agents (story-architect, narrative-writer, consistency-checker, etc.) are written into your project's `.claude/agents/` by `/story-setup`, or into `.codex/agents/*.toml` by `$story-setup`. Claude Code and Codex register custom agents most reliably at session start; ZCode 3.3.4, OpenClaw Phase 1, and the generic path default to skills + solo fallback. To check Claude/Codex agents: run `/story-review` in the new session — `Effective Mode: full/lean` means agents registered, `Fallback: ... -> solo` means they are unavailable.
+> **Multi-agent collaboration needs setup + a fresh session**: the 7 specialist agents (story-architect, narrative-writer, consistency-checker, etc.) are written into your project's `.claude/agents/` by `/story-setup`, or into `.codex/agents/*.toml` by `$story-setup`. Claude Code and Codex register custom agents most reliably at session start; ZCode 3.3.4, OpenClaw Phase 1, Reasonix Phase 1, and the generic path default to skills + solo fallback. To check Claude/Codex agents: run `/story-review` in the new session — `Effective Mode: full/lean` means agents registered, `Fallback: ... -> solo` means they are unavailable.
 
 ## Skills
 
@@ -121,12 +121,12 @@ npx skills add iceeyes27/oh-story-claudecode -y -g
 |:------|:--------|:------------|
 | `story-setup` | `/story-setup` / `$story-setup` | Environment setup — Claude/OpenCode/Codex/ZCode/OpenClaw plus generic (safe merge) |
 | `story` | `/story` / `$story` | Toolbox router — routes fuzzy intents to the matching skill |
-| `story-long-write` | `/story-long-write` | Long-form writing — outline building, character design, prose output |
-| `story-long-analyze` | `/story-long-analyze` | Long-form deconstruction — Golden First 3 Chapters, payoff design, pacing analysis |
-| `story-long-scan` | `/story-long-scan` | Long-form trend scan — Qidian/Fanqie/Jinjiang market trends |
-| `story-short-write` | `/story-short-write` | Short-form writing — emotion design, twist crafting, polish & delivery |
-| `story-short-analyze` | `/story-short-analyze` | Short-form deconstruction — story core, structure, emotional arc, reversal design, writing techniques, resonance analysis |
-| `story-short-scan` | `/story-short-scan` | Short-form trend scan — Zhihu Yanayan/Fanqie short-form trending data |
+| `story-write` | `/story-write` | Long-form writing — outline building, character design, prose output |
+| `story-analyze` | `/story-analyze` | Long-form deconstruction — Golden First 3 Chapters, payoff design, pacing analysis |
+| `story-scan` | `/story-scan` | Long-form trend scan — Qidian/Fanqie/Jinjiang market trends |
+| `story-write` | `/story-write` | Short-form writing — emotion design, twist crafting, polish & delivery |
+| `story-analyze` | `/story-analyze` | Short-form deconstruction — story core, structure, emotional arc, reversal design, writing techniques, resonance analysis |
+| `story-scan` | `/story-scan` | Short-form trend scan — Zhihu Yanayan/Fanqie short-form trending data |
 | `story-deslop` | `/story-deslop` | De-AI-ify — detect and remove AI writing traces |
 | `story-import` | `/story-import` | Reverse import — parse existing novels into standard project structure |
 | `story-review` | `/story-review` | Multi-perspective review — 4-agent adversarial review + Fanqie/Qidian/Zhihu scoring rubrics |
@@ -135,7 +135,7 @@ npx skills add iceeyes27/oh-story-claudecode -y -g
 
 > `story-deslop` uses local prose linting: blocking applies only to deterministic style/punctuation issues, while other findings require read-through judgment; external detectors such as Zhuque are self-check references, not replacements for human review.
 
-Natural language also triggers: `帮我开书` ("help me start writing") → `story-long-write`, `这篇太AI了` ("this is too AI-ish") → `story-deslop`, `把我的书导进来` ("import my book") → `story-import`, `沈栀现在什么状态` ("what's Shen Zhi's current status") → `story-explorer`.
+Natural language also triggers: `帮我开书` ("help me start writing") → `story-write`, `这篇太AI了` ("this is too AI-ish") → `story-deslop`, `把我的书导进来` ("import my book") → `story-import`, `沈栀现在什么状态` ("what's Shen Zhi's current status") → `story-explorer`.
 
 <details>
 <summary>Cover generation example</summary>
@@ -147,7 +147,7 @@ Natural language also triggers: `帮我开书` ("help me start writing") → `st
 <details>
 <summary>Deconstruction demo — Coiling Dragon</summary>
 
-Full output from `/story-long-analyze` deep mode on the first 23 chapters of *Coiling Dragon*:
+Full output from `/story-analyze` deep mode on the first 23 chapters of *Coiling Dragon*:
 
 ```
 demo/拆文库-盘龙/
@@ -185,7 +185,7 @@ Long-form deconstruction also produces `文风.md`, plus `剧情/节奏.md` (pac
 <details>
 <summary>Deconstruction demo — Once I Hid My Love (曾将爱意私藏, short-form)</summary>
 
-`/story-short-analyze` deconstructing the short story 《曾将爱意私藏》 (~8,500 chars, win-back / "faked-death" genre):
+`/story-analyze` deconstructing the short story 《曾将爱意私藏》 (~8,500 chars, win-back / "faked-death" genre):
 
 ```
 demo/拆文库-曾将爱意私藏/
@@ -196,14 +196,14 @@ demo/拆文库-曾将爱意私藏/
 └── _meta.json           # structure_counts (Phase 7 gate basis)
 ```
 
-Short-form deconstruction outputs `拆文报告 / 情节节点 / 写作手法`; downstream `/story-short-write` writes a new same-genre story from them.
+Short-form deconstruction outputs `拆文报告 / 情节节点 / 写作手法`; downstream `/story-write` writes a new same-genre story from them.
 
 </details>
 
 <details>
 <summary>Import demo — 让你管账号，你高燃混剪炸全网 (long-form continuation project)</summary>
 
-`/story-import` reverse-builds the author's already-published first 20 chapters (~37k chars) into a continuation-ready writing project, handed off to `/story-long-write` for daily writing from chapter 21:
+`/story-import` reverse-builds the author's already-published first 20 chapters (~37k chars) into a continuation-ready writing project, handed off to `/story-write` for daily writing from chapter 21:
 
 ```
 demo/让你管账号，你高燃混剪炸全网/

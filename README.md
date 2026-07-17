@@ -18,11 +18,11 @@
 
 围绕四条线展开：爆款逆向 · 剧情模块化重组 · 上下文状态分层管理 · 人机协同。
 
-> v0.6.23 起：新增 ZCode 3.3.4 原生适配——仓库可作为 marketplace/plugin 安装，暴露 11 个 Skills、11 个 Commands 与严格 JSON Hooks；`story-setup` 支持 `target_cli=zcode`，安全合并 `.zcode/config.json` 与根 `AGENTS.md`。ZCode 当前不执行项目/plugin custom agents，涉及专业 Agent 的流程会明确降级为 solo/direct。
+> v0.7.0 起：多端适配再扩两家——ZCode 3.3.4 原生适配（仓库作 marketplace/plugin 安装，`story-setup target_cli=zcode`）与 Reasonix Phase 1（skills + 原生 plugin manifest）；hook 核统一到共享 node 核并加六端 parity 锁；长篇把「剧情条/循环卡/…」五个叫法统一为「剧情单元」并把拆书产物接入卷纲/细纲；去 AI 味闸口机器化——写后正文网自动扫描确定性毒句式，写下一章前新增「毒句式欠账门」（无状态、node 缺失放行、可用 `<!-- 去味:跳过 -->` 显式豁免）。已部署项目需重新运行 `/story-setup` 并新开会话。
 >
 > v0.6.22 起：长篇正文接入「题材正文提示卡」——32 个番茄题材的腔调卡在写作时按题材召回进写手（卡内容绝不入正文），并配套大纲边界与逐章写法公式防越界注水；短篇新增投稿层 `submission-craft`（知乎盐选/小程序/番茄三路平台基调、导语门面打磨、付费点断点设计）；全套件 skill 文档去重瘦身约 33KB；story-setup 支持 generic Web AI 部署。已部署项目需重新运行 `/story-setup` 并新开会话。
 >
-> v0.6.21 起：短篇写作参考栈瘦身——`story-short-write` 删除长篇继承残留 references，改由 `short-format` / `short-craft` / `short-deslop` + 四个题材包（追妻火葬场、复仇打脸、总裁豪门、宅斗宫斗）承接短篇格式、情绪直给、节奏密度和去 AI 味；已部署项目建议重新运行 `/story-setup` 并新开会话，获取新版 narrative-writer 短篇例外。
+> v0.6.21 起：短篇写作参考栈瘦身——`story-write` 删除长篇继承残留 references，改由 `short-format` / `short-craft` / `short-deslop` + 四个题材包（追妻火葬场、复仇打脸、总裁豪门、宅斗宫斗）承接短篇格式、情绪直给、节奏密度和去 AI 味；已部署项目建议重新运行 `/story-setup` 并新开会话，获取新版 narrative-writer 短篇例外。
 >
 > 更早版本变更见 [CHANGELOG.md](CHANGELOG.md)。
 
@@ -115,9 +115,9 @@ npx skills add iceeyes27/oh-story-claudecode -y -g
 >
 > 升级后如果项目里已经跑过 `/story-setup`，建议在项目根重跑一次 `/story-setup`，同步 hooks / agents / references。每版变更见 [CHANGELOG.md](CHANGELOG.md) 与 [Releases](https://github.com/iceeyes27/oh-story-claudecode/releases)。
 
-> **多 agent 协作要先部署再新开会话**：7 个专业 agent（story-architect、narrative-writer、consistency-checker 等）由 `/story-setup` 写入项目 `.claude/agents/`，或由 `$story-setup` 写入 `.codex/agents/*.toml`。Claude Code / Codex 都在会话启动时更稳定地注册 custom agent；ZCode 3.3.4、OpenClaw Phase 1 与 generic 路径默认走 skills + solo fallback。判断是否生效：新会话里跑 `/story-review`，报告头是 `Effective Mode: full/lean` 即注册成功，是 `Fallback: ... -> solo` 说明当前运行时未暴露该 agent。
+> **多 agent 协作要先部署再新开会话**：7 个专业 agent（story-architect、narrative-writer、consistency-checker 等）由 `/story-setup` 写入项目 `.claude/agents/`，或由 `$story-setup` 写入 `.codex/agents/*.toml`。Claude Code / Codex 都在会话启动时更稳定地注册 custom agent；ZCode 3.3.4、OpenClaw Phase 1、Reasonix Phase 1 与 generic 路径默认走 skills + solo fallback。判断是否生效：新会话里跑 `/story-review`，报告头是 `Effective Mode: full/lean` 即注册成功，是 `Fallback: ... -> solo` 说明当前运行时未暴露该 agent。
 
-> **导入续写顺序：** 推荐先在写作项目根运行 `/story-setup`（部署 hooks/agents/AGENTS），新开/刷新会话后运行 `/story-import` 导入已有小说，再用 `/story-long-write 日更` 或 `/story-long-write 写第N章` 续写。也可以直接运行 `/story-import`；它会先检测是否已 setup，未部署时让你选择先去 setup 或继续串行导入。
+> **导入续写顺序：** 推荐先在写作项目根运行 `/story-setup`（部署 hooks/agents/AGENTS），新开/刷新会话后运行 `/story-import` 导入已有小说，再用 `/story-write 日更` 或 `/story-write 写第N章` 续写。也可以直接运行 `/story-import`；它会先检测是否已 setup，未部署时让你选择先去 setup 或继续串行导入。
 
 ## Skills
 
@@ -125,12 +125,12 @@ npx skills add iceeyes27/oh-story-claudecode -y -g
 |:------|:-----|:-----|
 | `story-setup` | `/story-setup` `$story-setup` `/准备写书` | 环境部署 · Claude/OpenCode/Codex/ZCode/OpenClaw + generic（已有配置安全合并） |
 | `story` | `/story` `$story` `/网文` | 工具箱路由 · 模糊意图自动分发到对应 skill |
-| `story-long-write` | `/story-long-write` `/写长篇` | 长篇写作 · 大纲搭建、人物设定、正文输出 |
-| `story-long-analyze` | `/story-long-analyze` | 长篇拆文 · 黄金三章、爽点设计、节奏分析 |
-| `story-long-scan` | `/story-long-scan` | 长篇扫榜 · 起点/番茄/晋江市场趋势 |
-| `story-short-write` | `/story-short-write` | 短篇写作 · 情绪设计、反转构思、精修出稿 |
-| `story-short-analyze` | `/story-short-analyze` | 短篇拆文 · 故事核、结构分析、情感线、反转设计、写作手法、共鸣分析 |
-| `story-short-scan` | `/story-short-scan` | 短篇扫榜 · 知乎盐言/番茄短篇风口数据 |
+| `story-write` | `/story-write` `/写长篇` | 长篇写作 · 大纲搭建、人物设定、正文输出 |
+| `story-analyze` | `/story-analyze` | 长篇拆文 · 黄金三章、爽点设计、节奏分析 |
+| `story-scan` | `/story-scan` | 长篇扫榜 · 起点/番茄/晋江市场趋势 |
+| `story-write` | `/story-write` | 短篇写作 · 情绪设计、反转构思、精修出稿 |
+| `story-analyze` | `/story-analyze` | 短篇拆文 · 故事核、结构分析、情感线、反转设计、写作手法、共鸣分析 |
+| `story-scan` | `/story-scan` | 短篇扫榜 · 知乎盐言/番茄短篇风口数据 |
 | `story-deslop` | `/story-deslop` `/去AI味` | 去AI味 · 检测并清除 AI 写作痕迹 |
 | `story-import` | `/story-import` `/导入小说` | 逆向导入 · 将已有小说反向解析为标准项目结构 |
 | `story-review` | `/story-review` `/审查` | 多视角审查 · 4 Agent 多视角审稿 + 番茄/起点/知乎评分标准 |
@@ -140,7 +140,7 @@ npx skills add iceeyes27/oh-story-claudecode -y -g
 > `story-deslop` 的本地检查是写作 lint：blocking 只限确定性句式/标点问题，其他提示按读感判断；朱雀等外部检测只作自测参考，不替代人工读感。
 
 自然语言同样触发：
-- 「帮我开书」→ `story-long-write`
+- 「帮我开书」→ `story-write`
 - 「这篇太 AI 了」→ `story-deslop`
 - 「把我的书导进来」→ `story-import`
 - 「沈栀现在什么状态」→ 自动 spawn `story-explorer` agent
@@ -155,7 +155,7 @@ npx skills add iceeyes27/oh-story-claudecode -y -g
 <details>
 <summary>拆文 demo — 盘龙</summary>
 
-使用 `/story-long-analyze` 深度模式分析《盘龙》前23章的完整输出：
+使用 `/story-analyze` 深度模式分析《盘龙》前23章的完整输出：
 
 ```
 demo/拆文库-盘龙/
@@ -193,7 +193,7 @@ demo/拆文库-盘龙/
 <details>
 <summary>拆文 demo — 曾将爱意私藏（短篇）</summary>
 
-使用 `/story-short-analyze` 拆解短篇《曾将爱意私藏》（约 8500 字，追妻火葬场 · 死遁）的完整输出：
+使用 `/story-analyze` 拆解短篇《曾将爱意私藏》（约 8500 字，追妻火葬场 · 死遁）的完整输出：
 
 ```
 demo/拆文库-曾将爱意私藏/
@@ -204,14 +204,14 @@ demo/拆文库-曾将爱意私藏/
 └── _meta.json           # 结构计数 structure_counts（Phase 7 门控依据）
 ```
 
-短篇拆文产出 `拆文报告 / 情节节点 / 写作手法`，下游 `/story-short-write` 据此写同题材新短篇。
+短篇拆文产出 `拆文报告 / 情节节点 / 写作手法`，下游 `/story-write` 据此写同题材新短篇。
 
 </details>
 
 <details>
 <summary>导入 demo — 让你管账号，你高燃混剪炸全网（长篇续写工程）</summary>
 
-推荐先 `/story-setup` 部署写作项目，再使用 `/story-import` 把作者已发布的前 20 章（约 3.7 万字）逆向重建为可续写的写作工程，最后接 `/story-long-write 日更` 或 `/story-long-write 写第21章` 续写：
+推荐先 `/story-setup` 部署写作项目，再使用 `/story-import` 把作者已发布的前 20 章（约 3.7 万字）逆向重建为可续写的写作工程，最后接 `/story-write 日更` 或 `/story-write 写第21章` 续写：
 
 ```
 demo/让你管账号，你高燃混剪炸全网/

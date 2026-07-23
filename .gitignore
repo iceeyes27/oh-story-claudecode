@@ -4,6 +4,7 @@
 .agents/*
 !.agents/skills
 .codebuddy/
+.workbuddy/
 AGENTS.md
 CLAUDE.md
 _archive/

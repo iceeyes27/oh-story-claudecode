@@ -162,7 +162,7 @@ AI 味不按语法错误处理，也不需要「修正」。它属于风格问�
 node scripts/check-ai-patterns.js --check --fail-on=blocking <正文文件...>
 ```
 
-- severity=blocking 的类别（`not-is-comparison` / `em-dash` / `voice-contrast` / `negation-parade` / `reverse-not-is` / `trailer-ending`）并入 Gate B，属于写作/去 AI 味时优先处理的 blocking 类问题。
+- severity=blocking 的类别（`not-is-comparison` / `em-dash` / `voice-contrast` / `negation-parade` / `reverse-not-is` / `trailer-ending` / `trailer-summary`）并入 Gate B，属于写作/去 AI 味时优先处理的 blocking 类问题。
 - 其他 findings（碎句号、长段落、微动作、动作清单、抽象总结、套词、比喻密度、解释链、公文腔、过度精炼、低连接密度、引号强调滥用）只作读感提示；完整类别和修法见 `references/anti-ai-writing.md`。
 - 处理方式：删掉否定铺垫，直接写后项；或改成角色动作、物件细节、身体反应来呈现。
 - 若用户只要检测，保留报告不改文。若执行去 AI 味，只改确实损害读感且无叙事功能的问题；功能性写法标 `[需复核]` 并保留。
@@ -336,13 +336,13 @@ AI 写的心理描写特征：直接陈述情绪。
 - 「手铐紧紧扣住两人的手腕，中间连着一截不算长的链条」→「手铐扣住两人的手腕，中间连着链条」
 - 「暴雪极地的考场里，风雪没有停下的意思」→「暴雪极地的考场里」
 
-##### 门禁 D：节奏打碎
+##### 门禁 D：节奏调整
 
 AI 写作的节奏问题：句式过于整齐、段落过于匀称。
 
 处理方法：
 - 打断连续排比句（保留 1-2 个，删掉其余）
-- 长句拆短句
+- 只拆臃肿修饰、堆叠比喻、抽象总结的长句；改写后叙述仍以逗号长句为主（见 anti-ai-writing.md 规则 3），不要把正常的逗号长句拆成短句串
 - 偶尔用不完整句（口语感）
 - 段落长短交错（不要每段都 3-5 行）
 - 不按硬指标排版：番茄高分样本不是 50-60 字一行，也不是逢句号必换行；按动作 / 信息变化自然断段，读起来不卡即可
@@ -396,7 +396,7 @@ node scripts/normalize-punctuation.js <正文文件...>
 ```
 
 作用边界：
-- `check-ai-patterns.js` 只报告不改写：severity=blocking 的类别（`not-is-comparison` / `em-dash` / `voice-contrast` / `negation-parade` / `reverse-not-is` / `trailer-ending`）优先改正文并复扫；advisory 先通读判断，确属提纲感、解释腔或模板腔再改，功能性写法标 `[需复核]`。
+- `check-ai-patterns.js` 只报告不改写：severity=blocking 的类别（`not-is-comparison` / `em-dash` / `voice-contrast` / `negation-parade` / `reverse-not-is` / `trailer-ending` / `trailer-summary`）优先改正文并复扫；advisory 先通读判断，确属提纲感、解释腔或模板腔再改，功能性写法标 `[需复核]`。
 - 它只是读感提示；完整类别、例外和修法见 `references/anti-ai-writing.md`。
 - `check-degeneration.js` 报告模型退化（逐字复读 / 打转、末尾截断、占位符、工程词泄漏 `细纲` / `情节点` 等），每条带 `severity: blocking|advisory`。blocking 是退化信号，去 AI 味改不掉，应回去重新生成那一段再 deslop；advisory（tier2 章节 / 歧义词）只提示。
 - `normalize-punctuation.js` 机械兜底：清除残留的 `……`、漏网破折号 `——` / `—`、双连字符 `--` 和独立行 `---`；默认不改变引号风格，也不把有功能的 `？` / 少量 `！` 改成句号。

@@ -1,6 +1,6 @@
 # 管道运维参考
 
-story-long-analyze 拆解管道的运维工具文档：`_progress.md` 模板、错误处理、恢复机制操作步骤。
+story-analyze long 拆解管道的运维工具文档：`_progress.md` 模板、错误处理、恢复机制操作步骤。
 
 > 质量阈值（置信度 / 覆盖率 / 重叠率）见 [material-decomposition.md 质量阈值体系](material-decomposition.md)。
 
@@ -57,7 +57,7 @@ story-long-analyze 拆解管道的运维工具文档：`_progress.md` 模板、�
 
 动作：读存量 `拆文库/{书名}/剧情/*.md`（或 `对标/{书名}/剧情/*.md`）各剧情单元表头的 标题 / 类型 / 桥段标签 / 章节范围 字段，按 output-templates.md「剧情单元清单」表模板机械重建 `剧情/README.md` 的清单表；项目 `对标/{书名}/` 视图存在时同步一份。不读原文、不重跑任何 Stage、不改剧情单元内容、不动 `节奏.md` / `情绪模块.md`。旧剧情单元「章节范围」行没有字数信息时，体量列只写「共{N}章」、字数记「未知」，不得编造。
 
-写作侧消费点对无清单的书自动回退逐文件检索（见 story-long-write 的 outline-structure-theory.md「对标节奏迁移」步骤 1），补建只是加速，不是阻塞项。
+写作侧消费点对无清单的书自动回退逐文件检索（见 story-write long 的 outline-structure-theory.md「对标节奏迁移」步骤 1），补建只是加速，不是阻塞项。
 
 ## 错误处理
 

@@ -1,7 +1,7 @@
 # 拆文输出模板
 按需加载，配合 SKILL.md 和 material-decomposition.md 使用。
 
-本文件按 story-long-analyze 唯一管道的阶段编号组织：Stage 0-5 各阶段输出模板 + 停靠点「快速预览报告」模板 + 跨阶段通用速查。
+本文件按 story-analyze long 唯一管道的阶段编号组织：Stage 0-5 各阶段输出模板 + 停靠点「快速预览报告」模板 + 跨阶段通用速查。
 
 ---
 
@@ -501,7 +501,7 @@ Stage 3 除剧情文件外，必须写一个轻量索引 `剧情/README.md`，�
 
 ## Stage 6 文风
 
-输出 `拆文库/{书名}/文风.md`。整书级写作技法视图，供 story-long-write 日更循环喂给 narrative-writer。
+输出 `拆文库/{书名}/文风.md`。整书级写作技法视图，供 story-write long 日更循环喂给 narrative-writer。
 
 **字段速查**：
 

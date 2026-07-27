@@ -84,7 +84,7 @@
 
 ## 四、输出格式
 
-本节即为 `角色状态.md` 的标准模板（与 story-long-write 同名 artifact 字段一致），逐字段一一对应，不新增、不删减字段。
+本节即为 `角色状态.md` 的标准模板（与 story-write long 同名 artifact 字段一致），逐字段一一对应，不新增、不删减字段。
 
 ```markdown
 # 角色状态追踪

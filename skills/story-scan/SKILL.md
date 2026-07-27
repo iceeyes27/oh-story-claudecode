@@ -1,9 +1,14 @@
 ---
 name: story-scan
 version: 2.0.0
-description: "网文扫榜（长篇/短篇统一入口）。分析起点、番茄、晋江、知乎盐言、七猫、黑岩、点众等平台排行榜数据，提炼市场趋势与热门题材。触发方式：/story-scan、/长篇扫描、/短篇扫描、/长篇扫榜、/短篇扫榜、「长篇什么火」「短篇什么火」「起点排行」「知乎故事排行」。mode=long 走长篇扫榜流程，mode=short 走短篇扫榜流程；用户意图明确时自动路由，不明确时询问。"
-metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
+description: 网文扫榜（长篇/短篇统一入口）。分析起点、番茄、晋江、知乎盐言、七猫、黑岩、点众等平台排行榜数据，提炼市场趋势与热门题材。触发方式：/story-scan、/长篇扫描、/短篇扫描、/长篇扫榜、/短篇扫榜、「长篇什么火」「短篇什么火」「起点排行」「知乎故事排行」。mode=long
+  走长篇扫榜流程，mode=short 走短篇扫榜流程；用户意图明确时自动路由，不明确时询问。
+metadata:
+  openclaw:
+    source: https://github.com/iceeyes27/oh-story-claudecode
+disable: true
 ---
+
 # story-scan：网文扫榜（长篇/短篇统一入口）
 
 你是网络小说市场分析师。你的任务是基于榜单样本识别网文市场格局，并输出可执行的题材候选、情绪方向、风险阈值和验证动作。
@@ -26,8 +31,8 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 |---|---|---|
 | 「长篇」「起点」「番茄」（长篇语境）「晋江」「七猫」（长篇语境）「刺猬猫」 | `long` | 长篇平台关键词 |
 | 「短篇」「知乎盐言」「黑岩」「点众」「知乎故事」 | `short` | 短篇平台关键词 |
-| `/story-long-scan`、`/长篇扫榜`、`/长篇扫描` | `long` | 显式长篇命令，映射为 `/story-scan long` |
-| `/story-short-scan`、`/短篇扫榜`、`/短篇扫描` | `short` | 显式短篇命令，映射为 `/story-scan short` |
+| `/story-scan long`、`/长篇扫榜`、`/长篇扫描` | `long` | 显式长篇命令，映射为 `/story-scan long` |
+| `/story-scan short`、`/短篇扫榜`、`/短篇扫描` | `short` | 显式短篇命令，映射为 `/story-scan short` |
 | 「长篇什么火」「起点排行」 | `long` | 长篇意图短语 |
 | 「短篇什么火」「知乎故事排行」 | `short` | 短篇意图短语 |
 | 未明确（仅说「扫榜」「什么火」） | 询问 | 问用户：「长篇还是短篇？」 |
@@ -35,7 +40,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 **路由规则：**
 - 用户意图明确 → 自动路由到对应 mode，无需询问
 - 用户意图不明确 → 问：「长篇还是短篇？」（附一句平台示例帮助判断）
-- 所有原 `/story-long-scan` 和 `/story-short-scan` 命令统一映射为 `/story-scan`，带隐式 mode
+- 所有原 `/story-scan long` 和 `/story-scan short` 命令统一映射为 `/story-scan`，带隐式 mode
 - 用户在对话中切换平台到另一模式时（如长篇流程中提到「看看知乎短篇」），切换 mode 重新进入 Phase 1
 
 ---

@@ -1,8 +1,14 @@
 ---
 name: story-deslop
 version: 2.0.0
-description: "去AI味/说人话（小说正文+通用中文统一入口）。mode=novel 走网文去AI味 7 Gate 系统（禁用词/句式/心理/节奏/对话/结尾/解释腔），配合脚本和禁用词表；mode=general 走通用中文'说人话'（场景分级/Tier/档位/scope/误杀防护），适用于 chat/status/docs/public-writing。触发方式：/story-deslop、/去AI味、「去AI味」「说人话」「太AI了」「别像模板」「自然一点」——按输入类型自动路由。"
-metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
+description: 去AI味/说人话（小说正文+通用中文统一入口）。mode=novel 走网文去AI味 7 Gate
+  系统（禁用词/句式/心理/节奏/对话/结尾/解释腔），配合脚本和禁用词表；mode=general
+  走通用中文'说人话'（场景分级/Tier/档位/scope/误杀防护），适用于
+  chat/status/docs/public-writing。触发方式：/story-deslop、/去AI味、「去AI味」「说人话」「太AI了」「别像模板」「自然一点」——按输入类型自动路由。
+metadata:
+  openclaw:
+    source: https://github.com/iceeyes27/oh-story-claudecode
+disable: true
 ---
 
 # story-deslop：去 AI 味 / 说人话（统一入口）
@@ -96,7 +102,7 @@ AI 味不按语法错误处理，也不需要「修正」。它属于风格问�
 
 ## 小说去 AI 味模式（mode = novel）
 
-> 适用：网文小说正文、章节文件、批量长篇去 AI。配合本地脚本（`scripts/`）与禁用词表（`references/banned-words.md`）执行。
+> 适用：网文小说正文、章节文件、批量长篇去 AI。配合本地脚本（`scripts/`）与禁用词表（`.agents/skills/_shared/references/banned-words.md`）执行。
 
 ### 自然文本基准
 
@@ -159,11 +165,11 @@ AI 味不按语法错误处理，也不需要「修正」。它属于风格问�
 **确定性句式预检（文件模式）**：当输入是本地正文文件路径时，Phase 1 必须先运行本 skill 自带脚本，只报告不修改：
 
 ```bash
-node scripts/check-ai-patterns.js --check --fail-on=blocking <正文文件...>
+node .agents/skills/_shared/scripts/check-ai-patterns.js --check --fail-on=blocking <正文文件...>
 ```
 
-- severity=blocking 的类别（`not-is-comparison` / `em-dash` / `voice-contrast` / `negation-parade` / `reverse-not-is` / `trailer-ending` / `trailer-summary`）并入 Gate B，属于写作/去 AI 味时优先处理的 blocking 类问题。
-- 其他 findings（碎句号、长段落、微动作、动作清单、抽象总结、套词、比喻密度、解释链、公文腔、过度精炼、低连接密度、引号强调滥用）只作读感提示；完整类别和修法见 `references/anti-ai-writing.md`。
+- severity=blocking 的类别（`not-is-comparison` / `em-dash` / `voice-contrast` / `negation-parade` / `negation-only-parallel` / `reverse-not-is` / `trailer-ending`）并入 Gate B，属于写作/去 AI 味时优先处理的 blocking 类问题。
+- 其他 findings（碎句号、长段落、微动作、动作清单、抽象总结、套词、比喻密度、解释链、公文腔、过度精炼、低连接密度、引号强调滥用）只作读感提示；完整类别和修法见 `.agents/skills/_shared/references/anti-ai-writing.md`。
 - 处理方式：删掉否定铺垫，直接写后项；或改成角色动作、物件细节、身体反应来呈现。
 - 若用户只要检测，保留报告不改文。若执行去 AI 味，只改确实损害读感且无叙事功能的问题；功能性写法标 `[需复核]` 并保留。
 
@@ -200,7 +206,7 @@ node scripts/check-ai-patterns.js --check --fail-on=blocking <正文文件...>
 >
 > **综合判定规则**：取六项指标中的最高档位。任一指标达重度即按重度处理；无重度时，中度指标 ≥3 项按中度处理，否则按轻度处理。
 
-加载 [references/anti-ai-writing.md](references/anti-ai-writing.md) 的「系统性去 AI 三遍法」获取完整流程。三遍法与本 skill 的关系（覆盖关系，不是 1:1 映射）：
+加载 [.agents/skills/_shared/references/anti-ai-writing.md](../_shared/references/anti-ai-writing.md) 的「系统性去 AI 三遍法」获取完整流程。三遍法与本 skill 的关系（覆盖关系，不是 1:1 映射）：
 - **Pass 1（去泛化）** 覆盖 Gate A 的禁用词、Gate C 的抽象情绪、Gate D 的工整对仗、Gate E 的同语气对话粗扫、Gate G 的解释腔 / 上帝视角剧透 / 软评判
 - **Pass 2（去书面化）** 覆盖 Gate A 中的书面腔词、Gate B 的句式套路深化
 - **Pass 3（回自然感）** 覆盖 Gate D 的长短节奏、Gate E 的对话差异化、Gate F 的结尾去升华、补具体感官细节
@@ -215,7 +221,7 @@ node scripts/check-ai-patterns.js --check --fail-on=blocking <正文文件...>
 Phase 2 诊断完成后，按以下顺序选择执行路径：
 
 1. **已在 narrative-writer 子代理内**：直接 inline 执行 Gate A-G，不再 spawn（嵌套 spawn 会被静默降级）。
-2. **未在子代理内且 agent 目录（优先 `.claude/agents/`，其次 `.opencode/agents/`，再检查 `.codex/agents/`）下的 `narrative-writer.md` 或 `.codex/agents/narrative-writer.toml` 存在**：spawn `Agent(subagent_type: "narrative-writer", prompt: "项目目录：{dir}\n任务描述：去 AI 味\n检查范围：{待处理的正文文件}\nAI 味等级：{Phase 2 诊断结果}\n处理策略：{轻度 / 中度 / 重度对应的 Gate 范围}\n删除优先：每条 AI 味项先判能否删除——删后不丢伏笔 / 钩子 / 角色 / 情节 / 人物记忆 / 情绪承接 / 因果锚点 / 必要信息 / 必要转折的直接删，会丢才进 Gate 润色；看似解释 / 评价但承担小连贯的句子，压成白话承接、动作或物件锚点，不机械删除；已有任务 / 手续 / 物件 / 证据缺口可以压成角色当下要处理的具体卡点，但不新增原文没有的事件链；删除服从比例上限与字数下限，跌破下限改降 AI 重写。\n模式处理：按 references/anti-ai-writing.md 的问题模式目录执行；模式 8（解释腔 / 上帝视角 / 安排感）归入 Gate G，其余新增模式归入 Gate A-F 的对应处理。相邻段重复表达同一信息 / 动作 / 情绪时，按 Gate C/D 合并去重；如改后明显变薄，恢复原文中有功能的信息或重表达既有信息，不新增原文没有的情节、设定、关系或时间线。")`。
+2. **未在子代理内且 agent 目录（优先 `.claude/agents/`，其次 `.opencode/agents/`，再检查 `.codex/agents/`）下的 `narrative-writer.md` 或 `.codex/agents/narrative-writer.toml` 存在**：spawn `Agent(subagent_type: "narrative-writer", prompt: "项目目录：{dir}\n任务描述：去 AI 味\n检查范围：{待处理的正文文件}\nAI 味等级：{Phase 2 诊断结果}\n处理策略：{轻度 / 中度 / 重度对应的 Gate 范围}\n删除优先：每条 AI 味项先判能否删除——删后不丢伏笔 / 钩子 / 角色 / 情节 / 人物记忆 / 情绪承接 / 因果锚点 / 必要信息 / 必要转折的直接删，会丢才进 Gate 润色；看似解释 / 评价但承担小连贯的句子，压成白话承接、动作或物件锚点，不机械删除；已有任务 / 手续 / 物件 / 证据缺口可以压成角色当下要处理的具体卡点，但不新增原文没有的事件链；删除服从比例上限与字数下限，跌破下限改降 AI 重写。\n模式处理：按 .agents/skills/_shared/references/anti-ai-writing.md 的问题模式目录执行；模式 8（解释腔 / 上帝视角 / 安排感）归入 Gate G，其余新增模式归入 Gate A-F 的对应处理。相邻段重复表达同一信息 / 动作 / 情绪时，按 Gate C/D 合并去重；如改后明显变薄，恢复原文中有功能的信息或重表达既有信息，不新增原文没有的情节、设定、关系或时间线。")`。
 3. **agent 不存在或 spawn 失败**：主线程 inline 执行。
 
 ##### 删除优先判断（先于各 Gate）
@@ -231,7 +237,7 @@ Phase 2 诊断完成后，按以下顺序选择执行路径：
 
 ##### 门禁 A：禁用词替换
 
-加载 [references/banned-words.md](references/banned-words.md)，对照禁用词表逐项检查。
+加载 [.agents/skills/_shared/references/banned-words.md](../_shared/references/banned-words.md)，对照禁用词表逐项检查。
 
 **白名单机制**：
 
@@ -336,13 +342,13 @@ AI 写的心理描写特征：直接陈述情绪。
 - 「手铐紧紧扣住两人的手腕，中间连着一截不算长的链条」→「手铐扣住两人的手腕，中间连着链条」
 - 「暴雪极地的考场里，风雪没有停下的意思」→「暴雪极地的考场里」
 
-##### 门禁 D：节奏调整
+##### 门禁 D：节奏打碎
 
 AI 写作的节奏问题：句式过于整齐、段落过于匀称。
 
 处理方法：
 - 打断连续排比句（保留 1-2 个，删掉其余）
-- 只拆臃肿修饰、堆叠比喻、抽象总结的长句；改写后叙述仍以逗号长句为主（见 anti-ai-writing.md 规则 3），不要把正常的逗号长句拆成短句串
+- 长句拆短句
 - 偶尔用不完整句（口语感）
 - 段落长短交错（不要每段都 3-5 行）
 - 不按硬指标排版：番茄高分样本不是 50-60 字一行，也不是逢句号必换行；按动作 / 信息变化自然断段，读起来不卡即可
@@ -357,6 +363,7 @@ AI 写的对话特征：每句话都信息完整、逻辑清晰、表达精准�
 - 适当打断对话（角色可以答非所问）；对话被打断或拖长时用动作、换行或短句处理，不用 `——`
 - 用动作穿插对话（「她喝了口水。『然后呢？』」）
 - 删掉解释性对话（角色不会把自己的动机说清楚）
+- 对称对仗的定性台词（「不是 X，是 Y」式冷静给对手下定义、用成语收尾「不了了之/可想而知」）：不像活人开口，像作者旁白在解释逻辑。改带情绪/具体画面的口语短句（专项判定见 `dialogue-naturalness-scan` 第 4 类）
 - 不为凑比例硬扩台词；番茄对话占比随题材波动，台词只在角色此刻真会说、必须说时增加
 - 口误、停顿、粗话和重复要服务人物身份与情绪，不作为「真人感」装饰批量添加
 - 不把所有对话末尾改成句号：质问保留问号，爆发峰值保留少量感叹；吞回去 / 没说完用动作停顿、短句或换行，不用 `……`
@@ -390,14 +397,15 @@ AI 写作的结尾特征：总想总结、升华、点题。
 当输入是正文文件路径，且 Phase 3 已落盘修改后，**先**做句式 / 段落复扫，**再**做机械标点兜底（破折号要按功能改写，故先于机械替换报出）：
 
 ```bash
-node scripts/check-ai-patterns.js --check --fail-on=blocking <正文文件...>
-node scripts/check-degeneration.js --check <正文文件...>
-node scripts/normalize-punctuation.js <正文文件...>
+node .agents/skills/_shared/scripts/check-ai-patterns.js --check --fail-on=blocking <正文文件...>
+node .agents/skills/_shared/scripts/check-degeneration.js --check <正文文件...>
+node .agents/skills/_shared/scripts/normalize-punctuation.js <正文文件...>
 ```
 
 作用边界：
-- `check-ai-patterns.js` 只报告不改写：severity=blocking 的类别（`not-is-comparison` / `em-dash` / `voice-contrast` / `negation-parade` / `reverse-not-is` / `trailer-ending` / `trailer-summary`）优先改正文并复扫；advisory 先通读判断，确属提纲感、解释腔或模板腔再改，功能性写法标 `[需复核]`。
-- 它只是读感提示；完整类别、例外和修法见 `references/anti-ai-writing.md`。
+- `check-ai-patterns.js` 只报告不改写：severity=blocking 的类别（`not-is-comparison` / `em-dash` / `voice-contrast` / `negation-parade` / `negation-only-parallel` / `reverse-not-is` / `trailer-ending`）优先改正文并复扫；advisory 先通读判断，确属提纲感、解释腔或模板腔再改，功能性写法标 `[需复核]`。
+- 它只是读感提示；完整类别、例外和修法见 `.agents/skills/_shared/references/anti-ai-writing.md`。
+- 脚本清零后继续执行“省略速记人工门禁”：逐段检查动作句和承接句，把可疑句单独拿出来读；动作主体、对象或意图说不清的，改成具体动作或明确承接。自动扫描只能拦已知判例，不能替代人工语义复核。
 - `check-degeneration.js` 报告模型退化（逐字复读 / 打转、末尾截断、占位符、工程词泄漏 `细纲` / `情节点` 等），每条带 `severity: blocking|advisory`。blocking 是退化信号，去 AI 味改不掉，应回去重新生成那一段再 deslop；advisory（tier2 章节 / 歧义词）只提示。
 - `normalize-punctuation.js` 机械兜底：清除残留的 `……`、漏网破折号 `——` / `—`、双连字符 `--` 和独立行 `---`；默认不改变引号风格，也不把有功能的 `？` / 少量 `！` 改成句号。
 - 知乎盐言短篇可保留 `「」`；只有用户或项目明确要求时，才给标点脚本加 `--quote-mode ascii` 或 `--quote-mode yan`。
@@ -463,11 +471,11 @@ node scripts/normalize-punctuation.js <正文文件...>
 
 | 文件 | 何时加载 |
 |------|----------|
-| [references/banned-words.md](references/banned-words.md) | 检测和替换禁用词时 |
-| [references/anti-ai-writing.md](references/anti-ai-writing.md) | **去 AI 味完整指南**：预防 + 三遍法 + 范例 |
-| [scripts/normalize-punctuation.js](scripts/normalize-punctuation.js) | 文件模式落盘后做确定性标点收尾；默认保留引号风格 |
-| [scripts/check-ai-patterns.js](scripts/check-ai-patterns.js) | 文件模式 Phase 1 预检与 Phase 3.5 复扫（只看引号外叙述），只报告不改写 |
-| [scripts/check-degeneration.js](scripts/check-degeneration.js) | 文件模式 Phase 3.5 复扫，只报告不改写 |
+| [.agents/skills/_shared/references/banned-words.md](../_shared/references/banned-words.md) | 检测和替换禁用词时 |
+| [.agents/skills/_shared/references/anti-ai-writing.md](../_shared/references/anti-ai-writing.md) | **去 AI 味完整指南**：预防 + 三遍法 + 范例 |
+| [.agents/skills/_shared/scripts/normalize-punctuation.js](../_shared/scripts/normalize-punctuation.js) | 文件模式落盘后做确定性标点收尾；默认保留引号风格 |
+| [.agents/skills/_shared/scripts/check-ai-patterns.js](../_shared/scripts/check-ai-patterns.js) | 文件模式 Phase 1 预检与 Phase 3.5 复扫（只看引号外叙述），只报告不改写 |
+| [.agents/skills/_shared/scripts/check-degeneration.js](../_shared/scripts/check-degeneration.js) | 文件模式 Phase 3.5 复扫，只报告不改写 |
 
 ---
 
@@ -570,7 +578,7 @@ node scripts/normalize-punctuation.js <正文文件...>
 
 - 删开场套话、谄媚和元评论：例如 `值得注意的是`、`让我来为你解释`、`希望这对你有帮助`、`Great question!`
 - 删空总结和收尾腔：例如 `综上所述`、`归根结底`、`本质上`、`At the end of the day`
-- 处理二元对比骨架：`不是 X，而是 Y`、`与其 X，不如 Y` 多数删前半句，直接说 `Y`
+- 处理二元对比骨架：`不是 X，而是 Y`、`与其 X，不如 Y` 多数删前半句，直接说 `Y`；**若出现在台词/对话里**，这种对称工整的定性句尤其不像活人说话（真人是带情绪/具体画面开口，不是冷静自我对称纠正），优先改成口语短句或带态度的表达（专项见 `dialogue-naturalness-scan` 第 4 类）
 - 处理无源引用：`研究表明`、`数据显示`、`studies show`、`experts say` 默认按场景选择 `rewrite-safe` 或 `audit-only`；只有用户明确要保留原论证骨架时才用 `rewrite-with-placeholder`；不要补虚构来源
 - 把商业黑话和表演性技术腔改回普通动作：例如 `赋能`、`抓手`、`闭环`、`收窄`、`兜住`、`落盘`、`leverage`
 - 遇到过度接住、替用户做心理判断或身份认证式夸奖：例如 `你不是敏感`、`你只是太久没被稳稳接住了`、`你问到了问题的核心`、`顶刊作者的素养`，默认删姿态层，改回低承诺回应或具体判断；不要硬演「我懂了」

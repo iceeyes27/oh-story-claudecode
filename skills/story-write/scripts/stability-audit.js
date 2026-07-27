@@ -355,7 +355,7 @@ for (let n = startNum; n <= endNum; n += 1) {
     const packText = readPack(n - 1, n);
     const packProblems = [];
     if (packText === null) {
-      packProblems.push({ code: 'Handoff_Missing', message: `交接包缺失：追踪/交接包/第${pad3(n - 1)}章_to_第${pad3(n)}章.md（追踪/归档/ 下也无；node scripts/handoff-pack.js --write ${n - 1}）` });
+      packProblems.push({ code: 'Handoff_Missing', message: `交接包缺失：追踪/交接包/第${pad3(n - 1)}章_to_第${pad3(n)}章.md（追踪/归档/ 下也无；node .agents/skills/story-write/scripts/handoff-pack.js --write ${n - 1}）` });
     } else {
       if (!/Gate[：:]\s*PASS/.test(packText)) {
         packProblems.push({ code: 'Gate_Failed', message: '交接包的源章节 Gate 不是 PASS，失败章节不得交接' });

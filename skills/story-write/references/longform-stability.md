@@ -110,7 +110,7 @@
 每章门控 `Gate: PASS` 后、进入下一章前，运行：
 
 ```bash
-node scripts/handoff-pack.js --write {N}
+node .agents/skills/story-write/scripts/handoff-pack.js --write {N}
 ```
 
 脚本从门控（State Delta、继承关键词）、细纲（章尾钩子/结尾设定）、`追踪/伏笔.md`（状态为已埋的活跃行）、`设定/角色不变量/`（本章出场角色）自动汇总，落盘 `追踪/交接包/第{N}章_to_第{N+1}章.md`。**门控非 PASS 时脚本拒绝生成**——失败章节不得交接到下一章，先修复。
@@ -128,11 +128,11 @@ node scripts/handoff-pack.js --write {N}
 
 ```bash
 # 单章
-node scripts/stability-audit.js {N} {N}
+node .agents/skills/story-write/scripts/stability-audit.js {N} {N}
 # 批量 + 报告落盘（追踪/稳定性审计/日更_第{start}章_to_第{end}章.md）
-node scripts/stability-audit.js --write {start} {end}
+node .agents/skills/story-write/scripts/stability-audit.js --write {start} {end}
 # 自动化/runner 场景
-node scripts/stability-audit.js --json {start} {end}
+node .agents/skills/story-write/scripts/stability-audit.js --json {start} {end}
 ```
 
 逐章检查：细纲稳定性契约存在且有 B# beat、beat 关键词组全部命中正文、禁词未出现、门控存在且 `Gate: PASS`、门控覆盖全部 B#、门控含 State Delta、角色不变量 POV 感知扫描、世界观不变量违规词扫描（`设定/世界观不变量.md` 存在时）；相邻章检查：交接包存在、其 Gate 为 PASS、继承关键词在下一章正文命中。任一 FAIL 退出码 1，诊断带错误码。
@@ -155,9 +155,9 @@ node scripts/stability-audit.js --json {start} {end}
 门控和交接包每章各一个文件，长篇会持续累积（500 章 ≈ 1000 个）。每完成 50 章或一卷结束时（与 SKILL.md「追踪文件归档」同一时机），运行：
 
 ```bash
-node scripts/archive-stability.js            # 默认保留最近 20 章活跃窗口
-node scripts/archive-stability.js --keep 30  # 自定义窗口大小
-node scripts/archive-stability.js --dry-run  # 只报告会移动什么
+node .agents/skills/story-write/scripts/archive-stability.js            # 默认保留最近 20 章活跃窗口
+node .agents/skills/story-write/scripts/archive-stability.js --keep 30  # 自定义窗口大小
+node .agents/skills/story-write/scripts/archive-stability.js --dry-run  # 只报告会移动什么
 ```
 
 脚本按 `正文/` 最大章号倒推活跃窗口，把窗口外的漂移门控、交接包、审计报告分别移入 `追踪/归档/漂移门控/`、`追踪/归档/交接包/`、`追踪/归档/稳定性审计/`——移动不删除，逐文件保留可回查；窗口首章的入向交接包保持活跃（批量审计的交接继承检查需要它）。

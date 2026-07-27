@@ -1,6 +1,6 @@
 # 文风生成 SOP
 
-> **何时加载**：story-long-analyze Stage 6 执行时。前置依赖：Stage 0-5 已完成，`拆文报告.md` + `章节/*_摘要.md` + `章节/第1-3章_深度拆解.md` + `原文/原文.txt`（或 `.md`）齐全。
+> **何时加载**：story-analyze long Stage 6 执行时。前置依赖：Stage 0-5 已完成，`拆文报告.md` + `章节/*_摘要.md` + `章节/第1-3章_深度拆解.md` + `原文/原文.txt`（或 `.md`）齐全。
 >
 > **输出**：`拆文库/{书名}/文风.md`（模板见 [style-profile-protocol.md](style-profile-protocol.md)）。
 
@@ -100,7 +100,7 @@ PYEOF
 **Bash 不可用时的降级**（仅子代理上下文等极端情况，主线程不会触发）：
 
 - 跳过本步骤；句长段写「Bash 工具不可用，跳过确定性统计」
-- `confidence: low`，narrative-writer 让位回默认 Gate D（按句长标准校准）
+- `confidence: low`，narrative-writer 让位回默认 Gate D（句长拆短）
 
 ### Step 5: 选原文锚点片段 (4-6 段)
 
@@ -151,7 +151,7 @@ PYEOF
 
 - analyze Stage 6 写 `拆文库/{书名}/文风.md`
 - story-import 把整个 `拆文库/{书名}/` 同步到项目 `{项目}/对标/{书名}/` 时**自动包含**文风（与拆文报告同等待遇）
-- 写作端（story-long-write）的日更循环读 `{项目}/对标/{书名}/文风.md`（按对标书路径查找规则，回退 `拆文库/{书名}/`）
+- 写作端（story-write long）的日更循环读 `{项目}/对标/{书名}/文风.md`（按对标书路径查找规则，回退 `拆文库/{书名}/`）
 
 ## 单独重建文风
 

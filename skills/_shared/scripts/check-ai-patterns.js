@@ -24,12 +24,12 @@ Detect high-risk AI-flavor prose patterns that need human rewrite:
   - 监控摄像头式动作清单 (同段连续摆放动作动词，缺少视角温度/情绪缓冲)
   - 音量反差腔 (声音不高/不大…却…, 实战漏网句式)
   - 否定排比 (没有X，没有Y…连排 / 没X…只是Y 先否定后肯定, 实战漏网句式)
+  - 否定校正式排比 (不讲A，只讲B；不求C，只求D, 实战漏网句式)
   - 反序对比 (是A，不是B — not-is 的反序变种, 实战漏网句式)
   - 预告式总结收尾 (文末窗口 没人知道/才刚刚开始/正朝着…压了过去, 实战漏网句式)
-  - 章尾状态总结体 (文末窗口 这一夜注定/这一切都结束了/新的人生才刚刚开始/命运的齿轮)
   - 引号强调滥用 (叙述里 1-4 字短词加引号强调，密度型)
 
-Each finding carries severity: blocking by default for generation/deslop cleanup (not-is-comparison / em-dash / voice-contrast / negation-parade / reverse-not-is / trailer-ending / trailer-summary). This is a local style/readability gate, not an AIGC detector score; functional human text can be marked for review instead of hard-edited for a detector.
+Each finding carries severity: blocking by default for generation/deslop cleanup (not-is-comparison / em-dash / voice-contrast / negation-parade / negation-only-parallel / reverse-not-is / trailer-ending). This is a local style/readability gate, not an AIGC detector score; functional human text can be marked for review instead of hard-edited for a detector.
 或 advisory (period-stutter / long-paragraph / micro-action-tic / action-list-tic / abstract-summary-tic / cliche-density-tic / metaphor-density-tic / reasoning-chain-tic / system-notice-formality-tic / overcompressed-prose-tic / low-connective-density-tic / quote-emphasis-tic，是提示，justified 的长推理/氛围段可保留)。
 --fail-on=blocking 只在出现 blocking finding 时退出 1；默认 --fail-on=all 有任何 finding 即退出 1。
 
@@ -191,6 +191,10 @@ const NEGATION_PARADE_PATTERNS = [
   /没(?:有)?[^。！？!?\n，,]{1,12}[，,]\s*没(?:有)?[^。！？!?\n，,]{1,16}[，,。.][^。！？!?\n，,]{0,6}只(?:是|会|有)/g,
 ];
 
+// 否定校正式排比（实战漏网 B2）：“不讲A，只讲B；不求C，只求D”。
+// 单个“不X，只Y”在自然口语中很常见，只拦同句双联且中间用分号对齐的变体，避免误报。
+const NEGATION_ONLY_PARALLEL_PATTERN = /(?:不讲|不求|不谈|不要|不看|不管|不图|不问|不争|不算|不在乎|不考虑)[^。！？!?\n；;，,]{1,18}[，,]\s*(?:要的)?只[^。！？!?\n；;]{1,24}[；;]\s*(?:也)?(?:不讲|不求|不谈|不要|不看|不管|不图|不问|不争|不算|不在乎|不考虑)[^。！？!?\n；;，,]{1,18}[，,]\s*只[^。！？!?\n]{1,30}/g;
+
 // 反序对比腔（实战漏网 C）：「是真嗓子，不是修音修出来的」——not-is-comparison 的反序变种。
 // 复用 not-is 的排除基建：引号内剥离（maskQuoted）、「是的/是啊」确认语（isAffirmationTagAt）；
 // 前字排除从 either-or 的 不/就/也 扩展到全部「X是」连词/副词合成词（还是/只是/可是/但是/
@@ -209,21 +213,6 @@ const REVERSE_NOT_IS_PREV_EXCLUDE = new Set([...COMPACT_EITHER_OR_PREV, '还', '
 // 校准：《万疆》20 章排除「正式拉开序幕」2 处报幕句后 0 命中，demo 前 20 章 0 命中。
 const TRAILER_ENDING_PATTERN = /没人知道|谁也不知道|谁也没想到|殊不知|(?:这)?才刚刚开(?:始|头)|正(?:朝着|向着)[^。！？!?\n]{0,24}(?:压|涌|袭|逼)(?:了?过去|了?过来|来)|(?<!正式)拉开(?:序幕|帷幕)|即将(?:开始|来临|降临)/g;
 const TRAILER_ENDING_WINDOW_CHARS = 600;
-
-// 章尾状态总结体：把细纲「结尾设定/收束状态」原样写成总结句收章（「这一夜注定无人入眠」
-// 「这一切都结束了」「新的人生才刚刚开始」「命运的齿轮」）。与 trailer-ending 共用文末窗口，
-// 区别是它盖章过去、trailer-ending 预告将来；收的都是 banned-words 已按名禁掉的形态。
-// 不收「(这|那)一刻…终于明白」：真人语料里那是正常的认知节拍，短篇第一人称审判句还是卖点
-// （short-craft「审判金句 / 心死余韵」），密度型由 advisory 的 abstract-summary-tic 兜。
-// 各分支都要求落在句末断言位，否则会吃进条件从句（等这一切结束了，我们就…）、动补
-// （这一切都说明得非常清楚）、成语跨匹配（这一刻…命中注定）、系表（这一战的结果是注定的）、
-// 及物用法（就这样…才结束了这个话题）、场内报幕（就这样…宣布…圆满落幕）和否定认知
-// （他不知道这一切意味着什么）——最后一类靠 (?!什么) 排掉间接疑问，那是盖章的反面。
-// 校准（文末 600 字窗口，命中逐条人工复核）：qimao 章中段 20000 章命中 1 处（0.005%）、
-// heiyan 整篇 3999 篇命中 22 处（0.550%，全部是上列禁用形态）；同批既有 trailer-ending
-// 分别命中 1.345% / 6.602%——本规则误报面显著小于已上线的同窗口规则。短篇整篇即收口，
-// 基线天然高于长篇章中段，故两个总体分别报数。
-const TRAILER_SUMMARY_PATTERN = /这一(?:夜|天|刻|战|年|局|役)[，,]?[^。！？!?，,\n]{0,6}(?<!命中)(?<!是)注定[^。！？!?\n]{0,8}[。！]|就这样[，,][^。！？!?，,\n]{0,8}(?:一切|全部)[^。！？!?，,\n]{0,4}(?:结束了|落幕|收场)[。！]|这一切[，,]?[^。！？!?，,\n]{0,6}(?:都)?(?:说明|意味着|结束了)(?!的)(?:(?!什么)[^。！？!?\n]){0,6}[。！]|(?:新的篇章|新的旅程|崭新的篇章|新的人生)[^。！？!?\n]{0,6}(?:开始|拉开|展开)|命运[^。！？!?\n]{0,6}齿轮/g;
 
 // 引号强调滥用（实战漏网 E，advisory 密度型，风格照 metaphor-density-tic）：
 // 叙述里短词加引号强调（他是被请来"把关"的）。只数叙述层 1-4 字成对引号片段；
@@ -293,10 +282,15 @@ if (options.json) {
   }
 }
 
-if (failed) process.exit(2);
+// Do not call process.exit() after writing JSON to a pipe. Large multi-file
+// reports may still be buffered, and an immediate exit truncates the JSON.
+// Setting exitCode preserves the status while allowing stdout to flush.
+if (failed) process.exitCode = 2;
 // --fail-on=blocking 只在出现 blocking finding 时退出 1（advisory 仅报告）；默认 all 沿用「有任何 finding 即 1」。
 const hasBlocking = allFindings.some((f) => f.severity === 'blocking');
-if (options.failOn === 'blocking' ? hasBlocking : allFindings.length > 0) process.exit(1);
+if (!failed && (options.failOn === 'blocking' ? hasBlocking : allFindings.length > 0)) {
+  process.exitCode = 1;
+}
 
 function escapeRegExp(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -394,6 +388,7 @@ function scanProsePatterns(proseLines) {
 
   findings.push(...findVoiceContrast(proseLines));
   findings.push(...findNegationParade(proseLines));
+  findings.push(...findNegationOnlyParallel(proseLines));
   findings.push(...findReverseNotIs(proseLines));
   findings.push(...findTrailerEnding(proseLines));
   findings.push(...findQuoteEmphasisTic(proseLines));
@@ -509,6 +504,31 @@ function findNegationParade(proseLines) {
   return findings;
 }
 
+// 否定校正式排比（实战漏网 B2）：只扫引号外叙述，双联对齐逐处 blocking。
+function findNegationOnlyParallel(proseLines) {
+  const findings = [];
+
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const masked = maskQuoted(text);
+    NEGATION_ONLY_PARALLEL_PATTERN.lastIndex = 0;
+    let match;
+    while ((match = NEGATION_ONLY_PARALLEL_PATTERN.exec(masked)) !== null) {
+      findings.push({
+        line: lineNo,
+        column: match.index + 1,
+        type: 'negation-only-parallel',
+        severity: 'blocking',
+        message: '否定校正式排比：“不讲A，只讲B；不求C，只求D”是工整的作者总结腔；改写为具体动作、利益或后果。',
+        excerpt: compact(text.slice(match.index, match.index + match[0].length)),
+      });
+    }
+  }
+
+  return findings;
+}
+
 // 反序对比腔（实战漏网 C）：「是A，不是B」。排除基建复用 not-is-comparison：
 // 引号内剥离、「是的/是啊」确认语；前字合成词与反问尾巴见 REVERSE_NOT_IS_PREV_EXCLUDE 注释。
 function findReverseNotIs(proseLines) {
@@ -571,18 +591,6 @@ function findTrailerEnding(proseLines) {
         severity: 'blocking',
         message: '预告式总结收尾：「没人知道/才刚刚开始/正朝着…压了过去」是 AI 章尾预告腔；结尾停在具体动作、画面或一句台词上，悬念让事件自己挂住，别替读者预告下一章。',
         excerpt: compact(text.slice(match.index, match.index + match[0].length)),
-      });
-    }
-    TRAILER_SUMMARY_PATTERN.lastIndex = 0;
-    let summaryMatch;
-    while ((summaryMatch = TRAILER_SUMMARY_PATTERN.exec(masked)) !== null) {
-      findings.push({
-        line: lineNo,
-        column: summaryMatch.index + 1,
-        type: 'trailer-summary',
-        severity: 'blocking',
-        message: '章尾状态总结体：「这一夜注定…/这一切都结束了/新的人生才刚刚开始/命运的齿轮」是把细纲的收束状态原样写成了总结句；收束状态是规划口径，正文落到最后一个具体动作、画面或台词上，别替读者盖章。',
-        excerpt: compact(text.slice(summaryMatch.index, summaryMatch.index + summaryMatch[0].length)),
       });
     }
   }
@@ -1461,9 +1469,20 @@ function isWhitelistedOverlap(narrative, idx, phraseLen, whitelist) {
   return false;
 }
 
+function ruleLoadFailure(section, error) {
+  return [{
+    line: 1,
+    column: 1,
+    type: 'rule-load-error',
+    severity: 'blocking',
+    message: `无法加载共享禁词规则（${section}）：${error || '规则段为空'}。检查 .agents/skills/_shared/references/banned-words.md；禁止回退到 skill-local 旧副本。`,
+    excerpt: section,
+  }];
+}
+
 function findBannedWordsExact(proseLines) {
   const { phrases, error } = loadBannedExactPhrases();
-  if (error || phrases.length === 0) return [];
+  if (error || phrases.length === 0) return ruleLoadFailure('一级禁用词', error);
   const whitelist = loadWhitelist();
   const findings = [];
 
@@ -1501,7 +1520,7 @@ function findBannedWordsExact(proseLines) {
 // 项目根 .deslop-whitelist 中的子串仍豁免（沿用 isWhitelistedOverlap）。
 function findSynestheticMetaphor(proseLines) {
   const { patterns, error } = loadSynaPatterns();
-  if (error || patterns.length === 0) return [];
+  if (error || patterns.length === 0) return ruleLoadFailure('通感隐喻', error);
   const whitelist = loadWhitelist();
   const findings = [];
 
@@ -1534,7 +1553,7 @@ function findSynestheticMetaphor(proseLines) {
 
 function findAntithesis(proseLines) {
   const { patterns, error } = loadAntithesisPatterns();
-  if (error || patterns.length === 0) return [];
+  if (error || patterns.length === 0) return ruleLoadFailure('对仗反义俏皮话', error);
   const whitelist = loadWhitelist();
   const findings = [];
 

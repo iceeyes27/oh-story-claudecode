@@ -1,6 +1,6 @@
 # 结构迁移映射规则（短篇）
 
-Phase 3-S 短篇结构迁移的详细映射规则。将 `拆文库/{书名}/` 短篇拆文产物转换为 `{短篇标题}/` 短篇工程结构，供 `story-short-write` Phase 3 无缝接手续写。
+Phase 3-S 短篇结构迁移的详细映射规则。将 `拆文库/{书名}/` 短篇拆文产物转换为 `{短篇标题}/` 短篇工程结构，供 `story-write short` Phase 3 无缝接手续写。
 
 > 长篇迁移规则见 `structure-mapping-long.md`。
 
@@ -15,7 +15,7 @@ Phase 3-S 短篇结构迁移的详细映射规则。将 `拆文库/{书名}/` �
 | 角色状态 | **不产** `追踪/角色状态.md` | 产，由 `character-state-reverse.md` 反推 |
 | 大纲体系 | **不产** 卷纲、细纲 | 产 `大纲/卷纲_第X卷.md` + `大纲/细纲_第N章.md` |
 | 大纲目录 | **不产** `大纲/` 目录 | 产 |
-| 续写衔接 | story-short-write Phase 3（逐场景写作） | story-long-write 日更循环 |
+| 续写衔接 | story-write short Phase 3（逐场景写作） | story-write long 日更循环 |
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: story
-description: "网络小说工具箱主入口。根据用户需求自动路由到对应 skill，并可启动本地 Dashboard 查看拆文库、写作项目和编辑文本；当用户意图不明确时触发，由路由逻辑分发到具体的扫榜/拆文/写作/去AI味/封面/导入/审查 skill。触发方式：/story、$story、/story dashboard、$story dashboard、/网文、「我想写小说」「帮我写书」「打开工作台」「检查更新」「有新版本吗」。"
+description: "网络小说工具箱主入口。根据用户需求自动路由到对应 skill；当用户只说检查、检查这本小说、帮我检查或检查当前书时，必须执行完整的小说复合检查。也用于分发扫榜、拆文、写作、去AI味、封面、导入和审查请求。触发方式：/story、$story、/网文、/检查、「我想写小说」「帮我写书」「写网文」「检查这本小说」「检查更新」「有新版本吗」。"
 metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
 ---
 # story：网文工具箱路由
@@ -23,11 +23,11 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 | 选题决策 | 写什么能爆、帮我选题、选题方向 | `/story-scan` (mode=long) |
 | 短篇扫榜 | 短篇排行、知乎盐言排行 | `/story-scan` (mode=short) |
 | 去 AI 味 | 去 AI 味、太 AI、去味、说人话 | `/story-deslop` |
+| 小说复合检查 | 检查、检查这本小说、帮我检查、检查一下当前书 | 依次执行 `story-review` → `story-deslop` (mode=novel) → `story-deslop` (mode=general) → `humanizer` |
 | 封面 | 封面、封面图 | `/story-cover` |
 | 环境部署 | 准备写书、搭环境、初始化 | `/story-setup` |
 | 浏览器操控 | 浏览器、抓取、登录态 | `/browser-cdp` |
 | 导入小说 | 导入、反向解析、导入小说、把我的书导进来 | `/story-import` |
-| 工作台 | dashboard、工作台、看拆文库、浏览项目文件、打开项目面板 | 见下方「Dashboard 工作台」 |
 | 检查/更新版本 | 检查更新、有新版本吗、升级、更新工具箱 | 见下方「版本更新检查」 |
 | 切换/列出书目 | 切书、换书、列出我的书、我在写哪几本、切换项目 | 见下方「多书切换」 |
 | 查故事资料 | 查角色、查伏笔、查进度、查设定、什么状态、写到哪了 | spawn `story-explorer` agent（结构化 prompt：`项目目录：{dir}\n查询类型：{根据意图选择}\n查询参数：{用户查询}`）；agent 不可用时见下方「查询降级」 |
@@ -37,32 +37,6 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 
 用户问"导入续写先 setup 还是 import"时，直接回答：**推荐先 `/story-setup`，新开/刷新会话后 `/story-import`，最后 `/story-write 日更` 或 `/story-write 写第N章`**。如果用户已经直接触发 `/story-import`，按 story-import 自带环境检测继续：未 setup 时让用户选择先去 setup 或继续串行导入。
 
-## Dashboard 工作台
-
-用户执行 `/story dashboard`（Codex 为 `$story dashboard`），或明确说“打开工作台 / 看项目
-文件”时，直接启动随本 skill 分发的本地 Dashboard，不再转发到其他 skill：
-
-1. 把**当前工作目录**作为默认工作区；用户明确给出目录时改用该目录。目录必须存在。
-2. 从当前已加载的 `story` skill 目录定位 `scripts/dashboard-server.mjs`，不要硬编码仓库路径、
-   全局 skill 路径或用户主目录。
-3. 检查 `node` 可用后，以长运行进程执行：
-
-   ```bash
-   node "<story-skill-dir>/scripts/dashboard-server.mjs" --root "<workspace>" --open
-   ```
-
-4. 等待输出出现“本机地址”，把完整 URL 回给用户。工具支持后台进程/PTY 时让服务保持运行；
-   无法自动拉起浏览器不算失败，仍返回可点击 URL。
-5. Dashboard 默认只监听 `127.0.0.1`。不要主动增加 `--allow-network`，不要把工作区暴露到
-   局域网或公网。
-
-工作台会识别标准 `拆文库/{书名}/`，兼容存量 `拆文库-{书名}/`，并把含 `正文/`、
-`大纲/`、`设定/` 或 `追踪/` 的目录识别为写作项目。浏览器可编辑 `.md`、`.txt`、
-`.json`、`.yaml`、`.yml`、`.toml`，保存或确认删除前用修改时间防止误操作外部更新。
-
-停止服务时终止对应的 Node 长运行进程即可。若用户只问用法，不要替他启动；给出
-`/story dashboard` / `$story dashboard` 两种平台对应入口。
-
 ## 路由流程
 
 1. 分析用户请求，提取意图关键词
@@ -70,6 +44,21 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 3. 如果能明确匹配，直接调用对应 skill（Claude/OpenCode 可用 `Skill("skill-name")` 或 slash command；Codex 用 `$skill-name` / `/skills`；OpenClaw 用 `/skill skill-name` 或自然语言点名）
 4. 如果无法匹配，询问用户想做什么（从上表中选择）
 5. 如果用户说"我想写小说"但未指定长篇/短篇，询问篇幅类型后再路由
+
+## 小说复合检查硬门禁
+
+用户只说“检查”且未限定单项时，不得缩减成一次 `story-review`，必须按以下顺序完成：
+
+1. `story-review`：结构、逻辑、设定、人物、时间线、伏笔和平台适配。
+2. `story-deslop`（mode=novel）：正文 AI 味 7 Gate。
+3. `story-deslop`（mode=general）：正文及对外文案的套路腔、空话和模板感。
+4. `humanizer`：通用 AI 痕迹复核；纯中文正文只作模式复核。
+
+开始前输出当前书名、正文目录、章节总数和四阶段识别结果。每完成一个阶段，立即输出该阶段的独立结论，至少包含：执行状态、实际检查范围、问题数量和关键发现。最终输出 `复合检查完成：4/4`；未达到 4/4 不得宣称检查完成。
+
+任一 Skill 未加载、输入文件不可读或检查范围不完整时，明确报告失败阶段和已完成范围，并停止后续阶段，不得静默跳过。内部 reviewer agent 不可用但 `story-review` 按自身规则完成 solo 降级时，必须在该阶段结论中标明降级。
+
+用户未明确要求修改时，复合检查只读，不写正文文件。
 
 ## 查询降级
 

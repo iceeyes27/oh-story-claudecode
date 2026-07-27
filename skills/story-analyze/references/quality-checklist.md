@@ -1,14 +1,14 @@
 
 # 网文质量检查清单
 
-> **定位**：story-short-analyze（短篇拆书）的质量自检清单，评估**拆解对象（源文）**的成文质量时逐项核对。
+> **定位**：story-analyze short（短篇拆书）的质量自检清单，评估**拆解对象（源文）**的成文质量时逐项核对。
 > 拆书管道本身的质量检查见 output-templates.md「质量检查必填字段」；所有数值阈值的唯一权威定义见 material-decomposition.md「质量标准」与「节奏分析」，本清单不自定义数值。
 >
 > **三类质量的分工（别混用）**：
 >
 > 1. **拆书管道质量检查**（执行过程中）→ [output-templates.md「质量检查必填字段」](output-templates.md)。每条带 `[BLOCK]` / `[WARN]` 标注；`[BLOCK]` 缺失 → 「BLOCK 项扫描」阻断。
 > 2. **评估对象（源文）质量**（拆什么样的料）→ 本文件。回答"这篇源文写得好不好"。
-> 3. **拆文报告本身质量**（写什么样的报告）→ [anti-ai-writing.md](anti-ai-writing.md) + [banned-words.md](banned-words.md)。**报告自己**不能写成 AI 腔，由「拆文报告 AI 腔自检」守门，扫描 `拆文报告.md` 全文。注意：扫的是「我们写的拆文报告」，不是源文滤镜。
+> 3. **拆文报告本身质量**（写什么样的报告）→ [.agents/skills/_shared/references/anti-ai-writing.md](../../_shared/references/anti-ai-writing.md) + [.agents/skills/_shared/references/banned-words.md](../../_shared/references/banned-words.md)。**报告自己**不能写成 AI 腔，由「拆文报告 AI 腔自检」守门，扫描 `拆文报告.md` 全文。注意：扫的是「我们写的拆文报告」，不是源文滤镜。
 
 ## 目录
 
@@ -120,7 +120,7 @@
 | 照搬原句导致语气不自然 | medium | 只在确有 AI 腔时改写，正常原句可保留 |
 | 大量使用 AI 标志词 | high | 替换为具体描述 |
 | 同一句式重复出现 | medium | 变换表达方式 |
-| 描写过于文学化（辞藻堆砌、书面腔、比喻成串） | medium | 改为口语化/动作化；动作化不是切成三五字短句串，改写后叙述仍以逗号长句为主 |
+| 描写过于文学化 | medium | 改为口语化/动作化 |
 
 ### 维度 3：格式一致度
 检查：段落结构、字数分配、开头结尾格式是否统一。
@@ -140,7 +140,7 @@
 | 套路修辞 | 「命运仿佛在和他开玩笑」 | 删掉或换成具体描述 |
 | 抽象裁判金句 | 「海里认的是水，不是你这张嘴」「认的是水里那口真」「认活路」「长骨头」这类表面硬、细想不落地的对仗话 | 改成具体能力、来路证据、行内规矩或组织结果，如水性、船号、泥痕、盐印、账面来路、规矩立起来 |
 | 情绪标签 | 「他感到一阵悲伤」 | 改为行为表现 |
-| 心理描写空转 | 内心独白无新信息、重复同一情绪或复述读者已知 | 只压缩空转部分；带新信息、决断或情绪转折的独白不按句数压缩 |
+| 大段心理描写 | 连续 3 句以上内心独白 | 压缩为 1 句或转为对话 |
 
 ### 维度 5：逻辑连贯
 检查：句间/段间是否通顺，有无设定冲突。
@@ -215,8 +215,8 @@
 
 ### 毒点/代入感/震惊/开头/结尾/情绪/期待感速查
 
-> **本表评估的是源文**（拆解对象写得好不好）。详细的毒点分类、识别方法和修复方案见 [anti-ai-writing.md](anti-ai-writing.md)。
-> **不要把本表用来评估拆文报告本身**：拆文报告本身 AI 腔检查走「拆文报告 AI 腔自检」+ [anti-ai-writing.md](anti-ai-writing.md) + [banned-words.md](banned-words.md)。
+> **本表评估的是源文**（拆解对象写得好不好）。详细的毒点分类、识别方法和修复方案见 [.agents/skills/_shared/references/anti-ai-writing.md](../../_shared/references/anti-ai-writing.md)。
+> **不要把本表用来评估拆文报告本身**：拆文报告本身 AI 腔检查走「拆文报告 AI 腔自检」+ [.agents/skills/_shared/references/anti-ai-writing.md](../../_shared/references/anti-ai-writing.md) + [.agents/skills/_shared/references/banned-words.md](../../_shared/references/banned-words.md)。
 > **拆文管道完成度** 走 [output-templates.md「质量检查必填字段」](output-templates.md) 的 `[BLOCK]` / `[WARN]` 清单。
 
 | 检查项 | 标准 |

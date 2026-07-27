@@ -1,9 +1,15 @@
 ---
 name: story-analyze
 version: 2.0.0
-description: "网文拆文（长篇/短篇统一入口）。深度拆解爆款小说的黄金三章、人设架构、爽点设计、节奏控制、情感线、反转设计、写作手法。mode=long 走长篇 7 阶段管道（Stage 0-6），mode=short 走短篇 5 阶段管道（Stage 2-6）。触发方式：/story-analyze、/长篇拆文、/短篇拆文、「帮我拆这本书」「拆短篇」「分析黄金三章」「深度拆解」——按字数自动路由。"
-metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
+description: 网文拆文（长篇/短篇统一入口）。深度拆解爆款小说的黄金三章、人设架构、爽点设计、节奏控制、情感线、反转设计、写作手法。mode=long
+  走长篇 7 阶段管道（Stage 0-6），mode=short 走短篇 5 阶段管道（Stage
+  2-6）。触发方式：/story-analyze、/长篇拆文、/短篇拆文、「帮我拆这本书」「拆短篇」「分析黄金三章」「深度拆解」——按字数自动路由。
+metadata:
+  openclaw:
+    source: https://github.com/iceeyes27/oh-story-claudecode
+disable: true
 ---
+
 # story-analyze：网文拆文（长篇/短篇统一入口）
 
 你是网络小说结构分析师。
@@ -30,8 +36,8 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 
 **命令映射**：
 - `/story-analyze` → 按字数自动路由
-- `/story-long-analyze`（旧命令）→ `/story-analyze long`
-- `/story-short-analyze`（旧命令）→ `/story-analyze short`
+- `/story-analyze long`（旧命令）→ `/story-analyze long`
+- `/story-analyze short`（旧命令）→ `/story-analyze short`
 - `/长篇拆文` → `mode = long`
 - `/短篇拆文` → `mode = short`
 - 「帮我拆这本书」「拆这本书」「分析黄金三章」「深度拆解」「系统拆解」→ 按字数自动路由（默认 long 倾向）
@@ -195,7 +201,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 └── _meta.json           # 管道元数据 + 结构计数（resume + Phase 7 数值依据）
 ```
 
-> **短篇下游契约**：`story-short-write` 同时读全套产出——`拆文报告.md` 取分析叙事，
+> **短篇下游契约**：`story-write short` 同时读全套产出——`拆文报告.md` 取分析叙事，
 > `情节节点.md` 看节奏锚点，`写作手法.md` 抄手法，`原文/` 抄语感，`_meta.json`
 > 看题材识别和结构计数。完整字段定义见 [references/output-contract.md](references/output-contract.md)。
 
@@ -439,7 +445,7 @@ Stage 6 内容写完后，**不**立刻 append `6` 到 `stages_completed[]`。�
 
 ### 7.1 拆文报告 AI 腔自检
 
-扫描 `拆文报告.md` 全文 against [references/banned-words.md](references/banned-words.md) 词表 + [references/anti-ai-writing.md](references/anti-ai-writing.md) 句式规则。扫描时跳过源文引用——以 `>` 开头的引用行、以及表格中「关键台词 / 原文引用」列的引号直引不计入，只扫分析师本人写的措辞。
+扫描 `拆文报告.md` 全文 against [.agents/skills/_shared/references/banned-words.md](../_shared/references/banned-words.md) 词表 + [.agents/skills/_shared/references/anti-ai-writing.md](../_shared/references/anti-ai-writing.md) 句式规则。扫描时跳过源文引用——以 `>` 开头的引用行、以及表格中「关键台词 / 原文引用」列的引号直引不计入，只扫分析师本人写的措辞。
 
 - **命中** → 不写 `stages_completed[6]`，列出命中位置，提示用户人工修订**拆文报告本身**的 AI 腔（不是源文——源文里有 AI 腔正常报告即可，但报告本身不能写成 AI 腔）。
 - **未命中** → 继续 7.2。
@@ -519,8 +525,8 @@ Stage 6 内容写完后，**不**立刻 append `6` 到 `stages_completed[]`。�
 | [references/output-templates.md](references/output-templates.md) | 拆文时：输出模板 + 结构库 + 质量检查（含 [BLOCK]/[WARN] 标注） |
 | [references/material-decomposition.md](references/material-decomposition.md) | 拆文方法论：情节节点提取 + 写作手法 + 情感线 + 节奏分析 + 共鸣分析 + 人物规则 + **质量标准唯一权威** |
 | [references/quality-checklist.md](references/quality-checklist.md) | 评估**源文**质量时：短篇拆书的质量自检清单（评估对象的好坏，不是评估拆文报告本身） |
-| [references/anti-ai-writing.md](references/anti-ai-writing.md) | Phase 7.1：扫描**拆文报告本身**的 AI 腔（不是源文滤镜） |
-| [references/banned-words.md](references/banned-words.md) | Phase 7.1：拆文报告禁用词速查 |
+| [.agents/skills/_shared/references/anti-ai-writing.md](../_shared/references/anti-ai-writing.md) | Phase 7.1：扫描**拆文报告本身**的 AI 腔（不是源文滤镜） |
+| [.agents/skills/_shared/references/banned-words.md](../_shared/references/banned-words.md) | Phase 7.1：拆文报告禁用词速查 |
 
 ### 短篇按需加载（拆解对应题材 / 维度时作为对照标尺）
 

@@ -35,7 +35,7 @@ Markdown 追踪文件回答不了两类问题：**「第 N 章那一刻的世界
 每章过完漂移门控、更新追踪文件的同一时刻，把本章 State Delta 里的条目翻译成事件写入（一条 Delta 一般对应 1-2 个事件）：
 
 ```bash
-node scripts/state-query.js add '{"ch":12,"type":"状态","entity":"林岚","field":"位置","value":"营业厅"}'
+node .agents/skills/story-write/scripts/state-query.js add '{"ch":12,"type":"状态","entity":"林岚","field":"位置","value":"营业厅"}'
 ```
 
 只录**会被后文引用的硬状态**（生死、位置跃迁、能力获得、关键持有物、关系定性、关键信息获知、伏笔操作），不录情绪、氛围、一次性细节——那些是散文性上下文，留在 Markdown 里。每章通常 2-5 条，多了说明录得太细。
@@ -43,11 +43,11 @@ node scripts/state-query.js add '{"ch":12,"type":"状态","entity":"林岚","fie
 ## 查询
 
 ```bash
-node scripts/state-query.js snapshot 47                # 第 47 章时点的全量快照
-node scripts/state-query.js snapshot 47 --entity 林岚  # 单实体：状态+已知信息
-node scripts/state-query.js foreshadow 47              # 第 47 章时点活跃伏笔（含超期标记）
-node scripts/state-query.js log --entity 陈叔          # 实体全事件时间线
-node scripts/state-query.js check                      # 全库矛盾检测，FAIL 退出码 1
+node .agents/skills/story-write/scripts/state-query.js snapshot 47                # 第 47 章时点的全量快照
+node .agents/skills/story-write/scripts/state-query.js snapshot 47 --entity 林岚  # 单实体：状态+已知信息
+node .agents/skills/story-write/scripts/state-query.js foreshadow 47              # 第 47 章时点活跃伏笔（含超期标记）
+node .agents/skills/story-write/scripts/state-query.js log --entity 陈叔          # 实体全事件时间线
+node .agents/skills/story-write/scripts/state-query.js check                      # 全库矛盾检测，FAIL 退出码 1
 ```
 
 用法场景：

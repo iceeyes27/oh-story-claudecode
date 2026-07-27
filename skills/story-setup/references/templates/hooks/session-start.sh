@@ -66,17 +66,17 @@ if sentinel_exists "$ROOT/.story-deployed"; then
       HAS_CONTENT=true
       ;;
     *)
-      if [ "$AGENTS_VERSION" -lt 21 ]; then
-        OUTPUT+="[WARN] story-setup agents_version=$AGENTS_VERSION 低于 v21。重新运行 /story-setup 刷新 hooks、agents 和 references（部署后需新开会话）。\n\n"
+      if [ "$AGENTS_VERSION" -lt 20 ]; then
+        OUTPUT+="[WARN] story-setup agents_version=$AGENTS_VERSION 低于 v20。重新运行 /story-setup 刷新 canonical skills、adapters、hooks、agents 和 references（部署后需新开会话）。\n\n"
         HAS_CONTENT=true
-      elif [ "$AGENTS_VERSION" -gt 21 ]; then
-        OUTPUT+="[WARN] story-setup agents_version=$AGENTS_VERSION 高于本 hook 支持的 v21。不要降级覆盖；请先更新 oh-story-claudecode。\n\n"
+      elif [ "$AGENTS_VERSION" -gt 20 ]; then
+        OUTPUT+="[WARN] story-setup agents_version=$AGENTS_VERSION 高于本 hook 支持的 v20。不要降级覆盖；请先更新 oh-story-claudecode。\n\n"
         HAS_CONTENT=true
       fi
       ;;
   esac
 
-  for field in setup_skill_version target_cli resolver_strategy references_dir; do
+  for field in setup_skill_version target_cli resolver_strategy canonical_skills_dir adapter_manifest references_dir; do
     if [ -z "$(read_sentinel_field "$field" "$ROOT/.story-deployed")" ]; then
       OUTPUT+="[WARN] .story-deployed 缺少 $field 字段。重新运行 /story-setup 刷新部署元信息。\n\n"
       HAS_CONTENT=true
@@ -141,8 +141,8 @@ story_update_check() {
   [ -n "${STORY_NO_UPDATE_CHECK:-}" ] && return 0
   command -v curl >/dev/null 2>&1 || return 0
   local vfile=""
-  [ -f "$ROOT/.claude/skills/story/VERSION" ] && vfile="$ROOT/.claude/skills/story/VERSION"
-  [ -z "$vfile" ] && [ -f "$HOME/.claude/skills/story/VERSION" ] && vfile="$HOME/.claude/skills/story/VERSION"
+  [ -f "$ROOT/.agents/skills/story/VERSION" ] && vfile="$ROOT/.agents/skills/story/VERSION"
+  [ -z "$vfile" ] && [ -f "$HOME/.agents/skills/story/VERSION" ] && vfile="$HOME/.agents/skills/story/VERSION"
   [ -n "$vfile" ] || return 0
   local cur; cur=$(tr -dc '0-9.' < "$vfile" 2>/dev/null) || return 0
   [ -n "$cur" ] || return 0
@@ -166,6 +166,14 @@ story_update_check() {
   fi
 }
 story_update_check || true
+
+# Skill resolver 自检：只读、轻量；异常才输出，避免静默加载平台旧副本。
+if command -v node >/dev/null 2>&1 && [ -f "$ROOT/.agents/skills/story-setup/scripts/manage-skill-adapters.js" ]; then
+  if ! adapter_report=$(node "$ROOT/.agents/skills/story-setup/scripts/manage-skill-adapters.js" check --root="$ROOT" 2>&1); then
+    OUTPUT+="[WARN] Skill 适配层异常；当前权威路径：$ROOT/.agents/skills。运行 node .agents/skills/story-setup/scripts/manage-skill-adapters.js repair\n${adapter_report}\n"
+    HAS_CONTENT=true
+  fi
+fi
 
 # 仅在有实际内容时输出，否则完全静默
 if [ "$HAS_CONTENT" = true ]; then

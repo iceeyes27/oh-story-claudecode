@@ -27,7 +27,7 @@ memory: project
 **确定项目根目录：** 执行 `git rev-parse --show-toplevel`，失败则用当前工作目录。以下所有路径均为项目根下的绝对路径。
 
 读取参考文件时，直接 Read 当前 Claude 部署的 canonical 路径，禁止先用 Glob/Grep 搜索：
-1. `{项目根}/.claude/skills/story-setup/references/agent-references/{文件名}`
+1. `{项目根}/.agents/skills/story-setup/references/agent-references/{文件名}`
 
 文件不存在时返回缺失事实，由父流程提示重新运行 `/story-setup`；不要探测其他 CLI 的目录。
 
@@ -96,7 +96,7 @@ memory: project
 - 发展：{}
 - 转折：{}
 - 高潮：{}
-- 结尾：{本章最后落在谁的什么动作/画面/台词上；写具体落点，不写"尘埃落定"式状态判词}
+- 结尾：{}
 
 #### 情节安排（多线）
 - 主线推进：{}
@@ -115,7 +115,7 @@ memory: project
 - 行动成本（可无）/收益归属：{可无行动成本，不硬造代价；收益归谁、如何可见}
 
 #### 结尾设定和钩子
-- 结尾设定：{收束落到什么具体动作或画面；未解决问题；下一章推动力}
+- 结尾设定：{}
 - 章尾钩子：{类型} — {内容；期待度；承接}
 ```
 

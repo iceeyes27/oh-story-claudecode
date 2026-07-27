@@ -1,9 +1,15 @@
 ---
 name: story-review
 version: 1.2.0
-description: "多视角对抗式审查。full/lean 模式在已部署 reviewer agents 时并行 spawn；缺失/异常 agents 或 spawn 失败时自动降级 solo，参考文件不可读时使用内置 rubric fallback。触发方式：/story-review、/审查、「审查一下」「帮我审一下」。"
-metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
+description: 多视角对抗式审查。full/lean 模式在已部署 reviewer agents 时并行 spawn；缺失/异常 agents 或
+  spawn 失败时自动降级 solo，参考文件不可读时使用内置 rubric
+  fallback。触发方式：/story-review、/审查、「审查一下」「帮我审一下」。
+metadata:
+  openclaw:
+    source: https://github.com/iceeyes27/oh-story-claudecode
+disable: true
 ---
+
 # story-review：多视角对抗式审查
 
 你是审查协调器。你的职责是找出小说文本中的结构、角色、文字、设定问题，并给出可执行修改建议。
@@ -36,7 +42,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
       - **Claude Code agent（`.claude/agents/`）**：读取 frontmatter，确认 `name:` 与 subagent_type 完全一致；frontmatter 缺失、不可解析或 name 不匹配时视为 malformed agent。
       - **OpenCode agent（`.opencode/agents/`）**：文件名即 agent 名（OpenCode 不要求在 frontmatter 中写 `name:`），读取 frontmatter 确认 `mode: subagent` 和 `permission` 字段存在且可解析即可；frontmatter 缺失或不可解析视为 malformed。
       - **Codex agent（`.codex/agents/`）**：文件名为 `{agent}.toml`，TOML 必须可解析，且包含 `name`、`description`、`developer_instructions`；`name` 必须与目标 agent 完全一致。
-    - 如果 `.story-deployed` 存在且 `agents_version` 缺失、非整数或小于 `21`，视为 stale deployment；不要 spawn，降级 `solo`，建议用户重新运行 `/story-setup`。`agents_version` 大于 `21` 时也不 spawn：这表示当前 skill 比项目部署旧，降级 `solo` 并提示先更新 oh-story-claudecode，不要用 v21 重新部署。
+    - 如果 `.story-deployed` 存在且 `agents_version` 缺失、非整数或小于 `20`，视为 stale deployment；不要 spawn，降级 `solo`，建议用户重新运行 `/story-setup`。`agents_version` 大于 `20` 时也不 spawn：这表示当前 skill 比项目部署旧，降级 `solo` 并提示先更新 oh-story-claudecode，不要用 v20 重新部署。
    - 如果目标模式所需任一文件缺失或 malformed，**不要尝试 spawn 缺失/异常 Agent**；自动降级为 `solo`，并在报告开头写明：`Fallback: missing agents -> solo` 或 `Fallback: malformed agents -> solo`，列出问题文件，建议用户运行 `/story-setup`。
 5. **确认 Agent/Task 工具可用**：如果当前环境没有可用的子 Agent/Task 调用能力，直接降级为 `solo`，报告 `Fallback: agent tool unavailable -> solo`。
 6. **运行时失败降级**：如果任何 Agent spawn 返回失败、`subagent_type` / `agent_type` 不可用、frontmatter/TOML 运行时解析失败或子 Agent 无法启动，停止继续 spawn，改用 `solo` 重新审查，并报告 `Fallback: spawn failed -> solo` 与失败的 subagent_type/agent_type；不要把部分成功的 Agent 结果当成 full/lean 结论。
@@ -77,14 +83,14 @@ Rubric Source: file | embedded fallback
 |---|---|
 | 通用质量清单 | `story-review/references/quality-checklist.md` |
 | 通用内容评分 rubric | `story-review/references/quality-rubric.md` |
-| 去 AI 味方法 | `story-review/references/anti-ai-writing.md` |
+| 去 AI 味方法 | `.agents/skills/_shared/references/anti-ai-writing.md` |
 | 剧情循环/高潮公式 | `story-review/references/plot-core-methods.md` |
 | 角色关系/好感度 | `story-review/references/character-relations.md` |
 | 对话质量 | `story-review/references/dialogue-mastery.md` |
-| 审查禁用词 | `story-review/references/banned-words.md` |
+| 审查禁用词 | `.agents/skills/_shared/references/banned-words.md` |
 | 平台 rubric | `story-review/references/rubrics/{fanqie,qidian,zhihu}.md` |
-| 标点预检脚本 | `story-review/scripts/normalize-punctuation.js` |
-| AI句式预检脚本 | `story-review/scripts/check-ai-patterns.js` |
+| 标点预检脚本 | `.agents/skills/_shared/scripts/normalize-punctuation.js` |
+| AI句式预检脚本 | `.agents/skills/_shared/scripts/check-ai-patterns.js` |
 
 ### 内置审查基准包（路径不可读时必用）
 
@@ -95,12 +101,10 @@ Rubric Source: file | embedded fallback
 - 冲突推进：本章是否有阻碍、选择、代价或关系变化；只解释/闲聊/总结至少 S2。
 - 情绪曲线：是否有铺垫、升温、释放或反转；情绪平直或突兀至少 S2/S3。
 - 钩子与期待：开头或结尾是否制造后续问题；没有悬念或未完成期待至少 S2。
-- 开头新鲜度（仅开篇/前 3 章）：开局有具体人物/处境切口，还是同题材默认套路（能整体换到任意同类书）？"有钩子/非天气开场"不豁免同质化；套路化开局即使有钩子也至少 S3，整体撞同题材模板 S2。
 - 角色动机：行为是否符合目标、性格、处境和关系压力；为剧情服务而失真是 S1/S2。
 - 对话质量：是否有潜台词、信息控制、角色差异；说明书式对话至少 S2。
 - 设定一致性：不违背已写规则、时间线、角色属性；明确事实冲突通常 S1。
 - 文字自然度：具体、可感、动作承载信息；AI 腔、陈词滥调、总结体按影响定 S2/S3。
-- 句长节奏：叙述默认是逗号长句（一句用逗号串起 2-4 件事再落句号）；碎句和电报体（逗号之间连着都是 ≤5 字、通篇超短句像提纲）与 AI 腔同级，按影响定 S3/S2，不因「短=网文节奏」放行。
 - 标点节奏：标点是否服务语气/人物声线；通篇句号化、随机堆砌问号/感叹号，或残留 `……`/`——` 硬造停顿，按影响定 S3/S2。
 - 具体字数表达校验：正文用“这五个字 / 短短四字 / 三个字一落 / 八个字砸下去”等具体字数表达评价台词、题字、信件、念头或弹幕时，必须能确认统计口径、机器核对结果和叙事必要；不能确保字数计算正确时，按文字自然度问题处理，建议改成“这句话一落”“那几个字”“话音落下”等非具体数字表达。
 - 格式可读性：段落短、对话独立、无多余空行；格式阻碍阅读按 S3，严重混乱按 S2。
@@ -114,7 +118,7 @@ AI 味 / 禁用词 fallback 速查：
 - 章末总结体：`这一切都说明...`、`他终于明白...`、`新的篇章开始了...`。
 - 信息倾倒：角色直接说“我要解释世界观/规则/关系变化”。
 - 论文体/万能结论：过度使用“然而、与此同时、不可否认、这意味着”。
-- 处理原则：有原文证据才输出 finding；给出可执行替换方向，不只评价“AI 味重”。修法方向不默认「拆短 / 删虚词 / 剥标点」：把正常的逗号长句拆成碎句，与 AI 腔同样是问题。
+- 处理原则：有原文证据才输出 finding；给出可执行替换方向，不只评价“AI 味重”。
 
 平台 fallback 摘要：
 - 番茄：强开局、强冲突、高频爽点/情绪反馈、低理解门槛。
@@ -147,15 +151,15 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
    - 起点 → 优先读取 `story-review/references/rubrics/qidian.md`；不可读时使用内置起点 fallback 摘要。
    - 知乎盐言 → 优先读取 `story-review/references/rubrics/zhihu.md`；不可读时使用内置知乎 fallback 摘要。
    - 未识别平台 → 优先读取 `story-review/references/quality-rubric.md`；不可读时使用内置通用网文内容 rubric，并报告 `Rubric: generic web-fiction` 与 `Rubric Source: file | embedded fallback`。
-5. **形成审查基准包摘要**：把已加载的文件内容或内置 fallback 摘要压缩为 5-12 条审查标准，后续 solo 和子 Agent 都必须使用这份摘要。摘要必须保留一条句长标准：叙述默认是逗号长句，碎句和电报体与 AI 腔同级处理，不因「短」放行。
+5. **形成审查基准包摘要**：把已加载的文件内容或内置 fallback 摘要压缩为 5-12 条审查标准，后续 solo 和子 Agent 都必须使用这份摘要。
 6. **确定性预检（只报告，不修改）**：当审查范围包含本地正文文件路径时，运行本 skill 自带脚本：
    ```bash
-   node scripts/normalize-punctuation.js --check <正文文件...>
-   node scripts/check-ai-patterns.js --check --fail-on=blocking <正文文件...>
-   node scripts/check-degeneration.js --check <正文文件...>
+   node .agents/skills/_shared/scripts/normalize-punctuation.js --check <正文文件...>
+   node .agents/skills/_shared/scripts/check-ai-patterns.js --check --fail-on=blocking <正文文件...>
+   node .agents/skills/_shared/scripts/check-degeneration.js --check <正文文件...>
    ```
    - 将 `ellipsis`、`double-hyphen`、`markdown-divider` 结果作为 `format` findings 合并进报告。`em-dash` 破折号只采用 `check-ai-patterns.js` 的语义改写建议（见下条）；`normalize-punctuation.js` 报的同一位置 `em-dash` 在合并时去重丢弃，避免同处出现「机械替换」与「按功能改写」两条相互冲突的 finding。另外人工检查标点节奏是否通篇句号化或随机堆砌，脚本不替代语气判断。
-   - `check-ai-patterns.js` 的 findings 合并进 `prose`：severity=blocking 的类别一律按 S2（当前为 `not-is-comparison` / `em-dash` / `voice-contrast` / `negation-parade` / `reverse-not-is` / `trailer-ending` / `trailer-summary`），修法直接采用检测器输出的建议（删否定铺垫/反差腔/排比否定/章尾预告腔/章尾状态总结句，直接写后项或具体动作；破折号按功能改成动作/短句/逗号/冒号）。
+   - `check-ai-patterns.js` 的 findings 合并进 `prose`：severity=blocking 的类别一律按 S2（当前为 `not-is-comparison` / `em-dash` / `voice-contrast` / `negation-parade` / `reverse-not-is` / `trailer-ending`），修法直接采用检测器输出的建议（删否定铺垫/反差腔/排比否定/章尾预告腔，直接写后项或具体动作；破折号按功能改成动作/短句/逗号/冒号）。
    - 其余 prose findings 统一按 S4：只指出读感风险，不替代人工判断；功能性写法标 `[需复核]` 并保留。完整类别和修法见 `anti-ai-writing.md`。
    - `check-degeneration.js` 报告模型退化（逐字复读/截断/占位符/工程词泄漏），每条带 `severity: blocking|advisory`：blocking（复读/截断/tier1 工程词）作为 S1/S2 `prose` findings，修复建议是「重新生成该段，不是改写」；advisory（tier2 章节/歧义词）作为 S4。
    - `story-review` 不修改文件；需要自动修复时建议转 `/story-deslop`。
@@ -242,8 +246,6 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
   8. 伏笔密度、连载期待和结构信息量是否合理？（伏笔密度通常只作为 S4 结构风险，除非已造成理解混乱）
   9. 按平台 rubric 或通用内容 rubric 逐项对照，标记 PASS/FAIL。
   10. 继承的开放项里，本批本该兑现的钩子/伏笔是否落空？
-  11. 开头同质化（仅当本章是全书开篇/前 3 章）：开局切口是不是同题材的默认套路（穿越即退婚、系统绑定、末世第一天、开场即打脸等），能不能原样换到任意同类书？"有钩子/非天气开场"不等于不同质。对照 references/plot-core-methods.md「噱头分类与开篇流程」判断——能整体换到同类书=同质化（撞题材模板至少 S2；套路化但有具体人物/处境微差 S3）。
-  12. 结尾总结：章尾是总结/升华/复述式收尾（"就这样……""他终于明白……""这一夜注定……"），还是落在动作/画面/悬念上？检测器已判 blocking 的（`trailer-summary`）按上面「blocking 一律 S2」处理，不重复定级；检测器没覆盖的总结/升华/复述式收尾按影响定 S2/S3（改写走 /story-deslop Gate F，本 skill 只标问题不改写）。
 
   输出格式：
   VERDICT: APPROVE / CONCERNS / REJECT
@@ -414,7 +416,7 @@ lean 模式只 spawn `story-architect` + `consistency-checker`。如果任一缺
 solo 必须执行基础检查：
 1. 格式合规性检查（戏剧单元/画面分段、无机械字数切分、无空行、对话格式、主语/角色名节奏）。
 2. 简单的设定一致性 grep（角色名、属性、关键设定、伏笔关键词）+ 推理型一致性检查（规则边界、设定层级、跨章因果链、可滥用漏洞、代价一致性）。
-3. AI 味与禁用词检查（优先读取 `story-review/references/banned-words.md` 与 `story-review/references/anti-ai-writing.md`，不可读时使用内置 AI 味 / 禁用词 fallback 速查）。
+3. AI 味与禁用词检查（优先读取 `.agents/skills/_shared/references/banned-words.md` 与 `.agents/skills/_shared/references/anti-ai-writing.md`，不可读时使用内置 AI 味 / 禁用词 fallback 速查）。
 4. 通用网文内容评分（优先读取 `story-review/references/quality-rubric.md`，不可读时使用内置通用网文内容 rubric）。
 5. 按统一 Findings Schema 输出简化版报告。
 

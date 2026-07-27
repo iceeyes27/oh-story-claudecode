@@ -1,9 +1,15 @@
 ---
 name: story-write
 version: 2.0.0
-description: "网文写作（长篇/短篇统一入口）。从大纲到正文，辅助网络小说创作。mode=long 走长篇写作流程（Phase 1-5：选题→设定→大纲→正文→质检），mode=short 走短篇写作流程（Phase 1-4：情绪目标→构思→逐场景写作→精修）。触发方式：/story-write、/写长篇、/写短篇、「帮我开书」「写大纲」「日更」「续写」「帮我写一篇短篇」「写个盐言故事」——按意图自动路由。"
-metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
+description: 网文写作（长篇/短篇统一入口）。从大纲到正文，辅助网络小说创作。mode=long 走长篇写作流程（Phase
+  1-5：选题→设定→大纲→正文→质检），mode=short 走短篇写作流程（Phase
+  1-4：情绪目标→构思→逐场景写作→精修）。触发方式：/story-write、/写长篇、/写短篇、「帮我开书」「写大纲」「日更」「续写」「帮我写一篇短篇」「写个盐言故事」——按意图自动路由。
+metadata:
+  openclaw:
+    source: https://github.com/iceeyes27/oh-story-claudecode
+disable: true
 ---
+
 # story-write：网文写作（长篇 / 短篇统一入口）
 
 你是网络小说创作教练。你的任务是帮用户从零开始写网络小说——长篇从选题确认到大纲搭建再到正文输出，短篇从构思到成稿。根据用户意图自动路由到对应写作流程。
@@ -136,7 +142,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 1. `ls 拆文库/`（数据源）与项目 `对标/`（引用视图）列已有书目；都为空 → 跳到第 4 条。
 2. 逐本读题材（短篇读 `拆文库/{书}/_meta.json` 的 `genre_detected`；长篇读 `概要.md` 头部或 `拆文报告.md`「基本信息」的「题材」），与本书题材/方向比对，标 同题材 / 弱相关 / 不相关。
 3. 有同题材或弱相关候选 → 用 AskUserQuestion 推荐（列候选书 +「都不用」+「另拆一本」），主对标 1 本走文风/正文、其余作副对标。选定后写入 `设定/题材定位.md`「对标登记」的 `主对标书` / `对标书列表`（Phase 2 落文件，此处先记选择），并按上方「首次引用对标书」规则把选中书从 `拆文库/{书}/` 复制到 `对标/{书}/`。
-4. 无候选 → 无对标继续（大纲按八节点自排，见 Phase 3）；用户想对标可先 `/story-long-analyze` 拆一本。
+4. 无候选 → 无对标继续（大纲按八节点自排，见 Phase 3）；用户想对标可先 `/story-analyze long` 拆一本。
 
 如果用户提到对标书或工作目录下已存在 `对标/` 目录：
 
@@ -323,7 +329,7 @@ story-architect 属于高层级结构设计 agent。轻量题材定位优先由�
 - 发展：{冲突如何推进}
 - 转折：{信息/关系/局势哪里改变}
 - 高潮：{本章情绪或动作峰值}
-- 结尾：{本章最后落在谁的什么动作/画面/台词上——写具体落点，不写"尘埃落定""一切结束"式状态判词}
+- 结尾：{收束到什么状态}
 
 #### 情节安排（多线）
 - 主线推进：{本章对主目标的推进}
@@ -344,7 +350,7 @@ story-architect 属于高层级结构设计 agent。轻量题材定位优先由�
 - 行动成本（可无）/收益归属：{可无行动成本；若有则写谁付出什么成本；收益归谁、如何可见、是否留下后续账}
 
 #### 结尾设定和钩子
-- 结尾设定：{收束落到什么具体动作或画面（不写"就这样……""他终于明白……"式状态判词）；未解决问题；下一章推动力}
+- 结尾设定：{收束状态；未解决问题；下一章推动力}
 - 章尾钩子：{从章尾13式中选择} — {具体内容，期待度：强/中/弱；低压/过场章可弱钩子或留阶段目标；与下一章如何承接}
 
 #### 稳定性契约（启用长篇稳定性验收时必填——正文超过 10 章自动启用；未启用整节省略。格式与验收规则见 references/longform-stability.md）
@@ -558,7 +564,7 @@ story-architect 属于高层级结构设计 agent。轻量题材定位优先由�
        - 主会话另行直接读 `设定/文风.md`：含实质内容时作为本书风格基准；但不豁免情绪/节奏缺失。
    - **指令确认**：综合细纲、本节速记和模块召回结果，用一句话写清本章意图。
 	     - 新版细纲必须消费：阶段位置、单元ID/位置、主角目标/关键选择、结构公式、禁止提前释放、内容概括、情节安排、人物关系/出场顺序、情节细化、结尾钩子，并对照当前剧情单元的卷契约、本卷主推线/战果、终局底牌边界。
-	     - **细纲优先边界**：正文只能展开本章细纲已有事件、人物、冲突、伏笔和结尾钩子；不得为了凑字或"更精彩"自造新主线、新角色、新反转、提前写后续章剧情，必要的过渡动作只能服务于细纲已列情节点。后续阶段真相、底牌、关系结论和终局矛盾不得因为章尾钩子提前泄露。反过来，细纲是"要发生什么"的契约、不是正文的形状：正文可自由编排叙述顺序、合并/穿插情节点，不必一个情节点一段、也不必按五段式顺写，把每个点演成场景而不是照抄概括语（见 writing-craft.md「从细纲到正文」）。
+	     - **细纲优先边界**：正文只能展开本章细纲已有事件、人物、冲突、伏笔和结尾钩子；不得为了凑字或"更精彩"自造新主线、新角色、新反转、提前写后续章剧情，必要的过渡动作只能服务于细纲已列情节点。后续阶段真相、底牌、关系结论和终局矛盾不得因为章尾钩子提前泄露。
 	     - 爽点出手前要有可指认的危机/期待铺垫；装逼/打脸/揭露章要写在场配角的差异反应。
 	     - 高压/生死/悲痛节拍 要收紧对话声线：搞笑担当让位，信息型角色不当科普嘴，对话逐句承接对方情绪。
 	     - 检查任务卡点：本章如果有“办事被卡住”，它必须卡出信息、关系、代价、选择或伏笔变化；没有就不强补。
@@ -631,7 +637,7 @@ story-architect 属于高层级结构设计 agent。轻量题材定位优先由�
 
 每完成 50 章或一个卷结束时，对 `追踪/上下文.md` 做一次轻量归档：保留最近 5 章详记，将更早内容压缩到 `追踪/归档/第XXX-YYY章.md`，并在上下文中保留归档索引。伏笔、时间线、角色状态仍以当前文件为准，不把活跃线索移入归档。
 
-启用长篇稳定性验收的项目，同一时机再运行 `node scripts/archive-stability.js`：把活跃窗口（默认最近 20 章）之外的漂移门控/交接包/审计报告移入 `追踪/归档/` 对应子目录。归档对验收透明——`stability-audit.js` / `handoff-pack.js` 自动回退读取归档位置，老章节回炉无需先取回文件；详见 references/longform-stability.md「归档」。
+启用长篇稳定性验收的项目，同一时机再运行 `node .agents/skills/story-write/scripts/archive-stability.js`：把活跃窗口（默认最近 20 章）之外的漂移门控/交接包/审计报告移入 `追踪/归档/` 对应子目录。归档对验收透明——`stability-audit.js` / `handoff-pack.js` 自动回退读取归档位置，老章节回炉无需先取回文件；详见 references/longform-stability.md「归档」。
 
 ---
 
@@ -643,13 +649,13 @@ story-architect 属于高层级结构设计 agent。轻量题材定位优先由�
 
 **写后同轮清零**：正文落盘不是汇报时机——每章落盘后必须在**同一轮**内跑完 Phase 4 步骤 10-11 扫描、下方确定性收尾脚本与 narrative-writer 审查，blocking 清零才算本章完成；不得先汇报"已写完"再等指示。写后 hook 会对落盘正文自动扫描确定性毒句式并把命中推回——那是兜底网不是替代，hook 报出的命中当轮清零。**唯一豁免**：用户显式说"本章不去味/跳过检查"——豁免时在该章标题行下加一行 `<!-- 去味:跳过 -->`（写后 hook 的毒句式推回与写下一章前的欠账拦截都认这个标记；其余网照常）。
 
-**确定性收尾**：本批正文写完后，主会话对实际落盘文件运行 `node scripts/check-ai-patterns.js --check --fail-on=blocking 正文/第XXX章_*.md`。blocking 命中先回正文改写并复扫；advisory 只作读感提示，确属问题才改，功能性写法标 `[需复核]`。
-随后运行 `node scripts/normalize-punctuation.js 正文/第XXX章_*.md`（默认 `--quote-mode keep`）清理无功能省略号、破折号、双连字符和独立分隔线；盐言「」不受影响。narrative-writer agent 不运行这些脚本。
+**确定性收尾**：本批正文写完后，主会话对实际落盘文件运行 `node .agents/skills/_shared/scripts/check-ai-patterns.js --check --fail-on=blocking 正文/第XXX章_*.md`。blocking 命中先回正文改写并复扫；advisory 只作读感提示，确属问题才改，功能性写法标 `[需复核]`。
+随后运行 `node .agents/skills/_shared/scripts/normalize-punctuation.js 正文/第XXX章_*.md`（默认 `--quote-mode keep`）清理无功能省略号、破折号、双连字符和独立分隔线；盐言「」不受影响。narrative-writer agent 不运行这些脚本。
 
-**退化防护**：正文落盘后运行 `node scripts/check-degeneration.js --check 正文/第XXX章_*.md`。blocking（复读、截断、拒绝语、tier1 工程词泄漏）只重写受影响章节，最多 2 次；仍失败就报告证据让用户定夺。
+**退化防护**：正文落盘后运行 `node .agents/skills/_shared/scripts/check-degeneration.js --check 正文/第XXX章_*.md`。blocking（复读、截断、拒绝语、tier1 工程词泄漏）只重写受影响章节，最多 2 次；仍失败就报告证据让用户定夺。
 advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界面用语、弹幕刷屏、重复台词等有功能则保留。
 
-**稳定性批量验收（启用长篇稳定性验收时；正文超过 10 章自动启用）**：本批正文全部过章后运行 `node scripts/stability-audit.js --write {start} {end}` 做剧情连续性确定性验收——beat 交付、禁词、漂移门控、角色不变量、跨章交接继承，报告落盘 `追踪/稳定性审计/日更_第{start}章_to_第{end}章.md`。FAIL 按 `references/longform-stability.md`「修复分派与闭环」按错误码分派修复，修复后重写门控、重新交接、重跑审计，未 PASS 不宣布本批完成。
+**稳定性批量验收（启用长篇稳定性验收时；正文超过 10 章自动启用）**：本批正文全部过章后运行 `node .agents/skills/story-write/scripts/stability-audit.js --write {start} {end}` 做剧情连续性确定性验收——beat 交付、禁词、漂移门控、角色不变量、跨章交接继承，报告落盘 `追踪/稳定性审计/日更_第{start}章_to_第{end}章.md`。FAIL 按 `references/longform-stability.md`「修复分派与闭环」按错误码分派修复，修复后重写门控、重新交接、重跑审计，未 PASS 不宣布本批完成。
 
 #### Agent 调用：consistency-checker
 
@@ -982,8 +988,8 @@ advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界�
 - [ ] 节数 = 小节大纲规划节数（不得合并/省略）
 - [ ] 身体部位同一词全文 ≤ 5 次
 - [ ] 「像/好像/仿佛/如同」不成片堆叠；超过 10 处需逐处复核功能，不机械全删
-- [ ] `node scripts/check-ai-patterns.js --check --fail-on=blocking 正文.md` 无 blocking 命中；其余提示先通读，确属问题再改
-- [ ] `node scripts/check-degeneration.js --check 正文.md` 无 blocking 退化命中（复读/截断/工程词泄漏）
+- [ ] `node .agents/skills/_shared/scripts/check-ai-patterns.js --check --fail-on=blocking 正文.md` 无 blocking 命中；其余提示先通读，确属问题再改
+- [ ] `node .agents/skills/_shared/scripts/check-degeneration.js --check 正文.md` 无 blocking 退化命中（复读/截断/工程词泄漏）
 
 **中文文本统计注意事项**：
 - `wc -c` 统计的是字节数，禁止用于字数统计，也禁止模型估算字数
@@ -997,7 +1003,7 @@ advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界�
 ### Phase 4：精修打磨
 
 加载 `references/writing-workflow.md` 中的精修清单完成检查。
-重点：开头钩子、情绪曲线、反转铺垫、每句话价值、格式规范、AI 腔排查。文件模式先运行 `node scripts/check-ai-patterns.js --check --fail-on=blocking 正文.md`：blocking 先改正文并复扫；其他提示只作为读感风险，功能性写法标 `[需复核]`。再运行 `node scripts/normalize-punctuation.js 正文.md` 做标点兜底，并运行 `node scripts/check-degeneration.js --check 正文.md`；退化 blocking 要重新生成受影响段落，不靠润色。
+重点：开头钩子、情绪曲线、反转铺垫、每句话价值、格式规范、AI 腔排查。文件模式先运行 `node .agents/skills/_shared/scripts/check-ai-patterns.js --check --fail-on=blocking 正文.md`：blocking 先改正文并复扫；其他提示只作为读感风险，功能性写法标 `[需复核]`。再运行 `node .agents/skills/_shared/scripts/normalize-punctuation.js 正文.md` 做标点兜底，并运行 `node .agents/skills/_shared/scripts/check-degeneration.js --check 正文.md`；退化 blocking 要重新生成受影响段落，不靠润色。
 
 #### Agent 调用：narrative-writer（去AI味）+ consistency-checker
 
@@ -1128,10 +1134,10 @@ advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界�
 | [references/villain-and-reveal.md](references/villain-and-reveal.md) | Phase 2 设计反派时 |
 | [references/reversal-toolkit.md](references/reversal-toolkit.md) | 设计反转时 |
 | [references/quality-checklist.md](references/quality-checklist.md) | 精修检查时 |
-| [references/banned-words.md](references/banned-words.md) | 禁用词表 |
-| [scripts/normalize-punctuation.js](scripts/normalize-punctuation.js) | Phase 4 文件模式确定性标点收尾 |
-| [scripts/check-ai-patterns.js](scripts/check-ai-patterns.js) | Phase 3 完成门槛与 Phase 4 复扫；报告高危 AI 句式、破折号、碎句号、长段落、微动作复读、抽象总结、套词/比喻密度、解释链、系统公告腔、提纲感短段、低连接密度 |
-| [scripts/check-degeneration.js](scripts/check-degeneration.js) | Phase 3 完成门槛与 Phase 4 复扫；报告模型退化（复读/截断/工程词泄漏），blocking 需重新生成 |
+| [.agents/skills/_shared/references/banned-words.md](../_shared/references/banned-words.md) | 禁用词表 |
+| [.agents/skills/_shared/scripts/normalize-punctuation.js](../_shared/scripts/normalize-punctuation.js) | Phase 4 文件模式确定性标点收尾 |
+| [.agents/skills/_shared/scripts/check-ai-patterns.js](../_shared/scripts/check-ai-patterns.js) | Phase 3 完成门槛与 Phase 4 复扫；报告高危 AI 句式、破折号、碎句号、长段落、微动作复读、抽象总结、套词/比喻密度、解释链、系统公告腔、提纲感短段、低连接密度 |
+| [.agents/skills/_shared/scripts/check-degeneration.js](../_shared/scripts/check-degeneration.js) | Phase 3 完成门槛与 Phase 4 复扫；报告模型退化（复读/截断/工程词泄漏），blocking 需重新生成 |
 | [references/dialogue-mastery.md](references/dialogue-mastery.md) | 写对话时 |
 | [references/output-contract.md](references/output-contract.md) | Phase 2 对标上下文加载时（理解 analyze 产出格式与消费规范） |
 

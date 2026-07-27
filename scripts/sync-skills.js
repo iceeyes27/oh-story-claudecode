@@ -2,7 +2,7 @@
 /**
  * sync-skills.js — 写作项目 ⇄ skill 仓库 双向同步工具（零依赖 Node）
  *
- * 权威工作副本在写作项目（如 wozaiyuenan）的 `.claude/skills/`，本仓库 `skills/` 是
+ * 权威工作副本在写作项目（如 wozaiyuenan）的 `.agents/skills/`，本仓库 `skills/` 是
  * 分发源。写作中改了 skill 之后用本工具把改动推回远程仓库；多机/上游方向用 pull。
  *
  * 用法（在写作项目根目录运行）：
@@ -24,15 +24,23 @@ const path = require('path');
 const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 
-const SKILLS = ['browser-cdp', 'humanizer', 'story', 'story-analyze', 'story-cover',
+const SKILLS = ['_shared', 'browser-cdp', 'humanizer', 'story', 'story-analyze', 'story-cover',
   'story-deslop', 'story-import', 'story-review', 'story-scan', 'story-setup', 'story-write'];
 const IGNORE_BASENAMES = new Set(['_skillhub_meta.json', '.DS_Store']);
 const IGNORE_DIRS = new Set(['__pycache__']);
 const STATE_FILE = '.skills-sync-state.json';
 const DEFAULT_FORK = 'D:\\code\\oh-story-claudecode';
 
-// 共享文件字节一致性（与 scripts/check-shared-files.sh 的强约束子集对应）
-const SHARED_SETS = [
+// v0.8+ 将反 AI 规则与扫描器集中到 _shared。旧版副本布局仍支持检查，便于迁移。
+const CANONICAL_SHARED_FILES = [
+  'references/anti-ai-writing.md',
+  'references/banned-words.md',
+  'references/deslop-whitelist',
+  'scripts/check-ai-patterns.js',
+  'scripts/check-degeneration.js',
+  'scripts/normalize-punctuation.js',
+];
+const LEGACY_SHARED_SETS = [
   { name: 'banned-words.md', copies: [
     'story-analyze/references/banned-words.md',
     'story-deslop/references/banned-words.md',
@@ -106,7 +114,24 @@ function computeDiff(localSkills, forkSkills) {
 
 function checkShared(localSkills) {
   const bad = [];
-  for (const set of SHARED_SETS) {
+  const canonicalRoot = path.join(localSkills, '_shared');
+  if (fs.existsSync(canonicalRoot)) {
+    for (const rel of CANONICAL_SHARED_FILES) {
+      if (!fs.existsSync(path.join(canonicalRoot, rel))) {
+        bad.push('_shared: 缺少权威文件 ' + rel);
+      }
+    }
+    for (const set of LEGACY_SHARED_SETS) {
+      for (const rel of set.copies) {
+        if (fs.existsSync(path.join(localSkills, rel))) {
+          bad.push(set.name + ': 发现应移除的旧版副本 ' + rel);
+        }
+      }
+    }
+    return bad;
+  }
+
+  for (const set of LEGACY_SHARED_SETS) {
     const hashes = new Map();
     for (const rel of set.copies) {
       const p = path.join(localSkills, rel);
@@ -125,8 +150,12 @@ function checkShared(localSkills) {
 
 function resolvePaths(argv) {
   const projRoot = process.cwd();
-  const localSkills = path.join(projRoot, '.claude', 'skills');
-  if (!fs.existsSync(localSkills)) die('当前目录不是写作项目根（缺 .claude/skills/）。请在写作项目根目录运行。');
+  const canonicalSkills = path.join(projRoot, '.agents', 'skills');
+  const legacySkills = path.join(projRoot, '.claude', 'skills');
+  const localSkills = fs.existsSync(canonicalSkills) ? canonicalSkills : legacySkills;
+  if (!fs.existsSync(localSkills)) {
+    die('当前目录不是写作项目根（缺 .agents/skills/；旧项目也未找到 .claude/skills/）。请在写作项目根目录运行。');
+  }
   const state = loadState(projRoot) || {};
   const forkPath = argv.fork || state.forkPath || DEFAULT_FORK;
   const branch = argv.branch || state.branch || 'main';
@@ -240,4 +269,6 @@ function main() {
   }
 }
 
-main();
+if (require.main === module) main();
+
+module.exports = { CANONICAL_SHARED_FILES, LEGACY_SHARED_SETS, checkShared, computeDiff, resolvePaths };

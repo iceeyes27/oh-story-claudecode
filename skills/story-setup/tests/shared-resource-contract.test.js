@@ -8,7 +8,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const test = require('node:test');
 
-const ROOT = path.resolve(__dirname, '..', '..', '..', '..');
+const ROOT = path.resolve(__dirname, '..', '..', '..');
 const SHARED = path.join(ROOT, '.agents', 'skills', '_shared');
 
 test('shared prose rules and scanners have one canonical entity', () => {
@@ -69,11 +69,9 @@ test('AI scanner flushes complete JSON before returning a blocking exit code', (
   assert.equal(payload.findings.filter((finding) => finding.type === 'em-dash').length, files.length);
 });
 
-test('canonical agent templates reference the .agents bundle only', () => {
+test('canonical source agent templates reference the .agents bundle only', () => {
   const roots = [
     path.join(ROOT, '.agents', 'skills', 'story-setup', 'references', 'templates', 'agents'),
-    path.join(ROOT, '.agents', 'skills', 'story-setup', 'references', 'codex', 'agents'),
-    path.join(ROOT, '.agents', 'skills', 'story-setup', 'references', 'opencode', 'agents'),
   ];
   const stale = [];
   for (const directory of roots) {

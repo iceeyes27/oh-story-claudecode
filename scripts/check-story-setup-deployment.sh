@@ -150,11 +150,17 @@ echo "  OK TS1 hook dependency completeness"
 # 连续性检查全部静默退化，同样必须登记进自检名单。
 selfcheck_line="$(grep -E 'for hook in .*; do' "$HOOKS_DIR/session-start.sh" | head -1)"
 [ -n "$selfcheck_line" ] || fail "session-start.sh 缺少 hook 自检 for 循环"
+# 名单里最后一个 hook 后面紧跟的是 `;` 而不是空格（grep 命中行按 pattern 必然以 `; do` 收尾），
+# 直接拿原始行做 *" $base "* 会把「排在最后的、其实已登记」的 hook 误报成漏列。先把分号换成
+# 空格并两端补空格，让首位/末位都能被同一条 case 命中，而不是要求名单保持某种排序。
+selfcheck_tokens=" ${selfcheck_line//;/ } "
 while IFS= read -r hookfile; do
   base="$(basename "$hookfile")"
-  case "$selfcheck_line" in
+  case "$selfcheck_tokens" in
     *" $base "*) : ;;
-    *) fail "session-start.sh 部署自检名单漏列 hook：$base（新增 hook 须同步加入该名单）" ;;
+    # ${base} 必须加花括号：macOS bash 3.2 在 UTF-8 区域会把全角「（」的首字节并进变量名，
+    # set -u 于是抛 base?: unbound variable，真正漏列时反而看不到是哪个 hook。
+    *) fail "session-start.sh 部署自检名单漏列 hook：${base}（新增 hook 须同步加入该名单）" ;;
   esac
 done < <(find "$HOOKS_DIR" -maxdepth 1 \( -name '*.sh' -o -name '*.js' \) -type f)
 echo "  OK TS1b session-start self-check lists all hook scripts and node cores"
@@ -228,10 +234,14 @@ cat > "$root/book/追踪/上下文.md" <<'CTX'
 - 章: 第1章
 CTX
 touch "$root/拆文库/sample/_progress.md"
+# 负向 fixture：已拆完的书不得再被报成「未完成」（裸数 _progress.md 会永久误报）。
+mkdir -p "$root/拆文库/done"
+printf '# 深度拆解进度：done\n\n- 最终状态：completed\n- schema_version: 2\n' > "$root/拆文库/done/_progress.md"
 
 out_start="$(run_from_nested "$root" session-start.sh || true)"
 echo "$out_start" | grep -q '当前位置' || fail "session-start did not resolve active book from project root"
 echo "$out_start" | grep -q '未完成拆文' || fail "session-start did not resolve 拆文库 from project root"
+echo "$out_start" | grep -q '有 1 个未完成拆文' || fail "session-start counted completed 拆文 as unfinished"
 if echo "$out_start" | grep -q '参考资料包缺失'; then
   fail "session-start reported missing reference bundle after deployed refs were copied"
 fi
@@ -245,6 +255,11 @@ echo "$out_post" | grep -q 'Read book/追踪/上下文.md' || fail "post-compact
 out_gaps="$(run_from_nested "$root" detect-story-gaps.sh || true)"
 if [ -n "$out_gaps" ] && echo "$out_gaps" | grep -q "$root/nested"; then
   fail "detect-story-gaps leaked nested cwd paths"
+fi
+# 与 session-start 同口径：未完成的要报、已完成的不许报（两边各自读取 拆文库/，需各自钉死）。
+echo "$out_gaps" | grep -q '拆文未完成：拆文库/sample/_progress.md' || fail "detect-story-gaps missed unfinished 拆文"
+if echo "$out_gaps" | grep -q '拆文库/done/_progress.md'; then
+  fail "detect-story-gaps counted completed 拆文 as unfinished"
 fi
 
 fallback_root="$TMP_DIR/git-fallback"
@@ -436,7 +451,7 @@ assert_grep 'agents_version.*小于 `21`|版本 < 21' "$SKILL_DIR/SKILL.md" "sto
 assert_grep 'agents_version.*大于 `21`' "$SKILL_DIR/SKILL.md" "story-setup must stop before downgrading a newer deployment"
 assert_grep 'agents_version.*小于 `21`|小于 .21' "$REPO_ROOT/skills/story-review/SKILL.md" "story-review must treat agents_version 20 as stale"
 assert_grep 'agents_version.*大于 `21`' "$REPO_ROOT/skills/story-review/SKILL.md" "story-review must not run old contracts against a newer deployment"
-assert_grep '^version:[[:space:]]*1\.2\.7$' "$SKILL_FILE" "story-setup frontmatter must match the deployed setup version"
+assert_grep '^version:[[:space:]]*1\.3\.0$' "$SKILL_FILE" "story-setup frontmatter must match the deployed setup version"
 assert_grep '剧情/情绪模块\.md.*missing_primary_contract|missing_primary_contract.*剧情/情绪模块\.md' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must require the current emotion-module artifact"
 assert_grep '剧情/节奏\.md.*missing_primary_contract|missing_primary_contract.*剧情/节奏\.md' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must require the current rhythm artifact"
 assert_no_grep 'legacy_deconstruction|contract_version.*legacy|pre-v12' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must not keep legacy benchmark branches"

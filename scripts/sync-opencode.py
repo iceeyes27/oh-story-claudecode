@@ -15,16 +15,40 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 
+# agent 正文里表达 shell 步骤的唯一写法：「执行 `<命令>`」（模板全仓库仅此一种）。
+# 只读 agent 若出现这种指令，生成直接失败：OpenCode shell.ts 只检查 command 的直接父节点，
+# 即使“完整命令字面量”白名单也会被 `( command ) > 正文.md` 的 subshell 外层重定向绕过。
+BODY_COMMAND_RE = re.compile(r"执行 `([^`]+)`")
+
+
+def body_bash_commands(body: str) -> list[str]:
+    """从 agent 正文抽出它明确要求执行的命令（按出现顺序去重）。
+
+    刻意不用「agent 名字硬编码集合」——那正是早前审计在 generate-codex-agents.py 里点名的
+    反模式：名单与正文各自漂移，新加了指令的 agent 拿不到权限、删了指令的 agent 白留着权限。
+    这里以正文为唯一事实来源；只读 agent 抽到任何命令都会在转换阶段中断。
+    """
+    commands: list[str] = []
+    for match in BODY_COMMAND_RE.finditer(body):
+        command = match.group(1).strip()
+        if command and command not in commands:
+            commands.append(command)
+    return commands
+
 
 def parse_frontmatter(content: str) -> tuple[dict, str]:
     """Extract YAML-like frontmatter and body from markdown content."""
-    if not content.startswith("---"):
+    # 结束分隔符必须是独占一行的 `---`（锚定 "\n---\n"），不能用 content.split("---", 2)：
+    # 后者会被 frontmatter 值里的三连字符（描述里的 `---`、注释里的 `---`）当成结束标记，
+    # 把剩余键连同 permission/steps 一起截断进正文，且静默 exit 0。
+    # 与同源生成器 generate-codex-agents.py 的解析口径保持一致。
+    if not content.startswith("---\n"):
         return {}, content
-    parts = content.split("---", 2)
-    if len(parts) < 3:
+    end = content.find("\n---\n", len("---"))
+    if end < 0:
         return {}, content
-    fm_text = parts[1].strip()
-    body = parts[2]
+    fm_text = content[len("---") : end].strip()
+    body = content[end + len("\n---") :]
     fm = {}
     lines = fm_text.split("\n")
     i = 0
@@ -63,8 +87,12 @@ def parse_frontmatter(content: str) -> tuple[dict, str]:
     return fm, body
 
 
-def convert_claude_to_opencode(fm: dict) -> dict:
-    """Convert Claude Code agent frontmatter to OpenCode format."""
+def convert_claude_to_opencode(fm: dict, body: str) -> dict:
+    """Convert Claude Code agent frontmatter to OpenCode format.
+
+    `body` 不是可选的：bash 白名单按「正文是否真的要求执行该命令」逐个 agent 授权，
+    少传一个正文就等于凭空收紧/放宽权限，所以这里强制调用方交出正文。
+    """
     result = {}
     name = fm.get("name", "")
 
@@ -93,7 +121,21 @@ def convert_claude_to_opencode(fm: dict) -> dict:
     elif has_write:
         perm["edit"] = "allow"
 
-    if "Bash" in tools:
+    # bash 同样走 "disallowedTools 优先"。OpenCode 未声明 bash 权限时默认为 ask；只读 agent
+    # 必须写成标量 deny，让上游 disabled() 直接摘掉 bash 工具。不要加“只读命令”白名单：
+    # shell.ts 只鉴权 command 的直接父节点，`( allowlisted-command ) > 正文.md` 会把外层重定向
+    # 藏在 subshell 外，字面量白名单也守不住文件系统边界。
+    mentioned_bash = body_bash_commands(body)
+    restricted_bash = "Bash" in disallowed
+    if restricted_bash:
+        if mentioned_bash:
+            raise ValueError(
+                f"{name or '<unnamed>'}: 只读 agent 禁止 Bash，但正文要求执行 "
+                + "、".join(f"`{command}`" for command in mentioned_bash)
+                + "；改写正文以使用宿主已提供的工作区和 Read/Glob/Grep，不得开放 shell 例外。"
+            )
+        perm["bash"] = "deny"
+    elif "Bash" in tools:
         perm["bash"] = "allow"
     if perm:
         result["permission"] = perm
@@ -123,7 +165,15 @@ def format_frontmatter(fm: dict) -> str:
         if key == "permission" and isinstance(value, dict):
             lines.append("permission:")
             for pk, pv in value.items():
-                lines.append(f"  {pk}: {pv}")
+                if isinstance(pv, dict):
+                    # 命令 glob 形式（如 bash）：glob 键必须加引号，裸 `*` 在 YAML 里是别名标记。
+                    # 严禁对这里的键排序：OpenCode 用 findLast 解析，后写的规则覆盖先写的，
+                    # 键顺序即优先级。必须按 dict 的插入顺序原样输出。
+                    lines.append(f"  {pk}:")
+                    for glob, action in pv.items():
+                        lines.append(f'    "{glob}": {action}')
+                else:
+                    lines.append(f"  {pk}: {pv}")
         elif key == "description" and "\n" in value:
             lines.append("description: |")
             for desc_line in value.split("\n"):
@@ -216,7 +266,9 @@ def render_agents() -> dict[str, str]:
             )
         if not description:
             raise ValueError(f"{md_file}: missing agent description")
-        new_fm = convert_claude_to_opencode(fm)
+        # 用**源模板正文**（未做 .claude→.opencode 路径替换）推导 bash 白名单：
+        # 授权依据是源定义里写没写这条命令，不是生成产物的措辞。
+        new_fm = convert_claude_to_opencode(fm, body)
         new_body = replace_claude_paths(body)
         new_body = fix_path_rules_section(new_body)  # 覆盖路径规则段的错误替换
         output = format_frontmatter(new_fm) + new_body

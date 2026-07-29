@@ -363,6 +363,278 @@ PY
 
 echo "  OK agent templates"
 
+# frontmatter 解析必须锚定独占一行的 `---`（值里的三连字符不得截断 permission/steps），
+# 且 disallowedTools 里的 Bash 必须落成真正的标量 deny：OpenCode 未声明 bash 权限时
+# evaluate() 返回 ask（不是 deny），只有 edit: deny 的只读 agent 仍能借 shell 重定向写正文。
+# 不给任何“只读命令”例外：上游 shell.ts 只把 command 的**直接父节点** redirected_statement
+# 纳入鉴权，`( allowlisted-command ) > 正文.md` 的 command 直接父节点是 subshell，能绕过字面量白名单。
+python3 - "scripts/sync-opencode.py" <<'PY'
+import importlib.util
+import sys
+from pathlib import Path
+
+script_path = Path(sys.argv[1]).resolve()
+spec = importlib.util.spec_from_file_location("sync_opencode_permissions", script_path)
+module = importlib.util.module_from_spec(spec)
+assert spec.loader is not None
+spec.loader.exec_module(module)
+
+source = (
+    "---\nname: a\ndescription: |\n  只读 agent --- 7 Gate。\n"
+    "tools: [Read, Glob, Grep]\ndisallowedTools: [Write, Edit, Bash]\nmaxTurns: 9\n"
+    "# 备注 --- 与主 skill 平级\n---\nbody\n"
+)
+fm, body = module.parse_frontmatter(source)
+missing = {'name', 'description', 'tools', 'disallowedTools', 'maxTurns'} - set(fm)
+assert not missing, f'frontmatter truncated at an inline ---: missing {missing}'
+assert body.strip() == 'body', body
+
+# 正文是授权的唯一依据，所以 body 是必传参数：给它一个默认值就等于「忘了传 = 悄悄改权限」。
+try:
+    module.convert_claude_to_opencode(fm)
+except TypeError:
+    pass
+else:
+    raise AssertionError('convert_claude_to_opencode must require the agent body (no default)')
+
+# 只读 agent 的正文若要求执行命令，生成器必须大声失败，而不是暗开 shell 例外。
+try:
+    module.convert_claude_to_opencode(
+        fm, '**确定项目根目录：** 执行 `git rev-parse --show-toplevel`，失败则用当前工作目录。\n'
+    )
+except ValueError as error:
+    assert 'git rev-parse --show-toplevel' in str(error), error
+else:
+    raise AssertionError('restricted agent instructions must not require Bash')
+
+# 正文没提该命令 → 一条都不放（标量 deny 还会让上游 disabled() 把 bash 工具整个摘掉）
+plain = module.convert_claude_to_opencode(fm, '只读 agent，正文没有任何 shell 步骤\n')
+assert plain['permission']['bash'] == 'deny', (
+    f'read-only agent whose body never asks for a command must get a plain bash deny: {plain}'
+)
+
+# 生成器必须**大声失败**，而不是默默产出一个跑不动或被撬开的 agent。
+# 正文要求任何 shell 命令 → 生成必须中断并点名该命令
+try:
+    module.convert_claude_to_opencode(fm, '**准备环境：** 执行 `npm install`，然后开始检查。\n')
+except ValueError as error:
+    assert 'npm install' in str(error), error
+else:
+    raise AssertionError('generator must fail loudly when the body needs an ungranted command')
+
+
+def bash_rules_in_file_order(fm_text: str):
+    """按**文件里的书写顺序**取 bash 规则——顺序就是优先级，不能走 dict/set。
+
+    同时兼容标量写法 `bash: deny`：上游 fromConfig() 把它展开成单条 `*` 规则。
+    """
+    import re
+    rules = []
+    in_bash = False
+    for line in fm_text.split('\n'):
+        scalar = re.match(r'^ {2}bash:\s*(\S+)\s*$', line)
+        if scalar:
+            rules.append(('*', scalar.group(1)))
+            in_bash = False
+            continue
+        if re.match(r'^ {2}bash:\s*$', line):
+            in_bash = True
+            continue
+        if in_bash:
+            matched = re.match(r'^ {4}"(.+)":\s*(\S+)\s*$', line)
+            if matched:
+                rules.append((matched.group(1), matched.group(2)))
+                continue
+            if line.strip():
+                in_bash = False
+    return rules
+
+
+# format_frontmatter 不得对键排序：一排序，生成器里「宽 deny 在前、窄 allow 在后」的
+# 顺序就被静默抹掉。用逆字母序的插入顺序探它。
+probe = {
+    'permission': {
+        'read': 'allow',
+        'bash': {'zzz cmd': 'deny', '*': 'deny', 'aaa cmd': 'allow'},
+    }
+}
+probe_rules = bash_rules_in_file_order(module.format_frontmatter(probe))
+assert probe_rules == [('zzz cmd', 'deny'), ('*', 'deny'), ('aaa cmd', 'allow')], (
+    f'format_frontmatter reordered permission globs (must preserve dict order): {probe_rules}'
+)
+
+# 生成器自身的输出：只读 agent 必须是不可覆盖的标量 deny。
+generated_rules = bash_rules_in_file_order(module.format_frontmatter(plain))
+assert generated_rules == [('*', 'deny')], generated_rules
+PY
+
+echo "  OK generator makes read-only Bash unavailable and rejects contradictory instructions"
+
+# 生成产物的**裁决矩阵**（#265 二轮 review）。这里独立复刻上游 opencode v1.18.5 的判定，
+# 刻意不复用 sync-opencode.py 里的同名函数——复用的话，复刻本身写错时测试会跟着一起错：
+#   util/wildcard.ts     match()
+#   permission/index.ts  fromConfig() / evaluate()（findLast）/ Permission.ask()
+#   tool/shell.ts        source()（带重定向时取整条 redirected_statement）/ collect()
+python3 - <<'PY'
+import re
+from pathlib import Path
+
+
+def wildcard_match(value: str, pattern: str) -> bool:
+    value = value.replace('\\', '/')
+    pattern = pattern.replace('\\', '/')
+    escaped = re.sub(r'[.+^${}()|\[\]\\]', r'\\\g<0>', pattern)
+    escaped = escaped.replace('*', '.*').replace('?', '.')
+    # 上游原注释：pattern 以 " *" 结尾时让尾段可选，好让 "ls *" 也匹配 "ls"。
+    # 正是这一步让前缀 glob 吃下带重定向的整条语句。
+    if escaped.endswith(' .*'):
+        escaped = escaped[:-3] + '( .*)?'
+    return re.match('^' + escaped + '$', value, flags=re.DOTALL) is not None
+
+
+def evaluate(rules, pattern: str) -> str:
+    """findLast：最后一条命中的规则生效；一条都不命中时上游默认 ask。"""
+    action = 'ask'
+    for rule_pattern, rule_action in rules:
+        if wildcard_match(pattern, rule_pattern):
+            action = rule_action
+    return action
+
+
+def resolve(rules, patterns) -> str:
+    """Permission.ask()：任一 pattern 判 deny，整条 shell 调用即被拒。"""
+    verdict = 'allow'
+    for pattern in patterns:
+        action = evaluate(rules, pattern)
+        if action == 'deny':
+            return 'deny'
+        if action != 'allow':
+            verdict = 'ask'
+    return verdict
+
+
+def bash_rules_in_file_order(fm_text: str):
+    rules = []
+    in_bash = False
+    for line in fm_text.split('\n'):
+        scalar = re.match(r'^ {2}bash:\s*(\S+)\s*$', line)
+        if scalar:
+            rules.append(('*', scalar.group(1)))
+            in_bash = False
+            continue
+        if re.match(r'^ {2}bash:\s*$', line):
+            in_bash = True
+            continue
+        if in_bash:
+            matched = re.match(r'^ {4}"(.+)":\s*(\S+)\s*$', line)
+            if matched:
+                rules.append((matched.group(1), matched.group(2)))
+                continue
+            if line.strip():
+                in_bash = False
+    return rules
+
+
+NEEDED = 'git rev-parse --show-toplevel'
+TARGET = 'book/正文/第001章.md'
+# 每项 =（展示用命令, collect() 会产生的 scan.patterns）。一条 shell 命令可能含多个
+# tree-sitter `command` 节点；带重定向的节点取整条 redirected_statement 的文本。
+ESCAPES = [
+    (f'{NEEDED} > {TARGET}', [f'{NEEDED} > {TARGET}']),
+    (f'{NEEDED} >> {TARGET}', [f'{NEEDED} >> {TARGET}']),
+    (f'{NEEDED} 2> {TARGET}', [f'{NEEDED} 2> {TARGET}']),
+    # 上游 source() 只检查 command 的直接父节点。套一层 subshell/compound 后，collect()
+    # 看见的 pattern 仍是裸 NEEDED，外层重定向没有进入鉴权 pattern。
+    (f'( {NEEDED} ) > {TARGET}', [NEEDED]),
+    (f'{{ {NEEDED}; }} > {TARGET}', [NEEDED]),
+    (f'{NEEDED} | tee {TARGET}', [NEEDED, f'tee {TARGET}']),
+    (f'{NEEDED} && cat > {TARGET}', [NEEDED, f'cat > {TARGET}']),
+    (f'{NEEDED}; rm -rf /', [NEEDED, 'rm -rf /']),
+    ('git rev-parse HEAD', ['git rev-parse HEAD']),
+    ('git push', ['git push']),
+    ('rm -rf /', ['rm -rf /']),
+    ("python3 -c 'print(1)'", ["python3 -c 'print(1)'"]),
+    ('echo x > 第1章.md', ['echo x > 第1章.md']),
+    ('bash -c "cat /etc/passwd"', ['bash -c "cat /etc/passwd"']),
+]
+
+read_only = {'chapter-extractor', 'consistency-checker', 'story-explorer'}
+base = Path('skills/story-setup/references/opencode/agents')
+for name in sorted(read_only):
+    fm_text = (base / f'{name}.md').read_text(encoding='utf-8').split('\n---\n', 1)[0]
+    rules = bash_rules_in_file_order(fm_text)
+    assert rules, f'{name}: read-only agent must declare a bash restriction'
+    assert rules == [('*', 'deny')], (
+        f'{name}: read-only Bash must be a scalar deny without exceptions: {rules}'
+    )
+    assert resolve(rules, [NEEDED]) == 'deny', (
+        f'{name}: bare {NEEDED!r} must also be denied'
+    )
+    # 反向：重定向/追加/stderr 重定向/管道/串联，以及任意越权命令，一律 deny
+    for shown, patterns in ESCAPES:
+        got = resolve(rules, patterns)
+        assert got == 'deny', (
+            f'{name}: `{shown}` resolved to {got!r}, must be deny — 只读 agent 不得借'
+            f'重定向/管道/串联覆写作者正文（rules in file order: {rules}）'
+        )
+PY
+
+echo "  OK read-only agents deny bare commands plus redirection/subshell/pipe/chain escapes"
+
+# 生成必须幂等：跑两遍产物一致。否则 --check 会在无人改模板时随机报 out-of-sync。
+python3 - "scripts/sync-opencode.py" "$TMP_DIR" <<'PY'
+import contextlib
+import importlib.util
+import io
+import shutil
+import sys
+from pathlib import Path
+
+script_path = Path(sys.argv[1]).resolve()
+root = Path(sys.argv[2]) / "opencode-idempotent"
+spec = importlib.util.spec_from_file_location("sync_opencode_idempotent", script_path)
+module = importlib.util.module_from_spec(spec)
+assert spec.loader is not None
+spec.loader.exec_module(module)
+
+src = Path("skills/story-setup/references")
+dst = root / "skills/story-setup/references"
+dst.mkdir(parents=True)
+shutil.copytree(src / "templates", dst / "templates")
+shutil.copytree(src / "opencode", dst / "opencode")
+
+
+def snapshot() -> dict[str, bytes]:
+    base = dst / "opencode"
+    return {
+        path.relative_to(base).as_posix(): path.read_bytes()
+        for path in sorted(base.rglob("*"))
+        if path.is_file()
+    }
+
+
+def run() -> None:
+    old_root, old_argv = module.ROOT, sys.argv
+    module.ROOT = root
+    sys.argv = [str(script_path)]
+    try:
+        with contextlib.redirect_stdout(io.StringIO()):
+            module.main()
+    finally:
+        module.ROOT, sys.argv = old_root, old_argv
+
+
+run()
+first = snapshot()
+run()
+second = snapshot()
+if first != second:
+    drift = sorted(key for key in set(first) | set(second) if first.get(key) != second.get(key))
+    raise SystemExit(f"sync-opencode.py is not idempotent; drifting files: {drift}")
+PY
+
+echo "  OK generation is idempotent (second run is byte-identical)"
+
 python3 - <<'PY'
 from pathlib import Path
 skill_names = {p.parent.name for p in Path('skills').glob('*/SKILL.md')}

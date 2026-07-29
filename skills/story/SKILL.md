@@ -23,7 +23,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 | 选题决策 | 写什么能爆、帮我选题、选题方向 | `/story-scan` (mode=long) |
 | 短篇扫榜 | 短篇排行、知乎盐言排行 | `/story-scan` (mode=short) |
 | 去 AI 味 | 去 AI 味、太 AI、去味、说人话 | `/story-deslop` |
-| 小说复合检查 | 检查、检查这本小说、帮我检查、检查一下当前书 | 依次执行 `story-review` → `story-deslop` (mode=novel) → `story-deslop` (mode=general) → `humanizer` |
+| 小说复合检查 | 检查、检查这本小说、帮我检查、检查一下当前书 | 依次执行 `story-review` → `ai-flavor-scan` → `story-deslop` (mode=novel) → `dialogue-naturalness-scan` → `jargon-verb-scan` → `story-deslop` (mode=general) → `humanizer` |
 | 封面 | 封面、封面图 | `/story-cover` |
 | 环境部署 | 准备写书、搭环境、初始化 | `/story-setup` |
 | 浏览器操控 | 浏览器、抓取、登录态 | `/browser-cdp` |
@@ -70,11 +70,14 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 用户只说“检查”且未限定单项时，不得缩减成一次 `story-review`，必须按以下顺序完成：
 
 1. `story-review`：结构、逻辑、设定、人物、时间线、伏笔和平台适配。
-2. `story-deslop`（mode=novel）：正文 AI 味 7 Gate。
-3. `story-deslop`（mode=general）：正文及对外文案的套路腔、空话和模板感。
-4. `humanizer`：通用 AI 痕迹复核；纯中文正文只作模式复核。
+2. `ai-flavor-scan`：正文七层 AI 味实扫，覆盖禁用词、AI 修辞、融合比喻、空洞总结、黑话单字、生造搭配和欠写作。
+3. `story-deslop`（mode=novel）：正文 AI 味 7 Gate。
+4. `dialogue-naturalness-scan`：台词自然度专项，检查模糊指代、书面腔、别扭搭配和解释式台词。
+5. `jargon-verb-scan`：行业词或专业名词硬当动词专项，检查被行话隐藏的真实动作。
+6. `story-deslop`（mode=general）：正文及对外文案的套路腔、空话和模板感。
+7. `humanizer`：通用 AI 痕迹复核；纯中文正文只作模式复核。
 
-开始前输出当前书名、正文目录、章节总数和四阶段识别结果。每完成一个阶段，立即输出该阶段的独立结论，至少包含：执行状态、实际检查范围、问题数量和关键发现。最终输出 `复合检查完成：4/4`；未达到 4/4 不得宣称检查完成。
+开始前输出当前书名、正文目录、章节总数和七阶段识别结果。每完成一个阶段，立即输出该阶段的独立结论，至少包含：执行状态、实际检查范围、问题数量和关键发现。最终输出 `复合检查完成：7/7`；未达到 7/7 不得宣称检查完成。
 
 任一 Skill 未加载、输入文件不可读或检查范围不完整时，明确报告失败阶段和已完成范围，并停止后续阶段，不得静默跳过。内部 reviewer agent 不可用但 `story-review` 按自身规则完成 solo 降级时，必须在该阶段结论中标明降级。
 

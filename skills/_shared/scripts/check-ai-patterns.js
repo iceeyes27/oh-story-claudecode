@@ -414,6 +414,7 @@ function scanProsePatterns(proseLines) {
   findings.push(...findBannedWordsExact(proseLines));
   findings.push(...findSynestheticMetaphor(proseLines));
   findings.push(...findAntithesis(proseLines));
+  findings.push(...findContrastRhetorical(proseLines));
   return findings;
 }
 
@@ -1446,6 +1447,34 @@ function loadAntithesisPatterns() {
   return result;
 }
 
+var _contrastCache = null;
+function loadContrastPatterns() {
+  if (_contrastCache) return _contrastCache;
+  const result = { patterns: [], error: null };
+  try {
+    const mdPath = path.join(__dirname, '..', 'references', 'banned-words.md');
+    const md = fs.readFileSync(mdPath, 'utf8');
+    const lines = md.split(/\r?\n/);
+    let inSec = false;
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (/^##\s/.test(line)) {
+        inSec = /^##\s*反问式内省/.test(line) || /^##\s*伪深刻对比/.test(line);
+        continue;
+      }
+      if (!inSec) continue;
+      const m = line.match(/^\/(.+)\/$/);
+      if (m) {
+        try { result.patterns.push(new RegExp(m[1], 'g')); } catch (e) { /* skip invalid regex */ }
+      }
+    }
+  } catch (error) {
+    result.error = error.message;
+  }
+  _contrastCache = result;
+  return result;
+}
+
 var _whitelistCache = null;
 function loadWhitelist() {
   if (_whitelistCache) return _whitelistCache;
@@ -1585,6 +1614,37 @@ function findAntithesis(proseLines) {
           type: 'banned-word-antithesis',
           severity: 'blocking',
           message: '对仗反义俏皮话[' + hit + ']：banned-words.md 对仗反义俏皮话规则，工整对称反义金句（如"X轻，Y不轻"）是 AI 写作套路，出现即改；改成角色自然口语或具体动作/物件/对话，不要同义词轮换。',
+          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+function findContrastRhetorical(proseLines) {
+  const { patterns, error } = loadContrastPatterns();
+  if (error || patterns.length === 0) return ruleLoadFailure('反问式内省/伪深刻对比', error);
+  const whitelist = loadWhitelist();
+  const findings = [];
+
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const narrative = stripQuoted(trimmed);
+    for (const re of patterns) {
+      re.lastIndex = 0;
+      let match;
+      while ((match = re.exec(narrative)) !== null) {
+        const hit = match[0];
+        const idx = narrative.indexOf(hit);
+        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
+        findings.push({
+          line: lineNo,
+          column: idx + 1,
+          type: 'contrast-rhetorical',
+          severity: 'blocking',
+          message: '反问式内省/伪深刻对比[' + hit + ']：用「倒被X吓住？」式伪深刻反问做内省，靠过去/现在反差+模糊指代（一沓纸/那页东西/这玩意）撑"人物复杂"，是高级 AI 味；改成角色当下可见的具体动作/生理反应（手抖/手顿/把纸翻过去）或本书招牌"裂痕"装置展示，对象写具体（这份材料/这份协议），去掉文艺腔反问。',
           excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
         });
       }

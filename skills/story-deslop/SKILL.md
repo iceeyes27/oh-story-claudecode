@@ -168,6 +168,17 @@ AI 味不按语法错误处理，也不需要「修正」。它属于风格问�
 node .agents/skills/_shared/scripts/check-ai-patterns.js --check --fail-on=blocking <正文文件...>
 ```
 
+**脚本插入污染预检（文件模式）**：当输入是本地正文文件路径、且正文可能是批量生成/批量插入过的（多章节、刚做过补人物/补内心/补动作操作），Phase 1 必须**并行**运行 batch-pollution-detector 检测，只报告不修改：
+
+```bash
+python3 ~/.workbuddy/skills/batch-pollution-detector/scripts/find-duplicates.py <正文目录> --min-len 18 --min-count 2
+python3 ~/.workbuddy/skills/batch-pollution-detector/scripts/check-balance.py <正文目录>
+```
+
+- 污染信号：同一长句（≥18字）跨 ≥3 文件重复、句子嵌在对话引号内、主语与上下文不符、正文出现「待补/细纲/情节点/内档/TODO」等工程词。
+- 命中 → 在检测报告中单列「脚本污染」区块，先于 AI 味问题报告；清理见 batch-pollution-detector 的清理原则（备份→整句删除→复扫→查引号）。
+- 未命中 → 跳过，不影响正常 AI 味流程。
+
 - severity=blocking 的类别（`not-is-comparison` / `em-dash` / `voice-contrast` / `negation-parade` / `negation-only-parallel` / `reverse-not-is` / `trailer-ending`）并入 Gate B，属于写作/去 AI 味时优先处理的 blocking 类问题。
 - 其他 findings（碎句号、长段落、微动作、动作清单、抽象总结、套词、比喻密度、解释链、公文腔、过度精炼、低连接密度、引号强调滥用）只作读感提示；完整类别和修法见 `.agents/skills/_shared/references/anti-ai-writing.md`。
 - 处理方式：删掉否定铺垫，直接写后项；或改成角色动作、物件细节、身体反应来呈现。

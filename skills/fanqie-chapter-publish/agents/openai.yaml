@@ -1,0 +1,4 @@
+interface:
+  display_name: "番茄发布"
+  short_description: "把本地章节同步到番茄后台并处理排版发布与定时发布全流程"
+  default_prompt: "Use $fanqie-chapter-publish to upload the user-specified chapter file or 第NN章 to Fanqie, normalize formatting, force AI=否, and publish or schedule it."

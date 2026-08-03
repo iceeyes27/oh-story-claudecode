@@ -74,12 +74,25 @@ function findBody(n) {
   const dir = path.join(BOOK, '正文');
   if (!fs.existsSync(dir)) return null;
   const id = pad3(n);
-  const hits = fs
-    .readdirSync(dir)
-    .filter((f) => f.endsWith('.md') && !f.includes('原稿'))
-    .filter((f) => f === `第${id}章.md` || f.startsWith(`第${id}章_`))
-    .sort();
-  return hits.length > 0 ? path.join('正文', hits[0]) : null;
+  const hits = [];
+  const visit = (current) => {
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      const candidate = path.join(current, entry.name);
+      if (entry.isDirectory()) {
+        visit(candidate);
+      } else if (
+        entry.isFile()
+        && entry.name.endsWith('.md')
+        && !entry.name.includes('原稿')
+        && (entry.name === `第${id}章.md` || entry.name.startsWith(`第${id}章_`))
+      ) {
+        hits.push(candidate);
+      }
+    }
+  };
+  visit(dir);
+  hits.sort((a, b) => a.localeCompare(b, 'zh-Hans-CN'));
+  return hits.length > 0 ? path.relative(BOOK, hits[0]) : null;
 }
 
 function extractSection(text, titleRe) {

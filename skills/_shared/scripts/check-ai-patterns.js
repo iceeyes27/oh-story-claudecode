@@ -222,11 +222,6 @@ const REVERSE_NOT_IS_PREV_EXCLUDE = new Set([...COMPACT_EITHER_OR_PREV, '还', '
 const TRAILER_ENDING_PATTERN = /没人知道|谁也不知道|谁也没想到|殊不知|(?:这)?才刚刚开(?:始|头)|正(?:朝着|向着)[^。！？!?\n]{0,24}(?:压|涌|袭|逼)(?:了?过去|了?过来|来)|(?<!正式)拉开(?:序幕|帷幕)|即将(?:开始|来临|降临)/g;
 const TRAILER_ENDING_WINDOW_CHARS = 600;
 
-// 章尾状态总结体：把细纲“结尾设定/收束状态”原样写成总结句收章。与 trailer-ending 共用文末窗口，
-// 区别是它盖章过去、trailer-ending 预告将来。各分支要求落在句末断言位，避免误伤条件从句、动补、
-// 成语、及物用法和否定认知；“这一刻终于明白”由密度型 abstract-summary-tic 处理。
-const TRAILER_SUMMARY_PATTERN = /这一(?:夜|天|刻|战|年|局|役)[，,]?[^。！？!?，,\n]{0,6}(?<!命中)(?<!是)注定[^。！？!?\n]{0,8}[。！]|就这样[，,][^。！？!?，,\n]{0,8}(?:一切|全部)[^。！？!?，,\n]{0,4}(?:结束了|落幕|收场)[。！]|这一切[，,]?[^。！？!?，,\n]{0,6}(?:都)?(?:说明|意味着|结束了)(?!的)(?:(?!什么)[^。！？!?\n]){0,6}[。！]|(?:新的篇章|新的旅程|崭新的篇章|新的人生)[^。！？!?\n]{0,6}(?:开始|拉开|展开)|命运[^。！？!?\n]{0,6}齿轮/g;
-
 // 引号强调滥用（实战漏网 E，advisory 密度型，风格照 metaphor-density-tic）：
 // 叙述里短词加引号强调（他是被请来"把关"的）。只数叙述层 1-4 字成对引号片段；
 // 排除项：【】系统面板载体、引语动词（说|道|问|喊|答|念|叫|回|吼|嘀咕，加细 骂|写|读|唱）
@@ -420,6 +415,10 @@ function scanProsePatterns(proseLines) {
   findings.push(...findSynestheticMetaphor(proseLines));
   findings.push(...findAntithesis(proseLines));
   findings.push(...findContrastRhetorical(proseLines));
+  findings.push(...findGreyCrackInHead(proseLines));
+  findings.push(...findSummarySlogan(proseLines));
+  findings.push(...findEnglishResidue(proseLines));
+  findings.push(...findProcessTermAsObject(proseLines));
   return findings;
 }
 
@@ -605,18 +604,6 @@ function findTrailerEnding(proseLines) {
         severity: 'blocking',
         message: '预告式总结收尾：「没人知道/才刚刚开始/正朝着…压了过去」是 AI 章尾预告腔；结尾停在具体动作、画面或一句台词上，悬念让事件自己挂住，别替读者预告下一章。',
         excerpt: compact(text.slice(match.index, match.index + match[0].length)),
-      });
-    }
-    TRAILER_SUMMARY_PATTERN.lastIndex = 0;
-    let summaryMatch;
-    while ((summaryMatch = TRAILER_SUMMARY_PATTERN.exec(masked)) !== null) {
-      findings.push({
-        line: lineNo,
-        column: summaryMatch.index + 1,
-        type: 'trailer-summary',
-        severity: 'blocking',
-        message: '章尾状态总结体：「这一夜注定…/这一切都结束了/新的人生才刚刚开始/命运的齿轮」是把细纲的收束状态原样写成了总结句；收束状态是规划口径，正文落到最后一个具体动作、画面或台词上，别替读者盖章。',
-        excerpt: compact(text.slice(summaryMatch.index, summaryMatch.index + summaryMatch[0].length)),
       });
     }
   }
@@ -1665,6 +1652,120 @@ function findContrastRhetorical(proseLines) {
           excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
         });
       }
+    }
+  }
+  return findings;
+}
+
+// ---- 全面检查补充维度（来源：实战写作抓到的真实漏网，2026-08 校准）----
+// 覆盖项目已立铁律中被原版 check 漏检的部分：灰裂脑子里裂、总结腔、英文残留、
+// 过程术语不作动作宾语。均为「出现即修」级硬伤，单处即 blocking（不像密度型放行）。
+// 校准基线：第一卷全扫回填（新增维度首次全扫应 0 命中或仅命中已知残留）。
+
+// 灰裂铁律：裂痕必须锚定证据/纸面/屏幕等可见物，绝不写「脑子里…裂」。
+// 单处 blocking；引号内台词豁免（与碎句号一致）。
+function findGreyCrackInHead(proseLines) {
+  const GREY_CRACK_IN_HEAD_PATTERN = /脑子里.{0,8}(?:裂|裂开|裂缝|裂痕|裂了一道|裂着)/g;
+  const findings = [];
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const narrative = stripQuoted(trimmed);
+    GREY_CRACK_IN_HEAD_PATTERN.lastIndex = 0;
+    let match;
+    while ((match = GREY_CRACK_IN_HEAD_PATTERN.exec(narrative)) !== null) {
+      findings.push({
+        line: lineNo,
+        column: narrative.indexOf(match[0]) + 1,
+        type: 'grey-crack-in-head',
+        severity: 'blocking',
+        message: '灰裂铁律：裂痕必须锚定证据/纸面/屏幕等可见物，绝不写「脑子里…裂」；改为「视野里/纸面上/那几行上」等具体落点。',
+        excerpt: compact(narrative.slice(Math.max(0, match.index - 8), match.index + match[0].length + 8)),
+      });
+    }
+  }
+  return findings;
+}
+
+// 总结腔：角色给自己写跨时段人生格言（「X辈子的经验合起来只有一条」）是 AI 总结腔高危形态，
+// 单处即 blocking。必须含「经验/教训/总结/活法/道理」或「合起来/说到底/到头来/总结起来」等
+// 总结标记，避免误伤普通「这辈子只想X」式正常叙述。
+function findSummarySlogan(proseLines) {
+  const SUMMARY_SLOGAN_PATTERNS = [
+    /(?:两辈子|这辈子|上辈子|半辈子|两世)(?:的)?[^。！？!?\n]{0,16}(?:经验|教训|总结|活法|道理|合起来|说到底|归根到底|到头来)[^。！？!?\n]{0,12}(?:只有|就|不外乎|无非|是)[^。！？!?\n]{0,10}(?:一条|这一条|一个|一句话|一句)/g,
+    /(?:合起来|说到底|归根到底|到头来|总结起来|横竖|无论如何|说白了|一句话)[^。！？!?\n]{0,6}(?:只有|就|不外乎|无非|是)[^。！？!?\n]{0,10}(?:一条|这一条|一个|一种|一句话|一句)/g,
+  ];
+  const findings = [];
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const narrative = stripQuoted(trimmed);
+    for (const pattern of SUMMARY_SLOGAN_PATTERNS) {
+      pattern.lastIndex = 0;
+      let match;
+      while ((match = pattern.exec(narrative)) !== null) {
+        findings.push({
+          line: lineNo,
+          column: narrative.indexOf(match[0]) + 1,
+          type: 'summary-slogan',
+          severity: 'blocking',
+          message: '总结腔：角色给自己写跨时段人生格言（「X辈子的经验合起来只有一条」）是 AI 总结腔；改成具体画面/身体记忆/当下闪念，不要替读者盖章。',
+          excerpt: compact(narrative.slice(Math.max(0, match.index - 8), match.index + match[0].length + 8)),
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+// 英文残留：正文（引号外叙述）出现 ASCII 英文词（≥2 字母）即视为残留；
+// 白名单放常见有意英文。法援律师正文应为纯中文，叙述里夹英文是编辑/生成残留。
+function findEnglishResidue(proseLines) {
+  const ENGLISH_WORD_PATTERN = /[A-Za-z]{2,}/g;
+  const ENGLISH_WHITELIST = new Set(['OK', 'APP', 'DNA', 'GPS', 'WiFi', 'AI', 'ID', 'QQ']);
+  const findings = [];
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const narrative = stripQuoted(trimmed);
+    ENGLISH_WORD_PATTERN.lastIndex = 0;
+    let match;
+    while ((match = ENGLISH_WORD_PATTERN.exec(narrative)) !== null) {
+      const word = match[0];
+      if (ENGLISH_WHITELIST.has(word)) continue;
+      findings.push({
+        line: lineNo,
+        column: match.index + 1,
+        type: 'english-residue',
+        severity: 'blocking',
+        message: `英文残留「${word}」：正文应为纯中文，英文词是编辑/生成残留，译为对应中文或删除。`,
+        excerpt: compact(narrative.slice(Math.max(0, match.index - 8), match.index + word.length + 8)),
+      });
+    }
+  }
+  return findings;
+}
+
+// 过程术语不作动作宾语：动词（确认/核对/检查/复查/比对/核实）的宾语是过程术语本身
+// （校验/验证/认证/审核/确认），等于「确认了一遍验证」。宾语须是具体结果或对象（文件、编号、页码）。
+function findProcessTermAsObject(proseLines) {
+  const PROCESS_TERM_OBJECT_PATTERN = /(?:确认|核对|检查|复查|比对|核实)(?:了|过)?(?:一遍|一下|一次|这份|这些|所有|都)?[^，。！？!?\n]{0,8}(?:校验|验证|认证|审核)/g;
+  const findings = [];
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const narrative = stripQuoted(trimmed);
+    PROCESS_TERM_OBJECT_PATTERN.lastIndex = 0;
+    let match;
+    while ((match = PROCESS_TERM_OBJECT_PATTERN.exec(narrative)) !== null) {
+      findings.push({
+        line: lineNo,
+        column: narrative.indexOf(match[0]) + 1,
+        type: 'process-term-as-object',
+        severity: 'blocking',
+        message: '过程术语不作动作宾语：动词宾语必须是具体结果或对象（文件、编号、页码、时间戳），不能拿过程术语本身（校验/验证/认证/审核）当宾语；改为「确认了一遍文件都在」之类。',
+        excerpt: compact(narrative.slice(Math.max(0, match.index - 8), match.index + match[0].length + 8)),
+      });
     }
   }
   return findings;

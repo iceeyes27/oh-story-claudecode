@@ -217,27 +217,27 @@ chinese-novelist/
 
 | 文件 | 内容 |
 |------|------|
-| `phase0-initialization.md` | Phase 0：初始化与偏好加载 |
-| `phase1-layer1-core.md` | Phase 1 Layer 1：核心定位问答（Q1-Q3） |
-| `phase1-layer2-customize.md` | Phase 1 Layer 2：深度定制问答（Q4-Q8） |
-| `phase2-planning.md` | Phase 2：规划与写作计划生成 |
-| `phase3-writing.md` | Phase 3：疯狂创作（三种写作模式） |
-| `phase4-validation.md` | Phase 4：自动校验与修复 |
-| `shared-infrastructure.md` | 共享机制（偏好系统、黄金法则、字数脚本） |
+| `references/flows/phase0-initialization.md` | Phase 0：初始化与偏好加载 |
+| `references/flows/phase1-layer1-core.md` | Phase 1 Layer 1：核心定位问答（Q1-Q3） |
+| `references/flows/phase1-layer2-customize.md` | Phase 1 Layer 2：深度定制问答（Q4-Q8） |
+| `references/flows/phase2-planning.md` | Phase 2：规划与写作计划生成 |
+| `references/flows/phase3-writing.md` | Phase 3：疯狂创作（三种写作模式） |
+| `references/flows/phase4-validation.md` | Phase 4：自动校验与修复 |
+| `references/flows/shared-infrastructure.md` | 共享机制（偏好系统、黄金法则、字数脚本） |
 
 ### 写作指南（`references/guides/`）
 
 | 文件 | 内容 |
 |------|------|
-| `chapter-guide.md` | 章节写作指南（含开头技巧、中文文学技法、连贯性保证、质量检查） |
-| `hook-techniques.md` | 悬念设置技巧（13 种结尾钩子类型） |
-| `character-building.md` | 人物塑造技法（侧重写作过程中的塑造技巧） |
-| `dialogue-writing.md` | 对话写作规范（含节奏进阶、权力博弈） |
-| `plot-structures.md` | 情节结构模板 |
-| `content-expansion.md` | 内容扩充技巧（含分题材策略、实例对比） |
-| `outline-template.md` | 大纲模板（7列章节规划） |
-| `character-template.md` | 人物档案模板 |
-| `chapter-template.md` | 章节文件模板 |
+| `references/guides/chapter-guide.md` | 章节写作指南（含开头技巧、中文文学技法、连贯性保证、质量检查） |
+| `references/guides/hook-techniques.md` | 悬念设置技巧（13 种结尾钩子类型） |
+| `references/guides/character-building.md` | 人物塑造技法（侧重写作过程中的塑造技巧） |
+| `references/guides/dialogue-writing.md` | 对话写作规范（含节奏进阶、权力博弈） |
+| `references/guides/plot-structures.md` | 情节结构模板 |
+| `references/guides/content-expansion.md` | 内容扩充技巧（含分题材策略、实例对比） |
+| `references/guides/outline-template.md` | 大纲模板（7列章节规划） |
+| `references/guides/character-template.md` | 人物档案模板 |
+| `references/guides/chapter-template.md` | 章节文件模板 |
 
 ---
 

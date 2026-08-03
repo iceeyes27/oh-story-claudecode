@@ -36,7 +36,7 @@ disable: true
 3. **输入是粘贴文本**（无文件路径）：
    - 文本以小说正文特征为主（叙事段落、对话密集、章节体）→ `mode = novel`
    - 文本是 chat / status / docs / 公开写作 / 中英混排技术文本 → `mode = general`
-4. **默认**：本项目（`/Users/yolandahao/code/book`）默认 `mode = novel`，除非用户明确表示处理的是非小说文本。
+4. **默认**：当前项目默认 `mode = novel`，除非用户明确表示处理的是非小说文本。
 
 ### 路由后行为
 
@@ -170,10 +170,7 @@ node .agents/skills/_shared/scripts/check-ai-patterns.js --check --fail-on=block
 
 **脚本插入污染预检（文件模式）**：当输入是本地正文文件路径、且正文可能是批量生成/批量插入过的（多章节、刚做过补人物/补内心/补动作操作），Phase 1 必须**并行**运行 batch-pollution-detector 检测，只报告不修改：
 
-```bash
-python3 ~/.workbuddy/skills/batch-pollution-detector/scripts/find-duplicates.py <正文目录> --min-len 18 --min-count 2
-python3 ~/.workbuddy/skills/batch-pollution-detector/scripts/check-balance.py <正文目录>
-```
+调用 `batch-pollution-detector` Skill，对正文目录执行重复长句检测和引号/括号平衡检查。该专项 Skill 自带检测脚本；此处只声明路由，不读取其文件路径。
 
 - 污染信号：同一长句（≥18字）跨 ≥3 文件重复、句子嵌在对话引号内、主语与上下文不符、正文出现「待补/细纲/情节点/内档/TODO」等工程词。
 - 命中 → 在检测报告中单列「脚本污染」区块，先于 AI 味问题报告；清理见 batch-pollution-detector 的清理原则（备份→整句删除→复扫→查引号）。

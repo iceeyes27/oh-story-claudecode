@@ -1,0 +1,11 @@
+{
+  "upstream_baseline": "f7ae182",
+  "mappings": [
+    { "source": "skills/story-long-write", "target": "skills/story-write" },
+    { "source": "skills/story-short-write", "target": "skills/story-write" },
+    { "source": "skills/story-long-analyze", "target": "skills/story-analyze" },
+    { "source": "skills/story-short-analyze", "target": "skills/story-analyze" },
+    { "source": "skills/story-long-scan", "target": "skills/story-scan" },
+    { "source": "skills/story-short-scan", "target": "skills/story-scan" }
+  ]
+}

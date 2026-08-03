@@ -1,48 +1,28 @@
 #!/usr/bin/env python3
-"""deslop-register helper.
+"""Register phrases and regexes in this installed bundle's shared word list.
 
-Syncs banned phrases / synesthetic regexes across the project's framework copies
-of banned-words.md, and runs the deslop scanner over a book directory.
+Usage: register.py {phrase|syna|antithesis|scan|list} <value>
 
-Usage:
-  python3 register.py phrase "短语"        # append phrase to 表情类 line in all banned-words.md copies
-  python3 register.py syna  "/正则/"        # append /regex/ to the 通感隐喻 section
-  python3 register.py antithesis "/正则/"   # append /regex/ to the 对仗反义俏皮话 section
-  python3 register.py scan   "<book_dir>"   # run check-ai-patterns.js on all .md under book_dir
-  python3 register.py list                  # show how many banned-words.md copies exist
-
-The scanner is read at runtime by check-ai-patterns.js, so registering a phrase or
-regex in banned-words.md is enough — no .js edit needed.
+The scanner reads the shared word list at runtime, so a registration needs no
+JavaScript edit.
 """
 import os
 import sys
-import glob
 import subprocess
 import argparse
+from pathlib import Path
 
-ROOT = os.getcwd()
-FRAMEWORKS = [".workbuddy", ".codex", ".claude", ".agents"]
-BANNED_REL = [
-    "story-deslop/references/banned-words.md",
-    "story-long-write/references/banned-words.md",
-    "story-short-write/references/banned-words.md",
-    "story-short-analyze/references/banned-words.md",
-    "story-review/references/banned-words.md",
-    "story-setup/references/agent-references/banned-words.md",
-]
+SKILLS_ROOT = Path(__file__).resolve().parents[2]
+REPO_ROOT = SKILLS_ROOT.parent
+BANNED_WORDS = SKILLS_ROOT / "_shared" / "references" / "banned-words.md"
+SCANNER = SKILLS_ROOT / "_shared" / "scripts" / "check-ai-patterns.js"
 EXPR_HEADING = "### 表情类"         # header preceding the 表情类 list line
 SYNA_HEADING = "## 通感隐喻"         # section header for synesthetic regexes
 ANTIT_HEADING = "## 对仗反义俏皮话"   # section header for antithetical aphorism regexes
 
 
 def banned_copies():
-    out = []
-    for fw in FRAMEWORKS:
-        for rel in BANNED_REL:
-            p = os.path.join(ROOT, fw, "skills", rel)
-            if os.path.isfile(p):
-                out.append(p)
-    return out
+    return [BANNED_WORDS] if BANNED_WORDS.is_file() else []
 
 
 def _expr_line_index(lines):
@@ -66,7 +46,7 @@ def add_phrase(phrase):
     copies = banned_copies()
     updated = skipped = 0
     for p in copies:
-        t = open(p, encoding="utf-8").read()
+        t = p.read_text(encoding="utf-8")
         if phrase in t:
             skipped += 1
             continue
@@ -76,7 +56,7 @@ def add_phrase(phrase):
             lines.append(phrase)
         else:
             lines[idx] = lines[idx].rstrip() + "、" + phrase
-        open(p, "w", encoding="utf-8").write("\n".join(lines))
+        p.write_text("\n".join(lines), encoding="utf-8")
         updated += 1
     print(f"phrase '{phrase}': updated={updated} skipped(already)={skipped} (copies={len(copies)})")
 
@@ -89,7 +69,7 @@ def add_syna(regex_line):
     copies = banned_copies()
     updated = skipped = 0
     for p in copies:
-        t = open(p, encoding="utf-8").read()
+        t = p.read_text(encoding="utf-8")
         if regex_line in t:
             skipped += 1
             continue
@@ -110,7 +90,7 @@ def add_syna(regex_line):
             out.append(l)
         if in_sec and not inserted:
             out.append(regex_line)
-        open(p, "w", encoding="utf-8").write("\n".join(out))
+        p.write_text("\n".join(out), encoding="utf-8")
         updated += 1
     print(f"syna {regex_line}: updated={updated} skipped(already)={skipped} (copies={len(copies)})")
 
@@ -123,7 +103,7 @@ def add_antithesis(regex_line):
     copies = banned_copies()
     updated = skipped = 0
     for p in copies:
-        t = open(p, encoding="utf-8").read()
+        t = p.read_text(encoding="utf-8")
         if regex_line in t:
             skipped += 1
             continue
@@ -150,30 +130,34 @@ def add_antithesis(regex_line):
             out.append(regex_line)
         elif in_sec and not inserted:
             out.append(regex_line)
-        open(p, "w", encoding="utf-8").write("\n".join(out))
+        p.write_text("\n".join(out), encoding="utf-8")
         updated += 1
     print(f"antithesis {regex_line}: updated={updated} skipped(already)={skipped} (copies={len(copies)})")
 
 
 def scan(book_dir):
     node = os.environ.get("NODE_BIN") or "node"
-    scanner = os.path.join(ROOT, ".workbuddy", "skills", "story-deslop",
-                           "scripts", "check-ai-patterns.js")
-    if not os.path.isfile(scanner):
-        print("ERROR: scanner not found at", scanner)
+    if not SCANNER.is_file():
+        print("ERROR: scanner not found at", SCANNER)
         sys.exit(1)
-    files = sorted(glob.glob(os.path.join(book_dir, "**", "*.md"), recursive=True))
-    if not files:
-        files = sorted(glob.glob(os.path.join(book_dir, "*.md")))
+    source = Path(book_dir)
+    files = sorted(str(path) for path in source.rglob("*.md"))
     if not files:
         print("ERROR: no .md files found under", book_dir)
         sys.exit(1)
-    cmd = [node, scanner, "--check"] + files
-    res = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+    cmd = [node, str(SCANNER), "--check"] + files
+    res = subprocess.run(
+        cmd,
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+    )
     out = res.stdout + res.stderr
     for kind in ["banned-word-exact", "banned-word-syna", "banned-word-antithesis"]:
         print(f"{kind}: {out.count(kind)}")
-    return out
+    return res.returncode
 
 
 def main():
@@ -197,13 +181,14 @@ def main():
     elif args.cmd == "antithesis":
         add_antithesis(args.value)
     elif args.cmd == "scan":
-        scan(args.book_dir)
+        return scan(args.book_dir)
     elif args.cmd == "list":
         copies = banned_copies()
         print(f"banned-words.md copies found: {len(copies)}")
         for c in copies:
             print("  ", c)
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

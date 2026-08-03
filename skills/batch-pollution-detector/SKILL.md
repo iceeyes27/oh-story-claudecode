@@ -29,7 +29,8 @@ agent_created: true
 运行脚本：
 
 ```bash
-python3 /Users/yolandahao/.workbuddy/skills/batch-pollution-detector/scripts/find-duplicates.py <文件或目录>
+for PYBIN in python3 python py; do "$PYBIN" -c "" 2>/dev/null && break; done
+"$PYBIN" scripts/find-duplicates.py <文件或目录>
 ```
 
 脚本行为：
@@ -64,7 +65,7 @@ grep -rn "待补\|细纲\|情节点\|内档\|TODO\|待后续\|(待\|【" <正文
 删除污染句后，必须检查引号是否失衡（删掉的是引号内内容时尤其重要）：
 
 ```bash
-python3 /Users/yolandahao/.workbuddy/skills/batch-pollution-detector/scripts/check-balance.py <文件或目录>
+"$PYBIN" scripts/check-balance.py <文件或目录>
 ```
 
 输出失衡文件列表。中文引号 `“”`、单引号 `‘’`、ASCII 引号 `"` 分开统计。

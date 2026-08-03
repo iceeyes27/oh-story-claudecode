@@ -1,0 +1,3 @@
+{"file": "scripts/static-check.py", "reason": "30 skills static check passed"}
+{"file": "scripts/check-hook-regex-sync.sh", "reason": "hook regex synchronization passed"}
+{"file": "scripts/check-unified-skill-upstream-drift.py", "reason": "upstream drift guard passed"}

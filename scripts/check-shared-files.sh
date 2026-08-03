@@ -120,6 +120,23 @@ for base in $dup_names; do
     [ "${fpath##*/}" = "$base" ] && paths+=("$fpath")
   done <<< "$REFERENCE_FILES"
 
+  # trellis-meta has three intentionally distinct, nested overview documents
+  # (customization, local architecture, and platform files).  They share a
+  # basename but are not mirrored assets.  Restrict the exception to that one
+  # Skill so unrelated overview.md copies remain guarded.
+  if [ "$base" = "overview.md" ]; then
+    trellis_only=true
+    for p in ${paths[@]+"${paths[@]}"}; do
+      case "$p" in
+        */skills/trellis-meta/*) ;;
+        *) trellis_only=false; break ;;
+      esac
+    done
+    if [ "$trellis_only" = true ]; then
+      continue
+    fi
+  fi
+
   # Analyst-divergent basenames: drop the story-analyze copy (intentional
   # analyst-lens fork); the remaining copies must still be byte-identical.
   case " $ANALYST_DIVERGENT_NAMES " in

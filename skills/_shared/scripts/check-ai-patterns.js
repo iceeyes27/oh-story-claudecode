@@ -222,6 +222,11 @@ const REVERSE_NOT_IS_PREV_EXCLUDE = new Set([...COMPACT_EITHER_OR_PREV, '还', '
 const TRAILER_ENDING_PATTERN = /没人知道|谁也不知道|谁也没想到|殊不知|(?:这)?才刚刚开(?:始|头)|正(?:朝着|向着)[^。！？!?\n]{0,24}(?:压|涌|袭|逼)(?:了?过去|了?过来|来)|(?<!正式)拉开(?:序幕|帷幕)|即将(?:开始|来临|降临)/g;
 const TRAILER_ENDING_WINDOW_CHARS = 600;
 
+// 章尾状态总结体：把细纲“结尾设定/收束状态”原样写成总结句收章。与 trailer-ending 共用文末窗口，
+// 区别是它盖章过去、trailer-ending 预告将来。各分支要求落在句末断言位，避免误伤条件从句、动补、
+// 成语、及物用法和否定认知；“这一刻终于明白”由密度型 abstract-summary-tic 处理。
+const TRAILER_SUMMARY_PATTERN = /这一(?:夜|天|刻|战|年|局|役)[，,]?[^。！？!?，,\n]{0,6}(?<!命中)(?<!是)注定[^。！？!?\n]{0,8}[。！]|就这样[，,][^。！？!?，,\n]{0,8}(?:一切|全部)[^。！？!?，,\n]{0,4}(?:结束了|落幕|收场)[。！]|这一切[，,]?[^。！？!?，,\n]{0,6}(?:都)?(?:说明|意味着|结束了)(?!的)(?:(?!什么)[^。！？!?\n]){0,6}[。！]|(?:新的篇章|新的旅程|崭新的篇章|新的人生)[^。！？!?\n]{0,6}(?:开始|拉开|展开)|命运[^。！？!?\n]{0,6}齿轮/g;
+
 // 引号强调滥用（实战漏网 E，advisory 密度型，风格照 metaphor-density-tic）：
 // 叙述里短词加引号强调（他是被请来"把关"的）。只数叙述层 1-4 字成对引号片段；
 // 排除项：【】系统面板载体、引语动词（说|道|问|喊|答|念|叫|回|吼|嘀咕，加细 骂|写|读|唱）
@@ -600,6 +605,18 @@ function findTrailerEnding(proseLines) {
         severity: 'blocking',
         message: '预告式总结收尾：「没人知道/才刚刚开始/正朝着…压了过去」是 AI 章尾预告腔；结尾停在具体动作、画面或一句台词上，悬念让事件自己挂住，别替读者预告下一章。',
         excerpt: compact(text.slice(match.index, match.index + match[0].length)),
+      });
+    }
+    TRAILER_SUMMARY_PATTERN.lastIndex = 0;
+    let summaryMatch;
+    while ((summaryMatch = TRAILER_SUMMARY_PATTERN.exec(masked)) !== null) {
+      findings.push({
+        line: lineNo,
+        column: summaryMatch.index + 1,
+        type: 'trailer-summary',
+        severity: 'blocking',
+        message: '章尾状态总结体：「这一夜注定…/这一切都结束了/新的人生才刚刚开始/命运的齿轮」是把细纲的收束状态原样写成了总结句；收束状态是规划口径，正文落到最后一个具体动作、画面或台词上，别替读者盖章。',
+        excerpt: compact(text.slice(summaryMatch.index, summaryMatch.index + summaryMatch[0].length)),
       });
     }
   }

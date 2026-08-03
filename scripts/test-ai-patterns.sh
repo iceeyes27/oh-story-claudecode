@@ -8,20 +8,8 @@ if [ -z "$REPO_ROOT" ]; then
   exit 1
 fi
 
-SCRIPT="$REPO_ROOT/skills/story-deslop/scripts/check-ai-patterns.js"
-DETECTOR_COPIES=(
-  "$REPO_ROOT/skills/story-deslop/scripts/check-ai-patterns.js"
-  "$REPO_ROOT/skills/story-write/scripts/check-ai-patterns.js"
-  "$REPO_ROOT/skills/story-review/scripts/check-ai-patterns.js"
-  "$REPO_ROOT/skills/story-write/scripts/check-ai-patterns.js"
-)
-for detector_copy in "${DETECTOR_COPIES[@]}"; do
-  node --check "$detector_copy" >/dev/null
-  cmp -s "$SCRIPT" "$detector_copy" || {
-    echo "FAIL: detector copy drifted from story-deslop source: $detector_copy" >&2
-    exit 1
-  }
-done
+SCRIPT="$REPO_ROOT/skills/_shared/scripts/check-ai-patterns.js"
+node --check "$SCRIPT" >/dev/null
 TMP_DIR="$(mktemp -d)"
 
 cleanup() {

@@ -472,6 +472,25 @@ def test_brace_enumerations_name_each_file() -> None:
             )
 
 
+def test_trellis_project_artifacts_do_not_disable_link_validation() -> None:
+    with tempfile.TemporaryDirectory(prefix="story-static-trellis-") as tmp:
+        root = Path(tmp)
+        build_agent_catalog(root)
+        write(
+            root / "skills/trellis-demo/SKILL.md",
+            "---\nname: trellis-demo\ndescription: Project workflow\n---\n# Trellis\n\n"
+            "Create `prd.md`, `design.md`, and `trellis/scripts/task.py` in the target repository.\n\n"
+            "[This local guide is still checked](references/missing.md).\n",
+        )
+
+        result = run(root)
+        assert result.returncode == 1, result.stdout + result.stderr
+        assert "skills/trellis-demo/SKILL.md:9" in result.stdout, result.stdout
+        assert "[broken-link-path]" in result.stdout, result.stdout
+        assert "prd.md" not in result.stdout, result.stdout
+        assert "trellis/scripts/task.py" not in result.stdout, result.stdout
+
+
 def test_launcher_reports_missing_git_repository() -> None:
     bash = shutil.which("bash")
     if bash is None:
@@ -543,6 +562,7 @@ def main() -> None:
     test_cjk_joined_globs_validate_every_named_path()
     test_wildcard_mentions_do_not_hide_dead_references()
     test_brace_enumerations_name_each_file()
+    test_trellis_project_artifacts_do_not_disable_link_validation()
     test_launcher_reports_missing_git_repository()
     print("PASS: structured static-check regression")
 

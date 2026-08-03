@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """引号/括号平衡检查：删除污染句后验证标点是否失衡。
-用法: python3 check-balance.py <文件或目录>
+用法: <Python 3 解释器> check-balance.py <文件或目录>
 输出失衡文件列表。"""
 import sys, os, glob
 
@@ -12,7 +12,7 @@ def get_files(path):
 
 def main():
     if len(sys.argv) < 2:
-        print("用法: python3 check-balance.py <文件或目录>")
+        print("用法: <Python 3 解释器> check-balance.py <文件或目录>")
         sys.exit(1)
     path = sys.argv[1]
     files = get_files(path)

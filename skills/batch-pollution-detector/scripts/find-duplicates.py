@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """跨文件重复长句检测：定位脚本批量插入的复读污染。
-用法: python3 find-duplicates.py <文件或目录> [--min-len 18] [--min-count 2]
+用法: <Python 3 解释器> find-duplicates.py <文件或目录> [--min-len 18] [--min-count 2]
 只报告，不改文。"""
 import sys, os, glob, re
 from collections import defaultdict
@@ -18,7 +18,7 @@ def split_sentences(text):
 
 def main():
     if len(sys.argv) < 2:
-        print("用法: python3 find-duplicates.py <文件或目录> [--min-len 18] [--min-count 2]")
+        print("用法: <Python 3 解释器> find-duplicates.py <文件或目录> [--min-len 18] [--min-count 2]")
         sys.exit(1)
     path = sys.argv[1]
     min_len = 18

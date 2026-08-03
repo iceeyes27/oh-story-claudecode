@@ -63,6 +63,12 @@ DEPLOYED_RUNTIME_PREFIXES = (".claude/", ".codex/", ".opencode/")
 # skills may reference its launcher; every other cross-skill file path remains
 # forbidden so domain workflows stay self-contained.
 FOUNDATION_SKILL_REFERENCES = frozenset({"browser-cdp", "_shared"})
+# Trellis instructions describe task artifacts and framework scripts in the
+# target repository (for example `prd.md` and `trellis/scripts/task.py`).
+# Those names are not assets that belong to the Trellis skill bundle.  Keep
+# normal Markdown-link and cross-skill validation active; only bare project
+# artifact mentions use this exception.
+PROJECT_WORKFLOW_SKILL_PREFIX = "trellis-"
 # 变更日志按定义记录历史状态：其内联路径是「当时」的引用（含已删/已移动/跨 skill 的旧文件），
 # 不是当前运行时依赖，不作跨 skill / 死链校验（与 check-current-skill-contracts.py 的跳过一致）。
 CHANGELOG_DOCS = frozenset({"UPGRADING.md", "CHANGELOG.md"})
@@ -479,6 +485,14 @@ def validate_skill(
             if key in seen_refs:
                 continue
             seen_refs.add(key)
+            if (
+                skill_dir.name.startswith(PROJECT_WORKFLOW_SKILL_PREFIX)
+                and (
+                    ref.kind == "inline-md"
+                    or (ref.kind == "skill-path" and ref.raw.startswith("trellis/"))
+                )
+            ):
+                continue
             if is_deployed_runtime_ref(ref, document, skill_dir, agent_names):
                 continue
             target, fragment, local, dynamic = resolve_ref(

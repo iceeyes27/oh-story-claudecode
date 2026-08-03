@@ -61,13 +61,14 @@ PY
 echo "  OK native plugin/marketplace manifest"
 
 python3 - <<'PY'
-import re
+import json, re
 from pathlib import Path
 
-skills = sorted(Path('skills').glob('*/SKILL.md'))
+published_names = json.loads(Path('scripts/platform-skill-set.json').read_text(encoding='utf-8'))['skills']
+skills = sorted(Path('skills') / name / 'SKILL.md' for name in published_names)
 commands = sorted(Path('skills/story-setup/references/zcode/commands').glob('*.md'))
-assert len(skills) == 11, f'expected 11 skills, got {len(skills)}'
-assert len(commands) == 11, f'expected 11 commands, got {len(commands)}'
+assert all(skill.is_file() for skill in skills), 'platform skill set references a missing skill'
+assert len(commands) == len(skills), f'expected {len(skills)} commands, got {len(commands)}'
 expected = {p.parent.name for p in skills}
 assert {p.stem for p in commands} == expected
 
@@ -92,7 +93,7 @@ for command in commands:
     assert 'description' in keys and 'skills' in keys
     assert '$ARGUMENTS' in body
 PY
-echo "  OK 11 Skills + 11 Commands (schema and one-to-one names)"
+echo "  OK published Skills + Commands (schema and one-to-one names)"
 
 python3 - <<'PY'
 import json
@@ -170,7 +171,7 @@ assert_grep 'references/zcode/config\.json\.patch' skills/story-setup/SKILL.md "
 # 组合安装验证代理（CI 无 ZCode 运行时）：插件 manifest 与 workspace config 注册同一批 hooks，
 # 部署算法必须记录二者互斥（装插件则跳过 config hooks 合并），否则 PreToolUse/PostToolUse 双触发。
 assert_grep 'hooks 互斥' skills/story-setup/SKILL.md "story-setup must document the plugin/workspace hooks mutex (skip config hooks merge when plugin installed, avoid double-firing)"
-assert_grep '\.zcode/skills/story-setup/references/agent-references' skills/story-setup/SKILL.md "story-setup missing ZCode reference path"
+assert_grep '\.agents/skills/story-setup/references/agent-references' skills/story-setup/SKILL.md "story-setup missing canonical agent reference path"
 
 for skill in story-write story-analyze story-import story-deslop story-review; do
   assert_grep 'ZCode 3\.3\.4|\.zcode/' "skills/$skill/SKILL.md" "$skill must document ZCode fallback"

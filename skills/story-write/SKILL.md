@@ -1,12 +1,8 @@
 ---
 name: story-write
 version: 2.0.0
-description: 网文写作（长篇/短篇统一入口）。从大纲到正文，辅助网络小说创作。mode=long 走长篇写作流程（Phase
-  1-5：选题→设定→大纲→正文→质检），mode=short 走短篇写作流程（Phase
-  1-4：情绪目标→构思→逐场景写作→精修）。触发方式：/story-write、/写长篇、/写短篇、「帮我开书」「写大纲」「日更」「续写」「帮我写一篇短篇」「写个盐言故事」——按意图自动路由。
-metadata:
-  openclaw:
-    source: https://github.com/iceeyes27/oh-story-claudecode
+description: "网文写作（长篇/短篇统一入口）。从大纲到正文，辅助网络小说创作。mode=long 走长篇写作流程（Phase 1-5：选题→设定→大纲→正文→质检），mode=short 走短篇写作流程（Phase 1-4：情绪目标→构思→逐场景写作→精修）。触发方式：/story-write、/写长篇、/写短篇、「帮我开书」「写大纲」「日更」「续写」「帮我写一篇短篇」「写个盐言故事」——按意图自动路由。"
+metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
 disable: true
 ---
 

@@ -40,24 +40,9 @@ import json
 import sys
 from pathlib import Path
 
-expected = {
-    "browser-cdp",
-    "story",
-    "story-cover",
-    "story-deslop",
-    "story-import",
-    "story-analyze",
-    "story-scan",
-    "story-write",
-    "story-review",
-    "story-setup",
-    "story-analyze",
-    "story-scan",
-    "story-write",
-}
-
 data = json.loads(Path(sys.argv[1]).read_text())
 repo_root = Path(sys.argv[2]).resolve()
+expected = set(json.loads((repo_root / "scripts/platform-skill-set.json").read_text())['skills'])
 items = {
     item.get("name") or item.get("id"): item
     for item in data
@@ -99,28 +84,13 @@ echo "  Checking deployed project config/agents/commands/plugin"
   run_opencode debug config >"$TMP_ROOT/project-config.json"
 )
 
-python3 - "$TMP_ROOT/project-config.json" <<'PY'
+python3 - "$TMP_ROOT/project-config.json" "$REPO_ROOT/scripts/platform-skill-set.json" <<'PY'
 import json
 import sys
 from pathlib import Path
 
 cfg = json.loads(Path(sys.argv[1]).read_text())
-
-expected_commands = {
-    "browser-cdp",
-    "story",
-    "story-cover",
-    "story-deslop",
-    "story-import",
-    "story-analyze",
-    "story-scan",
-    "story-write",
-    "story-review",
-    "story-setup",
-    "story-analyze",
-    "story-scan",
-    "story-write",
-}
+expected_commands = set(json.loads(Path(sys.argv[2]).read_text())['skills'])
 expected_agents = {
     "chapter-extractor",
     "character-designer",

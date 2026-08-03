@@ -222,6 +222,11 @@ const REVERSE_NOT_IS_PREV_EXCLUDE = new Set([...COMPACT_EITHER_OR_PREV, '还', '
 const TRAILER_ENDING_PATTERN = /没人知道|谁也不知道|谁也没想到|殊不知|(?:这)?才刚刚开(?:始|头)|正(?:朝着|向着)[^。！？!?\n]{0,24}(?:压|涌|袭|逼)(?:了?过去|了?过来|来)|(?<!正式)拉开(?:序幕|帷幕)|即将(?:开始|来临|降临)/g;
 const TRAILER_ENDING_WINDOW_CHARS = 600;
 
+// 章尾状态总结体与部署 hook 使用同一规格：收束状态是细纲的规划口径，正文应停在
+// 具体动作、画面或台词上。每个分支都要求落在句末，避免误伤条件从句、动补、成语、
+// 系表与认知句；引号内容仍由 maskQuoted 排除。
+const TRAILER_SUMMARY_PATTERN = /这一(?:夜|天|刻|战|年|局|役)[，,]?[^。！？!?，,\n]{0,6}(?<!命中)(?<!是)注定[^。！？!?\n]{0,8}[。！]|就这样[，,][^。！？!?，,\n]{0,8}(?:一切|全部)[^。！？!?，,\n]{0,4}(?:结束了|落幕|收场)[。！]|这一切[，,]?[^。！？!?，,\n]{0,6}(?:都)?(?:说明|意味着|结束了)(?!的)(?:(?!什么)[^。！？!?\n]){0,6}[。！]|(?:新的篇章|新的旅程|崭新的篇章|新的人生)[^。！？!?\n]{0,6}(?:开始|拉开|展开)|命运[^。！？!?\n]{0,6}齿轮/g;
+
 // 引号强调滥用（实战漏网 E，advisory 密度型，风格照 metaphor-density-tic）：
 // 叙述里短词加引号强调（他是被请来"把关"的）。只数叙述层 1-4 字成对引号片段；
 // 排除项：【】系统面板载体、引语动词（说|道|问|喊|答|念|叫|回|吼|嘀咕，加细 骂|写|读|唱）
@@ -399,6 +404,7 @@ function scanProsePatterns(proseLines) {
   findings.push(...findNegationOnlyParallel(proseLines));
   findings.push(...findReverseNotIs(proseLines));
   findings.push(...findTrailerEnding(proseLines));
+  findings.push(...findTrailerSummary(proseLines));
   findings.push(...findQuoteEmphasisTic(proseLines));
   findings.push(...findPeriodStutter(proseLines));
   findings.push(...findMicroActionTic(proseLines));
@@ -579,7 +585,7 @@ function findReverseNotIs(proseLines) {
 
 // 预告式总结收尾（实战漏网 D）：只扫文末窗口。从文末往回收集叙述行，
 // 直到剥引号后的可见字数达到窗口大小（按行取整，边界行整行计入）。
-function findTrailerEnding(proseLines) {
+function trailerWindowLines(proseLines) {
   const windowLines = [];
   let accumulated = 0;
 
@@ -590,6 +596,12 @@ function findTrailerEnding(proseLines) {
     windowLines.unshift(proseLines[i]);
     accumulated += visibleLength(stripQuoted(trimmed));
   }
+
+  return windowLines;
+}
+
+function findTrailerEnding(proseLines) {
+  const windowLines = trailerWindowLines(proseLines);
 
   const findings = [];
   for (const { text, lineNo } of windowLines) {
@@ -608,6 +620,26 @@ function findTrailerEnding(proseLines) {
     }
   }
 
+  return findings;
+}
+
+function findTrailerSummary(proseLines) {
+  const findings = [];
+  for (const { text, lineNo } of trailerWindowLines(proseLines)) {
+    const masked = maskQuoted(text);
+    TRAILER_SUMMARY_PATTERN.lastIndex = 0;
+    let match;
+    while ((match = TRAILER_SUMMARY_PATTERN.exec(masked)) !== null) {
+      findings.push({
+        line: lineNo,
+        column: match.index + 1,
+        type: 'trailer-summary',
+        severity: 'blocking',
+        message: '章尾状态总结体：收束状态是细纲的规划口径；正文停在具体动作、画面或台词上，不替读者盖章总结。',
+        excerpt: compact(text.slice(match.index, match.index + match[0].length)),
+      });
+    }
+  }
   return findings;
 }
 

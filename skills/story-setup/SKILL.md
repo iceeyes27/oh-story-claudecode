@@ -1,12 +1,8 @@
 ---
 name: story-setup
 version: 1.3.0
-description: 网文写作工具集基础设施部署。为 Claude Code / OpenCode / Codex / ZCode / OpenClaw / Reasonix
-  提供内置适配；Web AI / 通用 Agent 可走 skills + AGENTS.md
-  文件模式。触发方式：/story-setup、$story-setup、「准备写书」「帮我搭一下环境」「配置写作项目」。
-metadata:
-  openclaw:
-    source: https://github.com/iceeyes27/oh-story-claudecode
+description: "网文写作工具集基础设施部署。为 Claude Code / OpenCode / Codex / ZCode / OpenClaw / Reasonix 提供内置适配；Web AI / 通用 Agent 可走 skills + AGENTS.md 文件模式。触发方式：/story-setup、$story-setup、「准备写书」「帮我搭一下环境」「配置写作项目」。"
+metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
 disable: true
 ---
 

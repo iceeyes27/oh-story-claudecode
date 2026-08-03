@@ -6,7 +6,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 MARKETPLACE="$REPO_ROOT/.claude-plugin/marketplace.json"
-EXPECTED_COUNT=11
+SKILL_SET="$REPO_ROOT/scripts/platform-skill-set.json"
 
 fail() { echo "FAIL: $*" >&2; exit 1; }
 
@@ -14,25 +14,26 @@ echo "Claude Code adapter check"
 echo "========================="
 echo "Repo: $REPO_ROOT"
 
-python3 - "$MARKETPLACE" "$REPO_ROOT" "$EXPECTED_COUNT" <<'PY'
+python3 - "$MARKETPLACE" "$REPO_ROOT" "$SKILL_SET" <<'PY'
 import json
 import sys
 from pathlib import Path
 
 marketplace_path = Path(sys.argv[1])
 repo_root = Path(sys.argv[2])
-expected_count = int(sys.argv[3])
+skill_set_path = Path(sys.argv[3])
 
 data = json.loads(marketplace_path.read_text(encoding="utf-8"))
+skill_set = json.loads(skill_set_path.read_text(encoding="utf-8"))
 plugins = data.get("plugins")
 if not isinstance(plugins, list):
     raise SystemExit("FAIL: marketplace plugins must be an array")
-if len(plugins) != expected_count:
-    raise SystemExit(
-        f"FAIL: expected {expected_count} marketplace plugins, found {len(plugins)}"
-    )
-
-expected = {path.parent.name for path in (repo_root / "skills").glob("*/SKILL.md")}
+expected = set(skill_set.get("skills", []))
+if not expected or len(expected) != len(skill_set.get("skills", [])):
+    raise SystemExit("FAIL: platform skill set must contain unique skill names")
+missing_assets = sorted(name for name in expected if not (repo_root / "skills" / name / "SKILL.md").is_file())
+if missing_assets:
+    raise SystemExit(f"FAIL: platform skill set references missing skills: {missing_assets}")
 found: set[str] = set()
 for plugin in plugins:
     if not isinstance(plugin, dict):
@@ -62,7 +63,7 @@ if found != expected:
     extra = sorted(found - expected)
     raise SystemExit(f"FAIL: marketplace/skills mismatch; missing={missing}, extra={extra}")
 
-print(f"  OK marketplace maps all {len(found)} skills exactly once")
+print(f"  OK marketplace maps all {len(found)} published skills exactly once")
 PY
 
 if [ "${CLAUDE_REAL_CHECK:-0}" = "1" ]; then
@@ -97,7 +98,7 @@ manifest = {
 )
 PY
   claude plugin validate --strict "$TMP_DIR/plugin"
-  echo "  OK Claude CLI strict component validation (all $EXPECTED_COUNT skills)"
+  echo "  OK Claude CLI strict component validation"
 
   claude plugin validate --strict "$REPO_ROOT"
   echo "  OK Claude CLI strict marketplace validation"
@@ -120,17 +121,16 @@ PY
 )
   CLAUDE_CONFIG_DIR="$TMP_DIR/config" HOME="$TMP_DIR/home" \
     claude plugin list --json >"$TMP_DIR/installed.json"
-  python3 - "$TMP_DIR/installed.json" "$MARKETPLACE" "$EXPECTED_COUNT" <<'PY'
+  python3 - "$TMP_DIR/installed.json" "$MARKETPLACE" <<'PY'
 import json
 import sys
 from pathlib import Path
 
 installed = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
 marketplace = json.loads(Path(sys.argv[2]).read_text(encoding="utf-8"))
-expected_count = int(sys.argv[3])
 expected = {f'{item["name"]}@oh-story-skills' for item in marketplace["plugins"]}
 found = {item.get("id") for item in installed}
-if len(installed) != expected_count or found != expected:
+if len(installed) != len(expected) or found != expected:
     raise SystemExit(f"FAIL: installed Claude plugins mismatch; expected={sorted(expected)}, found={sorted(found)}")
 for item in installed:
     name = item["id"].split("@", 1)[0]

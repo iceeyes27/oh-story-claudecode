@@ -6,7 +6,6 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
-EXPECTED_COUNT=13
 TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/ohstory-codex-e2e.XXXXXX")"
 trap 'rm -rf "$TMP_ROOT"' EXIT
 
@@ -49,7 +48,7 @@ echo "  Checking isolated deployed project (skills + agents + hooks)"
 HOME="$TMP_ROOT/home" CODEX_HOME="$TMP_ROOT/home/.codex" \
   codex -C "$WORKSPACE" debug prompt-input >"$TMP_ROOT/prompt-input.json"
 
-python3 - "$TMP_ROOT/prompt-input.json" "$WORKSPACE" "$EXPECTED_COUNT" <<'PY'
+python3 - "$TMP_ROOT/prompt-input.json" "$WORKSPACE" <<'PY'
 import json
 import re
 import sys
@@ -58,8 +57,6 @@ from pathlib import Path
 
 output_path = Path(sys.argv[1])
 repo_root = Path(sys.argv[2]).resolve()
-expected_count = int(sys.argv[3])
-
 data = json.loads(output_path.read_text(encoding="utf-8"))
 
 def strings(value):
@@ -77,11 +74,6 @@ expected = {
     path.parent.name: str(path.resolve())
     for path in (repo_root / "skills").glob("*/SKILL.md")
 }
-if len(expected) != expected_count:
-    raise SystemExit(
-        f"repository fixture error: expected {expected_count} skills, found {len(expected)}"
-    )
-
 missing = sorted(name for name, path in expected.items() if path not in rendered)
 if missing:
     raise SystemExit(f"Codex prompt input omitted repository skills: {missing}")

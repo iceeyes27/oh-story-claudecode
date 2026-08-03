@@ -1,12 +1,8 @@
 ---
 name: story-analyze
 version: 2.0.0
-description: 网文拆文（长篇/短篇统一入口）。深度拆解爆款小说的黄金三章、人设架构、爽点设计、节奏控制、情感线、反转设计、写作手法。mode=long
-  走长篇 7 阶段管道（Stage 0-6），mode=short 走短篇 5 阶段管道（Stage
-  2-6）。触发方式：/story-analyze、/长篇拆文、/短篇拆文、「帮我拆这本书」「拆短篇」「分析黄金三章」「深度拆解」——按字数自动路由。
-metadata:
-  openclaw:
-    source: https://github.com/iceeyes27/oh-story-claudecode
+description: "网文拆文（长篇/短篇统一入口）。深度拆解爆款小说的黄金三章、人设架构、爽点设计、节奏控制、情感线、反转设计、写作手法。mode=long 走长篇 7 阶段管道（Stage 0-6），mode=short 走短篇 5 阶段管道（Stage 2-6）。触发方式：/story-analyze、/长篇拆文、/短篇拆文、「帮我拆这本书」「拆短篇」「分析黄金三章」「深度拆解」——按字数自动路由。"
+metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
 disable: true
 ---
 

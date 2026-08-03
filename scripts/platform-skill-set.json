@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "skills": [
+    "browser-cdp",
+    "humanizer",
+    "story",
+    "story-analyze",
+    "story-cover",
+    "story-deslop",
+    "story-import",
+    "story-review",
+    "story-scan",
+    "story-setup",
+    "story-write"
+  ]
+}

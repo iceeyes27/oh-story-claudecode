@@ -11,25 +11,29 @@ if [ -z "$REPO_ROOT" ]; then
 fi
 
 SKILLS_DIR="$REPO_ROOT/skills"
-EXPECTED_COUNT=11
+SKILL_SET="$REPO_ROOT/scripts/platform-skill-set.json"
 
 echo "OpenClaw skills check"
 echo "====================="
 echo "Repo: $REPO_ROOT"
 
-python3 - "$SKILLS_DIR" "$EXPECTED_COUNT" <<'PY'
+python3 - "$SKILLS_DIR" "$SKILL_SET" <<'PY'
 from pathlib import Path
 import json
 import re
 import sys
 
 skills_dir = Path(sys.argv[1])
-expected = int(sys.argv[2])
+skill_set = json.loads(Path(sys.argv[2]).read_text(encoding='utf-8'))
+skill_names = skill_set.get('skills', [])
 failures: list[str] = []
-skill_files = sorted(skills_dir.glob('*/SKILL.md'))
+if not skill_names or len(skill_names) != len(set(skill_names)):
+    failures.append('platform skill set must contain unique skill names')
+skill_files = [skills_dir / name / 'SKILL.md' for name in skill_names]
 
-if len(skill_files) != expected:
-    failures.append(f'expected {expected} SKILL.md files, found {len(skill_files)}')
+for path in skill_files:
+    if not path.is_file():
+        failures.append(f'missing published skill: {path.relative_to(skills_dir.parent)}')
 
 frontmatter_re = re.compile(r'^---\n(.*?)\n---\n', re.S)
 for path in skill_files:
@@ -145,7 +149,19 @@ if [ "${OPENCLAW_REAL_CHECK:-0}" = "1" ]; then
 
   mkdir -p "$TMP_DIR/workspace"
   echo "  OpenClaw: $(openclaw --version)"
-  cp -R "$SKILLS_DIR" "$TMP_DIR/workspace/skills"
+  python3 - "$SKILLS_DIR" "$SKILL_SET" "$TMP_DIR/workspace/skills" <<'PY'
+import json
+import shutil
+import sys
+from pathlib import Path
+
+source = Path(sys.argv[1])
+published = json.loads(Path(sys.argv[2]).read_text(encoding='utf-8'))['skills']
+destination = Path(sys.argv[3])
+destination.mkdir(parents=True, exist_ok=True)
+for name in published:
+    shutil.copytree(source / name, destination / name)
+PY
   # Exercise the documented top-level metadata.openclaw.os gate with a platform
   # that intentionally excludes the current runner.
   case "$(uname -s)" in
@@ -170,7 +186,7 @@ EOF
     --json >/dev/null
   LIST_JSON="$TMP_DIR/skills.json"
   openclaw --profile "$PROFILE" skills list --agent ohstory-check --json >"$LIST_JSON"
-  python3 - "$LIST_JSON" "$EXPECTED_COUNT" "$TMP_DIR/workspace/skills" <<'PY'
+  python3 - "$LIST_JSON" "$SKILL_SET" "$TMP_DIR/workspace/skills" <<'PY'
 import json
 import os
 import shutil
@@ -178,15 +194,15 @@ import sys
 from pathlib import Path
 
 data = json.loads(Path(sys.argv[1]).read_text(encoding='utf-8'))
-expected = int(sys.argv[2])
+published = set(json.loads(Path(sys.argv[2]).read_text(encoding='utf-8'))['skills'])
 skills_dir = Path(sys.argv[3])
 skills = data.get('skills', [])
-story = [s for s in skills if s.get('name') == 'browser-cdp' or str(s.get('name', '')).startswith('story')]
+story = [s for s in skills if s.get('name') in published]
 errors = []
 if data.get('workspaceDir') is None:
     errors.append('missing workspaceDir in openclaw skills output')
-if len(story) != expected:
-    errors.append(f'expected {expected} story skills from temporary workspace, got {len(story)}')
+if {str(s.get('name', '')) for s in story} != published:
+    errors.append(f'published workspace skills mismatch: expected {sorted(published)}, got {sorted(str(s.get("name", "")) for s in story)}')
 
 def declared_openclaw(name: str) -> dict:
     path = skills_dir / name / 'SKILL.md'
@@ -241,7 +257,7 @@ if errors:
     for err in errors:
         print(f'FAIL: {err}', file=sys.stderr)
     sys.exit(1)
-print(f'OK: OpenClaw CLI discovered {len(story)} workspace story skills')
+print(f'OK: OpenClaw CLI discovered {len(story)} published workspace skills')
 PY
 fi
 

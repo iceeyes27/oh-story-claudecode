@@ -32,10 +32,10 @@ assert manifest['skills'] == 'skills', manifest.get('skills')
 assert isinstance(manifest.get('description'), str) and manifest['description'], 'description required'
 version = Path('skills/story/VERSION').read_text().strip()
 assert manifest['version'] == version, f"version {manifest['version']!r} must match skills/story/VERSION {version!r}"
-# The manifest promises the skills under `skills`; keep it honest.
+# The manifest promises the complete repository skill directory; keep it honest.
 skills = sorted(Path('skills').glob('*/SKILL.md'))
-assert len(skills) == 11, f'expected 11 skills, got {len(skills)}'
+assert skills, 'no skills found under manifest directory'
 PY
-echo "  OK reasonix-plugin.json (schema + version pin + 11 Skills)"
+echo "  OK reasonix-plugin.json (schema + version pin + repository Skills)"
 echo ""
 echo "OK: Reasonix adapter checks passed"

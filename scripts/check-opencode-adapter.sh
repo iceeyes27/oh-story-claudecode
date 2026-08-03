@@ -636,8 +636,12 @@ PY
 echo "  OK generation is idempotent (second run is byte-identical)"
 
 python3 - <<'PY'
+import json
 from pathlib import Path
-skill_names = {p.parent.name for p in Path('skills').glob('*/SKILL.md')}
+
+skill_names = set(json.loads(Path('scripts/platform-skill-set.json').read_text(encoding='utf-8'))['skills'])
+missing = sorted(name for name in skill_names if not (Path('skills') / name / 'SKILL.md').is_file())
+assert not missing, f'platform skill set references missing skills: {missing}'
 command_names = {p.stem for p in Path('skills/story-setup/references/opencode/commands').glob('*.md')}
 assert skill_names == command_names, f'missing={skill_names-command_names}, extra={command_names-skill_names}'
 for p in sorted(Path('skills/story-setup/references/opencode/commands').glob('*.md')):

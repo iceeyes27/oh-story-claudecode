@@ -1,12 +1,8 @@
 ---
 name: story-import
 version: 1.0.0
-description: 逆向导入已有小说。将已写好的小说（半成品或完本）反向解析为标准项目目录结构，兼容 story-write long /
-  story-write short 后续写作流程；内部复用 story-analyze long / story-analyze short
-  的拆解管道，按篇幅自动分流。触发方式：/story-import、「导入小说」「反向解析」「导入」「把我的书导进来」。
-metadata:
-  openclaw:
-    source: https://github.com/iceeyes27/oh-story-claudecode
+description: "逆向导入已有小说。将已写好的小说（半成品或完本）反向解析为标准项目目录结构，兼容 story-write long / story-write short 后续写作流程；内部复用 story-analyze long / story-analyze short 的拆解管道，按篇幅自动分流。触发方式：/story-import、「导入小说」「反向解析」「导入」「把我的书导进来」。"
+metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
 disable: true
 ---
 

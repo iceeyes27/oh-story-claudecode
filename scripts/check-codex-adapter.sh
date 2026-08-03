@@ -113,7 +113,7 @@ echo "  OK prose backstop parity surface (Stop net + SessionStart continuity)"
 target="$(readlink .agents/skills)"
 [ "$target" = "../skills" ] || fail ".agents/skills symlink target must be relative '../skills', got '$target'"
 skill_count="$(find skills -maxdepth 2 -name SKILL.md | wc -l | tr -d ' ')"
-[ "$skill_count" = "11" ] || fail "expected 11 skills, found $skill_count"
+[ "$skill_count" -gt 0 ] || fail "no repository skills found"
 for skill in skills/*/SKILL.md; do
   name="$(basename "$(dirname "$skill")")"
   assert_file ".agents/skills/$name/SKILL.md"

@@ -1,13 +1,8 @@
 ---
 name: story-deslop
 version: 2.0.0
-description: 去AI味/说人话（小说正文+通用中文统一入口）。mode=novel 走网文去AI味 7 Gate
-  系统（禁用词/句式/心理/节奏/对话/结尾/解释腔），配合脚本和禁用词表；mode=general
-  走通用中文'说人话'（场景分级/Tier/档位/scope/误杀防护），适用于
-  chat/status/docs/public-writing。触发方式：/story-deslop、/去AI味、「去AI味」「说人话」「太AI了」「别像模板」「自然一点」——按输入类型自动路由。
-metadata:
-  openclaw:
-    source: https://github.com/iceeyes27/oh-story-claudecode
+description: "去AI味/说人话（小说正文+通用中文统一入口）。mode=novel 走网文去AI味 7 Gate 系统（禁用词/句式/心理/节奏/对话/结尾/解释腔），配合脚本和禁用词表；mode=general 走通用中文'说人话'（场景分级/Tier/档位/scope/误杀防护），适用于 chat/status/docs/public-writing。触发方式：/story-deslop、/去AI味、「去AI味」「说人话」「太AI了」「别像模板」「自然一点」——按输入类型自动路由。"
+metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
 disable: true
 ---
 

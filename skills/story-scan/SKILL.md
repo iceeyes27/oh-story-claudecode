@@ -1,11 +1,8 @@
 ---
 name: story-scan
 version: 2.0.0
-description: 网文扫榜（长篇/短篇统一入口）。分析起点、番茄、晋江、知乎盐言、七猫、黑岩、点众等平台排行榜数据，提炼市场趋势与热门题材。触发方式：/story-scan、/长篇扫描、/短篇扫描、/长篇扫榜、/短篇扫榜、「长篇什么火」「短篇什么火」「起点排行」「知乎故事排行」。mode=long
-  走长篇扫榜流程，mode=short 走短篇扫榜流程；用户意图明确时自动路由，不明确时询问。
-metadata:
-  openclaw:
-    source: https://github.com/iceeyes27/oh-story-claudecode
+description: "网文扫榜（长篇/短篇统一入口）。分析起点、番茄、晋江、知乎盐言、七猫、黑岩、点众等平台排行榜数据，提炼市场趋势与热门题材。触发方式：/story-scan、/长篇扫描、/短篇扫描、/长篇扫榜、/短篇扫榜、「长篇什么火」「短篇什么火」「起点排行」「知乎故事排行」。mode=long 走长篇扫榜流程，mode=short 走短篇扫榜流程；用户意图明确时自动路由，不明确时询问。"
+metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
 disable: true
 ---
 

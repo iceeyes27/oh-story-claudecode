@@ -13,7 +13,7 @@ metadata:
 ## 三大黄金法则
 
 1. **展示而非讲述** - 用动作和对话表现，不要直接陈述
-2. **冲突驱动剧情** - 每章必须有冲突或转折
+2. **冲突驱动剧情** - 每章必须有冲突或转折，并推动至少一名重要角色的弧线
 3. **悬念承上启下** - 每章结尾必须留下钩子
 
 ## 特性说明
@@ -40,7 +40,7 @@ metadata:
 
 ### 第二阶段：规划 + 二次确认
 
-创建项目文件夹（`./chinese-novelist/{timestamp}-{小说名称}/`），生成大纲、人物档案和写作计划JSON，等待用户确认。 → 详见 [phase2-planning.md](references/flows/phase2-planning.md)
+创建项目文件夹（`./chinese-novelist/{timestamp}-{小说名称}/`），生成带人物弧线的大纲、人物档案和写作计划JSON，等待用户确认。 → 详见 [phase2-planning.md](references/flows/phase2-planning.md)
 
 ### 第2.5步：写作模式选择
 
@@ -54,7 +54,7 @@ metadata:
 ### 第三阶段：疯狂创作（无需用户确认）
 > 切记，一旦进入这个阶段，所有过程都禁止向用户确认。用户就是你的读者，你必须把完整的小说创作完成才能与用户报告
 
-根据用户选择的写作模式（串行/并行/Teams）逐章执行创作流程。每章创作前必须读取 `01-大纲.md` 中对应章节的规划信息，严格按大纲创作。支持中断续写。 → 详见 [phase3-writing.md](references/flows/phase3-writing.md)
+根据用户选择的写作模式（串行/并行/Teams）逐章执行创作流程。每章创作前必须读取 `01-大纲.md` 和 `00-人物档案.md` 中对应的弧线节点；用可见选择验证变化，并在章节摘要和写作计划中更新弧线进度。支持中断续写。 → 详见 [phase3-writing.md](references/flows/phase3-writing.md)
 
 ### 第四阶段：自动校验与修复（无需用户确认）
 
@@ -62,4 +62,4 @@ metadata:
 
 ## 共享机制
 
-偏好系统、写作计划系统、黄金法则详解、字数检查脚本等跨阶段共享机制。 → 详见 [shared-infrastructure.md](references/flows/shared-infrastructure.md)
+偏好系统、写作计划系统、人物弧线状态、黄金法则详解、字数检查脚本等跨阶段共享机制。人物设计和章节写作时读取 [character-arc.md](references/guides/character-arc.md)。 → 详见 [shared-infrastructure.md](references/flows/shared-infrastructure.md)

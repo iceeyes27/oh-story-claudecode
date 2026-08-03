@@ -5,8 +5,8 @@
 执行以下步骤：
 
 1. **创建项目文件夹**：`./chinese-novelist/{YYYYMMDD-HHmmss}-{Layer 3 确认的标题}/`（相对当前工作目录，使用用户在 Layer 3 选定的小说标题）
-2. **生成人物档案**：创建 `00-人物档案.md`，使用 [character-template.md](../guides/character-template.md) 模板，参考 [character-building.md](../guides/character-building.md) 创建主角、反派、配角档案。**人物档案必须详细**：每个角色的性格核心、致命缺陷、说话风格/口头禅、恐惧/弱项、背景故事都要具体到可以直接指导写作的程度
-3. **生成大纲**：创建 `01-大纲.md`，使用 [outline-template.md](../guides/outline-template.md) 模板，参考 [plot-structures.md](../guides/plot-structures.md) 填入完整的章节规划。**大纲必须以人物驱动情节** 参照 `00-人物档案.md`，确保情节服务于人物成长弧线
+2. **生成人物档案**：创建 `00-人物档案.md`，使用 [character-template.md](../guides/character-template.md) 模板，参考 [character-building.md](../guides/character-building.md) 与 [character-arc.md](../guides/character-arc.md) 创建主角、反派、重要配角档案。每个重要角色必须写全「性格核心、外显方式、欲望、恐惧、缺陷、人物弧线、阶段进度」。人物弧线必须写成「起点状态 → 转变压力 → 关键选择 → 终点证据」，不能只写“变得更成熟”。
+3. **生成大纲**：创建 `01-大纲.md`，使用 [outline-template.md](../guides/outline-template.md) 模板，参考 [plot-structures.md](../guides/plot-structures.md) 填入完整的章节规划。为每名重要角色在「人物弧线节点」列安排起点、受压、裂缝、选择、新习惯的章节；每个节点都必须写可见的选择、动作或代价。**大纲必须以人物驱动情节**，确保情节服务于人物成长弧线。
 4. **生成写作计划**：创建 `02-写作计划.json`，基于大纲内容填充，结构如下：
    ```json
    {
@@ -19,6 +19,15 @@
      "updatedAt": "[ISO时间]",
      "status": "planning",
      "writingMode": "[serial|subagent-parallel|agent-teams]",
+     "characterArcs": [
+       {
+         "name": "[角色名]",
+         "startState": "[起点状态]",
+         "endState": "[终点状态]",
+         "currentStage": "not_started",
+         "stages": ["not_started", "pressured", "cracked", "choice", "new_habit"]
+       }
+     ],
      "chapters": [
        {
          "chapterNumber": 1,
@@ -27,7 +36,14 @@
          "status": "pending",
          "wordCount": null,
          "wordCountPass": null,
-         "retryCount": 0
+         "retryCount": 0,
+         "characterArcBeats": [
+           {
+             "character": "[角色名]",
+             "stage": "[not_started|pressured|cracked|choice|new_habit]",
+             "evidence": "[本章用来证明该阶段的选择、动作或代价]"
+           }
+         ]
        }
      ]
    }

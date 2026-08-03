@@ -19,11 +19,12 @@
    ```bash
    python scripts/check_chapter_wordcount.py <章节文件路径>
    ```
-3. **更新 JSON**：将 `wordCount` 和 `wordCountPass` 写入对应章节记录
+3. **人物弧线检查**：读取本章 `characterArcBeats`、章节摘要中的「人物弧线验证」与 `00-人物档案.md`：每个节点必须有可见证据，阶段必须按 `not_started → pressured → cracked → choice → new_habit` 连续推进；角色没有出场或没有证据时，不得更新阶段。
+4. **更新 JSON**：将 `wordCount`、`wordCountPass` 和已验证的 `currentStage` 写入对应记录
 
 ### 3. 汇总结果
 
-- **全部通过**（所有章节文件存在且 `wordCountPass == true`）→ 更新项目 `status` 为 `"completed"`，进入步骤5
+- **全部通过**（所有章节文件存在、`wordCountPass == true`，且所有已规划人物弧线节点均有连续的可见证据）→ 更新项目 `status` 为 `"completed"`，进入步骤5
 - **有不通过** → 进入步骤4
 
 ### 4. 自动修复（最多3轮）
@@ -31,7 +32,7 @@
 对每个不通过的章节：
 
 1. 将 `status` 设为 `"failed"`，`retryCount` 加 1
-2. 回到第三阶段对该章节执行逐章创作流程（写前分析→撰写→润色→收尾）
+2. 回到第三阶段对该章节执行逐章创作流程（写前分析→撰写→润色→收尾）；弧线不合格时只补写或重写该节点所需的冲突、选择和证据，不改变未确认的主线事件
 3. 重写完成后重新检查字数
 4. 更新 `02-写作计划.json`
 
@@ -55,6 +56,9 @@
 ✅ 第1章：[标题]（[字数]字）
 ✅ 第2章：[标题]（[字数]字）
 ...
+
+人物弧线：
+✅ [角色]：[起点状态] → [终点状态]（终点证据：[行动]）
 
 项目文件夹：./chinese-novelist/[timestamp]-[小说名称]/
 ```

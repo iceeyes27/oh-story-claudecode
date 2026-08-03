@@ -24,7 +24,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 
-const SKILLS = ['_shared', 'browser-cdp', 'humanizer', 'story', 'story-analyze', 'story-cover',
+const SKILLS = ['_shared', 'browser-cdp', 'chinese-novelist', 'humanizer', 'story', 'story-analyze', 'story-cover',
   'story-deslop', 'story-import', 'story-review', 'story-scan', 'story-setup', 'story-write'];
 const IGNORE_BASENAMES = new Set(['_skillhub_meta.json', '.DS_Store']);
 const IGNORE_DIRS = new Set(['__pycache__']);
@@ -173,6 +173,7 @@ function parseArgv() {
     else if (args[i] === '--branch') a.branch = args[++i];
     else if (args[i] === '--fork') a.fork = args[++i];
     else if (args[i] === '--json') a.json = true;
+    else if (args[i] === '--force') a.force = true;
     else a._.push(args[i]);
   }
   return a;
@@ -187,7 +188,7 @@ function main() {
   const argv = parseArgv();
   const cmd = argv._[0];
   if (!['status', 'push', 'pull'].includes(cmd)) {
-    console.log('用法: node sync-skills.js <status|push|pull> [-m msg] [--branch name] [--fork path] [--json]');
+    console.log('用法: node sync-skills.js <status|push|pull> [-m msg] [--branch name] [--fork path] [--json] [--force]');
     process.exit(cmd ? 1 : 0);
   }
   const ctx = resolvePaths(argv);
@@ -258,13 +259,18 @@ function main() {
       copyFile(path.join(ctx.forkSkills, rel), path.join(ctx.localSkills, rel));
       console.log('  + ' + rel);
     }
-    if (conflict.length) {
+    if (conflict.length && argv.force) {
+      for (const rel of conflict) {
+        copyFile(path.join(ctx.forkSkills, rel), path.join(ctx.localSkills, rel));
+        console.log('  ~ ' + rel);
+      }
+    } else if (conflict.length) {
       console.log('\n以下文件本地与 fork 都有改动，未覆盖（需人工比对后决定，或本地改完用 push 反推）:');
       conflict.forEach(x => console.log('  ! ' + x));
     }
     const newHead = git(ctx.forkPath, ['rev-parse', ctx.branch]);
     saveState(ctx.projRoot, { forkPath: ctx.forkPath, branch: ctx.branch, lastSyncedCommit: newHead, lastSyncedAt: new Date().toISOString() });
-    info('pull 完成：新增 ' + toAdd.length + '，冲突待人工 ' + conflict.length + '，本地独有 ' + localOnly.length);
+    info('pull 完成：新增 ' + toAdd.length + '，' + (argv.force ? '覆盖冲突 ' : '冲突待人工 ') + conflict.length + '，本地独有 ' + localOnly.length);
     return;
   }
 }

@@ -3,6 +3,7 @@
 ## Ownership
 
 - `skills/_shared/` 是通用写作规则、禁用词与扫描器的唯一来源；业务 Skill 通过 `../_shared/...` 引用它。
+- 复制公开 Skill 到独立项目时，必须同时复制非 Skill 支持资产 `_shared`；`_shared` 不计入公开 Skill 数量，但缺失时不得宣称完整检查可执行。
 - `scripts/sync-shared-assets.py` 维护 story-setup 的部署副本。修改 hook 或共享扫描器后，先同步再运行 `bash scripts/check-shared-files.sh`。
 - `skills/story-write`、`story-analyze`、`story-scan` 是统一入口。不要新增旧的 `story-long-*`、`story-short-*` 目录。
 

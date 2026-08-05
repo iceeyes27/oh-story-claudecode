@@ -1,6 +1,7 @@
 ---
 name: dialogue-naturalness-scan
 description: "小说正文「台词自然度 / 真人会不会这么说话」扫描。检测对话里不像活人开口的说法：模糊指代（那页东西/这玩意）、书面腔混进口语（予以/并非/实则/方才…）、别扭动宾搭配。比 jargon-verb-scan 更宽一档——不要求构成黑话，只要'读者会想谁会这么说'就报。配套项目偏好「不自然的口语表达也要改」（见 创作偏好.md / 设定/文风.md）。当用户要求扫台词自然度、查'不像人话的对话'、或写完一批章节后复查口语通顺度时使用。"
+metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
 ---
 
 # 台词自然度 · 扫描法（真人会不会这么说话）

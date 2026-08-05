@@ -74,8 +74,8 @@ if [ "${CLAUDE_REAL_CHECK:-0}" = "1" ]; then
   echo "  Claude: $(claude --version)"
 
   # Marketplace validation alone does not validate component frontmatter. Build
-  # one synthetic plugin containing every skill so the official CLI parses all
-  # 13 SKILL.md files in a single strict validation pass.
+  # one synthetic plugin containing every skill so the official CLI parses the
+  # complete repository Skill set in a single strict validation pass.
   mkdir -p "$TMP_DIR/plugin/.claude-plugin" "$TMP_DIR/home" "$TMP_DIR/config"
   cp -R "$REPO_ROOT/skills" "$TMP_DIR/plugin/skills"
   python3 - "$TMP_DIR/plugin" <<'PY'

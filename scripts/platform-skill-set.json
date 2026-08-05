@@ -1,8 +1,11 @@
 {
   "version": 1,
   "skills": [
+    "ai-flavor-scan",
     "browser-cdp",
+    "dialogue-naturalness-scan",
     "humanizer",
+    "jargon-verb-scan",
     "story",
     "story-analyze",
     "story-cover",

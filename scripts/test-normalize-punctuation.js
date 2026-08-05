@@ -10,7 +10,7 @@ const { spawnSync } = require("child_process");
 const repoRoot = path.resolve(__dirname, "..");
 const normalizer = path.join(
   repoRoot,
-  "skills/story-deslop/scripts/normalize-punctuation.js"
+  "skills/_shared/scripts/normalize-punctuation.js"
 );
 const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "normalize-punctuation-"));
 

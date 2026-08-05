@@ -14,31 +14,19 @@ const originalCwd = process.cwd();
 
 // plugin.ts imports "./lib/story_hook_core.js"（与 ZCode 共享的 prose-guard 核，部署到
 // .opencode/plugins/lib/）。仓库源码里核是平铺的，只有部署布局才有 lib/ 子目录；在 tmp 里
-// 复刻部署布局，import 才能解析到核。
+// 复刻部署布局，再让 Node 的 --experimental-strip-types 直接加载原始 TypeScript。不要用
+// 手工正则把类型改写成 JavaScript：新增一个类型签名就会让测试转换器和真实插件漂移。
 const deployDir = path.join(tmp, "plugins");
 fs.mkdirSync(path.join(deployDir, "lib"), { recursive: true });
-const pluginSource = fs
-  .readFileSync(path.join(srcDir, "plugin.ts"), "utf8")
-  .replace(/^import type .*?\n/, "")
-  .replace(/function projectRoot\(\): string/g, "function projectRoot()")
-  .replace(/function tryGit\(root: string, args: string\): string/g, "function tryGit(root, args)")
-  .replace(/function preCompactOutput\(\): string/g, "function preCompactOutput()")
-  .replace(/_input: unknown/g, "_input")
-  .replace(/output: \{ context: string\[\]; prompt\?: string \}/g, "output")
-  .replace(/input: \{ tool: string; args\?: Record<string, unknown> \}/g, "input")
-  .replace(/output: \{ args\?: Record<string, unknown> \}/g, "output")
-  .replace(/output: \{ output\?: string \}/g, "output")
-  .replace(/const targets: string\[\] = \[\]/g, "const targets = []")
-  .replace(/\(output\.args\?\.command as string\)/g, "(output.args?.command)")
-  .replace(/\(output\.args\?\.filePath as string\)/g, "(output.args?.filePath)")
-  .replace(/\(input\.args\?\.filePath as string\)/g, "(input.args?.filePath)")
-  .replace(/\}\)\s+satisfies\s+Plugin\s*$/, "})");
-fs.writeFileSync(path.join(deployDir, "plugin.mjs"), pluginSource, "utf8");
+fs.writeFileSync(path.join(deployDir, "package.json"), '{"type":"module"}\n', "utf8");
+fs.writeFileSync(path.join(deployDir, "lib", "package.json"), '{"type":"commonjs"}\n', "utf8");
+const pluginSource = fs.readFileSync(path.join(srcDir, "plugin.ts"), "utf8");
+fs.writeFileSync(path.join(deployDir, "plugin.ts"), pluginSource, "utf8");
 fs.copyFileSync(
   path.join(srcDir, "story_hook_core.js"),
   path.join(deployDir, "lib", "story_hook_core.js")
 );
-const pluginPath = path.join(deployDir, "plugin.mjs");
+const pluginPath = path.join(deployDir, "plugin.ts");
 
 async function expectBlocked(action, label) {
   await assert.rejects(action, /写正文被拦截/, label);

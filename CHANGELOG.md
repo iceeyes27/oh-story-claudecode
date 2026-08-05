@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.8.0
+
+> 完整小说复合检查依赖正式纳入跨平台公开发布；修复仓库内 Skill 适配漂移、本地测试路径和 OpenCode 的 Node 版本能力判断。
+
+### 修复
+
+- **完整检查可公开安装**：公开清单与 Claude marketplace 增加 `ai-flavor-scan`、`dialogue-naturalness-scan`、`jargon-verb-scan`，Claude、OpenCode、ZCode 与 OpenClaw 的公开 Skill/Command 数量统一为 14。
+- **本地回归恢复**：完整检查契约测试仅验证权威路由 `skills/story/SKILL.md`，不再依赖另一个项目的 `AGENTS.md`；标点规范化测试改读 `_shared` 下的权威脚本。
+- **OpenCode Node 能力检测**：先探测 `--experimental-strip-types`；支持时运行插件行为测试，不支持时保留静态语法与生成一致性检查，并明确报告跳过原因。
+- **仓库适配一致性**：Claude、Codex、WorkBuddy 入口由 `.agents/skills` 唯一来源重新生成，适配清单同步刷新。
+
 ## v0.7.2
 
 > 本地工作台 `/story dashboard`（只绑 127.0.0.1、零生产依赖）；治细纲形状被正文照抄导致的生硬与章尾总结体；仓库质量门禁不再掩盖破坏性失败；修会话起点两处长期误报。**本版把 `agents_version` 发到 21，已部署项目需重新运行 `/story-setup` 并新开会话**——v0.7.1 发出去的是 20，不重新部署则 v0.7.1、v0.7.2 的正文与 hook 改动都不会生效。

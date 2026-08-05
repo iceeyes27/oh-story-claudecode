@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "网络小说创作工具箱 — 扫榜、拆文、写作全流程 Claude Code skill，覆盖长篇与短篇网文",
-    "version": "0.7.2"
+    "version": "0.8.0"
   },
   "plugins": [
     {
@@ -212,6 +212,63 @@
       ],
       "skills": [
         "./skills/story-cover"
+      ]
+    },
+    {
+      "name": "ai-flavor-scan",
+      "description": "网文正文 AI 味七层扫描。检查禁用词、AI 修辞、抽象融合比喻、空洞总结、生造搭配和欠写作电报体。",
+      "source": "./",
+      "strict": false,
+      "version": "1.0.0",
+      "category": "novel-quality",
+      "keywords": [
+        "ai-writing",
+        "scan",
+        "novel",
+        "去AI味",
+        "电报体",
+        "chinese"
+      ],
+      "skills": [
+        "./skills/ai-flavor-scan"
+      ]
+    },
+    {
+      "name": "dialogue-naturalness-scan",
+      "description": "小说台词自然度扫描。检查模糊指代、书面腔、别扭搭配和解释式台词。",
+      "source": "./",
+      "strict": false,
+      "version": "1.0.0",
+      "category": "novel-quality",
+      "keywords": [
+        "dialogue",
+        "naturalness",
+        "novel",
+        "台词",
+        "口语",
+        "chinese"
+      ],
+      "skills": [
+        "./skills/dialogue-naturalness-scan"
+      ]
+    },
+    {
+      "name": "jargon-verb-scan",
+      "description": "小说行业词硬当动词专项扫描。定位被行话隐藏、普通读者需要猜测的真实动作。",
+      "source": "./",
+      "strict": false,
+      "version": "1.0.0",
+      "category": "novel-quality",
+      "keywords": [
+        "jargon",
+        "readability",
+        "novel",
+        "黑话",
+        "通俗度",
+        "chinese"
+      ],
+      "skills": [
+        "./skills/jargon-verb-scan"
       ]
     },
     {

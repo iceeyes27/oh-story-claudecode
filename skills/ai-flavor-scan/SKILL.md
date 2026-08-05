@@ -1,6 +1,7 @@
 ---
 name: ai-flavor-scan
 description: "网文/小说正文去 AI 味七层扫描法。对指定正文目录做「禁用词 + AI修辞词库 + 抽象融合比喻 + 排比空洞总结 + 高频黑话单字 + 生造词强行搭配 + 欠写作电报体」七层实扫，区分『该清/该展』与『该留』，生成可核查修改报告。当用户要求检查小说 AI 味、去 AI 味、说明书式说话、比喻滥用、审查文本 AI 痕迹、电报体/欠写作/太简略、或想批量扫某卷/某项目时使用。"
+metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
 ---
 
 # 网文去 AI 味 · 七层扫描法

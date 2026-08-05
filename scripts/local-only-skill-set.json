@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "skills": {
+    "chinese-novelist": "legacy standalone writing skill; the supported public writing entry is story-write",
+    "deslop-register": "maintainer workflow that edits canonical shared scanner rules",
+    "fanqie-chapter-publish": "authenticated local publishing workflow pending cross-platform command normalization",
+    "trellis-before-dev": "repository development workflow",
+    "trellis-brainstorm": "repository development workflow",
+    "trellis-break-loop": "repository development workflow",
+    "trellis-channel": "repository development workflow",
+    "trellis-check": "repository development workflow",
+    "trellis-continue": "repository development workflow",
+    "trellis-finish-work": "repository development workflow",
+    "trellis-meta": "repository development workflow",
+    "trellis-session-insight": "repository development workflow",
+    "trellis-spec-bootstrap": "repository development workflow",
+    "trellis-start": "repository development workflow",
+    "trellis-update-spec": "repository development workflow"
+  }
+}

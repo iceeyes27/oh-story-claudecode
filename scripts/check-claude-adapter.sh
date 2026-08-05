@@ -66,6 +66,9 @@ if found != expected:
 print(f"  OK marketplace maps all {len(found)} published skills exactly once")
 PY
 
+node --test "$REPO_ROOT/scripts/skill-publication-coverage.test.js" >/dev/null
+echo "  OK every repository skill is explicitly public or local-only"
+
 if [ "${CLAUDE_REAL_CHECK:-0}" = "1" ]; then
   command -v claude >/dev/null 2>&1 \
     || fail "CLAUDE_REAL_CHECK=1 but claude is not on PATH"

@@ -28,6 +28,12 @@ NICKNAMES = {
 }
 
 
+def write_text_lf(path: Path, content: str) -> None:
+    """Write UTF-8/LF on Python 3.9+, where Path.write_text lacks newline."""
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write(content)
+
+
 def parse_frontmatter(text: str) -> tuple[dict[str, str], str]:
     if not text.startswith("---\n"):
         raise ValueError("missing frontmatter")
@@ -145,7 +151,7 @@ def publish_rendered(rendered: dict[str, str], dst_dir: Path) -> list[Path]:
     )
     try:
         for filename, output in rendered.items():
-            (staging / filename).write_text(output, encoding="utf-8", newline="\n")
+            write_text_lf(staging / filename, output)
 
         existing = sorted(dst_dir.glob("*.toml"))
         for path in existing:

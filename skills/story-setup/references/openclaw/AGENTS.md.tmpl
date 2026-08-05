@@ -12,6 +12,7 @@ OpenClaw 会从项目 `skills/` 目录发现 `SKILL.md`。优先通过 OpenClaw 
 | `/skill story-analyze`、长篇拆文、短篇拆文 | story-analyze | 网文拆文统一入口（按字数自动路由长/短管道） |
 | `/skill story-scan`、长篇扫描、短篇扫描 | story-scan | 网文扫榜统一入口（长/短模式自动路由） |
 | `/skill story-deslop`、去 AI 味 | story-deslop | 去除 AI 写作痕迹 |
+| `/skill batch-pollution-detector`、检查重复/污染 | batch-pollution-detector | 检查跨文件复读、错位与工程词泄漏；只报告 |
 | `/skill story-cover`、封面 | story-cover | 生成封面图；需要 `GPT_IMAGE_API_KEY` |
 | `/skill story-review`、审查 | story-review | 多视角审查；OpenClaw Phase 1 默认 solo/soft-fallback |
 | `/skill story-import`、导入 | story-import | 逆向导入已有小说到项目结构 |
@@ -28,7 +29,7 @@ OpenClaw 会从项目 `skills/` 目录发现 `SKILL.md`。优先通过 OpenClaw 
 
 ## 文件结构
 
-- `skills/` — OpenClaw workspace skills，包含 oh-story 的 14 个公开 Skill
+- `skills/` — OpenClaw workspace skills，包含 oh-story 的 15 个公开 Skill
 - `拆文库/` — 拆文分析结果存放目录
 - `{书名}/正文/` — 长篇小说正文章节
 - `{书名}/正文.md` — 短篇小说正文

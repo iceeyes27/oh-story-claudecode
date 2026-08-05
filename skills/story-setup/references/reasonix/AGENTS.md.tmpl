@@ -8,13 +8,14 @@ Reasonix 会从项目 `.agents/skills`（部署时创建的指向 `skills/` 的 
 
 | 意图 | Skill | 说明 |
 |------|-------|------|
-| 写长篇 / 开书 / 续写 | story-long-write | 长篇网文写作（逐章推进） |
-| 写短篇 | story-short-write | 短篇网文写作（情绪驱动） |
-| 长篇拆文 | story-long-analyze | 长篇小说深度拆解 |
-| 短篇拆文 | story-short-analyze | 短篇小说拆文分析 |
-| 长篇扫榜 | story-long-scan | 长篇小说榜单与市场趋势 |
-| 短篇扫榜 | story-short-scan | 短篇小说榜单与情绪风口 |
+| 写长篇 / 开书 / 续写 | story-write（mode=long） | 长篇网文写作（逐章推进） |
+| 写短篇 | story-write（mode=short） | 短篇网文写作（情绪驱动） |
+| 长篇拆文 | story-analyze（mode=long） | 长篇小说深度拆解 |
+| 短篇拆文 | story-analyze（mode=short） | 短篇小说拆文分析 |
+| 长篇扫榜 | story-scan（mode=long） | 长篇小说榜单与市场趋势 |
+| 短篇扫榜 | story-scan（mode=short） | 短篇小说榜单与情绪风口 |
 | 去 AI 味 | story-deslop | 去除 AI 写作痕迹 |
+| 检查重复 / 脚本污染 | batch-pollution-detector | 检查跨文件复读、错位与工程词泄漏；只报告 |
 | 封面 | story-cover | 生成封面图；需要 `GPT_IMAGE_API_KEY` |
 | 审查 | story-review | 多视角审查；Reasonix 默认 solo/direct fallback |
 | 导入 | story-import | 逆向导入已有小说到项目结构 |
@@ -26,13 +27,13 @@ Reasonix 会从项目 `.agents/skills`（部署时创建的指向 `skills/` 的 
 
 - 只部署 skills 与本 `AGENTS.md`：Reasonix 原生扫描 `.agents/skills`（部署时创建的指向 `skills/` 的 symlink）发现 `skills/*/SKILL.md`，并把 `AGENTS.md` 作为项目指令加载。也可用根 `reasonix-plugin.json` 走 `reasonix plugin install`；`reasonix doctor capabilities` 校验 skill 发现。
 - 暂不部署 Reasonix hooks/custom agents：写正文前大纲守卫、commit 提醒、session/compact 自动注入在 Reasonix 下不是硬拦截，只作为 skill 内软约束执行。
-- 涉及专业 Agent 的 Skill（story-review 多视角、story-long-write 的 narrative-writer/story-architect 等）按 solo/direct fallback 执行，并在结果里说明降级。
+- 涉及专业 Agent 的 Skill（story-review 多视角、story-write 的 narrative-writer/story-architect 等）按 solo/direct fallback 执行，并在结果里说明降级。
 - Windows 未启用 symlink 时改走根 `reasonix-plugin.json` 原生 plugin 安装。
 - `story-cover` 依赖 `GPT_IMAGE_API_KEY`，未配置时该 skill 不可用。
 
 ## 文件结构
 
-- `skills/` — 项目本地 skills，包含 oh-story 的 14 个公开 Skill
+- `skills/` — 项目本地 skills，包含 oh-story 的 15 个公开 Skill
 - `拆文库/` — 拆文分析结果存放目录
 - `{书名}/正文/` — 长篇小说正文章节
 - `{书名}/正文.md` — 短篇小说正文

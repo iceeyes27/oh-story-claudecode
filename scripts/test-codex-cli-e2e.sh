@@ -52,8 +52,8 @@ python3 - "$TMP_ROOT/prompt-input.json" "$WORKSPACE" <<'PY'
 import json
 import re
 import sys
-import tomllib
 from pathlib import Path
+from scripts.agent_toml import loads
 
 output_path = Path(sys.argv[1])
 repo_root = Path(sys.argv[2]).resolve()
@@ -90,7 +90,7 @@ agents = sorted((repo_root / ".codex/agents").glob("*.toml"))
 if len(agents) != 7:
     raise SystemExit(f"deployed fixture error: expected 7 custom agents, found {len(agents)}")
 for path in agents:
-    data = tomllib.loads(path.read_text(encoding="utf-8"))
+    data = loads(path.read_text(encoding="utf-8"))
     for key in ("name", "description", "developer_instructions"):
         if not data.get(key):
             raise SystemExit(f"{path}: missing required custom-agent field {key}")

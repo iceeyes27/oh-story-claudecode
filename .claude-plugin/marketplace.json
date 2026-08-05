@@ -234,6 +234,25 @@
       ]
     },
     {
+      "name": "batch-pollution-detector",
+      "description": "小说批量写入污染检测。定位跨文件复读、引号错位、上下文错乱和工程词泄漏，只报告不自动修改。",
+      "source": "./",
+      "strict": false,
+      "version": "1.0.0",
+      "category": "novel-quality",
+      "keywords": [
+        "duplicate",
+        "pollution",
+        "novel",
+        "复读",
+        "脚本污染",
+        "chinese"
+      ],
+      "skills": [
+        "./skills/batch-pollution-detector"
+      ]
+    },
+    {
       "name": "dialogue-naturalness-scan",
       "description": "小说台词自然度扫描。检查模糊指代、书面腔、别扭搭配和解释式台词。",
       "source": "./",

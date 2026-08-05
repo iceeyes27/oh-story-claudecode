@@ -57,3 +57,11 @@ test('every composite-check dependency is in the installable public skill set', 
     );
   }
 });
+
+test('story-deslop file-mode pollution dependency is publicly installable', () => {
+  const published = new Set(JSON.parse(fs.readFileSync(skillSetPath, 'utf8')).skills);
+  const deslop = fs.readFileSync(path.join(repoRoot, 'skills', 'story-deslop', 'SKILL.md'), 'utf8');
+  assert.match(deslop, /调用 `batch-pollution-detector` Skill/);
+  assert.ok(published.has('batch-pollution-detector'));
+  assert.ok(fs.existsSync(path.join(repoRoot, 'skills', 'batch-pollution-detector', 'SKILL.md')));
+});

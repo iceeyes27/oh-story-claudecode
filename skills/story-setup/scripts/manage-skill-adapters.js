@@ -24,10 +24,20 @@ function die(message, code = 2) {
   process.exit(code);
 }
 
+function inferRoot() {
+  const candidates = [
+    path.resolve(process.cwd()),
+    path.resolve(__dirname, '..', '..', '..', '..'),
+    path.resolve(__dirname, '..', '..', '..'),
+  ];
+  return candidates.find((candidate) => fs.existsSync(path.join(candidate, '.agents', 'skills')))
+    || candidates[0];
+}
+
 function parseArgs(argv) {
   const options = {
     command: null,
-    root: path.resolve(__dirname, '..', '..', '..', '..'),
+    root: inferRoot(),
     platforms: null,
     mode: 'auto',
     replaceManagedCopies: false,
@@ -50,7 +60,7 @@ function parseArgs(argv) {
     } else if (arg === '-h' || arg === '--help') {
       process.stdout.write(`Usage: manage-skill-adapters.js <install|check|repair|remove> [options]\n\n` +
         `Options:\n` +
-        `  --root=<project>       Project root (default: inferred from this script)\n` +
+        `  --root=<project>       Project root (default: inferred from cwd/script)\n` +
         `  --platform=<list|all>  ${Object.keys(PLATFORM_DIRS).join(',')}\n` +
         `  --mode=<mode>          auto, symlink, junction, or fallback\n` +
         `  --replace-managed-copies  Migrate same-name generated/legacy copies\n` +

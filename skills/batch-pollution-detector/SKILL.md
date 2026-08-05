@@ -1,6 +1,7 @@
 ---
 name: batch-pollution-detector
 description: 检测小说/文档批量写入后遗留的"脚本插入污染"（同一长句跨文件复读、嵌在对话引号内、上下文错乱、工程词泄漏）。当用户说"检查重复句""检查污染""有没有重复/复读""检查脚本插入""查上下文不通的句子"，或对正文做过脚本批量插入（补人物、补内心、补动作）、或怀疑批量生成/插入有机器残留、或用户报告"某句重复出现/上下文不通"时使用。只检测报告，不自动改文。
+metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
 agent_created: true
 ---
 

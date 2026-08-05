@@ -500,11 +500,8 @@ def test_launcher_reports_missing_git_repository() -> None:
         outside = Path(tmp) / "not-a-repo"
         outside.mkdir()
         launcher = outside / "static-check.sh"
-        launcher.write_text(
-            LAUNCHER.read_text(encoding="utf-8"),
-            encoding="utf-8",
-            newline="\n",
-        )
+        with launcher.open("w", encoding="utf-8", newline="\n") as handle:
+            handle.write(LAUNCHER.read_text(encoding="utf-8"))
 
         launcher_arg = str(launcher)
         command = [bash, launcher_arg]

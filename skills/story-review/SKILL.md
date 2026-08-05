@@ -38,7 +38,7 @@ disable: true
       - **Claude Code agent（`.claude/agents/`）**：读取 frontmatter，确认 `name:` 与 subagent_type 完全一致；frontmatter 缺失、不可解析或 name 不匹配时视为 malformed agent。
       - **OpenCode agent（`.opencode/agents/`）**：文件名即 agent 名（OpenCode 不要求在 frontmatter 中写 `name:`），读取 frontmatter 确认 `mode: subagent` 和 `permission` 字段存在且可解析即可；frontmatter 缺失或不可解析视为 malformed。
       - **Codex agent（`.codex/agents/`）**：文件名为 `{agent}.toml`，TOML 必须可解析，且包含 `name`、`description`、`developer_instructions`；`name` 必须与目标 agent 完全一致。
-    - 如果 `.story-deployed` 存在且 `agents_version` 缺失、非整数或小于 `21`，视为 stale deployment；不要 spawn，降级 `solo`，建议用户重新运行 `/story-setup`。`agents_version` 大于 `21` 时也不 spawn：这表示当前 skill 比项目部署旧，降级 `solo` 并提示先更新 oh-story-claudecode，不要用 v21 重新部署。
+    - 如果 `.story-deployed` 存在且 `agents_version` 缺失、非整数或小于 `22`，视为 stale deployment；不要 spawn，降级 `solo`，建议用户重新运行 `/story-setup`。`agents_version` 大于 `22` 时也不 spawn：这表示当前 skill 比项目部署旧，降级 `solo` 并提示先更新 oh-story-claudecode，不要用 v22 重新部署。
    - 如果目标模式所需任一文件缺失或 malformed，**不要尝试 spawn 缺失/异常 Agent**；自动降级为 `solo`，并在报告开头写明：`Fallback: missing agents -> solo` 或 `Fallback: malformed agents -> solo`，列出问题文件，建议用户运行 `/story-setup`。
 5. **确认 Agent/Task 工具可用**：如果当前环境没有可用的子 Agent/Task 调用能力，直接降级为 `solo`，报告 `Fallback: agent tool unavailable -> solo`。
 6. **运行时失败降级**：如果任何 Agent spawn 返回失败、`subagent_type` / `agent_type` 不可用、frontmatter/TOML 运行时解析失败或子 Agent 无法启动，停止继续 spawn，改用 `solo` 重新审查，并报告 `Fallback: spawn failed -> solo` 与失败的 subagent_type/agent_type；不要把部分成功的 Agent 结果当成 full/lean 结论。
@@ -65,13 +65,16 @@ Rubric Source: file | embedded fallback
 
 ### 参考资料解析顺序
 
-可读取参考文件时，按以下顺序尝试：
+可读取参考文件时，按以下顺序尝试，第一个命中即用：
 1. `{项目根}/.claude/skills/{规范路径}`（Claude Code 项目内安装）
 2. `{项目根}/.opencode/skills/{规范路径}`（OpenCode 项目内安装）
 3. `{项目根}/.codex/skills/{规范路径}`（Codex 项目内安装）
 4. `{项目根}/.zcode/skills/{规范路径}`（ZCode 项目内安装）
-5. `{项目根}/skills/{规范路径}`（本仓库开发环境）
-6. 工具自身可访问的全局 skill 搜索路径中同名 `{skill-name}/...` 目录
+5. `{项目根}/skills/{规范路径}`（OpenClaw / Reasonix / generic 部署，也是本仓库开发环境）
+6. `{项目根}/.agents/skills/{规范路径}`（Codex / Reasonix 扫描的项目 skill root，通常是指向 `skills/` 的 symlink）
+7. 当前运行时加载本 skill 的目录，或其可访问的全局 skill 搜索路径中同名 `{skill-name}/...` 目录
+
+> 靠前几层不存在是正常的，不是部署损坏。`/story-setup` 只在 ZCode 的 `.zcode/skills/` 和 OpenClaw / Reasonix / generic 的 `skills/` 下整份复制 skill；Codex 项目部署不复制 skill 本体，本 skill 由 Codex 从 skill root 加载，references 就在其中，通常命中第 6 或第 7 层。不要手工把 `references/` 复制进 `.codex/skills/`——手工副本不受 story-setup 管理，升级后会静默变旧。
 
 规范路径如下；禁止只写裸文件名，禁止跨 skill 误读其他 skill 的 references：
 

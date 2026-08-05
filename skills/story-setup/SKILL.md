@@ -33,9 +33,9 @@ disable: true
 ## Phase 1：检测项目状态
 
 1. 检查当前目录是否已部署过（存在 `.story-deployed`）
-   - `agents_version` 缺失、非整数或小于 `21` → 标记为待更新，继续执行当前部署
-   - `agents_version: 21` → 使用 AskUserQuestion 确认是否重新部署
-   - `agents_version` 大于 `21` → 当前 story-setup 比项目部署旧；停止以避免降级覆盖，提示先更新 oh-story-claudecode，不写任何部署文件
+   - `agents_version` 缺失、非整数或小于 `22` → 标记为待更新，继续执行当前部署
+   - `agents_version: 22` → 使用 AskUserQuestion 确认是否重新部署
+   - `agents_version` 大于 `22` → 当前 story-setup 比项目部署旧；停止以避免降级覆盖，提示先更新 oh-story-claudecode，不写任何部署文件
 2. 检查是否有书名目录（包含 `追踪/` 子目录的目录，或用户自定义结构）
    - 有 → 识别为长篇项目，显示当前项目信息
    - 无 → 识别为新项目或短篇项目
@@ -74,6 +74,8 @@ disable: true
 ## Phase 2：部署基础设施
 
 使用 AskUserQuestion 确认部署位置后，依次执行。
+
+整个 Phase 2 幂等：目录复制、文件写入和下表各合并算法重复执行结果一致。因环境原因（工具不可用、权限被拒、网络失败）中途失败时，直接从头重跑本 Phase，不需要先清理半成品；`create only if absent` 的用户状态文件（见下表 Owner class）不会被二次覆盖。
 
 ### 2.0 部署清单（机械可检查）
 
@@ -361,7 +363,7 @@ Reasonix（DeepSeek-Reasonix CLI）当前只部署 skills 与 `AGENTS.md`，不�
 - 写入以下字段（YAML `key: value` 格式，hook 用 `references/templates/hooks/lib/sentinel.sh` 读取）：
   ```
   deployed_at: <date -u +"%Y-%m-%dT%H:%M:%SZ">
-  agents_version: 21
+  agents_version: 22
   setup_skill_version: 1.3.0
   target_cli: claude-code（或 opencode、codex、zcode、openclaw、reasonix、generic，或其任意组合）
   resolver_strategy: agents-canonical-v1
@@ -371,7 +373,7 @@ Reasonix（DeepSeek-Reasonix CLI）当前只部署 skills 与 `AGENTS.md`，不�
   ```
 - 此文件供 session-start.sh 和写作 skill 检测部署状态，避免重复提示
 - target_cli 含 claude-code 时，同时创建一次性标记文件 `.claude/.agents-pending-restart`（空文件即可）。session-start.sh 在下一个会话启动时据此确认 agents 已随新会话注册，并自动删除该标记——用来向用户确认「重启已生效」。ZCode 不创建该标记，因为它不部署项目 agents。
-- 如果 `.story-deployed` 已存在但 `agents_version` 缺失、非整数或小于 `21`，按本次流程更新 hooks/agents/rules/reference bundle（具体变更见 `UPGRADING.md`）；大于 `21` 时已在 Phase 1 停止，不得降级覆盖
+- 如果 `.story-deployed` 已存在但 `agents_version` 缺失、非整数或小于 `22`，按本次流程更新 hooks/agents/rules/reference bundle（具体变更见 `UPGRADING.md`）；大于 `22` 时已在 Phase 1 停止，不得降级覆盖
 
 ## Phase 3：验证安装
 
@@ -387,7 +389,7 @@ Reasonix（DeepSeek-Reasonix CLI）当前只部署 skills 与 `AGENTS.md`，不�
    - 运行 `manage-skill-adapters.js check`，确认平台入口全部解析到 `.agents/skills/`
    - 检查 `.agents/skills/story-setup/references/agent-references/` 完整，且共享资源只存在于 `_shared`
 5. 验证部署标记：
-   - 检查 `.story-deployed` 是否存在且包含时间戳、`agents_version: 21`、`setup_skill_version: 1.3.0`、`target_cli`、`resolver_strategy`、`canonical_skills_dir`、`adapter_manifest`、`references_dir`
+   - 检查 `.story-deployed` 是否存在且包含时间戳、`agents_version: 22`、`setup_skill_version: 1.3.0`、`target_cli`、`resolver_strategy`、`canonical_skills_dir`、`adapter_manifest`、`references_dir`
 6. 输出安装报告：
    - 列出所有已部署的文件
    - 列出需要注意的事项（如已有配置已合并）
@@ -504,9 +506,9 @@ hooks 注册合并按 command 字段去重：
 ## 重新部署
 
 - `.story-deployed` 不存在 → 全新安装，Phase 2 全部执行
-- `.story-deployed` 存在且 `agents_version: 21` → 提示已部署，AskUserQuestion 确认是否重新部署
-- `.story-deployed` 存在但 `agents_version` 缺失、非整数或小于 `21` → 提示需要更新，重新执行 Phase 2；平台 Skill 入口统一交给 adapter manager，其他配置仍按合并策略处理
-- `.story-deployed` 存在且 `agents_version` 大于 `21` → 当前 skill 版本过旧，停止并提示先更新 oh-story-claudecode；不覆盖项目中的更新部署
+- `.story-deployed` 存在且 `agents_version: 22` → 提示已部署，AskUserQuestion 确认是否重新部署
+- `.story-deployed` 存在但 `agents_version` 缺失、非整数或小于 `22` → 提示需要更新，重新执行 Phase 2；平台 Skill 入口统一交给 adapter manager，其他配置仍按合并策略处理
+- `.story-deployed` 存在且 `agents_version` 大于 `22` → 当前 skill 版本过旧，停止并提示先更新 oh-story-claudecode；不覆盖项目中的更新部署
 
 ---
 

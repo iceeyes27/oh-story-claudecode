@@ -8,7 +8,11 @@ if [ -z "$REPO_ROOT" ]; then
   exit 1
 fi
 
-SCRIPT="$REPO_ROOT/skills/story-deslop/scripts/check-degeneration.js"
+SCRIPT="$REPO_ROOT/skills/_shared/scripts/check-degeneration.js"
+if [ ! -f "$SCRIPT" ]; then
+  echo "FAIL: canonical degeneration detector is missing: $SCRIPT" >&2
+  exit 2
+fi
 TMP_DIR="$(mktemp -d)"
 cleanup() { rm -rf "$TMP_DIR"; }
 trap cleanup EXIT

@@ -8,7 +8,7 @@
 
 ## Upstream mapping
 
-上游仍可能修改旧拆分目录。`scripts/unified-skill-upstream-map.json` 声明旧目录到统一 Skill 的映射，`scripts/check-unified-skill-upstream-drift.py` 在 CI 中检查基线后的未处理修改。上游变更必须人工迁移到对应统一资产，并更新基线。
+上游仍可能修改旧拆分目录。`scripts/unified-skill-upstream-map.json` 声明旧目录到统一 Skill 的映射，`scripts/check-unified-skill-upstream-drift.py` 在本地检查基线后的未处理修改。上游变更必须人工迁移到对应统一资产，并更新基线。
 
 ## Self-contained runtime rule
 

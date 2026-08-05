@@ -68,7 +68,7 @@
 
 1. 在项目根目录重新运行 story-setup。
 2. 运行 `node .agents/skills/story-setup/scripts/manage-skill-adapters.js install --replace-managed-copies` 迁移旧平台副本。
-3. 确认 `.story-deployed` 写入 `agents_version: 22`、`setup_skill_version: 1.3.0`、`resolver_strategy: agents-canonical-v1`。
+3. 确认 `.story-deployed` 写入 `agents_version: 22`、`setup_skill_version: 1.2.7`、`resolver_strategy: agents-canonical-v1`。
 4. 运行 adapter `check`，确认 Skill 入口、agents、hooks/rules 和 references 通过验证。
 5. 新开会话，使 custom agents 与 hooks 按当前文件重新注册。
 6. 若已有拆文库或细纲不满足当前契约，先重新拆解/导入或补齐细纲，再继续写作。

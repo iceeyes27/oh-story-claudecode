@@ -428,6 +428,10 @@ def test_upgrading_version_contract() -> None:
 - `setup_skill_version: {setup_skill_version}`
 - `agents_version: {agents_version}`
 
+## 升级步骤
+
+1. 确认 `.story-deployed` 写入 `agents_version: {agents_version}`、`setup_skill_version: {setup_skill_version}`。
+
 ## 下一节
 """.format(
         setup_skill_version=manifest.setup_skill_version,
@@ -453,6 +457,44 @@ def test_upgrading_version_contract() -> None:
         ),
         "version strings scattered in prose must not satisfy current-version bullets",
     )
+    current_step = (
+        "1. 确认 `.story-deployed` 写入 `agents_version: {}`、"
+        "`setup_skill_version: {}`。".format(
+            manifest.agents_version, manifest.setup_skill_version
+        )
+    )
+    stale_step = structured.replace(
+        current_step,
+        "1. 确认 `.story-deployed` 写入 `agents_version: {}`、"
+        "`setup_skill_version: 9.9.9`。".format(manifest.agents_version),
+    )
+    require(stale_step != structured, "upgrade-step fixture must replace the current version")
+    require(
+        "upgrading-step-version"
+        in finding_codes(
+            VALIDATOR.upgrading_version_findings(
+                stale_step, manifest, Path("UPGRADING.md")
+            )
+        ),
+        "stale setup_skill_version in upgrade steps must be rejected",
+    )
+
+
+def test_github_actions_stay_disabled() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        require(
+            not VALIDATOR.github_actions_findings(root),
+            "a repository without workflow files must pass",
+        )
+        workflow = root / ".github/workflows/build.yml"
+        workflow.parent.mkdir(parents=True)
+        workflow.write_text("name: forbidden\n", encoding="utf-8")
+        findings = VALIDATOR.github_actions_findings(root)
+        require(
+            len(findings) == 1 and findings[0].code == "github-actions-disabled",
+            "every GitHub Actions workflow file must be rejected",
+        )
 
 
 def test_deeply_nested_fallback_keeps_all_governing_ancestors() -> None:
@@ -521,6 +563,7 @@ def main() -> int:
     test_structured_sentinel_contract()
     test_structured_outline_contract()
     test_upgrading_version_contract()
+    test_github_actions_stay_disabled()
     print("OK: current-contract manifest, structure, and fallback regressions passed")
     return 0
 

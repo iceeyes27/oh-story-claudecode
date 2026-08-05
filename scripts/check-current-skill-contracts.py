@@ -633,15 +633,29 @@ def upgrading_version_findings(
                 )
             )
     # 「升级步骤」里让用户核对的版本号是操作指令，bump 时最容易漏（它不在当前版本 bullet
-    # 里，也不被部署检查的 TS10 锚点覆盖）。任何写成 `agents_version: N` 的行都必须是当前值。
-    for raw in text.splitlines():
-        match = re.search(r"`agents_version:\s*(\d+)`", raw)
-        if match and match.group(1) != str(manifest.agents_version):
+    # 里，也不被部署检查的 TS10 锚点覆盖）。只检查该节，避免把历史版本记录误判为当前值。
+    lines = text.splitlines()
+    step_start: Optional[int] = None
+    step_end = len(lines)
+    for index, line in enumerate(lines):
+        if re.fullmatch(r"##\s+升级步骤\s*", line):
+            step_start = index + 1
+            break
+    if step_start is not None:
+        for index in range(step_start, len(lines)):
+            if re.match(r"^#{1,2}\s+", lines[index]):
+                step_end = index
+                break
+    for raw in lines[step_start:step_end] if step_start is not None else []:
+        for field, expected_value in expected.items():
+            match = re.search(r"`{}:\s*([^`]+)`".format(re.escape(field)), raw)
+            if not match or match.group(1).strip() == expected_value:
+                continue
             findings.append(
                 Finding(
                     "upgrading-step-version",
-                    "UPGRADING step line pins agents_version {!r}, must be {!r}: {}".format(
-                        match.group(1), str(manifest.agents_version), raw.strip()
+                    "UPGRADING step line pins {} {!r}, must be {!r}: {}".format(
+                        field, match.group(1).strip(), expected_value, raw.strip()
                     ),
                     path,
                 )
@@ -866,6 +880,22 @@ def progress_schema_pin_findings(repo_root: Path, expected: int) -> List[Finding
     return findings
 
 
+def github_actions_findings(repo_root: Path) -> List[Finding]:
+    """Keep this fork local-only by rejecting every GitHub Actions workflow file."""
+    workflow_root = repo_root / ".github/workflows"
+    if not workflow_root.exists():
+        return []
+    return [
+        Finding(
+            "github-actions-disabled",
+            "GitHub Actions are disabled in this fork; keep validation local",
+            path,
+        )
+        for path in sorted(workflow_root.rglob("*"))
+        if path.is_file()
+    ]
+
+
 def validate_repository(repo_root: Path, manifest: ContractManifest) -> List[Finding]:
     findings: List[Finding] = []
 
@@ -879,6 +909,7 @@ def validate_repository(repo_root: Path, manifest: ContractManifest) -> List[Fin
 
     for rule in LEGACY_RULES:
         findings.extend(check_absent_rule(repo_root, rule))
+    findings.extend(github_actions_findings(repo_root))
 
     pipeline = repo_root / "skills/story-analyze/references/pipeline-ops.md"
     pipeline_text = read_text(pipeline) or ""

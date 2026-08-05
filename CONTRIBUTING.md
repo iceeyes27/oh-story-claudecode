@@ -55,9 +55,9 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 2. 确保在仓库根目录运行 `npx skills validate` 无报错
 3. 提交 PR
 
-## CI 检查
+## 本地检查
 
-PR 自动运行 `.github/workflows/cross-platform.yml`。static-check job 跑以下检查（全部强制）：
+本 fork 不使用 GitHub Actions。提交或发起 PR 前，贡献者必须在本地运行与改动范围对应的检查：
 
 - `scripts/static-check.sh` — frontmatter、引用路径、死文件、references 交叉引用
 - `scripts/check-hook-regex-sync.sh` — hook 伏笔状态检测行为
@@ -72,11 +72,11 @@ PR 自动运行 `.github/workflows/cross-platform.yml`。static-check job 跑以
 - `scripts/test-zcode-hooks.sh` — ZCode 严格 JSON Hook 契约、正文守卫、连续性与跨平台 Node runner 测试
 - 采集脚本 `node --check` 语法校验
 
-以上为代表性列举；**强制清单按 `.github/workflows/cross-platform.yml` 为准**，每个脚本的用途与触发时机见 [scripts/README.md](scripts/README.md)。另有 `.github/workflows/cli-compat.yml` 在相关 PR、每周定时和手动触发时安装官方当前版本，真实运行 Claude Code、Codex、OpenCode、OpenClaw 的无鉴权 smoke。
+以上为代表性列举；完整清单与触发时机见 [scripts/README.md](scripts/README.md)。真实 CLI smoke 需要本机安装对应 CLI，按改动范围手动执行。
 
-另有 windows / macos job 验证 cdp-utils 加载与 setup 脚本 dry-run。
+跨平台改动必须在对应系统本地验证；无法访问目标系统时，在提交说明中明确未验证范围。
 
-提交前建议按 Linux CI 的强制清单本地跑一遍：
+提交前运行本地检查：
 
 ```bash
 bash scripts/static-check.sh
@@ -165,9 +165,9 @@ bash scripts/test-opencode-cli-e2e.sh  # 可选：需要本机已安装 opencode
 3. 输出同步结果摘要
 4. 可选真实 CLI smoke 会在临时项目里验证 11 个 slash commands、7 个 agents 与 `story-hooks.ts` 插件能被 OpenCode 解析加载
 
-### CI 检测
+### 本地检测
 
-PR 中如果修改了 Claude Code 模板文件，CI 会自动检测 opencode 模板是否同步，并额外检查 `opencode.json.patch`、`plugin.ts`、11 个 command 与 7 个 agent 的结构锚点。如果 CI 报错，请在本地运行同步脚本和 `bash scripts/check-opencode-adapter.sh`，再提交结果。
+修改 Claude Code 模板文件后，必须在本地运行同步脚本和 `bash scripts/check-opencode-adapter.sh`，检查 opencode 模板、`opencode.json.patch`、`plugin.ts`、11 个 command 与 7 个 agent 的结构锚点，再提交结果。
 
 ### 手动维护的部分
 
@@ -257,7 +257,7 @@ Reasonix（DeepSeek-Reasonix CLI）当前支持 skills + 原生 plugin manifest 
 - 根 `reasonix-plugin.json` 是 plugin manifest；`version` 必须与 `skills/story/VERSION` 同步（`check-reasonix-adapter.sh` 守卫）。
 - Reasonix 原生扫描项目 skill root（`.agents/skills` 等，指向 `skills/` 的 symlink，与 Codex 共用）发现 13 个 skill。
 - `story-setup` 的 `target_cli=reasonix` 走 skills-only 部署：复制 13 个 skill 到项目 `skills/`、写入 `references/reasonix/AGENTS.md.tmpl`，不部署 hooks/agents（与 OpenClaw / generic 同构，由 `check-story-setup-deployment.sh` 守卫）。改动 Reasonix 部署路径或模板时同步该守卫。
-- 真实 CLI 校验 `reasonix doctor capabilities` 不在 CI 内，发版前可手动跑。
+- 真实 CLI 校验 `reasonix doctor capabilities` 不在默认本地检查内，发版前手动运行。
 
 ### Reasonix 检查步骤
 

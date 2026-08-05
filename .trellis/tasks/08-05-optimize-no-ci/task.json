@@ -1,0 +1,28 @@
+{
+  "id": "optimize-no-ci",
+  "name": "optimize-no-ci",
+  "title": "修复仓库检查并停用 CI",
+  "description": "",
+  "status": "in_progress",
+  "dev_type": null,
+  "scope": "scripts,docs,trellis-spec,github-workflows",
+  "package": null,
+  "priority": "P2",
+  "creator": "nat.yu",
+  "assignee": "nat.yu",
+  "createdAt": "2026-08-05",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {
+    "description": "修复退化检测、上游漂移与版本文档，并永久移除 GitHub Actions CI"
+  }
+}

@@ -7,6 +7,7 @@
 .codebuddy/
 .workbuddy/
 .codewhale/
+.github/workflows/
 node_modules/
 playwright-report/
 test-results/

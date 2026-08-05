@@ -451,7 +451,7 @@ assert_grep 'agents_version.*小于 `22`|版本 < 22' "$SKILL_DIR/SKILL.md" "sto
 assert_grep 'agents_version.*大于 `22`' "$SKILL_DIR/SKILL.md" "story-setup must stop before downgrading a newer deployment"
 assert_grep 'agents_version.*小于 `22`|小于 .22' "$REPO_ROOT/skills/story-review/SKILL.md" "story-review must treat agents_version 21 as stale"
 assert_grep 'agents_version.*大于 `22`' "$REPO_ROOT/skills/story-review/SKILL.md" "story-review must not run old contracts against a newer deployment"
-assert_grep '^version:[[:space:]]*1\.3\.0$' "$SKILL_FILE" "story-setup frontmatter must match the deployed setup version"
+assert_grep '^version:[[:space:]]*1\.2\.7$' "$SKILL_FILE" "story-setup frontmatter must match the deployed setup version"
 assert_grep '剧情/情绪模块\.md.*missing_primary_contract|missing_primary_contract.*剧情/情绪模块\.md' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must require the current emotion-module artifact"
 assert_grep '剧情/节奏\.md.*missing_primary_contract|missing_primary_contract.*剧情/节奏\.md' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must require the current rhythm artifact"
 assert_no_grep 'legacy_deconstruction|contract_version.*legacy|pre-v12' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must not keep legacy benchmark branches"

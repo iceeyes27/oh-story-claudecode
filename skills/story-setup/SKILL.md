@@ -1,6 +1,6 @@
 ---
 name: story-setup
-version: 1.3.0
+version: 1.2.7
 description: "网文写作工具集基础设施部署。为 Claude Code / OpenCode / Codex / ZCode / OpenClaw / Reasonix 提供内置适配；Web AI / 通用 Agent 可走 skills + AGENTS.md 文件模式。触发方式：/story-setup、$story-setup、「准备写书」「帮我搭一下环境」「配置写作项目」。"
 metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
 disable: true
@@ -364,7 +364,7 @@ Reasonix（DeepSeek-Reasonix CLI）当前只部署 skills 与 `AGENTS.md`，不�
   ```
   deployed_at: <date -u +"%Y-%m-%dT%H:%M:%SZ">
   agents_version: 22
-  setup_skill_version: 1.3.0
+  setup_skill_version: 1.2.7
   target_cli: claude-code（或 opencode、codex、zcode、openclaw、reasonix、generic，或其任意组合）
   resolver_strategy: agents-canonical-v1
   canonical_skills_dir: .agents/skills
@@ -389,7 +389,7 @@ Reasonix（DeepSeek-Reasonix CLI）当前只部署 skills 与 `AGENTS.md`，不�
    - 运行 `manage-skill-adapters.js check`，确认平台入口全部解析到 `.agents/skills/`
    - 检查 `.agents/skills/story-setup/references/agent-references/` 完整，且共享资源只存在于 `_shared`
 5. 验证部署标记：
-   - 检查 `.story-deployed` 是否存在且包含时间戳、`agents_version: 22`、`setup_skill_version: 1.3.0`、`target_cli`、`resolver_strategy`、`canonical_skills_dir`、`adapter_manifest`、`references_dir`
+   - 检查 `.story-deployed` 是否存在且包含时间戳、`agents_version: 22`、`setup_skill_version: 1.2.7`、`target_cli`、`resolver_strategy`、`canonical_skills_dir`、`adapter_manifest`、`references_dir`
 6. 输出安装报告：
    - 列出所有已部署的文件
    - 列出需要注意的事项（如已有配置已合并）

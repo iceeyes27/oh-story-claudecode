@@ -2,8 +2,12 @@
 
 ## 当前版本
 
-- `setup_skill_version: 1.3.0`
+- `setup_skill_version: 1.2.7`
 - `agents_version: 22`
+
+> **本 fork 的取值约定**：`setup_skill_version` 跟随上游 worldwonderer/oh-story-claudecode，不另起 fork 自有版本线。本 fork 的架构差异由 `resolver_strategy: agents-canonical-v1` 连同 `canonical_skills_dir` / `adapter_manifest` 两个上游没有的字段标识，那几行远离上游高频改动区，能自动合并。
+>
+> 原因：`setup_skill_version` 与 `agents_version` 在本文件、`SKILL.md`、`current-contract.json`、`session-start.sh` 里都是相邻行，而上游每次发版都会 bump `agents_version`。两行贴在一起时会落进同一个 diff 块，只要 fork 在其中一行有自己的取值，每次合并上游必然冲突。让 `setup_skill_version` 与上游一致即可消除这类冲突，且不损失任何信息——运行时只用 `agents_version` 判断部署是否过期（见 `check-story-setup-deployment.sh` TS10 的 mixed-version 夹具），`setup_skill_version` 只做仓库内三处一致性校验。
 
 `.story-deployed` 缺失任一字段，或 `agents_version` 缺失 / 非整数 / 小于 `22`，都视为待更新部署。直接重新运行 `/story-setup`（Codex 用 `$story-setup`）；不在运行时逐级兼容历史模板。如项目 `agents_version` 大于 `22`，说明本地 story-setup 比项目旧：先更新 oh-story-claudecode，不得用 v22 降级覆盖。历史版本改动见仓库根目录 `CHANGELOG.md`。
 
@@ -73,7 +77,8 @@
 
 ### v22 (当前)
 
-- `.story-deployed` 的 `agents_version` 升级到 `22`（本 fork 的 `setup_skill_version` 仍为 `1.3.0`）。
+- `.story-deployed` 的 `agents_version` 升级到 `22`，`setup_skill_version` 回到上游线 `1.2.7`。
+- **`setup_skill_version` 停止走 fork 自有版本线**：v20 曾把它升到 `1.3.0` 标记 `.agents` canonical 架构，但它与 `agents_version` 在四个文件里都是相邻行，上游每次 bump `agents_version` 就连带冲突（v22 这次 6 个冲突里 5 个由此而来）。架构标识改由 `resolver_strategy: agents-canonical-v1` 单独承担——该字段上游不改动，历次合并均自动通过。已部署项目无需处理：运行时只认 `agents_version`，sentinel 里残留的 `setup_skill_version: 1.3.0` 不触发任何提示。
 - **章节概要改叙事化（#276）**：`chapter-extractor` 模板的「概要」字段不再要求用「因为…所以…」串联关键事件。改为按事件发生顺序连贯讲清发生了什么、为什么发生、结果如何，优先写进改变剧情走向的动作与结果、反常信息、会延续到后续章节的伏笔线索和有辨识度的具体细节（数字、原话、反常现象）；同一连接词不反复串联，仍禁空泛评价与主观解读。质量检查第 1 条与 Domain Boundary 同步改写，概要仍保持 `**概要**：` 行首单行形态（Stage 2 收尾的无损拼接校验依赖它）。
 - **原文引用改精选（#275）**：情节点的主要证据改为 P 行白描——谁做了什么、结果如何、原文给出的起因、伏笔线索必须写全，P 行新增独立的白描字段（此前只有并行 agent 路径缺这一段，与串行模板不一致）。原文引用不再逐点铺满，只给关键转折 / 关键台词 / 写法样本保留，每章至多 8 条，≤400 字连续切片；段落过长或分散时改用 `原文定位：{5-15字原句片段}`。质量检查第 5 条与 JSON schema 的 `summary` / `plot_points` 同步；自检条数标称从「10 条」更正为实际的 12 条。
 - **两条路径统一**：并行 chapter-extractor 与 solo/direct 串行降级此前是两份漂移的规范，而 ZCode / OpenClaw / Reasonix / generic 只能走串行。`story-analyze/references/output-templates.md`（上游为 `story-long-analyze/`）补齐白描铁律、基调与主题标签消歧、原文引用精选规则和 Stage 2 输出自检，串行路径不再需要读取 `chapter-extractor.md`（那些端读不到它）。

@@ -12,7 +12,7 @@ disable: true
 
 **执行铁律：不覆盖用户已有配置，合并而非替换。**
 
-## Skill 单一来源合同（v21）
+## Skill 单一来源合同（v22）
 
 - `.agents/skills/` 是唯一可编辑、唯一应由 Git 跟踪的 Skill 实体目录。
 - `.claude/skills/`、`.codex/skills/`、`.opencode/skills/`、`.zcode/skills/` 及其他平台目录只放逐 Skill 适配入口：macOS/Linux 使用 symlink，Windows 使用 junction；链接不可用时才生成带 SHA-256 manifest 的只读 fallback。

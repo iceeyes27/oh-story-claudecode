@@ -452,6 +452,21 @@ assert_grep 'agents_version.*大于 `22`' "$SKILL_DIR/SKILL.md" "story-setup mus
 assert_grep 'agents_version.*小于 `22`|小于 .22' "$REPO_ROOT/skills/story-review/SKILL.md" "story-review must treat agents_version 21 as stale"
 assert_grep 'agents_version.*大于 `22`' "$REPO_ROOT/skills/story-review/SKILL.md" "story-review must not run old contracts against a newer deployment"
 assert_grep '^version:[[:space:]]*1\.2\.7$' "$SKILL_FILE" "story-setup frontmatter must match the deployed setup version"
+
+# Phase 1 自检的目录名单是硬编码的，必须与实际 references/ 子目录集合一致。
+# 漏写一个 → 半装的包检不出；名单里多出已删除的目录 → 完好的包被判残缺，fail-closed 卡死所有部署。
+selfcheck_line="$(grep -n '先自检参考目录' "$SKILL_FILE" | head -1 | cut -d: -f1)"
+[ -n "$selfcheck_line" ] || fail "story-setup Phase 1 reference self-check paragraph not found"
+selfcheck_text="$(sed -n "${selfcheck_line}p" "$SKILL_FILE")"
+for ref_dir in "$SKILL_DIR"/references/*/; do
+  ref_name="$(basename "$ref_dir")"
+  case "$selfcheck_text" in
+    *"\`$ref_name\`"*) ;;
+    *) fail "story-setup Phase 1 self-check list is missing reference dir: $ref_name" ;;
+  esac
+done
+ref_dir_count="$(find "$SKILL_DIR/references" -maxdepth 1 -mindepth 1 -type d | wc -l | tr -d ' ')"
+[ "$ref_dir_count" -eq 8 ] || fail "story-setup references/ now has $ref_dir_count subdirs (expected 8); update the Phase 1 self-check list and this assertion"
 assert_grep '剧情/情绪模块\.md.*missing_primary_contract|missing_primary_contract.*剧情/情绪模块\.md' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must require the current emotion-module artifact"
 assert_grep '剧情/节奏\.md.*missing_primary_contract|missing_primary_contract.*剧情/节奏\.md' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must require the current rhythm artifact"
 assert_no_grep 'legacy_deconstruction|contract_version.*legacy|pre-v12' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must not keep legacy benchmark branches"
@@ -466,7 +481,10 @@ assert_grep '不用.*——|不使用.*——|不保留.*——|不残留.*—�
 assert_grep '语气标点谱系' "$AGENT_REFS_DIR/format-and-structure.md" "agent references must include v13 tone punctuation format rules"
 assert_grep '不用.*……|不使用.*……|不保留.*……|不残留.*……' "$AGENT_REFS_DIR/format-and-structure.md" "agent references must forbid ellipsis pause punctuation"
 assert_grep '不用.*——|不使用.*——|不保留.*——|不残留.*——|正文和对话都禁止.*——' "$AGENT_REFS_DIR/format-and-structure.md" "agent references must forbid dialogue dash exception"
-assert_grep '禁止先否定再肯定翻转句式' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must hard-ban not-then-is flips"
+assert_grep '禁止高置信否定铺垫后再肯定翻转|禁止高置信否定翻转句式' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must hard-ban high-confidence not-then-is flips"
+assert_grep '跨段.*不是A / 也不是B / 只是C.*(只作语义复核|advisory)' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must treat cross-paragraph negation as advisory"
+assert_grep '承担辩解、悬念排除或情绪递进时可保留|承担辩解、悬念排除、情绪递进等功能时可保留' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must preserve functional cross-paragraph negation"
+assert_grep '至于X不X，怎么X' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must review formulaic dialogue too"
 assert_grep 'check-ai-patterns\.js --check' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must require detector rescan handoff"
 assert_grep '裸调用.*不得自动进入正文写作|不得自动进入正文写作.*裸调用' "$REPO_ROOT/skills/story-write/SKILL.md" "story-write bare invocation must not auto-write prose"
 assert_grep '不得把已有项目默认为日更 3 章|默认为日更 3 章' "$REPO_ROOT/skills/story-write/SKILL.md" "story-write must not default existing projects to daily 3 chapters on bare invocation"

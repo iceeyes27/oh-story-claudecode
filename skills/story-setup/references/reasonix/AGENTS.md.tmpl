@@ -8,12 +8,12 @@ Reasonix 会从项目 `.agents/skills`（部署时创建的指向 `skills/` 的 
 
 | 意图 | Skill | 说明 |
 |------|-------|------|
-| 写长篇 / 开书 / 续写 | story-long-write | 长篇网文写作（逐章推进） |
-| 写短篇 | story-short-write | 短篇网文写作（情绪驱动） |
-| 长篇拆文 | story-long-analyze | 长篇小说深度拆解 |
-| 短篇拆文 | story-short-analyze | 短篇小说拆文分析 |
-| 长篇扫榜 | story-long-scan | 长篇小说榜单与市场趋势 |
-| 短篇扫榜 | story-short-scan | 短篇小说榜单与情绪风口 |
+| 写长篇 / 开书 / 续写 | story-write long | 长篇网文写作（逐章推进） |
+| 写短篇 | story-write short | 短篇网文写作（情绪驱动） |
+| 长篇拆文 | story-analyze long | 长篇小说深度拆解 |
+| 短篇拆文 | story-analyze short | 短篇小说拆文分析 |
+| 长篇扫榜 | story-scan long | 长篇小说榜单与市场趋势 |
+| 短篇扫榜 | story-scan short | 短篇小说榜单与情绪风口 |
 | 去 AI 味 | story-deslop | 去除 AI 写作痕迹 |
 | 封面 | story-cover | 生成封面图；需要 `GPT_IMAGE_API_KEY` |
 | 审查 | story-review | 多视角审查；Reasonix 默认 solo/direct fallback |
@@ -26,7 +26,7 @@ Reasonix 会从项目 `.agents/skills`（部署时创建的指向 `skills/` 的 
 
 - 只部署 skills 与本 `AGENTS.md`：Reasonix 原生扫描 `.agents/skills`（部署时创建的指向 `skills/` 的 symlink）发现 `skills/*/SKILL.md`，并把 `AGENTS.md` 作为项目指令加载。也可用根 `reasonix-plugin.json` 走 `reasonix plugin install`；`reasonix doctor capabilities` 校验 skill 发现。
 - 暂不部署 Reasonix hooks/custom agents：写正文前大纲守卫、commit 提醒、session/compact 自动注入在 Reasonix 下不是硬拦截，只作为 skill 内软约束执行。
-- 涉及专业 Agent 的 Skill（story-review 多视角、story-long-write 的 narrative-writer/story-architect 等）按 solo/direct fallback 执行，并在结果里说明降级。
+- 涉及专业 Agent 的 Skill（story-review 多视角、story-write long 的 narrative-writer/story-architect 等）按 solo/direct fallback 执行，并在结果里说明降级。
 - Windows 未启用 symlink 时改走根 `reasonix-plugin.json` 原生 plugin 安装。
 - `story-cover` 依赖 `GPT_IMAGE_API_KEY`，未配置时该 skill 不可用。
 
@@ -38,7 +38,7 @@ Reasonix 会从项目 `.agents/skills`（部署时创建的指向 `skills/` 的 
 - `{书名}/正文.md` — 短篇小说正文
 - `{书名}/设定/` — 角色设定、世界设定
 - `{书名}/大纲/` — 卷纲、细纲
-- `{书名}/追踪/` — 上下文.md、伏笔.md、时间线.md、角色状态.md
+- `{书名}/追踪/` — `_tracking-state.json` 唯一结构化权威、固定 7 栏 `上下文.md` 续写状态卡、逐章紧凑记录、核心角色独立派生快照、伏笔当前视图、作者与读者双时间线；全部通过追踪工具生成
 - `{书名}/对标/` — 对标作品分析
 
 ## 写作约束
@@ -47,7 +47,7 @@ Reasonix 会从项目 `.agents/skills`（部署时创建的指向 `skills/` 的 
 - Reasonix 未部署硬 hook 拦截；执行写作 skill 时必须由 skill 流程自行检查大纲、上下文和追踪文件，不得跳过。
 - 无 custom agents 时按 solo/direct 执行；遇到 skill 要求调用 story-architect、narrative-writer 等 agent 时，改由当前 Agent 直接完成，并在结果里说明降级。
 - **去AI味自锁**（本平台无 hook 兜底，此条是唯一防线）：每章正文落盘后，同一轮内立即按写作 skill 的「最毒句式速查 + 禁用词扫描」自检并清零（能运行 node 时跑 `check-ai-patterns.js --check --fail-on=blocking`）；写下一章前先复查上一章无欠账。唯一豁免＝用户显式说"本章不去味"，豁免章在标题行下加 `<!-- 去味:跳过 -->`。
-- Compact / 新会话后优先读取 `{书名}/追踪/上下文.md` 恢复当前写作进度。
+- Compact / 新会话后优先读取 `{书名}/追踪/上下文.md` 恢复当前写作状态。
 
 ## Compact 后恢复上下文
 

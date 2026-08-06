@@ -2,6 +2,22 @@
   "version": 1,
   "groups": [
     {
+      "name": "story-tracking-transaction",
+      "source": "skills/story-write/scripts/tracking_commit.py",
+      "targets": [
+        "skills/story-import/scripts/tracking_commit.py",
+        "skills/story-review/scripts/tracking_commit.py"
+      ]
+    },
+    {
+      "name": "story-tracking-transaction-reference",
+      "source": "skills/story-write/references/tracking-transaction.md",
+      "targets": [
+        "skills/story-import/references/tracking-transaction.md",
+        "skills/story-review/references/tracking-transaction.md"
+      ]
+    },
+    {
       "name": "story-hook-core",
       "source": "skills/story-setup/references/templates/hooks/story_hook_core.js",
       "targets": [

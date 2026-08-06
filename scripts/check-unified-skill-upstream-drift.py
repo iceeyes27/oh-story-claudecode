@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
-"""Fail when upstream changes a source path absorbed by a unified skill.
+"""Check upstream changes that must be migrated into unified skills.
 
 The fork deliberately keeps the 11-skill layout while upstream still owns the
 split story-long-* and story-short-* directories.  A normal merge can resolve
 "upstream modified / fork deleted" by retaining the deletion, which makes the
-merge look clean while discarding the upstream change.  This guard makes every
+merge look clean while discarding the upstream change. This guard makes every
 new upstream change in a mapped source directory an explicit review task.
+``--report`` keeps the check read-only and prints the source-to-target mapping
+needed for that review.
 """
 
 from __future__ import annotations
@@ -36,10 +38,17 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--upstream-ref", default="upstream/main")
     parser.add_argument("--map", type=Path, default=DEFAULT_MAP)
+    parser.add_argument(
+        "--report",
+        action="store_true",
+        help="print a migration report and return success when mapped changes exist",
+    )
     args = parser.parse_args()
 
+    map_path = args.map if args.map.is_absolute() else REPO_ROOT / args.map
+
     try:
-        config = json.loads(args.map.read_text(encoding="utf-8"))
+        config = json.loads(map_path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
         print(f"FAIL: cannot read unified-skill map: {error}", file=sys.stderr)
         return 2
@@ -60,23 +69,58 @@ def main() -> int:
         )
         return 2
 
-    source_paths: list[str] = []
+    source_to_target: dict[str, str] = {}
     for entry in mappings:
         if not isinstance(entry, dict) or not isinstance(entry.get("source"), str) or not isinstance(entry.get("target"), str):
             print("FAIL: every mapping needs source and target", file=sys.stderr)
             return 2
-        source_paths.append(entry["source"])
+        source = entry["source"].strip().strip("/")
+        target = entry["target"].strip().strip("/")
+        if not source or not target or source in source_to_target:
+            print("FAIL: mappings must contain unique non-empty source paths", file=sys.stderr)
+            return 2
+        if not (REPO_ROOT / target).is_dir():
+            print(f"FAIL: mapped unified target directory is missing: {target}", file=sys.stderr)
+            return 2
+        source_to_target[source] = target
 
-    changed = git("diff", "--name-only", f"{baseline}..{args.upstream_ref}", "--", *source_paths)
+    source_paths = list(source_to_target)
+
+    changed = git("diff", "--name-status", f"{baseline}..{args.upstream_ref}", "--", *source_paths)
     if not changed:
         print(f"OK: no mapped upstream skill changes after {baseline[:12]}")
         return 0
 
-    print("FAIL: upstream changed paths that were renamed into unified skills:")
-    for path in changed.splitlines():
-        print(f"  {path}")
-    print("Review each change, apply it to the mapped unified target, then advance upstream_baseline in scripts/unified-skill-upstream-map.json.")
-    return 1
+    rows: list[tuple[str, str, str]] = []
+    for line in changed.splitlines():
+        fields = line.split("\t")
+        status = fields[0]
+        paths = fields[1:]
+        path = " -> ".join(paths)
+        source = next(
+            (
+                candidate
+                for candidate in source_paths
+                if any(item == candidate or item.startswith(f"{candidate}/") for item in paths)
+            ),
+            None,
+        )
+        target = source_to_target[source] if source is not None else "<review map>"
+        rows.append((status, path, target))
+
+    if args.report:
+        print("Unified upstream migration report")
+    else:
+        print("FAIL: upstream changed paths that were renamed into unified skills:")
+    print(f"Baseline: {baseline[:12]}")
+    print(f"Upstream: {args.upstream_ref}")
+    for status, path, target in rows:
+        print(f"  {status:4} {path} -> {target}")
+    print(
+        "Review each source change, apply its semantics to the mapped unified target, "
+        "then advance upstream_baseline in scripts/unified-skill-upstream-map.json."
+    )
+    return 0 if args.report else 1
 
 
 if __name__ == "__main__":

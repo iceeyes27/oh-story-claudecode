@@ -8,6 +8,7 @@
 - `bash scripts/check-python-invocation.sh`：禁止 Windows 环境会失败的裸 `python3` 调用。
 - `bash scripts/check-hook-regex-sync.sh` 与 `bash scripts/test-ai-patterns.sh`：校验实时 hook 与共享扫描规则同步。
 - `python scripts/check-unified-skill-upstream-drift.py`：校验统一目录对上游拆分目录的人工迁移义务。
+- 需要查看迁移范围时使用 `python scripts/check-unified-skill-upstream-drift.py --report`；该报告只读，不自动覆盖统一 Skill。
 - `python scripts/check-current-skill-contracts.py`：除版本与产物契约外，拒绝 `.github/workflows/` 中的任何文件，保持本 fork 仅使用本地验证。
 - 跨平台校验必须读取 `scripts/platform-skill-set.json`，不得另建公开 Skill 名单；不公开的 Skill 必须在 `scripts/local-only-skill-set.json` 中写明原因，两个集合必须无交集且完整覆盖仓库 Skill。复合检查及其嵌套路由的契约测试还要证明全部必需 Skill 依赖属于公开集合且资产存在。
 
@@ -53,6 +54,9 @@
 - `skills/story/tests/composite-check-contract.test.js`：断言七阶段顺序和公开依赖集合。
 - `scripts/skill-publication-coverage.test.js`：断言公开与本地专用集合无遗漏、无重叠且原因非空。
 - 平台检查：断言 marketplace、commands、frontmatter、manifest 与清单一一对应。
+- 平台 AGENTS 路由模板中的 Skill 名称也必须与 `platform-skill-set.json` 一致，禁止保留已删除的 `story-long-*` / `story-short-*` 名称。
+- `scripts/test-unified-skill-upstream-drift.py`：验证旧路径变化会显示对应的统一目标路径。
+- `scripts/test-reasonix-adapter.sh`：验证 Reasonix 路由名必须来自公开 Skill 清单。
 - `check-story-setup-deployment.sh`：断言 `_shared` 与部署资源完整。
 
 ### 7. Wrong vs Correct

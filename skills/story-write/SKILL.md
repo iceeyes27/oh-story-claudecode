@@ -702,6 +702,7 @@ advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界�
 | 写作技法全程参考 | `references/writing-craft.md` |
 | 格式与结构规范 | `references/format-and-structure.md`（仅对话/段落格式适用长篇） |
 | 状态追踪协议 | `references/state-tracking.md` |
+| 结构化状态库（实验性旁路） | `references/state-store.md` |
 | 当前剧情单元与契约校准 | `references/reader-contract-and-progression.md` |
 
 ### Phase 5：质量检查
@@ -1166,6 +1167,7 @@ advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界�
 | 写作技法全程参考 | `references/writing-craft.md` |
 | 格式与结构规范 | `references/format-and-structure.md`（仅对话/段落格式适用长篇） |
 | 状态追踪协议 | `references/state-tracking.md` |
+| 结构化状态库（实验性旁路） | `references/state-store.md` |
 | 当前剧情单元与契约校准 | `references/reader-contract-and-progression.md` |
 
 ### 长篇 Phase 5：质量检查

@@ -12,8 +12,8 @@
 | `static-check.sh` + `static-check.py` | 结构化验证 frontmatter、Markdown 路径/锚点、Agent 引用、references 可达性；除基础组件 `browser-cdp` 外禁止跨 Skill 文件引用 | 提交前本地 |
 | `skill-numbering.py check` | 工作流 Step/Phase/Stage 编号策略、引用绑定、SKILL.md 裸编号/子步骤小数守卫 | 提交前本地；改工作流结构后 |
 | `check-current-skill-contracts.sh` + `.py` + `current-contract.json` | 从结构化 manifest 校验当前版本、Phase、schema、主产物、细纲契约与 GitHub Actions 禁用策略；保留 legacy/path 守卫并拦截缺主产物后的静默替代 | 提交前本地 |
-| `check-unified-skill-upstream-drift.py` + `unified-skill-upstream-map.json` | 上游 split skill 改动后强制人工映射到 unified skill，避免删除旧路径时静默丢失上游修复 | 合并上游后；提交前本地 |
-| `check-shared-files.sh` | 调 `sync-shared-assets.py check` 验 runtime 副本，再验 58 组共享 reference 字节一致 | 提交前本地 |
+| `check-unified-skill-upstream-drift.py` + `unified-skill-upstream-map.json` | 上游 split skill 改动后强制人工映射到 unified skill；`--report` 只读输出 source -> target 迁移清单 | 合并上游后；提交前本地 |
+| `check-shared-files.sh` | 调 `sync-shared-assets.py check` 验 runtime 副本，再验共享 reference 字节一致 | 提交前本地 |
 | `check-story-setup-deployment.sh` | story-setup 部署/运行时回归（慢，>2min） | story-setup 改动后本地 |
 | `check-hook-regex-sync.sh` | `detect-story-gaps.sh` 伏笔状态检测行为 | 相关改动后本地 |
 | `check-hook-locale-safety.sh` | 部署 hook 在 Windows 中文 GBK 区域的字节安全 | hook 改动后本地 |
@@ -26,7 +26,7 @@
 | `check-openclaw-skills.sh` | OpenClaw AgentSkills/frontmatter 兼容性 | 本地 |
 | `check-codex-adapter.sh` | Codex 适配层：repo skills symlink、agent TOML、hooks 与跨平台 launcher | 本地（调 generate-codex-agents.py 验生成确定性） |
 | `check-zcode-adapter.sh` | ZCode plugin/marketplace、Skills/Commands/Hooks 与部署锚点 | 本地 |
-| `check-reasonix-adapter.sh` | Reasonix plugin manifest（schema、完整仓库 Skill 目录、版本与 skills/story/VERSION 同步） | 本地 |
+| `check-reasonix-adapter.sh` | Reasonix plugin manifest、公开 Skill 清单和 AGENTS 路由名一致性 | 本地 |
 
 ## 测试回归（test-*）
 
@@ -52,6 +52,8 @@
 | `test-hook-encoding-portable.sh` | 部署 hook 在 Windows 中文系统的编码健壮性 | 本地 |
 | `test-opencode-cli-e2e.sh` | 真实 OpenCode CLI 加载 smoke（公开 Skill 命令 / 7 agents / plugin） | 可选本地；需已安装 `opencode` |
 | `test-skill-numbering.sh` | Step 重排级联安全、锚点 fail-closed、代码块引用、验证零写入/提交回滚、dry-run/write/幂等性 | 对应系统本地 |
+| `test-unified-skill-upstream-drift.py` | 上游旧拆分目录变化时，迁移检查会显示统一目标路径，并验证 `--report` 只读返回成功 | 改上游漂移检查后 |
+| `test-reasonix-adapter.sh` | Reasonix AGENTS 路由表拒绝已废弃的 split Skill 名称 | 改 Reasonix 模板或检查脚本后 |
 
 ## 代码生成 / 同步
 
@@ -72,7 +74,7 @@
 node scripts/sync-upstream.js
 ```
 
-脚本会 fetch `upstream/main`、开始一个不自动提交的 merge，并按 `unified-skill-upstream-map.json` 自动保留已统一 Skill 对旧 split 目录的删除。若上游修改了旧目录，漂移门禁会暂停合并，列出必须迁入 `story-write`、`story-analyze` 或 `story-scan` 的目标；其它语义冲突也会原样列出。处理完并通过检查后手动 `git commit`，或一开始传 `--commit` 让全套检查通过后自动创建 merge commit。放弃本次同步用 `git merge --abort`。
+脚本会 fetch `upstream/main`、开始一个不自动提交的 merge，并按 `unified-skill-upstream-map.json` 自动保留已统一 Skill 对旧 split 目录的删除。若上游修改了旧目录，漂移检查会暂停合并，列出必须迁入 `story-write`、`story-analyze` 或 `story-scan` 的目标；其它语义冲突也会原样列出。处理完并通过检查后手动 `git commit`，或一开始传 `--commit` 让全套检查通过后自动创建 merge commit。放弃本次同步用 `git merge --abort`。
 
 ## 工作流编号维护
 

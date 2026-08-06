@@ -48,6 +48,19 @@ assert 'skills/_shared/' in reasonix_section, 'Reasonix deployment must include 
 
 agents = Path('skills/story-setup/references/reasonix/AGENTS.md.tmpl').read_text(encoding='utf-8')
 assert f'{len(published)} 个公开 Skill' in agents, 'Reasonix template public Skill count drifted'
+route_section = agents.split('## Skill 路由表', 1)[1].split('## Reasonix 兼容说明', 1)[0]
+route_names = set()
+for line in route_section.splitlines():
+    if not line.lstrip().startswith('|'):
+        continue
+    columns = [column.strip() for column in line.strip().strip('|').split('|')]
+    if len(columns) >= 2 and columns[1].startswith('story') and columns[1] != 'Skill':
+        route_names.add(columns[1].split('（', 1)[0])
+unknown_routes = sorted(route_names - set(published))
+assert not unknown_routes, (
+    f'Reasonix route names must match platform skill set; '
+    f'unknown={unknown_routes}'
+)
 PY
 echo "  OK reasonix-plugin.json (schema + version pin + public set + repository Skills)"
 echo ""

@@ -9,17 +9,14 @@ skills/
 ├── story/                   # 工具箱路由
 ├── story-setup/             # 环境部署
 ├── story-import/            # 逆向导入
-├── story-long-write/        # 长篇写作
-├── story-long-analyze/      # 长篇拆文
-├── story-long-scan/         # 长篇扫榜
-├── story-short-write/       # 短篇写作
-├── story-short-analyze/     # 短篇拆文
-├── story-short-scan/        # 短篇扫榜
+├── story-write/             # 长短篇统一写作入口
+├── story-analyze/           # 长短篇统一拆文入口
+├── story-scan/              # 长短篇统一扫榜入口
 ├── story-deslop/            # 去AI味
 ├── story-review/            # 多视角审查
 ├── story-cover/             # 封面生成
 └── browser-cdp/             # 浏览器操控
-scripts/                       # 开发守卫 / 测试 / 代码生成（22 个脚本的完整索引见 scripts/README.md）
+scripts/                       # 开发守卫 / 测试 / 代码生成（完整索引见 scripts/README.md）
 ```
 
 每个 skill 由一个 `SKILL.md`（入口）和 `references/` 目录（知识库）组成。
@@ -69,6 +66,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 - `scripts/check-codex-adapter.sh` — Codex repo skills symlink、custom-agent TOML（schema + 生成确定性）与 hooks 锚点检查
 - `scripts/test-codex-hooks.sh` — Codex hooks 合成事件测试
 - `scripts/check-zcode-adapter.sh` — ZCode plugin/marketplace、公开 Skill/Commands、受支持 Hook 事件与部署锚点检查
+- `scripts/test-reasonix-adapter.sh` — Reasonix 路由名称与公开 Skill 清单回归检查
 - `scripts/test-zcode-hooks.sh` — ZCode 严格 JSON Hook 契约、正文守卫、连续性与跨平台 Node runner 测试
 - 采集脚本 `node --check` 语法校验
 
@@ -163,11 +161,11 @@ bash scripts/test-opencode-cli-e2e.sh  # 可选：需要本机已安装 opencode
 1. 将 `templates/agents/` 下的 Claude Code agent 转换为 opencode 格式，写入 `opencode/agents/`
 2. 将 `CLAUDE.md.tmpl` 复制到 `opencode/AGENTS.md.tmpl`，替换 `.claude/` 路径引用
 3. 输出同步结果摘要
-4. 可选真实 CLI smoke 会在临时项目里验证 14 个 slash commands、7 个 agents 与 `story-hooks.ts` 插件能被 OpenCode 解析加载
+4. 可选真实 CLI smoke 会在临时项目里验证 15 个 slash commands、7 个 agents 与 `story-hooks.ts` 插件能被 OpenCode 解析加载
 
 ### 本地检测
 
-修改 Claude Code 模板文件后，必须在本地运行同步脚本和 `bash scripts/check-opencode-adapter.sh`，检查 opencode 模板、`opencode.json.patch`、`plugin.ts`、14 个公开 command 与 7 个 agent 的结构锚点，再提交结果。
+修改 Claude Code 模板文件后，必须在本地运行同步脚本和 `bash scripts/check-opencode-adapter.sh`，检查 opencode 模板、`opencode.json.patch`、`plugin.ts`、15 个公开 command 与 7 个 agent 的结构锚点，再提交结果。
 
 ### 手动维护的部分
 
@@ -222,7 +220,7 @@ bash scripts/check-openclaw-skills.sh
 OPENCLAW_REAL_CHECK=1 bash scripts/check-openclaw-skills.sh  # 本机安装 openclaw 时可选
 ```
 
-`OPENCLAW_REAL_CHECK=1` 会用临时 profile + 临时 workspace 创建隔离 agent，确认 OpenClaw CLI 能从 workspace `skills/` 发现 14 个公开 Skill；脚本结束后清理临时 profile。
+`OPENCLAW_REAL_CHECK=1` 会用临时 profile + 临时 workspace 创建隔离 agent，确认 OpenClaw CLI 能从 workspace `skills/` 发现 15 个公开 Skill；脚本结束后清理临时 profile。
 
 ### OpenClaw 已知边界
 
@@ -256,13 +254,14 @@ Reasonix（DeepSeek-Reasonix CLI）当前支持 skills + 原生 plugin manifest 
 
 - 根 `reasonix-plugin.json` 是 plugin manifest；`version` 必须与 `skills/story/VERSION` 同步（`check-reasonix-adapter.sh` 守卫）。
 - Reasonix 原生扫描项目 skill root（`.agents/skills` 等，指向 `skills/` 的 symlink，与 Codex 共用）发现仓库内全部 30 个 Skill。
-- `story-setup` 的 `target_cli=reasonix` 走 skills-only 部署：复制 `scripts/platform-skill-set.json` 声明的 14 个公开 Skill 到项目 `skills/`、写入 `references/reasonix/AGENTS.md.tmpl`，不部署 hooks/agents（与 OpenClaw / generic 同构，由 `check-story-setup-deployment.sh` 守卫）。改动 Reasonix 部署路径或模板时同步该守卫。
+- `story-setup` 的 `target_cli=reasonix` 走 skills-only 部署：复制 `scripts/platform-skill-set.json` 声明的 15 个公开 Skill 到项目 `skills/`、写入 `references/reasonix/AGENTS.md.tmpl`，不部署 hooks/agents（与 OpenClaw / generic 同构，由 `check-story-setup-deployment.sh` 守卫）。改动 Reasonix 部署路径或模板时同步该守卫。
 - 真实 CLI 校验 `reasonix doctor capabilities` 不在默认本地检查内，发版前手动运行。
 
 ### Reasonix 检查步骤
 
 ```bash
 bash scripts/check-reasonix-adapter.sh
+bash scripts/test-reasonix-adapter.sh
 ```
 
 ## Codex 适配维护

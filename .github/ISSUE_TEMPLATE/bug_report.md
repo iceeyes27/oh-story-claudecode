@@ -12,7 +12,7 @@ labels: bug
 ## 环境信息
 - **操作系统：** [macOS / Windows / Linux]
 - **使用模型：** [例如 Claude Opus 4.6 / GLM-5.1 / DeepSeek-V4]
-- **使用 Skill：** [story-short-write / story-long-write / story-review / story-deslop / story-cover / story-import / 其他]
+- **使用 Skill：** [story-write / story-analyze / story-scan / story-review / story-deslop / story-cover / story-import / 其他]
 - **写作类型：** [长篇 / 短篇]
 
 ## 使用截图

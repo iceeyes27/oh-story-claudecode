@@ -2,6 +2,7 @@
   "version": 1,
   "skills": [
     "ai-flavor-scan",
+    "batch-pollution-detector",
     "browser-cdp",
     "dialogue-naturalness-scan",
     "humanizer",

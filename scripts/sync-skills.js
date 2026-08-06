@@ -24,8 +24,6 @@ const path = require('path');
 const crypto = require('crypto');
 const { spawnSync } = require('child_process');
 
-const SKILLS = ['_shared', 'browser-cdp', 'chinese-novelist', 'humanizer', 'story', 'story-analyze', 'story-cover',
-  'story-deslop', 'story-import', 'story-review', 'story-scan', 'story-setup', 'story-write'];
 const IGNORE_BASENAMES = new Set(['_skillhub_meta.json', '.DS_Store']);
 const IGNORE_DIRS = new Set(['__pycache__']);
 const STATE_FILE = '.skills-sync-state.json';
@@ -91,13 +89,23 @@ function listFiles(root) {
   return out;
 }
 
+function listSkillDirs(root) {
+  if (!fs.existsSync(root)) return [];
+  return fs.readdirSync(root, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .filter((name) => name === '_shared' || fs.existsSync(path.join(root, name, 'SKILL.md')))
+    .sort();
+}
+
 function hashFile(p) {
   return crypto.createHash('md5').update(fs.readFileSync(p)).digest('hex');
 }
 
 function computeDiff(localSkills, forkSkills) {
   const added = [], modified = [], deleted = [];
-  for (const skill of SKILLS) {
+  const skills = [...new Set([...listSkillDirs(localSkills), ...listSkillDirs(forkSkills)])].sort();
+  for (const skill of skills) {
     const l = listFiles(path.join(localSkills, skill));
     const f = listFiles(path.join(forkSkills, skill));
     for (const [rel, abs] of l) {
@@ -277,4 +285,4 @@ function main() {
 
 if (require.main === module) main();
 
-module.exports = { CANONICAL_SHARED_FILES, LEGACY_SHARED_SETS, checkShared, computeDiff, resolvePaths };
+module.exports = { CANONICAL_SHARED_FILES, LEGACY_SHARED_SETS, checkShared, computeDiff, listSkillDirs, resolvePaths };

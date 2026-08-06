@@ -26,6 +26,10 @@ function run(root, ...args) {
   return spawnSync(process.execPath, [SCRIPT, ...args, `--root=${root}`, '--json'], { encoding: 'utf8' });
 }
 
+function runFrom(root, ...args) {
+  return spawnSync(process.execPath, [SCRIPT, ...args, '--json'], { cwd: root, encoding: 'utf8' });
+}
+
 function cleanup(root) {
   if (!fs.existsSync(root)) return;
   for (const entry of fs.readdirSync(root, { recursive: true })) {
@@ -48,6 +52,14 @@ test('fresh install links managed skills and preserves custom skills', (t) => {
     fs.realpathSync(path.join(root, '.agents', 'skills', '_shared')));
   assert.equal(fs.readFileSync(custom, 'utf8'), 'custom\n');
   assert.equal(run(root, 'check', '--platform=claude').status, 0);
+});
+
+test('default root inference works from the project root', (t) => {
+  const root = fixture();
+  t.after(() => cleanup(root));
+  assert.equal(run(root, 'install', '--platform=claude', '--mode=symlink').status, 0);
+  const result = runFrom(root, 'check', '--platform=claude');
+  assert.equal(result.status, 0, result.stderr);
 });
 
 test('upgrade replaces a recognized legacy copy only with explicit consent', (t) => {
@@ -108,4 +120,3 @@ test('check reports an ordinary copy and a broken link', (t) => {
   fs.symlinkSync('../../missing', ordinary, 'dir');
   assert.notEqual(run(root, 'check', '--platform=claude').status, 0);
 });
-

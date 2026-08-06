@@ -45,3 +45,18 @@ test('diff includes the canonical _shared tree', () => {
     assert.deepEqual(computeDiff(local, remote).modified, ['_shared/references/banned-words.md']);
   });
 });
+
+test('diff discovers skills dynamically instead of dropping unlisted directories', () => {
+  withTempDir((root) => {
+    const local = path.join(root, 'local');
+    const remote = path.join(root, 'remote');
+    write(local, 'new-specialist/SKILL.md', 'new');
+    write(remote, 'new-specialist/SKILL.md', 'old');
+    write(remote, 'remote-only/SKILL.md', 'remote');
+    assert.deepEqual(computeDiff(local, remote), {
+      added: [],
+      modified: ['new-specialist/SKILL.md'],
+      deleted: ['remote-only/SKILL.md'],
+    });
+  });
+});

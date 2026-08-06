@@ -25,6 +25,12 @@ BODY_COMMAND_RE = re.compile(r"(?:执行|运行|跑) `([^`]+)`")
 BODY_DELEGATION_RE = re.compile(r"(调用方|父流程|主会话|用户|由.{0,6}提示)")
 
 
+def write_text_lf(path: Path, content: str) -> None:
+    """Write UTF-8/LF on Python 3.9+, where Path.write_text lacks newline."""
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write(content)
+
+
 def body_bash_commands(body: str) -> list[str]:
     """从 agent 正文抽出它明确要求执行的命令（按出现顺序去重）。
 
@@ -358,10 +364,10 @@ def publish_tree(rendered: dict[str, str], agents_md: str, dst_root: Path) -> No
         agents_dir.mkdir()
         backup_agents.mkdir()
         for filename, output in rendered.items():
-            (agents_dir / filename).write_text(output, encoding="utf-8", newline="\n")
+            write_text_lf(agents_dir / filename, output)
 
         staged_agents_md = staging / "AGENTS.md.tmpl"
-        staged_agents_md.write_text(agents_md, encoding="utf-8", newline="\n")
+        write_text_lf(staged_agents_md, agents_md)
 
         existing_md = sorted(existing_agents.glob("*.md"))
         for path in existing_md:

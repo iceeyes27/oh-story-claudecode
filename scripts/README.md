@@ -18,7 +18,9 @@
 | `check-hook-regex-sync.sh` | `detect-story-gaps.sh` 伏笔状态检测行为 | 相关改动后本地 |
 | `check-hook-locale-safety.sh` | 部署 hook 在 Windows 中文 GBK 区域的字节安全 | hook 改动后本地 |
 | `check-python-invocation.sh` | 技能文档禁止裸调 `python3`（须 python3→python→py 探测） | 提交前本地 |
-| `platform-skill-set.json` | 跨平台公开发布的 14 个 Skill 唯一清单；Claude、OpenCode、ZCode 与 OpenClaw 校验共用 | 增减公开 Skill 时先修改 |
+| `platform-skill-set.json` | 跨平台公开发布的 15 个 Skill 唯一清单；Claude、OpenCode、ZCode 与 OpenClaw 校验共用 | 增减公开 Skill 时先修改 |
+| `local-only-skill-set.json` | 不进入跨平台公开部署的 Skill 及原因；与公开清单的并集必须覆盖仓库全部 Skill | 新增或改变 Skill 发布范围时修改 |
+| `sync-upstream.js` | 安全拉取并合并 `upstream/main`；按统一 Skill 映射自动处理旧 split 目录冲突，漂移未迁移时拒绝提交 | 同步上游时运行 |
 | `check-claude-adapter.sh` | Claude marketplace 与公开 Skill 清单的一一映射；可选真实 CLI strict validate | 本地静态；`CLAUDE_REAL_CHECK=1`（真实 CLI） |
 | `check-opencode-adapter.sh` | OpenCode 适配层同步 + commands/agents/config 结构 + plugin 行为回归 | 本地（调 sync-opencode.py） |
 | `check-openclaw-skills.sh` | OpenClaw AgentSkills/frontmatter 兼容性 | 本地 |
@@ -61,6 +63,16 @@
 | `shared-assets.json` + `sync-shared-assets.py` | 为必须随 skill 独立部署的重复 runtime 脚本指定唯一源和目标 | 改共享 runtime 后跑 `sync`；提交前跑 `check` |
 
 > 改了 `skills/story-setup/references/templates/agents/*.md` 或 `CLAUDE.md.tmpl`，必须重跑这两个生成脚本并提交结果，否则本地适配检查失败。详见 [CONTRIBUTING.md](../CONTRIBUTING.md)「OpenCode 模板同步」「Codex 适配维护」。
+
+## 上游同步
+
+从干净工作区运行：
+
+```bash
+node scripts/sync-upstream.js
+```
+
+脚本会 fetch `upstream/main`、开始一个不自动提交的 merge，并按 `unified-skill-upstream-map.json` 自动保留已统一 Skill 对旧 split 目录的删除。若上游修改了旧目录，漂移门禁会暂停合并，列出必须迁入 `story-write`、`story-analyze` 或 `story-scan` 的目标；其它语义冲突也会原样列出。处理完并通过检查后手动 `git commit`，或一开始传 `--commit` 让全套检查通过后自动创建 merge commit。放弃本次同步用 `git merge --abort`。
 
 ## 工作流编号维护
 

@@ -13,6 +13,23 @@ All notable changes to this project will be documented in this file.
 - **OpenCode Node 能力检测**：先探测 `--experimental-strip-types`；支持时运行插件行为测试，不支持时保留静态语法与生成一致性检查，并明确报告跳过原因。
 - **仓库适配一致性**：Claude、Codex、WorkBuddy 入口由 `.agents/skills` 唯一来源重新生成，适配清单同步刷新。
 
+## v0.7.4（上游同步）
+
+> 将上游 v0.7.3/v0.7.4 的有效修复迁移到本 fork 的统一 Skill 架构；fork 版本仍保持 v0.8.0。
+
+### 修复
+
+- **导入工程与外部对标分离**：导入书只用于重建正文、设定、大纲和追踪；只有用户显式绑定的外部作品才进入 `对标/`，历史误建的 `对标/{当前书名}/` 不再参与召回。
+- **部署端探测可靠性**：优先读取 `.story-deployed` 的 `target_cli`，其余情况按各平台 `AGENTS.md` 标题识别；多端 `references_dir` 按逗号逐项检查。
+- **Windows 文风采样**：临时样本改用项目内相对路径，首次写入覆盖旧内容，避免原生 Python 与 Git Bash 的 `/tmp` 路径错位和重跑样本叠加。
+- **确定性契约修复**：章节字数只认细纲目标（缺失时以 3000 兜底）、browser-cdp 只结束调试 profile、黑岩扫榜文件名包含频道、章节边界表剔除原文目录并校验章号连续。
+- **审查评分标准对齐**：内置 fallback 与 `quality-rubric.md` 统一为同一组检查项，并增加契约校验防止再次漂移。
+
+## v0.7.3（上游同步）
+
+- **追踪事务模型**：`追踪/_tracking-state.json` 作为唯一结构化状态，`tracking_commit.py` 生成上下文、伏笔、时间线和角色快照等派生视图；旧项目通过 story-import 迁移。
+- **Dashboard 与拆文链路**：目录树按需加载；章节概要、原文引用、追踪迁移及主流程断链修复随上游同步进入统一 Skill。
+
 ## v0.7.2
 
 > 本地工作台 `/story dashboard`（只绑 127.0.0.1、零生产依赖）；治细纲形状被正文照抄导致的生硬与章尾总结体；仓库质量门禁不再掩盖破坏性失败；修会话起点两处长期误报。**本版把 `agents_version` 发到 21，已部署项目需重新运行 `/story-setup` 并新开会话**——v0.7.1 发出去的是 20，不重新部署则 v0.7.1、v0.7.2 的正文与 hook 改动都不会生效。

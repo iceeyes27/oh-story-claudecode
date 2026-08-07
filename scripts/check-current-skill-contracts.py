@@ -109,7 +109,7 @@ LEGACY_RULES = (
         "obsolete-short-benchmark-path",
         "short writing uses only current benchmark paths",
         r"\{短篇标题\}/拆文库/\{书名\}",
-        ("skills/story-short-write",),
+        ("skills/story-write",),
     ),
     AbsentRule(
         "dotted-demo-workflow-label",
@@ -141,6 +141,97 @@ LEGACY_RULES = (
         r"\.(?:claude|opencode)/skills/story-setup/references/agent-references/|\{项目根\}/skills/story-setup/references/agent-references/",
         ("skills/story-setup/references/codex/agents",),
     ),
+    AbsentRule(
+        "story-import-self-main-benchmark",
+        "story-import never registers the imported work itself as a benchmark",
+        r"导入当前书时至少登记自身|主对标书:\s*\{书名\}",
+        ("skills/story-import",),
+    ),
+    AbsentRule(
+        "story-import-self-benchmark-copy",
+        "story-import keeps imported-work analysis out of benchmark views",
+        r"\{项目\}/对标/\{书名\}|\{标题\}/对标/\{书名\}|对标/\{书名\}/剧情",
+        ("skills/story-import",),
+    ),
+    AbsentRule(
+        "story-import-import-title-benchmark-target",
+        "story-import never copies imported-work analysis into a benchmark target",
+        r"拆文库/\{导入书名\}[^\n]{0,160}(?:复制|同步|迁移)[^\n]{0,120}对标|对标/\{导入书名\}",
+        ("skills/story-import",),
+        exempt_when=r"不得|禁止|严禁|未被|不复制|不属于|不是对标",
+    ),
+    AbsentRule(
+        "story-import-self-benchmark-summary",
+        "story-import does not label the imported work's own analysis as a benchmark summary",
+        r"对标摘要：\{原书名\}",
+        ("skills/story-import",),
+    ),
+    AbsentRule(
+        "story-import-self-benchmark-fields",
+        "story-import does not map self-benchmark fields into the imported project's settings",
+        r"拆文报告\.md`?\s*的故事核/题材/对标字段",
+        ("skills/story-import",),
+    ),
+    AbsentRule(
+        "benchmark-primary-nonblocking-wording",
+        "missing benchmark primary artifacts never use a nonblocking fallback",
+        r"缺失按原流程，不阻塞",
+        ("skills/story-write",),
+    ),
+    AbsentRule(
+        "no-benchmark-skips-genre-card",
+        "no-benchmark writing still generates the project genre prose card",
+        r"无对标[^\n]{0,160}跳过[^\n]{0,80}对标模块/节奏/题材卡/文风召回",
+        ("skills/story-write",),
+    ),
+    AbsentRule(
+        "style-profile-all-inputs-required",
+        "Stage 6 prerequisites follow the explicit degradation matrix",
+        r"前置依赖：[^\n]*齐全",
+        ("skills/story-analyze/references/style-profile-generator.md",),
+    ),
+    AbsentRule(
+        "context-missing-skips-all",
+        "single-chapter context follows item-specific missing-file decisions",
+        r"按需加载，缺失则跳过",
+        ("skills/story-write/SKILL.md",),
+    ),
+    AbsentRule(
+        "static-long-word-floor",
+        "long-form release uses the outline target and one 90-percent tolerance",
+        r"默认最低字数[^\n]*3000\s*字/章|"
+        r"长篇写作以章为验证粒度[^\n]*(?:2000|3000)\s*字|"
+        r"(?:高速推进|正常节奏|舒缓铺垫|高潮爆发)\s*\|\s*≥\s*(?:2000|3000)\s*字/章",
+        (
+            "skills/story-write/SKILL.md",
+            "skills/story-setup/references/templates/agents/narrative-writer.md",
+            "skills/story-setup/references/opencode/agents/narrative-writer.md",
+            "skills/story-setup/references/codex/agents/narrative-writer.toml",
+        ),
+    ),
+    AbsentRule(
+        "broad-chrome-cleanup-doc",
+        "browser cleanup docs must not bypass consent with executable-name kills",
+        r"pkill[^\n]*(?:Google Chrome|google-chrome|chrome)|"
+        r"taskkill[^\n]*/IM\s+chrome\.exe",
+        ("skills/browser-cdp/SKILL.md",),
+    ),
+    AbsentRule(
+        "analyze-posix-tmp-sample-path",
+        "style sampling stays on a project-relative path Windows python can open",
+        r"/tmp/style-sample",
+        ("skills/story-analyze",),
+    ),
+)
+
+
+SPAWN_CAPABLE_SKILLS = (
+    "skills/story/SKILL.md",
+    "skills/story-deslop/SKILL.md",
+    "skills/story-import/SKILL.md",
+    "skills/story-analyze/SKILL.md",
+    "skills/story-write/SKILL.md",
+    "skills/story-review/SKILL.md",
 )
 
 
@@ -567,6 +658,117 @@ def require_pattern(path: Path, pattern: str, code: str, message: str) -> List[F
     return [Finding(code, message, path)]
 
 
+def spawn_preflight_findings(
+    text: str, manifest: ContractManifest, path: Path
+) -> List[Finding]:
+    """Require every spawn-capable Skill to surface a stale/future agent bundle.
+
+    版本不匹配只提示、不阻断：bump 的原因常常是别的部署物变了而 agent 模板根本没动
+    （v23 就只改了 story-explorer），硬闸会让所有人为无关变更付并行代价。真正该降级的
+    信号是 agent 文件缺失或运行时不暴露 custom agent。
+    """
+
+    current = str(manifest.agents_version)
+    required = (
+        (r"`agents_version:\s*{}`".format(current), "pin the current agents_version"),
+        (
+            r"照常按文件存在性检查并 spawn",
+            "state that a version mismatch does not block spawn",
+        ),
+        (
+            r"Notice: agents bundle 版本不匹配",
+            "surface the version mismatch notice",
+        ),
+        (
+            r"大于 {} 时额外提示先更新 oh-story-claudecode".format(current),
+            "tell future deployments to update the package first",
+        ),
+        (
+            r"只有 agent 文件缺失、或运行时不暴露 custom agent 时才降级 solo/direct",
+            "reserve the solo/direct fallback for genuinely missing agents",
+        ),
+    )
+    missing = [label for pattern, label in required if re.search(pattern, text) is None]
+    if not missing:
+        return []
+    return [
+        Finding(
+            "spawn-agents-version-preflight",
+            "spawn-capable Skill must use the shared agents_version preflight: {}".format(
+                "; ".join(missing)
+            ),
+            path,
+        )
+    ]
+
+
+def rubric_dimension_names(repo_root: Path) -> Tuple[List[str], List[str]]:
+    """取 quality-rubric.md「核心维度」表与 SKILL.md 内置 fallback 的维度名。"""
+
+    table: List[str] = []
+    rubric_text = read_text(repo_root / "skills/story-review/references/quality-rubric.md") or ""
+    in_table = False
+    for line in rubric_text.splitlines():
+        if line.startswith("| 维度 |"):
+            in_table = True
+            continue
+        if not in_table:
+            continue
+        if not line.startswith("|"):
+            break
+        cell = line.split("|")[1].strip()
+        if cell and not set(cell) <= {"-", ":"}:
+            table.append(cell)
+
+    embedded: List[str] = []
+    skill_text = read_text(repo_root / "skills/story-review/SKILL.md") or ""
+    if "通用网文内容 rubric：" in skill_text:
+        block = skill_text.split("通用网文内容 rubric：", 1)[1]
+        for line in block.splitlines():
+            if not line.startswith("- "):
+                if embedded:
+                    break
+                continue
+            embedded.append(line[2:].split("：", 1)[0].strip())
+    return table, embedded
+
+
+def rubric_parity_findings(repo_root: Path) -> List[Finding]:
+    """内置 fallback rubric 与 quality-rubric.md 必须是同一套维度。
+
+    两者是同一套标准的两个副本：文件可读时用文件，不可读时用内置。漂移过一次
+    （文件版独有「任务卡点」，内置版独有「标点节奏」「具体字数表达校验」），
+    结果是审查口径取决于路径可读性。手工对齐只管一次，这条断言管以后。
+    """
+
+    table, embedded = rubric_dimension_names(repo_root)
+    path = repo_root / "skills/story-review/SKILL.md"
+    if not table or not embedded:
+        return [
+            Finding(
+                "rubric-parity-unreadable",
+                "cannot read both generic rubrics to compare dimensions",
+                path,
+            )
+        ]
+    findings = []
+    for missing, where in (
+        (sorted(set(table) - set(embedded)), "内置 fallback rubric"),
+        (sorted(set(embedded) - set(table)), "quality-rubric.md"),
+    ):
+        if missing:
+            findings.append(
+                Finding(
+                    "rubric-dimension-drift",
+                    "generic rubric dimensions drifted: {} missing from {}".format(
+                        "、".join(missing), where
+                    ),
+                    path,
+                )
+            )
+    return findings
+
+
 def parse_frontmatter_version(path: Path) -> Optional[str]:
     text = read_text(path)
     if text is None:
@@ -943,6 +1145,14 @@ def validate_repository(repo_root: Path, manifest: ContractManifest) -> List[Fin
     setup_text = read_text(setup_skill) or ""
     findings.extend(sentinel_contract_findings(setup_text, manifest, setup_skill))
 
+    for relative in SPAWN_CAPABLE_SKILLS:
+        spawn_skill = repo_root / relative
+        findings.extend(
+            spawn_preflight_findings(
+                read_text(spawn_skill) or "", manifest, spawn_skill
+            )
+        )
+
     upgrading = repo_root / "skills/story-setup/UPGRADING.md"
     upgrading_text = read_text(upgrading) or ""
     findings.extend(upgrading_version_findings(upgrading_text, manifest, upgrading))
@@ -997,8 +1207,14 @@ def validate_repository(repo_root: Path, manifest: ContractManifest) -> List[Fin
                     )
                 )
 
+    findings.extend(rubric_parity_findings(repo_root))
+
     long_analyze = repo_root / "skills/story-analyze/SKILL.md"
     findings.extend(require_pattern(long_analyze, r"invalid_topic_decision_contract", "invalid-topic-contract", "invalid topic-decision artifacts must fail explicitly"))
+    # 章节边界表是 Stage 1/2/6 的唯一切片真值：原文开头的目录块会让每个章号命中两次，
+    # 不剔就一路错到底。剔除步骤和落表前的连续性校验都必须留在 Stage 0。
+    findings.extend(require_pattern(long_analyze, r"先剔掉目录块", "stage0-toc-block-removal", "Stage 0 must drop the leading table-of-contents block before building the chapter table"))
+    findings.extend(require_pattern(long_analyze, r"落表前校验章号连续", "stage0-chapter-table-validation", "Stage 0 must validate chapter numbers before writing the boundary table"))
     explorer = repo_root / "skills/story-setup/references/templates/agents/story-explorer.md"
     findings.extend(require_pattern(explorer, r"missing_primary_contract", "explorer-primary-failure", "story-explorer must fail closed on missing current benchmark artifacts"))
     findings.extend(require_pattern(explorer, r"repair_action", "explorer-repair-action", "story-explorer must return an explicit repair action"))
@@ -1013,6 +1229,53 @@ def validate_repository(repo_root: Path, manifest: ContractManifest) -> List[Fin
                 "long writing must require {}".format(artifact),
             )
         )
+
+    for relative in (
+        "skills/story-import/SKILL.md",
+        "skills/story-import/references/structure-mapping-long.md",
+        "skills/story-import/references/structure-mapping-short.md",
+    ):
+        import_contract = repo_root / relative
+        findings.extend(
+            require_pattern(
+                import_contract,
+                r"\{导入书名\}",
+                "story-import-import-title-boundary",
+                "story-import must name the imported work independently",
+            )
+        )
+        findings.extend(
+            require_pattern(
+                import_contract,
+                r"\{对标书名\}",
+                "story-import-benchmark-title-boundary",
+                "story-import must name external benchmarks independently",
+            )
+        )
+
+    for relative in (
+        "skills/story-write/SKILL.md",
+        "skills/story-write/references/cross-book-recall.md",
+    ):
+        benchmark_discovery = repo_root / relative
+        findings.extend(
+            require_pattern(
+                benchmark_discovery,
+                r"排除[^\n]*当前[^\n]*(?:拆文库|作品|正文)",
+                "benchmark-discovery-excludes-current-work",
+                "benchmark discovery must exclude the current imported work",
+            )
+        )
+
+    explorer_template = repo_root / "skills/story-setup/references/templates/agents/story-explorer.md"
+    findings.extend(
+        require_pattern(
+            explorer_template,
+            r"self_benchmark_ignored",
+            "explorer-self-benchmark-gap",
+            "story-explorer must report and ignore self-benchmark candidates",
+        )
+    )
 
     outline_rule = repo_root / "skills/story-setup/references/templates/rules/story-outline.md"
     outline_rule_text = read_text(outline_rule) or ""

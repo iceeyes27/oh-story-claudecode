@@ -42,6 +42,8 @@ disable: true
 ---
 
 > Agent 兼容性：检查专业 agent 是否可用时，按 `.claude/agents/{agent}.md` → `.opencode/agents/{agent}.md` → `.codex/agents/{agent}.toml` 的顺序查找。Codex 原生子代理调用优先使用同名 `agent_type`；如果当前 Codex 运行时返回 `unknown agent_type` 或未暴露 custom-agent registry，必须降级为 solo/direct。检测到 `.zcode/` 时同样直接 solo/direct，因为 ZCode 3.3.4 不执行项目 custom agents；报告 `Fallback: project custom agents unavailable -> solo`。Claude/OpenCode 兼容面保留 `subagent_type`。
+>
+> Spawn 版本提示（不阻断 spawn）：先读取项目根 `.story-deployed` 的 `agents_version`。与本版 `agents_version: 23` 不一致时（标记缺失、字段缺失/非整数、小于或大于 23）**照常按文件存在性检查并 spawn**，同时报告 `Notice: agents bundle 版本不匹配（项目 {N}，本版 23）` 并提示重新运行 `/story-setup` 后新开会话；大于 23 时额外提示先更新 oh-story-claudecode，不要用本地旧版 setup 降级覆盖。只有 agent 文件缺失、或运行时不暴露 custom agent 时才降级 solo/direct，报告 `Fallback: ... -> solo`。
 
 ## 拆解边界声明（主线程同样适用，长篇/短篇通用）
 
@@ -236,7 +238,9 @@ disable: true
 Stage 0 完成概要 + 章节索引之后、转入 Stage 1 之前，**必须**额外产出一份「章节边界」表写入 `_progress.md`。这是后续 Stage 1（黄金三章原文切片）/ Stage 2（每章传给 chapter-extractor agent）/ Stage 6（文风采样）共用的**唯一切片来源**——避免每个阶段各跑一次 regex 切片，结果可能不一致。
 
 操作：
+- 在识别章节标题前先剔掉目录块：只移除正文开头连续的目录式章节标题列表，保留首次进入实际章节正文后的所有内容；无法可靠区分时停止并报告，不得猜切片边界
 - 用 `style-profile-generator.md` Step 4 的章节正则（含 千/两，覆盖 1000+ 章）grep 出全部章节行号
+- 落表前校验章号连续：章号必须严格递增且不得重复；发现缺号、倒序或重复时停止落表，报告异常章号与行号，先修正源文本或切片规则
 - 按 `| 章号 | 标题 | 起始行 | 字数 |` 四列写入 `_progress.md` 的「章节边界」section（见 [pipeline-ops.md](references/pipeline-ops.md) 模板）
 - `_progress.md` 顶部 `schema_version: 2` 同时落盘
 

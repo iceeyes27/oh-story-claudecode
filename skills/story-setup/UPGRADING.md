@@ -3,13 +3,13 @@
 ## 当前版本
 
 - `setup_skill_version: 1.2.7`
-- `agents_version: 22`
+- `agents_version: 23`
 
 > **本 fork 的取值约定**：`setup_skill_version` 跟随上游 worldwonderer/oh-story-claudecode，不另起 fork 自有版本线。本 fork 的架构差异由 `resolver_strategy: agents-canonical-v1` 连同 `canonical_skills_dir` / `adapter_manifest` 两个上游没有的字段标识，那几行远离上游高频改动区，能自动合并。
 >
 > 原因：`setup_skill_version` 与 `agents_version` 在本文件、`SKILL.md`、`current-contract.json`、`session-start.sh` 里都是相邻行，而上游每次发版都会 bump `agents_version`。两行贴在一起时会落进同一个 diff 块，只要 fork 在其中一行有自己的取值，每次合并上游必然冲突。让 `setup_skill_version` 与上游一致即可消除这类冲突，且不损失任何信息——运行时只用 `agents_version` 判断部署是否过期（见 `check-story-setup-deployment.sh` TS10 的 mixed-version 夹具），`setup_skill_version` 只做仓库内三处一致性校验。
 
-`.story-deployed` 缺失任一字段，或 `agents_version` 缺失 / 非整数 / 小于 `22`，都视为待更新部署。直接重新运行 `/story-setup`（Codex 用 `$story-setup`）；不在运行时逐级兼容历史模板。如项目 `agents_version` 大于 `22`，说明本地 story-setup 比项目旧：先更新 oh-story-claudecode，不得用 v22 降级覆盖。历史版本改动见仓库根目录 `CHANGELOG.md`。
+`.story-deployed` 缺失任一字段，或 `agents_version` 缺失 / 非整数 / 小于 `23`，都视为待更新部署。直接重新运行 `/story-setup`（Codex 用 `$story-setup`）；不在运行时逐级兼容历史模板。如项目 `agents_version` 大于 `23`，说明本地 story-setup 比项目旧：先更新 oh-story-claudecode，不得用 v23 降级覆盖。历史版本改动见仓库根目录 `CHANGELOG.md`。
 
 ## 升级策略
 
@@ -49,12 +49,15 @@
 - `.active-book` — 用户活跃书目
 - 短篇项目的 `追踪/` — setup/hooks 不应为短篇自动创建
 
-## v22 当前契约
+## v23 当前契约
 
 - `.agents/skills/` 是唯一可编辑 Skill 源；平台 Skill 目录只允许 symlink、junction 或带 SHA-256 manifest 的只读 fallback。
 - `banned-words.md`、`anti-ai-writing.md` 与三支正文扫描器只存在于 `.agents/skills/_shared/`，消费者直接读取，不保存副本。
 - Agent reference 唯一实体路径为 `.agents/skills/story-setup/references/agent-references/`。
 - fresh setup 与 upgrade 共用 `manage-skill-adapters.js`；普通旧副本迁移需显式 `--replace-managed-copies`，用户 Skill 不受影响。
+- `story-import` 只把作者已有小说重建为写作工程：`拆文库/{导入书名}/` 迁移到正文/设定/大纲/追踪，不再自动登记成主/副对标，也不再复制到项目 `对标/`。只有用户明确选择、且来源为独立 `拆文库/{对标书名}/` 的外部作品才同步到 `对标/{对标书名}/`。
+- 无外部对标时只跳过对标模块、节奏和文风召回；项目题材卡仍从本书题材信息生成，不再被对标分支误伤。对标主产物缺失继续 fail-fast，只有单个可选模块卡未命中时才局部跳过。
+- 所有可能 spawn 项目 agent 的 Skill 都先读取 `.story-deployed.agents_version`：与 v23 不一致时**照常 spawn**，只在报告里提示版本不匹配、建议重跑 `/story-setup` 并新开会话。版本不匹配不阻断并行——bump 常常源于别的部署物变化而 agent 模板未动。真正降级 solo/direct 的信号是 agent 文件缺失或运行时不暴露 custom agent。
 - 写作与导入只接受当前拆文产物：`剧情/情绪模块.md` 与 `剧情/节奏.md` 缺失时 fail-fast，并给出重跑 Stage 3+ / 重新导入的修复动作。
 - 新建、补建、改纲的细纲只接受完整章节蓝图：缺少阶段位置、结构公式、禁止提前释放、内容概括、情节安排、人物关系、情节细化或结尾设定时，先补齐再写。旧版细纲缺这些字段不阻塞日更，回退消费旧字段（核心事件、情节点序列、目标情绪、章首/章尾钩子、字数目标）。
 - 每个 Agent adapter 只读取 `.agents` canonical reference；平台入口不再拥有 reference 副本。
@@ -68,11 +71,21 @@
 
 1. 在项目根目录重新运行 story-setup。
 2. 运行 `node .agents/skills/story-setup/scripts/manage-skill-adapters.js install --replace-managed-copies` 迁移旧平台副本。
-3. 确认 `.story-deployed` 写入 `agents_version: 22`、`setup_skill_version: 1.2.7`、`resolver_strategy: agents-canonical-v1`。
+3. 确认 `.story-deployed` 写入 `agents_version: 23`、`setup_skill_version: 1.2.7`、`resolver_strategy: agents-canonical-v1`、`canonical_skills_dir` 与 `adapter_manifest`。
 4. 运行 adapter `check`，确认 Skill 入口、agents、hooks/rules 和 references 通过验证。
 5. 新开会话，使 custom agents 与 hooks 按当前文件重新注册。
 6. **长篇在写项目必做**：检查每本书的 `追踪/_tracking-state.json` 是否存在。不存在就是旧追踪结构，按下方「追踪模型迁移」重建，否则写下一章会被拦。
 7. 若已有拆文库或细纲不满足当前契约，先重新拆解/导入或补齐细纲，再继续写作。
+
+## 导入项目的自对标清理（v23）
+
+旧版 `story-import` 可能把作者自己的导入书误建成 `对标/{当前书名}/`，甚至把本书设定登记成“主对标”。升级不会自动删除用户文件，按以下边界人工核对：
+
+1. 保留 `拆文库/{导入书名}/`；它是本书导入分析和重建工程的数据源，不是错误目录。
+2. 以项目根 `设定/` 为本书正式设定。若 `对标/{当前书名}/` 的内容确认只是从本书 `设定/` 或 `拆文库/{导入书名}/` 复制而来，且没有人工补充，再删除这个误建目录。
+3. 清理 `设定/题材定位.md` 中把当前书登记为主/副对标的字段；真实外部对标登记不动。
+4. 若某个 `对标/{外部书名}/` 目录名看似外部作品，但内容实际来自当前书，删除这份错误视图，再从真正的 `拆文库/{对标书名}/` 重新同步；不要改名冒充修复。
+5. 重新运行 `/story-setup`（Codex 用 `$story-setup`）并新开会话，使 v23 的 agent 模板生效；在此之前 spawn 照常工作，只会多一条版本不匹配提示。
 
 ## 追踪模型迁移（v0.7.2 及更早的长篇项目必读）
 
@@ -94,7 +107,15 @@
 
 ## 版本变更
 
-### v22 (当前)
+### v23 (当前)
+
+- `.story-deployed` 的 `agents_version` 升级到 `23`（`setup_skill_version` 仍为 `1.2.7`）。
+- **导入书与对标书解耦**：`story-import` 不再把 `{导入书名}` 自动登记为主/副对标，也不再把本书拆解或设定复制到 `对标/`；外部对标必须来自独立 `拆文库/{对标书名}/`，无外部对标时不创建子目录、不写主对标字段。
+- **历史误建防回流**：长短篇写作、跨书召回与 `story-explorer` 排除当前作品、来源指向当前正文的拆文目录，以及历史误建的 `对标/{当前书名}/`。
+- **统一 agent 版本提示（F-011）**：所有 spawn-capable Skill 都读 `.story-deployed.agents_version` 并在不匹配时明确提示，但不阻断 spawn；agent 文件缺失或运行时不暴露 custom agent 时才降级 solo/direct。
+- 已部署项目请按上方「导入项目的自对标清理」核对旧目录，重新运行 `/story-setup` 刷新 hooks/agents/references，并**新开会话**。
+
+### v22
 
 - `.story-deployed` 的 `agents_version` 升级到 `22`，`setup_skill_version` 回到上游线 `1.2.7`。
 - **`setup_skill_version` 停止走 fork 自有版本线**：v20 曾把它升到 `1.3.0` 标记 `.agents` canonical 架构，但它与 `agents_version` 在四个文件里都是相邻行，上游每次 bump `agents_version` 就连带冲突（v22 这次 6 个冲突里 5 个由此而来）。架构标识改由 `resolver_strategy: agents-canonical-v1` 单独承担——该字段上游不改动，历次合并均自动通过。已部署项目无需处理：运行时只认 `agents_version`，sentinel 里残留的 `setup_skill_version: 1.3.0` 不触发任何提示。

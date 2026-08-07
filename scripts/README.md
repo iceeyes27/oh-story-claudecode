@@ -38,6 +38,7 @@
 | `test-prose-backstop-hook.sh` | `check-prose-after-write.sh` 回归 | 本地 |
 | `test-story-continuity.sh` | `detect-story-gaps.sh` 跨批连续性后置回归 | 本地 |
 | `test-longform-stability.sh` | 长篇稳定性工具链（`stability-audit.js` + `handoff-pack.js` + `archive-stability.js`）回归：契约 beat/禁词/门控/角色不变量 POV 扫描/世界观不变量违规词/交接继承/归档透明回退 | 本地 |
+| `test-flow-state.sh` | `story-write` 写作阶段披露状态工具（`flow-state.js`）回归：阶段识别、`.active-book` 路径边界、缺追踪/缺细纲阻塞、短篇正文检查路径、状态更新字段校验 | 改 `flow-state.js` 或 `progressive-disclosure.md` 后 |
 | `test-state-store.sh` | 结构化状态库（`state-query.js`）回归：分片路由/时点快照折叠/活跃与超期伏笔/矛盾检测（死亡后活动、未埋先收、重复回收、分片错位） | 本地 |
 | `test-codex-hooks.sh` | Codex hook 合成 stdin/stdout 契约 | 本地 |
 | `test-static-check.py` | 真 frontmatter block、精确路径/锚点、跨 Skill 引用、fence、死 reference、Agent 与章节链接 fixture | 本地 |

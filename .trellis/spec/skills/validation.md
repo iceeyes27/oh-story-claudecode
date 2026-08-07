@@ -7,6 +7,7 @@
 - `bash scripts/check-shared-files.sh`：校验共享副本和部署模板一致性。
 - `bash scripts/check-python-invocation.sh`：禁止 Windows 环境会失败的裸 `python3` 调用。
 - `bash scripts/check-hook-regex-sync.sh` 与 `bash scripts/test-ai-patterns.sh`：校验实时 hook 与共享扫描规则同步。
+- `bash scripts/test-flow-state.sh`：改 `story-write` 写作阶段披露协议或 `flow-state.js` 时运行，校验阶段识别、状态更新边界和关键缺失项行为。
 - `python scripts/check-unified-skill-upstream-drift.py`：校验统一目录对上游拆分目录的人工迁移义务。
 - 需要查看迁移范围时使用 `python scripts/check-unified-skill-upstream-drift.py --report`；该报告只读，不自动覆盖统一 Skill。
 - `python scripts/check-current-skill-contracts.py`：除版本与产物契约外，拒绝 `.github/workflows/` 中的任何文件，保持本 fork 仅使用本地验证。

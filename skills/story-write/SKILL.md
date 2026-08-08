@@ -49,7 +49,8 @@ disable: true
 2. **从验证过的模式出发**。先问"什么被验证过有效，我如何重新交付"，少从"我想写什么"直接起步。扫榜找方向，拆文找模块，对标找节奏。
 3. **用模块组装，不要重新发明**。每个题材都有验证过的剧情模式——反转怎么铺、爽点怎么爆、感情怎么拉扯。找到对的模块，把对标书的具体角色看成功能位（对手/盟友/催化剂），再映射到你的角色。用你自己的素材填充这些功能位。
 4. **只加载必需信息**。写每章/每节时只加载"不知道就会写错"的信息。涉及角色的状态、待回收的伏笔、相关设定。其余留在文件系统里。
-5. **契约与推进决策走权威参考文件**。涉及读者契约、主角代理权、利益安全、期待债、终局储备（终局底牌/升级台阶）、机构/势力边界和 契约安全 / 需补强 / 契约破坏 风险判定时，先按 `references/reader-contract-and-progression.md` 校准，不在 SKILL.md 内复制长规则。
+5. **阶段披露由状态驱动**。每轮先按 `references/progressive-disclosure.md` 识别 `mode`、`current_phase`、`current_stage`、`missing_inputs`、`artifacts`、`next_action`；只展示和读取当前阶段必需资料。用户说"继续"、"日更"、"精修"、"检查"时，优先回到已识别阶段，不重新展开完整流程。
+6. **契约与推进决策走权威参考文件**。涉及读者契约、主角代理权、利益安全、期待债、终局储备（终局底牌/升级台阶）、机构/势力边界和 契约安全 / 需补强 / 契约破坏 风险判定时，先按 `references/reader-contract-and-progression.md` 校准，不在 SKILL.md 内复制长规则。
 
 | 题材 | 核心情绪 | 重点参考 |
 |------|---------|---------|
@@ -102,6 +103,10 @@ disable: true
 **匹配优先级**：同时命中多行时，按 大修 → 写指定章 → 补纲/扩纲 → 日更续写 → 开书 的顺序匹配。用户点名要"细纲/补纲/规划剧情"而未要正文时，优先入 补纲/扩纲，不入日更。日更续写的 AND 条件（项目已有正文+追踪）不满足时，提示用户"项目还没有正文，建议先开书/写第1章"。
 
 **日更续写保持在 workflow 内**：一旦本次请求路由到 `references/workflow-daily.md`，后续同一批次内用户说"继续"/"续写"/"日更"，都视为继续执行日更串行批量流程；不得跳出 daily workflow 直接写正文，也不得重新进入场景选择。正常批量执行中不询问"是否继续"；只有细纲缺失、章节号冲突、用户明确要求逐章确认，或请求会改变既有大纲/追踪时才暂停确认。
+
+**阶段披露状态**：进入任何长篇场景前先按 `references/progressive-disclosure.md` 做一次轻量识别。能从 `.active-book`、`追踪/_tracking-state.json`、`追踪/上下文.md`、细纲和正文目录推断当前阶段时，直接执行对应流程；只有 `missing_inputs` 非空时才提问。每章通过 Phase 5 后更新流程状态中的 `current_chapter`、`current_stage`、`artifacts` 和 `next_action`。
+
+文件模式可用 `scripts/flow-state.js` 辅助识别和维护状态：`detect --write` 写入 `追踪/写作流程状态.json`，`read` 读取现有状态，`update` 合并当前阶段结果。该工具只处理流程状态，不生成正文，也不修改追踪事务。
 
 无法判断场景时，列出上述场景表让用户选择，不要开放式提问。
 
@@ -209,6 +214,7 @@ disable: true
 | 设定/文风.md（自定义文风·优先级最高） | 本书 | 用户自写（Claude Code 可代写）；导入/拆解不覆盖 | Phase 4 每章写作前：含实质内容则取代对标文风作权威风格基 |
 | 对标/{书名}/文风.md | 对标书 | analyze Stage 6 输出 → story-import 显式绑定或本 skill 首次引用时同步 | Phase 4 每章写作前（文风召回；有自定义文风时降为参考/句长兜底） |
 | 大纲/卷纲_第X卷.md | 卷 | Phase 3 | Phase 4 写卷首章前 |
+| 追踪/写作流程状态.json | 书/流程 | Phase 1 推断后创建或更新 | 每轮开始按 `references/progressive-disclosure.md` 读取；只用于判断阶段和资料范围，不进正文 prompt |
 | 追踪/_tracking-state.json | 全书 | Phase 3 初始化 | 唯一结构化权威，不进正文 prompt；每章运行 `tracking_commit.py check` 读取章号和修订号 |
 | 追踪/伏笔.md | 全书当前视图 | Phase 3 初始化 | 续写状态卡缺项时按 ID 定点查询；每 ID 只一行 |
 | 追踪/时间线/{作者真相.md,读者已知.md} | 全书当前事实/认知派生视图 | Phase 3 初始化 | 按作者真相或读者认知的实际问题选择视图 |
@@ -455,6 +461,8 @@ advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界�
 | 写作技法全程参考 | `references/writing-craft.md` |
 | 格式与结构规范 | `references/format-and-structure.md`（仅对话/段落格式适用长篇） |
 | 状态追踪协议 | `references/state-tracking.md` |
+| 写作阶段披露协议 | `references/progressive-disclosure.md` |
+| 写作流程状态工具 | `scripts/flow-state.js` |
 | 结构化状态库（实验性旁路） | `references/state-store.md` |
 | 当前剧情单元与契约校准 | `references/reader-contract-and-progression.md` |
 
@@ -920,6 +928,7 @@ advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界�
 | 写作技法全程参考 | `references/writing-craft.md` |
 | 格式与结构规范 | `references/format-and-structure.md`（仅对话/段落格式适用长篇） |
 | 状态追踪协议 | `references/state-tracking.md` |
+| 写作阶段披露协议 | `references/progressive-disclosure.md` |
 | 结构化状态库（实验性旁路） | `references/state-store.md` |
 | 当前剧情单元与契约校准 | `references/reader-contract-and-progression.md` |
 

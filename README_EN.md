@@ -1,4 +1,4 @@
-<!-- Last synced with README.md: 2026-07-28 -->
+<!-- Last synced with README.md: 2026-08-08 -->
 
 **English** | [中文](README.md)
 
@@ -20,6 +20,8 @@ Built around four pillars: reverse-engineering hits · plot modularization · la
 
 > Starting in v0.8.0: the complete novel check's three specialist dependencies — `ai-flavor-scan`, `dialogue-naturalness-scan`, and `jargon-verb-scan` — are included in the cross-platform public release, bringing the published Skill/Command set to 14. The Claude marketplace and release metadata now use 0.8.0, and local adapter drift, stale test paths, and Node 18/22 OpenCode checks are repaired.
 > The current public set also includes `batch-pollution-detector`, for 15 total, so `story-deslop` file-mode pollution checks remain available after cross-platform deployment.
+>
+> Upstream v0.7.5 is now integrated: Claude's prose-write guard gains the missing tracking checkpoint; long-form book-opening phases 1-3 move to `story-write/references/workflow-setup.md` for on-demand loading; and over-restrictive prose rules such as treating ordinary “said” as a violation are removed. **The deployment contract is now `agents_version: 24`; deployed projects must rerun `/story-setup` and start a new session.**
 >
 > Upstream v0.7.3/v0.7.4 fixes are now integrated: imported works are separated from external benchmarks; long-form tracking uses `_tracking-state.json` plus `tracking_commit.py` as one transaction model; platform detection, multi-target reference checks, Windows style sampling, TOC chapter slicing, review-rubric parity, chapter-length contracts, and Heiyan channel output are repaired. Changes from upstream split skills were ported into this fork's unified `story-write`, `story-analyze`, and `story-scan` entries.
 >

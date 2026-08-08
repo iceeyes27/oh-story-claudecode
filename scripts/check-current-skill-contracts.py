@@ -1254,7 +1254,7 @@ def validate_repository(repo_root: Path, manifest: ContractManifest) -> List[Fin
         )
 
     for relative in (
-        "skills/story-write/SKILL.md",
+        "skills/story-write/references/workflow-setup.md",
         "skills/story-write/references/cross-book-recall.md",
     ):
         benchmark_discovery = repo_root / relative

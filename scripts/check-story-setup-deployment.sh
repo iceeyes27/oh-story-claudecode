@@ -60,7 +60,7 @@ write_sentinel() {
   local root="$1"
   cat > "$root/.story-deployed" <<'SENTINEL'
 deployed_at: 2026-05-24T00:00:00Z
-agents_version: 23
+agents_version: 24
 setup_skill_version: 1.2.7
 target_cli: claude-code
 resolver_strategy: project-local-skill-reference
@@ -303,7 +303,7 @@ setup_git_repo "$bad_sentinel_root"
 copy_hooks "$bad_sentinel_root"
 cat > "$bad_sentinel_root/.story-deployed" <<'SENTINEL'
 deployed_at: 2026-05-24T00:00:00Z
-agents_version: 23
+agents_version: 24
 setup_skill_version: 1.2.7
 resolver_strategy: project-local-skill-reference
 references_dir: .claude/skills/story-setup/references/agent-references
@@ -318,14 +318,14 @@ setup_git_repo "$stale_previous_root"
 copy_hooks "$stale_previous_root"
 cat > "$stale_previous_root/.story-deployed" <<'SENTINEL'
 deployed_at: 2026-05-24T00:00:00Z
-agents_version: 22
+agents_version: 23
 setup_skill_version: 1.2.7
 target_cli: claude-code
 resolver_strategy: project-local-skill-reference
 references_dir: .claude/skills/story-setup/references/agent-references
 SENTINEL
 stale_previous_out="$(run_from_nested "$stale_previous_root" session-start.sh 2>&1 || true)"
-echo "$stale_previous_out" | grep -q '低于 v23' || fail "session-start did not warn for agents_version 22 stale v23 deployment"
+echo "$stale_previous_out" | grep -q '低于 v24' || fail "session-start did not warn for agents_version 23 stale v24 deployment"
 
 newer_project_root="$TMP_DIR/newer-project"
 mkdir -p "$newer_project_root/.claude/skills/story-setup/references/agent-references"
@@ -333,14 +333,14 @@ setup_git_repo "$newer_project_root"
 copy_hooks "$newer_project_root"
 cat > "$newer_project_root/.story-deployed" <<'SENTINEL'
 deployed_at: 2026-05-24T00:00:00Z
-agents_version: 24
+agents_version: 25
 setup_skill_version: 1.3.0
 target_cli: claude-code
 resolver_strategy: project-local-skill-reference
 references_dir: .claude/skills/story-setup/references/agent-references
 SENTINEL
 newer_project_out="$(run_from_nested "$newer_project_root" session-start.sh 2>&1 || true)"
-echo "$newer_project_out" | grep -q '高于本 hook 支持的 v23' || fail "session-start did not reject agents_version 24 downgrade"
+echo "$newer_project_out" | grep -q '高于本 hook 支持的 v24' || fail "session-start did not reject agents_version 25 downgrade"
 echo "$newer_project_out" | grep -q '不要降级覆盖' || fail "session-start did not explain future-version safety"
 
 mixed_version_root="$TMP_DIR/mixed-version"
@@ -350,7 +350,7 @@ copy_hooks "$mixed_version_root"
 touch "$mixed_version_root/.claude/skills/story-setup/references/agent-references/dummy.md"
 cat > "$mixed_version_root/.story-deployed" <<'SENTINEL'
 deployed_at: 2026-05-24T00:00:00Z
-agents_version: 23
+agents_version: 24
 setup_skill_version: 1.2.6
 target_cli: claude-code
 resolver_strategy: project-local-skill-reference
@@ -358,11 +358,11 @@ references_dir: .claude/skills/story-setup/references/agent-references
 SENTINEL
 mixed_version_out="$(run_from_nested "$mixed_version_root" session-start.sh 2>&1 || true)"
 # agents_version 是唯一运行时过期权威；setup_skill_version 落后不触发重部署（设计如此）
-if echo "$mixed_version_out" | grep -q '低于 v23'; then
-  fail "session-start incorrectly nagged '低于 v23' for current agents_version=23 just because setup_skill_version lags"
+if echo "$mixed_version_out" | grep -q '低于 v24'; then
+  fail "session-start incorrectly nagged '低于 v24' for current agents_version=24 just because setup_skill_version lags"
 fi
 if echo "$mixed_version_out" | grep -q '高于本 hook'; then
-  fail "session-start incorrectly nagged '高于本 hook' for current agents_version=23 just because setup_skill_version lags"
+  fail "session-start incorrectly nagged '高于本 hook' for current agents_version=24 just because setup_skill_version lags"
 fi
 
 # 多端部署的 references_dir 是逗号分隔多条路径。整串当一条路径查会每次开会话都误报缺失，
@@ -376,7 +376,7 @@ touch "$multi_end_root/.claude/skills/story-setup/references/agent-references/du
 touch "$multi_end_root/.codex/skills/story-setup/references/agent-references/dummy.md"
 cat > "$multi_end_root/.story-deployed" <<'SENTINEL'
 deployed_at: 2026-05-24T00:00:00Z
-agents_version: 23
+agents_version: 24
 setup_skill_version: 1.2.7
 target_cli: claude-code,codex
 resolver_strategy: project-local-skill-reference
@@ -489,12 +489,12 @@ echo "  OK TS9 settings JSON"
 # agent 模板要带住关键行为规则。原先还夹着一批「UPGRADING.md/README 必须写到某句话」
 # 的文档完整性断言——那种改一个词就红、测的是措辞不是行为，已随 check-story-write-contract.sh
 # 一并去掉，发版是否补 UPGRADING 由发版清单和人把关，不靠 CI 钉死措辞。
-assert_grep 'AGENTS_VERSION.*-lt 23|AGENTS_VERSION" -lt 23' "$HOOKS_DIR/session-start.sh" "session-start must warn for agents_version 22 under v23 deployment"
-assert_grep 'AGENTS_VERSION.*-gt 23|AGENTS_VERSION" -gt 23' "$HOOKS_DIR/session-start.sh" "session-start must reject agents_version 24 downgrade"
-assert_grep 'agents_version.*小于 `23`|版本 < 23' "$SKILL_DIR/SKILL.md" "story-setup redeploy branch must treat agents_version 22 as stale"
-assert_grep 'agents_version.*大于 `23`' "$SKILL_DIR/SKILL.md" "story-setup must stop before downgrading a newer deployment"
+assert_grep 'AGENTS_VERSION.*-lt 24|AGENTS_VERSION" -lt 24' "$HOOKS_DIR/session-start.sh" "session-start must warn for agents_version 23 under v24 deployment"
+assert_grep 'AGENTS_VERSION.*-gt 24|AGENTS_VERSION" -gt 24' "$HOOKS_DIR/session-start.sh" "session-start must reject agents_version 25 downgrade"
+assert_grep 'agents_version.*小于 `24`|版本 < 24' "$SKILL_DIR/SKILL.md" "story-setup redeploy branch must treat agents_version 23 as stale"
+assert_grep 'agents_version.*大于 `24`' "$SKILL_DIR/SKILL.md" "story-setup must stop before downgrading a newer deployment"
 assert_grep 'Notice: agents bundle 版本不匹配' "$REPO_ROOT/skills/story-review/SKILL.md" "story-review must surface an agents_version mismatch"
-assert_grep '大于 23 时额外提示先更新 oh-story-claudecode' "$REPO_ROOT/skills/story-review/SKILL.md" "story-review must tell newer deployments to update the package first"
+assert_grep '大于 24 时额外提示先更新 oh-story-claudecode' "$REPO_ROOT/skills/story-review/SKILL.md" "story-review must tell newer deployments to update the package first"
 assert_grep '^version:[[:space:]]*1\.2\.7$' "$SKILL_FILE" "story-setup frontmatter must match the deployed setup version"
 
 # Phase 1 自检的目录名单是硬编码的，必须与实际 references/ 子目录集合一致。
@@ -561,7 +561,19 @@ run_guard() {
 # 长篇授权流：缺细纲拦截 / 有细纲放行 / 章号补零容忍
 [ "$(run_guard 'book/正文/第1章_开端.md')" = "2" ] || fail "guard did not BLOCK long prose when 细纲 missing"
 : > "$guard_root/book/大纲/细纲_第1章.md"
+# 细纲齐了还要过追踪检查点（issue #305 起 Claude 侧也有这道门，与另三端同序）。
+# 本节测的是细纲门与路径分类，不是追踪门，所以先落一份有效 state 把追踪这一维固定住。
+# last_committed 取一个大于本节所有用例章号的值：章号已在追踪范围内即跳过顺序校验，
+# 于是 第1/7/123/124 章都只被细纲门判定。顺序校验本身由 test-prose-net-parity.sh Part F
+# 的场景矩阵覆盖，不在这里重复。
+mkdir -p "$guard_root/book/追踪"
+printf '{"schema_version":4,"state_revision":0,"last_committed_chapter":200}\n' > "$guard_root/book/追踪/_tracking-state.json"
+printf '> 状态修订：0。\n' > "$guard_root/book/追踪/上下文.md"
 [ "$(run_guard 'book/正文/第1章_开端.md')" = "0" ] || fail "guard wrongly blocked long prose when 细纲 present"
+# 追踪门本身：state 移走即拦（Claude 端此前静默放行，写出无追踪正文）
+mv "$guard_root/book/追踪/_tracking-state.json" "$guard_root/book/追踪/_state.bak"
+[ "$(run_guard 'book/正文/第1章_开端.md')" = "2" ] || fail "guard did not BLOCK long prose when tracking state missing"
+mv "$guard_root/book/追踪/_state.bak" "$guard_root/book/追踪/_tracking-state.json"
 [ "$(run_guard 'book/正文/第001章_开端.md')" = "0" ] || fail "guard did not tolerate chapter-number zero padding (第001章 vs 细纲_第1章)"
 : > "$guard_root/book/大纲/细纲_第7章_惊变.md"
 [ "$(run_guard 'book/正文/第7章_x.md')" = "0" ] || fail "guard did not tolerate title-suffixed 细纲 (细纲_第7章_惊变.md)"

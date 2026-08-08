@@ -21,6 +21,8 @@
 > v0.8.0 起：完整小说复合检查依赖的 `ai-flavor-scan`、`dialogue-naturalness-scan`、`jargon-verb-scan` 纳入跨平台公开发布，公开 Skill/Command 增至 14 个；Claude marketplace 与版本信息同步到 0.8.0，并修复本地适配、测试路径及 Node 18/22 的 OpenCode 检查差异。
 > 当前公开集合另含 `batch-pollution-detector`，共 15 个，保证 `story-deslop` 文件模式的脚本污染预检在跨平台部署后不会缺席。
 >
+> 已同步上游 v0.7.5：Claude 写正文守卫补齐追踪检查点；长篇开书 Phase 1-3 移入 `story-write/references/workflow-setup.md` 按需加载；清理把普通「说」判违规等过度限制。**部署契约为 `agents_version: 24`，已部署项目需重跑 `/story-setup` 并新开会话。**
+>
 > 已同步上游 v0.7.3/v0.7.4：导入书与外部对标彻底分离；长篇追踪改用 `_tracking-state.json` + `tracking_commit.py` 单一事务模型；修复部署端误判、多端参考包误报、Windows 文风采样、章节目录误切片、审查评分漂移、静态字数双标准和黑岩频道覆盖。上游 split Skill 的改动已迁入本 fork 的 `story-write` / `story-analyze` / `story-scan` 统一入口。
 >
 > v0.7.2 起：新增本地工作台 `/story dashboard`——零生产依赖、只绑 `127.0.0.1`，分开展示 `拆文库/` 与写作项目文件树，支持搜索、Markdown 预览、轻量编辑和冲突保护；治细纲形状被正文照抄导致的生硬与章尾总结体（细纲只规定「要发生什么」，不规定正文形状）；修会话起点两处长期误报（拆完的书被反复报成未完成、版本提醒每次会话刷屏）。**本版把 `agents_version` 发到 21**，已部署项目需重新运行 `/story-setup` 并新开会话，否则 v0.7.1 与本版的正文、hook 改动都不生效。

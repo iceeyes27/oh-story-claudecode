@@ -313,8 +313,8 @@ def test_stale_scan_phase_reference_accepts_backticks() -> None:
         "stale-topic-decision-phase-reference",
     )
     require(
-        not stale,
-        "统一 Skill 文档不应保留选题决策 Phase 数字锚点，实际命中 {}".format(sorted(stale)),
+        "skills/story-write/references/workflow-setup.md" in stale,
+        "统一长篇开书 workflow 的选题决策阶段引用必须被扫到，实际命中 {}".format(sorted(stale)),
     )
 
 

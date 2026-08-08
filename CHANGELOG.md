@@ -13,6 +13,21 @@ All notable changes to this project will be documented in this file.
 - **OpenCode Node 能力检测**：先探测 `--experimental-strip-types`；支持时运行插件行为测试，不支持时保留静态语法与生成一致性检查，并明确报告跳过原因。
 - **仓库适配一致性**：Claude、Codex、WorkBuddy 入口由 `.agents/skills` 唯一来源重新生成，适配清单同步刷新。
 
+## v0.7.5（上游同步）
+
+> 将上游 v0.7.5 的稳定性修复迁入本 fork；fork 发布版本仍保持 v0.8.0，部署契约升级到 `agents_version: 24`。
+
+### 修复
+
+- **Claude 追踪检查点补齐**：写正文前的 Bash 守卫接入共享 `tracking-checkpoint` 核，追踪状态缺失、schema 错误、状态卡修订不一致和上一章事务未提交不再从 Claude 端漏过。
+- **正文规则去重与纠偏**：普通「说」可低频保留；心理外化不再诱导堆无功能小动作；段落按动作和信息变化调整，保留句内连贯性。
+- **长篇开书材料按需加载**：上游 `story-long-write` 的 Phase 1-3 抽到 `workflow-setup.md`；本 fork 将其迁入统一 `story-write/references/`，不恢复旧分拆 Skill。
+
+### 维护
+
+- 部署契约与会话提醒同步到 `agents_version: 24`，升级后需重新运行 `/story-setup` 并新开会话。
+- Bash/JS/Codex 正文守卫的一致性测试扩展到追踪检查点场景。
+
 ## v0.7.4（上游同步）
 
 > 将上游 v0.7.3/v0.7.4 的有效修复迁移到本 fork 的统一 Skill 架构；fork 版本仍保持 v0.8.0。

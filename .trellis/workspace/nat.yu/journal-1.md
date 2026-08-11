@@ -46,3 +46,36 @@
 ### Status
 
 [OK] **Completed**
+
+
+## Session 3: 修复故事工具链审查问题
+
+**Date**: 2026-08-11
+**Task**: 修复故事工具链审查问题
+**Branch**: `main`
+
+### Summary
+
+完成六组审查问题修复、跨平台适配与回归验证。
+
+### Main Changes
+
+- 统一 Claude Bash hook 与多端共享核心
+- 新增拆文阶段边界、审查状态和扫榜契约
+- 限制 Codex 工程发现范围并严格校验目标平台
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `a7b87cf` | (see git log) |
+
+### Testing
+
+- [OK] 全量静态检查 30/30 通过
+- [OK] 契约、部署、平台适配与新增回归用例通过
+- [OK] 正文守卫 parity 与无 Node 场景通过
+
+### Status
+
+[OK] **Completed**

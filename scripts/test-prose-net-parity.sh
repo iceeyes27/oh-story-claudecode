@@ -732,6 +732,11 @@ revisionbackup pass"
 
   # node 缺席时追踪门必须 fail-open（大纲门仍靠纯 bash 拦住）。
   local nonode="$tmp/nonode"; mkdir -p "$nonode"
+  # /usr/bin/node may exist on Linux/WSL, so merely narrowing PATH does not
+  # reliably model a native Claude install without Node. Shadow it with a
+  # deterministic failing executable while retaining the standard shell tools.
+  printf '#!/bin/sh\nexit 127\n' > "$nonode/node"
+  chmod +x "$nonode/node"
   local proj="$tmp/nostate" abs="$tmp/nostate/书/正文/第001章_测试.md"
   local payload; payload=$(python3 -c 'import json,sys;print(json.dumps({"tool_input":{"file_path":sys.argv[1]}}))' "$abs")
   ( cd "$proj" && PATH="$nonode:/usr/bin:/bin" CLAUDE_PROJECT_DIR="$proj" CLAUDE_TOOL_INPUT="$payload" \

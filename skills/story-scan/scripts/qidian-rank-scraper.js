@@ -29,7 +29,14 @@
 const fs = require("fs");
 const https = require("https");
 const path = require("path");
-const { ab, sleep, evalJSON, scrollLoad, getArg, localDateStamp, runCli } = require("./cdp-utils");
+const { ab, sleep, evalJSON, scrollLoad, runCli } = require("./cdp-utils");
+const {
+  parseCli,
+  createTimeSnapshot,
+  normalizeQidianBook,
+  summarizeMissing,
+  truncateDescription,
+} = require("./scan-contract");
 
 const PC_BASE_URL = "https://www.qidian.com/rank";
 const MOBILE_BASE_URL = "https://m.qidian.com";
@@ -301,51 +308,56 @@ function normalizeMobileBook(record, idx) {
   const title = record.bName || record.bookName || "";
   const bid = record.bid || record.bookId || "";
   const genre = [record.cat, record.subCat].filter(Boolean).join("·");
-  const stats = [];
-  if (record.cnt) stats.push(record.cnt);
-  if (record.rankCnt) stats.push(`榜单值 ${record.rankCnt}`);
-
-  return {
+  return normalizeQidianBook({
     rank: record.rankNum || idx + 1,
     title,
     url: bid ? `${MOBILE_BASE_URL}/book/${bid}/` : "",
     author: record.bAuth || record.author || "",
     genre,
-    status: stats.join(" · "),
-    descText: record.desc || "",
-    updateText: "",
-  };
+    status: record.status || record.bookStatus || record.isFinish,
+    contractStatus: record.contractStatus || record.signStatus || record.sign,
+    chargeMode: record.chargeMode || record.vipStatus || record.isVip,
+    wordCount: record.wordCount || record.wordsCount || record.totalWords || record.cnt,
+    totalRecommend: record.totalRecommend || record.recomCount || record.rankCnt,
+    tags: record.tags || record.tagList,
+    latestUpdate: record.latestUpdate || record.lastChapterName || record.updateTime,
+    description: record.desc || record.description,
+  });
 }
 
 function renderMarkdown(rt, books, url, sourceMode, extraLines = []) {
-  const now = new Date().toISOString();
+  const normalizedBooks = books.map(normalizeQidianBook);
   const lines = [
     `# 起点 · ${rt.label}`,
     "",
     `- 来源：${url}`,
     `- 抓取方式：${sourceMode}`,
-    `- 抓取时间：${now}`,
-    `- 条目数：${books.length}`,
+    `- 抓取时间：${SCAN_TIME.capturedAt}`,
+    `- 条目数：${normalizedBooks.length}`,
+    `- 数据质量：缺失字段 ${summarizeMissing(normalizedBooks)}`,
     ...extraLines,
     "",
     "---",
     "",
   ];
 
-  for (let i = 0; i < books.length; i++) {
-    const b = books[i];
+  for (let i = 0; i < normalizedBooks.length; i++) {
+    const b = normalizedBooks[i];
     lines.push(`## #${b.rank || i + 1} ${b.title}`);
-    const meta = [b.author, b.genre, b.status].filter(Boolean).join(" · ");
+    const meta = [b.author, b.genre, b.status, b.contractStatus, b.chargeMode].filter(Boolean).join(" · ");
     if (meta) lines.push(`*${meta}*`);
-    if (b.updateText) lines.push(`**最新更新：** ${b.updateText}`);
+    if (b.wordCount !== null) lines.push(`**字数：** ${b.wordCount}`);
+    if (b.totalRecommend !== null) lines.push(`**总推荐：** ${b.totalRecommend}`);
+    if (b.latestUpdate) lines.push(`**最新更新：** ${b.latestUpdate}`);
     if (b.tags?.length) lines.push(`**标签：** ${b.tags.join("、")}`);
     if (b.url) lines.push(`[作品页](${b.url})`);
-    if (b.descText) {
+    if (b.description) {
       lines.push("");
       lines.push("**简介**");
       lines.push("");
-      lines.push(b.descText);
+      lines.push(b.description);
     }
+    lines.push(`**缺失字段：** ${b.missing_fields.length ? b.missing_fields.join("、") : "无"}`);
     lines.push("", "---", "");
   }
 
@@ -395,12 +407,19 @@ async function scrapeRankMobile(rankTypeId) {
 // 主流程
 // ---------------------------------------------------------------------------
 
-const args = process.argv.slice(2);
-const PORT = parseInt(getArg(args, "--port") || "9222", 10);
-const OUTDIR = getArg(args, "--outdir") || ".";
-const RANKTYPE = getArg(args, "--type") || "hotsales";
-const SCRAPE_MODE = getArg(args, "--mode") || "auto"; // auto | mobile | cdp
-const FETCH_DETAIL = (getArg(args, "--detail") || "no") === "yes";
+const cli = parseCli(process.argv.slice(2), {
+  "--port": { type: "integer", min: 1, max: 65535, default: 9222 },
+  "--outdir": { type: "string", default: "." },
+  "--type": { type: "enum", values: [...RANK_TYPES.map((r) => r.id), "all"], default: "hotsales" },
+  "--mode": { type: "enum", values: ["auto", "mobile", "cdp"], default: "auto" },
+  "--detail": { type: "enum", values: ["yes", "no"], default: "no" },
+});
+const PORT = cli.port;
+const OUTDIR = cli.outdir;
+const RANKTYPE = cli.type;
+const SCRAPE_MODE = cli.mode;
+const FETCH_DETAIL = cli.detail === "yes";
+const SCAN_TIME = createTimeSnapshot();
 
 function scrapeRankCDP(port, rankTypeId) {
   const rt = RANK_TYPES.find((r) => r.id === rankTypeId);
@@ -422,7 +441,21 @@ function scrapeRankCDP(port, rankTypeId) {
   scrollLoad(port, 3);
   sleep(1000);
 
-  const books = extractBookList(port);
+  const books = extractBookList(port).map((book) => normalizeQidianBook({
+    rank: book.rank,
+    title: book.title,
+    author: book.author,
+    genre: book.genre,
+    status: book.status,
+    contractStatus: book.contractStatus,
+    chargeMode: book.chargeMode,
+    wordCount: book.wordCount,
+    totalRecommend: book.totalRecommend,
+    tags: book.tags,
+    latestUpdate: book.updateText,
+    url: book.url,
+    description: truncateDescription(book.descText),
+  }));
   if (!books.length) {
     console.log("  ⚠ 未提取到书籍");
     return null;
@@ -440,8 +473,8 @@ function scrapeRankCDP(port, rankTypeId) {
       const detail = extractDetail(port);
       if (detail) {
         if (detail.tags?.length) b.tags = detail.tags;
-        if (detail.intro) b.descText = detail.intro;
-        if (detail.update) b.updateText = detail.update;
+        if (detail.intro) b.description = truncateDescription(detail.intro);
+        if (detail.update) b.latestUpdate = detail.update;
       }
       console.log(`    [${i + 1}/${books.length}] ${b.title}`);
     }
@@ -500,8 +533,7 @@ async function main() {
       }
 
       const rtInfo = RANK_TYPES.find((r) => r.id === rt);
-      const date = localDateStamp();
-      const filename = `起点${rtInfo.label}_${date}.md`;
+      const filename = `起点${rtInfo.label}_${SCAN_TIME.dateStamp}.md`;
       fs.mkdirSync(OUTDIR, { recursive: true });
       const filepath = path.join(OUTDIR, filename);
       fs.writeFileSync(filepath, content, "utf-8");

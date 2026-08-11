@@ -114,6 +114,7 @@ echo "Repo: $REPO_ROOT"
 # TS1 — Hook dependency completeness
 assert_file "$HOOKS_DIR/lib/common.sh"
 assert_file "$HOOKS_DIR/lib/sentinel.sh"
+assert_file "$HOOKS_DIR/book-discovery-contract.json"
 runtime_artifacts="$(find "$HOOKS_DIR" -maxdepth 4 \( -path '*/.omc*' -o -name '.DS_Store' -o -name '*.tmp' -o -name '*.log' \) -print 2>/dev/null || true)"
 [ -z "$runtime_artifacts" ] || fail "hook templates contain runtime artifacts that would be recursively deployed: $runtime_artifacts"
 while IFS= read -r src; do
@@ -482,7 +483,17 @@ echo "  OK TS8 multi-book gap detection"
 
 # TS9 — Settings JSON remains valid
 python3 -m json.tool "$SETTINGS_FILE" >/dev/null
-echo "  OK TS9 settings JSON"
+node - "$SETTINGS_FILE" <<'NODE' || fail "settings hooks do not register Bash prose checks for success and failure events"
+const fs = require("fs")
+const settings = JSON.parse(fs.readFileSync(process.argv[2], "utf8")).hooks
+function has(event, matcherPattern, script) {
+  return (settings[event] || []).some((group) => matcherPattern.test(group.matcher || "") && (group.hooks || []).some((hook) => String(hook.command || "").includes(script)))
+}
+if (!has("PreToolUse", /Bash/, "guard-outline-before-prose.sh")) process.exit(1)
+if (!has("PostToolUse", /Bash/, "check-prose-after-write.sh")) process.exit(1)
+if (!has("PostToolUseFailure", /^Bash$/, "check-prose-after-write.sh")) process.exit(1)
+NODE
+echo "  OK TS9 settings JSON + Bash success/failure registration"
 
 # TS10 — Version threshold + deployed-behavior anchors
 # 只锚定「跑起来会坏」的东西：agents_version 阈值要跨文件对齐，部署到用户手里的
@@ -558,6 +569,35 @@ run_guard() {
   printf '%s' "$ec"
 }
 
+run_guard_payload() {
+  local payload="$1" ec=0
+  printf '%s' "$payload" \
+    | CLAUDE_PROJECT_DIR="$guard_root" bash "$guard_root/.claude/hooks/guard-outline-before-prose.sh" >/dev/null 2>&1 || ec=$?
+  printf '%s' "$ec"
+}
+
+registered_hook_command() {
+  local event="$1" script="$2"
+  node - "$SETTINGS_FILE" "$event" "$script" <<'NODE'
+const fs = require("fs")
+const [file, event, script] = process.argv.slice(2)
+const groups = (JSON.parse(fs.readFileSync(file, "utf8")).hooks || {})[event] || []
+for (const group of groups) {
+  if (!String(group.matcher || "").includes("Bash")) continue
+  const hook = (group.hooks || []).find((item) => String(item.command || "").includes(script))
+  if (hook) { process.stdout.write(String(hook.command)); process.exit(0) }
+}
+process.exit(1)
+NODE
+}
+
+run_registered_hook() {
+  local event="$1" script="$2" payload="$3" command ec=0
+  command="$(registered_hook_command "$event" "$script")" || return 97
+  printf '%s' "$payload" | CLAUDE_PROJECT_DIR="$guard_root" bash -c "$command" 2>/dev/null || ec=$?
+  return "$ec"
+}
+
 # 长篇授权流：缺细纲拦截 / 有细纲放行 / 章号补零容忍
 [ "$(run_guard 'book/正文/第1章_开端.md')" = "2" ] || fail "guard did not BLOCK long prose when 细纲 missing"
 : > "$guard_root/book/大纲/细纲_第1章.md"
@@ -585,6 +625,22 @@ mv "$guard_root/book/追踪/_state.bak" "$guard_root/book/追踪/_tracking-state
 # 非作品文件 / 无短篇工程信号 -> 放行（宁可漏拦不可误伤）
 [ "$(run_guard 'book/设定/角色.md')" = "0" ] || fail "guard wrongly blocked a non-prose file"
 [ "$(run_guard 'docs/正文.md')" = "0" ] || fail "guard wrongly blocked a non-story 正文.md (no 设定.md signal)"
+# Bash 直接写入：缺细纲拦截，有细纲放行；只读命令不误报；多目标任一缺细纲即拦截。
+[ "$(run_guard_payload '{"tool_name":"Bash","tool_input":{"command":"printf x > book/正文/第20章_Bash.md"}}')" = "2" ] \
+  || fail "guard did not BLOCK Bash redirection to prose without outline"
+: > "$guard_root/book/大纲/细纲_第20章.md"
+[ "$(run_guard_payload '{"tool_name":"Bash","tool_input":{"command":"printf x > book/正文/第20章_Bash.md"}}')" = "0" ] \
+  || fail "guard wrongly blocked Bash redirection when outline exists"
+[ "$(run_guard_payload '{"tool_name":"Bash","tool_input":{"command":"grep -n book/正文/第20章_Bash.md notes.md"}}')" = "0" ] \
+  || fail "guard wrongly treated read-only Bash as prose write"
+[ "$(run_guard_payload '{"tool_name":"Bash","tool_input":{"command":"echo '\''x > book/正文/第24章_引号文本.md'\''"}}')" = "0" ] \
+  || fail "guard wrongly treated a redirection character inside quoted text as a write"
+: > "$guard_root/book/大纲/细纲_第21章.md"
+[ "$(run_guard_payload '{"tool_name":"Bash","tool_input":{"command":"touch book/正文/第21章_a.md book/正文/第22章_b.md"}}')" = "2" ] \
+  || fail "guard did not inspect every Bash prose target"
+mkdir -p "$guard_root/space book/正文" "$guard_root/space book/大纲"
+[ "$(run_guard_payload '{"tool_name":"Bash","tool_input":{"command":"printf x > \"space book/正文/第23章_空格.md\""}}')" = "2" ] \
+  || fail "guard did not parse quoted Bash prose path with spaces"
 # 已存在正文 -> 放行（续写/改稿/去AI味）
 : > "$guard_root/book/正文/第9章_x.md"
 [ "$(run_guard 'book/正文/第9章_x.md')" = "0" ] || fail "guard wrongly blocked rewrite of an existing prose file"
@@ -592,6 +648,23 @@ mv "$guard_root/book/追踪/_state.bak" "$guard_root/book/追踪/_tracking-state
 [ "$(run_guard 'impbook/正文/第1章_x.md')" = "0" ] || fail "guard wrongly blocked story-import LONG prose migration (拆文库 source present)"
 : > "$guard_root/impshort/设定.md"
 [ "$(run_guard 'impshort/正文.md')" = "0" ] || fail "guard wrongly blocked story-import SHORT prose migration (拆文库 source present)"
+
+# 不仅静态检查 settings：从真实模板取出注册命令并执行，验证宿主事件到脚本的完整链路。
+registered_pre_payload='{"hook_event_name":"PreToolUse","tool_name":"Bash","tool_input":{"command":"printf x > book/正文/第125章_settings.md"}}'
+registered_pre_ec=0
+run_registered_hook PreToolUse guard-outline-before-prose.sh "$registered_pre_payload" >/dev/null || registered_pre_ec=$?
+[ "$registered_pre_ec" = "2" ] || fail "registered PreToolUse:Bash command did not block missing outline"
+printf '他' > "$guard_root/book/正文/第126章_settings.md"
+registered_post_payload='{"hook_event_name":"PostToolUse","tool_name":"Bash","tool_input":{"command":"printf x > book/正文/第126章_settings.md"}}'
+registered_post_out="$(run_registered_hook PostToolUse check-prose-after-write.sh "$registered_post_payload")" \
+  || fail "registered PostToolUse:Bash command failed"
+REGISTERED_JSON="$registered_post_out" node -e 'const x=JSON.parse(process.env.REGISTERED_JSON); if(x?.hookSpecificOutput?.hookEventName!=="PostToolUse") process.exit(1)' \
+  || fail "registered PostToolUse:Bash command did not return valid hook JSON"
+registered_failure_payload='{"hook_event_name":"PostToolUseFailure","tool_name":"Bash","tool_input":{"command":"printf x > book/正文/第126章_settings.md; false"},"error":"exit 1"}'
+registered_failure_out="$(run_registered_hook PostToolUseFailure check-prose-after-write.sh "$registered_failure_payload")" \
+  || fail "registered PostToolUseFailure:Bash command failed"
+REGISTERED_JSON="$registered_failure_out" node -e 'const x=JSON.parse(process.env.REGISTERED_JSON); if(x?.hookSpecificOutput?.hookEventName!=="PostToolUseFailure" || !x.hookSpecificOutput.additionalContext.includes("命令失败但文件可能已改变")) process.exit(1)' \
+  || fail "registered PostToolUseFailure:Bash command missed failure context"
 echo "  OK TS11 outline-before-prose guard"
 
 # TS11b — 阻断守卫在无 node 时必须回落纯 bash 抽取、仍然 exit 2（不得 fail-open）。
@@ -610,6 +683,13 @@ run_guard_nonode() {
       bash "$guard_root/.claude/hooks/guard-outline-before-prose.sh" >/dev/null 2>&1 || ec=$?
   printf '%s' "$ec"
 }
+run_guard_nonode_payload() {
+  local payload="$1" ec=0
+  printf '%s' "$payload" \
+    | CLAUDE_PROJECT_DIR="$guard_root" PATH="$nonode_shim:$PATH" \
+      bash "$guard_root/.claude/hooks/guard-outline-before-prose.sh" >/dev/null 2>&1 || ec=$?
+  printf '%s' "$ec"
+}
 if ! PATH="$nonode_shim:$PATH" node -e "" >/dev/null 2>&1; then
   # 缺细纲 -> 仍须拦截（bash 兜底解析出目标路径，照常 exit 2）
   [ "$(run_guard_nonode 'book/正文/第123章_无纲.md')" = "2" ] \
@@ -621,6 +701,24 @@ if ! PATH="$nonode_shim:$PATH" node -e "" >/dev/null 2>&1; then
   # 非正文目标 -> 放行
   [ "$(run_guard_nonode 'book/设定/角色.md')" = "0" ] \
     || fail "guard(no-node) wrongly blocked a non-prose file (bash 兜底)"
+  [ "$(run_guard_nonode_payload '{"tool_name":"Bash","tool_input":{"command":"printf x > book/正文/第130章_redir.md"}}')" = "2" ] \
+    || fail "guard(no-node) missed Bash redirection"
+  [ "$(run_guard_nonode_payload '{"tool_name":"Bash","tool_input":{"command":"printf x | tee book/正文/第131章_tee.md"}}')" = "2" ] \
+    || fail "guard(no-node) missed tee target"
+  [ "$(run_guard_nonode_payload '{"tool_name":"Bash","tool_input":{"command":"touch book/正文/第132章_a.md book/正文/第133章_b.md"}}')" = "2" ] \
+    || fail "guard(no-node) missed touch targets"
+  [ "$(run_guard_nonode_payload '{"tool_name":"Bash","tool_input":{"command":"cp draft.md book/正文/第134章_cp.md"}}')" = "2" ] \
+    || fail "guard(no-node) missed cp destination"
+  [ "$(run_guard_nonode_payload '{"tool_name":"Bash","tool_input":{"command":"mv draft.md book/正文/第135章_mv.md"}}')" = "2" ] \
+    || fail "guard(no-node) missed mv destination"
+  [ "$(run_guard_nonode_payload '{"tool_name":"Bash","tool_input":{"command":"printf x > \"space book/正文/第136章_空格.md\""}}')" = "2" ] \
+    || fail "guard(no-node) missed quoted path with spaces"
+  [ "$(run_guard_nonode_payload '{"tool_name":"Bash","tool_input":{"command":"printf x > \"book\\\\正文\\\\第140章_Windows路径.md\""}}')" = "2" ] \
+    || fail "guard(no-node) corrupted a quoted Windows backslash path"
+  [ "$(run_guard_nonode_payload '{"tool_name":"Bash","tool_input":{"command":"echo '\''x > book/正文/第137章_引号文本.md'\''"}}')" = "0" ] \
+    || fail "guard(no-node) misread quoted text as redirection"
+  [ "$(run_guard_nonode_payload '{"tool_name":"Bash","tool_input":{"command":"grep -n book/正文/第138章_readonly.md notes.md"}}')" = "0" ] \
+    || fail "guard(no-node) treated read-only Bash as a write"
   echo "  OK TS11b outline guard fail-closed without node"
 else
   echo "  SKIP TS11b (假 node 垫片未能遮蔽真 node，跳过 no-node 回归)"
@@ -641,6 +739,13 @@ run_guard_brokennode() {
       bash "$guard_root/.claude/hooks/guard-outline-before-prose.sh" >/dev/null 2>&1 || ec=$?
   printf '%s' "$ec"
 }
+run_guard_brokennode_payload() {
+  local payload="$1" ec=0
+  printf '%s' "$payload" \
+    | CLAUDE_PROJECT_DIR="$guard_root" PATH="$brokennode_shim:$PATH" \
+      bash "$guard_root/.claude/hooks/guard-outline-before-prose.sh" >/dev/null 2>&1 || ec=$?
+  printf '%s' "$ec"
+}
 resolved_node="$(PATH="$brokennode_shim:$PATH" bash -c 'command -v node' 2>/dev/null || true)"
 if [ "$resolved_node" = "$brokennode_shim/node" ]; then
   # node 探测通过但 CLI 抽取抛错 -> 缺细纲仍须拦截（bash 兜底解析目标路径）
@@ -650,6 +755,8 @@ if [ "$resolved_node" = "$brokennode_shim/node" ]; then
   # 有细纲 -> 放行（bash 兜底不误伤）
   [ "$(run_guard_brokennode 'book/正文/第124章_坏node.md')" = "0" ] \
     || fail "guard(broken-node) wrongly blocked long prose when 细纲 present (bash 兜底)"
+  [ "$(run_guard_brokennode_payload '{"tool_name":"Bash","tool_input":{"command":"touch book/正文/第139章_坏node.md"}}')" = "2" ] \
+    || fail "guard(broken-node) missed Bash target after CLI extraction failed"
   echo "  OK TS11c outline guard fail-closed when node present-but-broken"
 else
   echo "  SKIP TS11c (假 node 垫片未能遮蔽真 node，跳过 broken-node 回归)"

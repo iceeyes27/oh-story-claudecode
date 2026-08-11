@@ -305,6 +305,44 @@ def test_progress_schema_pins_are_repo_wide() -> None:
     )
 
 
+def test_stage6_cannot_rediscover_chapter_boundaries() -> None:
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        script = root / "skills/story-analyze/scripts/chapter-boundary.js"
+        skill = root / "skills/story-analyze/SKILL.md"
+        pipeline = root / "skills/story-analyze/references/pipeline-ops.md"
+        style = root / "skills/story-analyze/references/style-profile-generator.md"
+        for path in (script, skill, pipeline, style):
+            path.parent.mkdir(parents=True, exist_ok=True)
+        script.write_text(
+            "const CURRENT_SCHEMA_VERSION = 3\nsource_path source_bytes source_sha256\n",
+            encoding="utf-8",
+        )
+        skill.write_text(
+            "Stage 1、Stage 2、Stage 6 运行 chapter-boundary.js validate 后读取切片。\n",
+            encoding="utf-8",
+        )
+        pipeline.write_text(
+            "- source_path: 原文/原文.txt\n- source_bytes: 12\n- source_sha256: abc\n",
+            encoding="utf-8",
+        )
+        style.write_text(
+            "node skills/story-analyze/scripts/chapter-boundary.js validate x/_progress.md\n",
+            encoding="utf-8",
+        )
+        findings = VALIDATOR.stage_boundary_contract_findings(root, 3)
+        require("stage6-boundary-reslicing" not in finding_codes(findings), "validated Stage 6 contract must pass")
+        style.write_text(
+            "grep -nE '^第[0-9]+章' 原文/原文.txt\n相应调整 regex 后重新识别章节。\n",
+            encoding="utf-8",
+        )
+        findings = VALIDATOR.stage_boundary_contract_findings(root, 3)
+        require(
+            "stage6-boundary-reslicing" in finding_codes(findings),
+            "Stage 6 chapter rediscovery instructions must be rejected",
+        )
+
+
 def test_stale_scan_phase_reference_accepts_backticks() -> None:
     """统一 Skill 文档不应继续固定选题决策的旧 Phase 编号。"""
     current = repository_manifest().topic_decision_phase
@@ -804,6 +842,7 @@ def main() -> int:
     test_sibling_bullets_do_not_lend_the_missing_condition()
     test_undecodable_markdown_is_a_named_failure()
     test_progress_schema_pins_are_repo_wide()
+    test_stage6_cannot_rediscover_chapter_boundaries()
     test_deeply_nested_fallback_keeps_all_governing_ancestors()
     test_stale_scan_phase_reference_accepts_backticks()
     test_old_artifact_prose_silent_only()

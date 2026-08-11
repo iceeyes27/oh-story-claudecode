@@ -449,8 +449,8 @@ function testScraperFilenameDatesAreLocal() {
       `${name}: 文件名日期不能用 UTC（toISOString().slice(0,10)），必须用 localDateStamp()`
     );
     assert(
-      src.includes("localDateStamp()"),
-      `${name}: 输出文件名必须用 localDateStamp() 取本地日历日`
+      src.includes("localDateStamp()") || src.includes("createTimeSnapshot()"),
+      `${name}: 输出文件名必须使用本地日历日快照`
     );
   }
 }
@@ -529,7 +529,7 @@ function testQidianRankIsolation() {
   // 参数错误仍要快速失败，不能被 per-榜单隔离吞掉
   const badMode = runScraper(scraper, ["--type", "all", "--mode", "bogus"], {});
   assert.strictEqual(badMode.status, 1, "未知 --mode 必须失败");
-  assert.match(badMode.stderr, /未知 --mode: bogus/);
+  assert.match(badMode.stderr, /参数 --mode 的合法值：auto、mobile、cdp/);
   assert.strictEqual(badMode.files.length, 0);
 }
 

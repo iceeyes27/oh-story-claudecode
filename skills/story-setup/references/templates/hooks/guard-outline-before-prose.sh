@@ -1,5 +1,5 @@
 #!/bin/bash
-# guard-outline-before-prose.sh — PreToolUse(Write|Edit|MultiEdit) 流程守卫
+# guard-outline-before-prose.sh — PreToolUse(Bash|Write|Edit|MultiEdit) 流程守卫
 # 写「正文」前必须先有对应大纲/细纲，否则阻止（exit 2，BLOCKING）。
 #
 # 只拦截「首次创建正文文件且缺细纲」这一种情况：
@@ -19,7 +19,7 @@ source "$(dirname "$0")/lib/common.sh"
 export LC_ALL=C
 
 HOOK_INPUT="${CLAUDE_TOOL_INPUT:-}"
-if [ -z "$HOOK_INPUT" ] && [ ! -t 0 ]; then
+if [ -z "${STORY_GUARD_TARGET:-}" ] && [ -z "$HOOK_INPUT" ] && [ ! -t 0 ]; then
   HOOK_INPUT="$(cat)"
 fi
 # 故意不 export：Write/Edit/MultiEdit 负载里带整章正文（MultiEdit 还带 old_string+new_string），
@@ -29,8 +29,8 @@ fi
 # 的 node 调用处用管道喂 stdin（story_hook_cli.js extract-target 在 HOOK_INPUT 缺省时读 stdin）；
 # 下方 extract_target_bash 用的是 printf 内建，不需要 export。
 
-# 提取目标文件路径：优先 node 共享核（与其它端同一份实现）；node 缺席、或 node 在但抽取失败时
-# 都回落纯 bash 抽取。这是阻断守卫，不能因 node 问题而 fail-open——官方现在推荐原生二进制装
+# 提取目标文件路径：优先 node 共享核（与其它端同一份实现），支持 Bash 多目标；node 缺席、
+# 或 node 在但抽取失败时回落纯 bash 的直接 file_path 抽取。这是阻断守卫，不能因 node 问题而 fail-open——官方现在推荐原生二进制装
 # Claude Code，只有 npm 装法才带 Node，native 运行时可能无 node；旧 node 不识 node: 前缀、或
 # 部署的核损坏时 node 探测通过但抽取会抛错。只要能解析出目标路径就照常判定拦截，两条路径都抽不到
 # 才放行（宁可漏拦不可误伤）。
@@ -57,16 +57,198 @@ extract_target_bash() {
   return 1
 }
 
-TARGET=""
-if node -e "" >/dev/null 2>&1 && [ -f "$CLI" ]; then
-  TARGET="$(printf '%s' "$HOOK_INPUT" | node "$CLI" extract-target 2>/dev/null || true)"
-fi
-# node 在场却抽空（旧 node 不识 node: 前缀 / 核损坏时探测通过但抽取抛错）也回落纯 bash，
-# 否则会走 fail-open。两条路径都解析不到才放行。
-[ -z "$TARGET" ] && TARGET="$(extract_target_bash 2>/dev/null || true)"
-[ -z "$TARGET" ] && exit 0
+# 无 Node 环境使用的最小 shell 解析器。它不执行命令，只在引号外识别重定向与明确的
+# 写文件命令；无法确认的结构不推断，避免把命令参数里的普通正文路径误判为写入。
+extract_command_bash() {
+  local val decoded="" char next i=0 length
+  val="$(printf '%s' "$HOOK_INPUT" \
+    | grep -oE '"command"[[:space:]]*:[[:space:]]*"([^"\\]|\\.)*"' \
+    | head -n1 \
+    | sed -E 's/^"command"[[:space:]]*:[[:space:]]*"//; s/"$//')"
+  [ -n "$val" ] || return 1
+  # 按 JSON 转义顺序逐字符解码。不能先全局替换 \n/\t：Windows 路径在 JSON 中是
+  # `C:\\notes`，先替换会把第二个反斜杠与 n 误当换行，直接破坏路径。
+  length=${#val}
+  while [ "$i" -lt "$length" ]; do
+    char="${val:$i:1}"
+    if [ "$char" != '\' ] || [ $((i + 1)) -ge "$length" ]; then
+      decoded="${decoded}${char}"
+      i=$((i + 1))
+      continue
+    fi
+    i=$((i + 1))
+    next="${val:$i:1}"
+    case "$next" in
+      '"') decoded="${decoded}\"" ;;
+      '\') decoded="${decoded}\\" ;;
+      '/') decoded="${decoded}/" ;;
+      n) decoded="${decoded}"$'\n' ;;
+      r) decoded="${decoded}"$'\r' ;;
+      t) decoded="${decoded}"$'\t' ;;
+      *) decoded="${decoded}\\${next}" ;;
+    esac
+    i=$((i + 1))
+  done
+  printf '%s' "$decoded"
+}
+
+tokenize_shell_bash() {
+  local text="$1" token="" quote="" char next
+  local i=0 length=${#1}
+  while [ "$i" -lt "$length" ]; do
+    char="${text:$i:1}"
+    if [ -n "$quote" ]; then
+      if [ "$char" = "$quote" ]; then
+        quote=""
+      elif [ "$quote" = '"' ] && [ "$char" = '\' ]; then
+        next=""
+        [ $((i + 1)) -lt "$length" ] && next="${text:$((i + 1)):1}"
+        # shell 双引号只让反斜杠转义少数字符；`C:\book\正文` 中的普通路径
+        # 分隔符必须保留，不能无条件吃掉后一字符。
+        case "$next" in
+          '"'|'\'|'$'|'`') token="${token}${next}"; i=$((i + 1)) ;;
+          $'\n') i=$((i + 1)) ;;
+          *) token="${token}${char}" ;;
+        esac
+      else
+        token="${token}${char}"
+      fi
+      i=$((i + 1))
+      continue
+    fi
+    case "$char" in
+      "'"|'"') quote="$char" ;;
+      '\')
+        next=""
+        [ $((i + 1)) -lt "$length" ] && next="${text:$((i + 1)):1}"
+        case "$next" in
+          ' '|$'\t'|$'\r'|$'\n'|'>'|'<'|'|'|';'|'&'|'('|')'|"'"|'"'|'\')
+            token="${token}${next}"
+            i=$((i + 1))
+            ;;
+          *) token="${token}${char}" ;;
+        esac
+        ;;
+      ' '|$'\t'|$'\r'|$'\n')
+        [ -n "$token" ] && { printf '%s\n' "$token"; token=""; }
+        ;;
+      '>')
+        [ -n "$token" ] && { printf '%s\n' "$token"; token=""; }
+        printf '%s\n' '>'
+        [ $((i + 1)) -lt "$length" ] && [ "${text:$((i + 1)):1}" = '>' ] && i=$((i + 1))
+        ;;
+      '<'|'|'|';'|'&'|'('|')')
+        [ -n "$token" ] && { printf '%s\n' "$token"; token=""; }
+        printf '%s\n' "$char"
+        ;;
+      *) token="${token}${char}" ;;
+    esac
+    i=$((i + 1))
+  done
+  [ -n "$token" ] && printf '%s\n' "$token"
+}
+
+extract_command_targets_bash() {
+  local command token expect_output=0 skip_input=0
+  local -a words=()
+  command="$(extract_command_bash 2>/dev/null || true)"
+  [ -n "$command" ] || return 1
+
+  flush_words() {
+    local index=0 executable="" operand skip_value=0 options_ended=0 destination=""
+    local count=${#words[@]}
+    while [ "$index" -lt "$count" ]; do
+      operand="${words[$index]}"
+      if [[ "$operand" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]] || [ "$operand" = command ] || [ "$operand" = noglob ]; then
+        index=$((index + 1))
+        continue
+      fi
+      if [ "$operand" = env ]; then
+        index=$((index + 1))
+        while [ "$index" -lt "$count" ]; do
+          operand="${words[$index]}"
+          if [[ "$operand" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]] || [ "$operand" = -i ] || [ "$operand" = --ignore-environment ]; then
+            index=$((index + 1))
+          else
+            break
+          fi
+        done
+      fi
+      break
+    done
+    [ "$index" -lt "$count" ] || { words=(); return 0; }
+    executable="${words[$index]##*/}"
+    index=$((index + 1))
+    case "$executable" in
+      tee|touch)
+        while [ "$index" -lt "$count" ]; do
+          operand="${words[$index]}"
+          index=$((index + 1))
+          if [ "$skip_value" -eq 1 ]; then skip_value=0; continue; fi
+          if [ "$options_ended" -eq 0 ] && [ "$operand" = -- ]; then options_ended=1; continue; fi
+          if [ "$options_ended" -eq 0 ] && [ "$executable" = touch ]; then
+            case "$operand" in -d|-r|-t|--date|--reference|--time) skip_value=1; continue ;; esac
+          fi
+          if [ "$options_ended" -eq 0 ] && [[ "$operand" = -* ]]; then continue; fi
+          [[ "$operand" = *正文* ]] && printf '%s\n' "$operand"
+        done
+        ;;
+      cp|mv)
+        while [ "$index" -lt "$count" ]; do
+          operand="${words[$index]}"
+          index=$((index + 1))
+          [[ "$operand" = -* ]] && continue
+          destination="$operand"
+        done
+        [[ "$destination" = *正文* ]] && printf '%s\n' "$destination"
+        ;;
+    esac
+    words=()
+  }
+
+  while IFS= read -r token; do
+    if [ "$expect_output" -eq 1 ]; then
+      [[ "$token" = *正文* ]] && printf '%s\n' "$token"
+      expect_output=0
+      continue
+    fi
+    if [ "$skip_input" -eq 1 ]; then skip_input=0; continue; fi
+    case "$token" in
+      '>') expect_output=1 ;;
+      '<') skip_input=1 ;;
+      '|'|';'|'&'|'('|')') flush_words ;;
+      *) words+=("$token") ;;
+    esac
+  done < <(tokenize_shell_bash "$command")
+  flush_words
+}
 
 ROOT=$(project_root)
+TARGET="${STORY_GUARD_TARGET:-}"
+if [ -z "$TARGET" ] && node -e "" >/dev/null 2>&1 && [ -f "$CLI" ]; then
+  TARGETS="$(printf '%s' "$HOOK_INPUT" | node "$CLI" extract-targets "$ROOT" 2>/dev/null || true)"
+  if [ -n "$TARGETS" ]; then
+    while IFS= read -r target; do
+      [ -n "$target" ] || continue
+      STORY_GUARD_TARGET="$target" CLAUDE_TOOL_INPUT="" bash "$0" </dev/null || exit $?
+    done <<< "$TARGETS"
+    exit 0
+  fi
+fi
+# node 在场却抽空（旧 node 不识 node: 前缀 / 核损坏时探测通过但抽取抛错）也回落纯 bash。
+if [ -z "$TARGET" ]; then
+  TARGETS="$(extract_command_targets_bash 2>/dev/null | awk 'NF && !seen[$0]++' || true)"
+  if [ -n "$TARGETS" ]; then
+    while IFS= read -r target; do
+      [ -n "$target" ] || continue
+      STORY_GUARD_TARGET="$target" CLAUDE_TOOL_INPUT="" bash "$0" </dev/null || exit $?
+    done <<< "$TARGETS"
+    exit 0
+  fi
+  TARGET="$(extract_target_bash 2>/dev/null || true)"
+fi
+[ -z "$TARGET" ] && exit 0
+
 # 绝对路径直接采用，相对路径才拼项目根。
 # Windows + Git Bash 下 Claude Code 可能传入盘符绝对路径（F:/work/... 或 F:\work\...）；
 # 只认 /* 会把它们当相对路径拼成 $ROOT/F:/work/...，找错 大纲/ 目录、误报细纲缺失（issue #184）。
@@ -74,7 +256,7 @@ ROOT=$(project_root)
 case "$TARGET" in
   /*) ABS="$TARGET" ;;
   [A-Za-z]:[/\\]*) ABS="${TARGET//\\//}" ;;
-  *)  ABS="$ROOT/$TARGET" ;;
+  *)  ABS="$ROOT/${TARGET//\\//}" ;;
 esac
 
 BASE="$(basename "$ABS")"

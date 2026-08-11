@@ -20,7 +20,8 @@
 
 const fs = require("fs");
 const path = require("path");
-const { ab, sleep, evalJSONBase64, scrollLoad, getArg, localDateStamp, runCli } = require("./cdp-utils");
+const { ab, sleep, evalJSONBase64, scrollLoad, runCli } = require("./cdp-utils");
+const { parseCli, truncateDescription, createTimeSnapshot } = require("./scan-contract");
 
 // 一次详情请求的并发批大小。番茄详情页用同步 XHR 拉取，批太大会撞上
 // cdp-utils 里 ab() 的 20s 超时；超时会显式失败，这里分批是为了避免整个题材被中断。
@@ -213,22 +214,26 @@ function cleanDesc(raw) {
     .replace(/番茄小说[^。！？]*?(?:免费阅读|完整版|在线阅读)[^。！？]*$/g, "")
     .replace(/\s+/g, " ")
     .trim();
-  if (d.length <= 100) return d;
-  const cut = d.slice(0, 100);
-  const m = cut.match(/^[\s\S]*[。！？]/);
-  return (m ? m[0] : cut) + "...";
+  return truncateDescription(d);
 }
 
 // ---------------------------------------------------------------------------
 // 主流程
 // ---------------------------------------------------------------------------
 
-const args = process.argv.slice(2);
-const PORT = parseInt(getArg(args, "--port") || "9222", 10);
-const OUTDIR = getArg(args, "--outdir") || ".";
-const CHANNEL = getArg(args, "--channel") || "1";
-const TYPE = getArg(args, "--type") || "2";
-const TOP = parseInt(getArg(args, "--top") || "20", 10);
+const cli = parseCli(process.argv.slice(2), {
+  "--port": { type: "integer", min: 1, max: 65535, default: 9222 },
+  "--outdir": { type: "string", default: "." },
+  "--channel": { type: "enum", values: ["1", "0", "all"], default: "1" },
+  "--type": { type: "enum", values: ["2", "1", "all"], default: "2" },
+  "--top": { type: "integer", min: 1, max: 100, default: 20 },
+});
+const PORT = cli.port;
+const OUTDIR = cli.outdir;
+const CHANNEL = cli.channel;
+const TYPE = cli.type;
+const TOP = cli.top;
+const SCAN_TIME = createTimeSnapshot();
 
 function channelLabel(ch) {
   return ch === "1" ? "男频" : "女频";
@@ -282,12 +287,11 @@ function scrapeChannel(ch, type) {
     console.log(`  发现 ${categories.length} 个品类`);
   }
 
-  const now = new Date().toISOString();
   const lines = [
     `# 番茄 · ${chLabel}${tyLabel} · 全 ${categories.length} 题材`,
     "",
     `- 频道参数：channel=${ch}，type=${type}`,
-    `- 抓取时间：${now}`,
+    `- 抓取时间：${SCAN_TIME.capturedAt}`,
     `- 每题材上限 ≈ ${TOP}`,
     "",
     "---",
@@ -396,8 +400,7 @@ function main() {
         const content = scrapeChannel(ch, ty);
         if (!content) continue;
 
-        const date = localDateStamp();
-        const filename = `番茄${channelLabel(ch)}${typeLabel(ty)}_全题材_${date}.md`;
+        const filename = `番茄${channelLabel(ch)}${typeLabel(ty)}_全题材_${SCAN_TIME.dateStamp}.md`;
         fs.mkdirSync(OUTDIR, { recursive: true });
         const filepath = path.join(OUTDIR, filename);
         fs.writeFileSync(filepath, content, "utf-8");

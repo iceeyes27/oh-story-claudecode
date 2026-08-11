@@ -24,6 +24,15 @@
         "skills/story-setup/references/opencode/story_hook_core.js",
         "skills/story-setup/references/zcode/hooks/story_hook_core.js"
       ]
+    },
+    {
+      "name": "story-book-discovery-contract",
+      "source": "skills/story-setup/references/templates/hooks/book-discovery-contract.json",
+      "targets": [
+        "skills/story-setup/references/opencode/book-discovery-contract.json",
+        "skills/story-setup/references/codex/hooks/book-discovery-contract.json",
+        "skills/story-setup/references/zcode/hooks/book-discovery-contract.json"
+      ]
     }
   ]
 }

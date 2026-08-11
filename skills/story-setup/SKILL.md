@@ -95,7 +95,7 @@ disable: true
 | `.agents/skills/<managed-skill>/` | platform `skills/<managed-skill>/` | adapter manager managed | symlink/junction/read-only fallback | `manage-skill-adapters.js check` resolves target to canonical or verifies SHA-256 |
 | `.agents/skills/_shared/` | platform `skills/_shared/` | canonical + adapter only | symlink/junction/read-only fallback | shared rules and scanners each have one entity |
 | `skills/story-setup/references/templates/CLAUDE.md.tmpl` | `CLAUDE.md` | user+managed | marker/section merge | contains story skill routing sections |
-| `skills/story-setup/references/templates/hooks/` | `.claude/hooks/` | story-setup managed | recursive replace | `session-*.sh`, `detect-story-gaps.sh`, `validate-story-commit.sh`, `guard-outline-before-prose.sh`, `check-prose-after-write.sh`, `story_hook_core.js`, `story_hook_cli.js`, `lib/common.sh`, `lib/sentinel.sh` exist；`story_hook_core.js` 与 OpenCode/ZCode 副本字节一致 |
+| `skills/story-setup/references/templates/hooks/` | `.claude/hooks/` | story-setup managed | recursive replace | `session-*.sh`, `detect-story-gaps.sh`, `validate-story-commit.sh`, `guard-outline-before-prose.sh`, `check-prose-after-write.sh`, `story_hook_core.js`, `story_hook_cli.js`, `book-discovery-contract.json`, `lib/common.sh`, `lib/sentinel.sh` exist；`story_hook_core.js` 与 OpenCode/ZCode 副本字节一致 |
 | `skills/story-setup/references/templates/rules/*.md` | `.claude/rules/*.md` | story-setup managed | replace | every rule contains `paths` frontmatter |
 | `skills/story-setup/references/templates/agents/*.md` | `.claude/agents/*.md` | story-setup managed | replace | 7 agent files exist |
 | `.agents/skills/story-setup/references/agent-references/*.md` | platform adapter view | adapter manager managed | symlink/junction/fallback | every agent resolves the canonical `.agents` path |
@@ -104,7 +104,7 @@ disable: true
 | `skills/story-setup/references/opencode/AGENTS.md.tmpl` | `AGENTS.md` | user+managed | marker/section merge | contains story skill routing sections | target_cli 含 opencode |
 | `skills/story-setup/references/opencode/agents/` | `.opencode/agents/` | story-setup managed | replace | 7 agent files exist（replace 前按 2.4.4 Step 0 缓存现有 `model:`，避免覆盖用户已配模型） | target_cli 含 opencode |
 | `skills/story-setup/references/opencode/plugin.ts` | `.opencode/plugins/story-hooks.ts` | story-setup managed | replace | TypeScript plugin file exists | target_cli 含 opencode |
-| `skills/story-setup/references/opencode/story_hook_core.js` | `.opencode/plugins/lib/story_hook_core.js` | story-setup managed | replace | Node syntax valid；与 ZCode 副本字节一致；被 story-hooks.ts import | target_cli 含 opencode |
+| `skills/story-setup/references/opencode/story_hook_core.js` + `book-discovery-contract.json` | `.opencode/plugins/lib/` | story-setup managed | replace | Node syntax与契约 JSON 有效；共享核与 ZCode 副本字节一致；被 story-hooks.ts import | target_cli 含 opencode |
 | `skills/story-setup/references/opencode/commands/` | `.opencode/commands/` | story-setup managed | replace | `platform-skill-set.json` 中每个公开 Skill 都有同名 command（当前 15 个） | target_cli 含 opencode |
 | `skills/story-setup/references/opencode/opencode.json.patch` | merge into `opencode.json` | user+managed | merge by plugin/permission key | plugin entry registered | target_cli 含 opencode |
 | `skills/story-setup/references/agent-references/` | `skills/story-setup/references/agent-references/` | story-setup managed | replace | every reference resolves | target_cli 含 opencode |
@@ -112,14 +112,14 @@ disable: true
 | `skills/story-setup/references/codex/AGENTS.md.tmpl` | `AGENTS.md` | user+managed | marker/section merge | contains Codex story skill routing sections | target_cli 含 codex |
 | `skills/story-setup/references/codex/agents/` | `.codex/agents/` | story-setup managed | replace | 7 TOML agent files parse and contain `name`/`description`/`developer_instructions` | target_cli 含 codex |
 | `skills/story-setup/references/codex/hooks/hooks.json` | `.codex/hooks.json` | user+managed | merge by event+command | hook JSON valid; commands deduped | target_cli 含 codex |
-| `skills/story-setup/references/codex/hooks/story_codex_hook.py` + `skills/story-setup/references/codex/hooks/run-story-hook.sh` + `skills/story-setup/references/codex/hooks/run-story-hook.cmd` | `.codex/hooks/` | story-setup managed | replace | Python syntax valid；runner scripts exist | target_cli 含 codex |
+| `skills/story-setup/references/codex/hooks/story_codex_hook.py` + `book-discovery-contract.json` + runner scripts | `.codex/hooks/` | story-setup managed | replace | Python syntax与契约 JSON 有效；runner scripts exist | target_cli 含 codex |
 | `.agents/skills/story-setup/references/agent-references/` | Codex agent canonical reference path | canonical | direct read | every reference resolves | target_cli 含 codex |
 | `skills/story-setup/references/zcode/AGENTS.md.tmpl` | `AGENTS.md` | user+managed | marker/section merge | contains ZCode `$story-*` routing and solo fallback | target_cli 含 zcode |
 | `scripts/platform-skill-set.json` 声明的 `skills/<name>/` | `.zcode/skills/<name>/` | story-setup managed for known skill names | replace known skill dirs only | 15 个公开 `SKILL.md` 存在并满足 ZCode frontmatter 限制 | target_cli 含 zcode |
 | `skills/_shared/` | `.zcode/skills/_shared/` | story-setup managed support asset | replace | 共享规则与扫描器存在；不计入 15 个公开 Skill | target_cli 含 zcode |
 | `skills/story-setup/references/zcode/commands/` | `.zcode/commands/` | story-setup managed for known command names | replace known command files only | 15 个 command 与公开 Skill 一一对应且 frontmatter 有效 | target_cli 含 zcode |
 | `skills/story-setup/references/zcode/hooks/story_zcode_hook.js` | `.zcode/hooks/story_zcode_hook.js` | story-setup managed | replace | Node syntax valid; hook contract tests pass | target_cli 含 zcode |
-| `skills/story-setup/references/zcode/hooks/story_hook_core.js` | `.zcode/hooks/story_hook_core.js` | story-setup managed | replace | Node syntax valid; hook contract tests pass | target_cli 含 zcode |
+| `skills/story-setup/references/zcode/hooks/story_hook_core.js` + `book-discovery-contract.json` | `.zcode/hooks/` | story-setup managed | replace | Node syntax与契约 JSON 有效; hook contract tests pass | target_cli 含 zcode |
 | `skills/story-setup/references/zcode/config.json.patch` | merge into `.zcode/config.json` | user+managed | merge by event+matcher+process args | JSON valid; 按「ZCode 部署算法」第 4 步 hooks 互斥分支校验——未装 oh-story 插件时 `hooks.enabled=true`、only supported events；已装插件时校验 `.zcode/config.json` 不含（或已移除）这批 oh-story hooks 注册 | target_cli 含 zcode |
 | `skills/story-setup/references/openclaw/AGENTS.md.tmpl` | `AGENTS.md` | user+managed | marker/section merge | contains OpenClaw story skill routing sections | target_cli 含 openclaw |
 | `skills/story-setup/references/reasonix/AGENTS.md.tmpl` | `AGENTS.md` | user+managed | marker/section merge | contains Reasonix story skill routing sections and solo/direct fallback | target_cli 含 reasonix |
@@ -321,7 +321,7 @@ ZCode 首版部署 Skills、Commands、AGENTS.md 和支持事件内的 Hooks；�
 
 1. 读取仓库根 `scripts/platform-skill-set.json`，复制其中声明的 15 个公开 Skill 到 `.zcode/skills/{skill-name}/`，并复制非 Skill 支持资产 `skills/_shared/` 到 `.zcode/skills/_shared/`；仅替换这些已知目录，保留用户其他 Skills。
 2. 复制 `references/zcode/commands/*.md` 到 `.zcode/commands/`；仅替换 15 个同名命令，保留用户其他 Commands。
-3. 复制 `references/zcode/hooks/story_zcode_hook.js` 和 `references/zcode/hooks/story_hook_core.js` 到 `.zcode/hooks/`。
+3. 复制 `references/zcode/hooks/story_zcode_hook.js`、`references/zcode/hooks/story_hook_core.js` 和 `references/zcode/hooks/book-discovery-contract.json` 到 `.zcode/hooks/`。
 4. 读取 `references/zcode/config.json.patch` 和现有 `.zcode/config.json`（如只有根 `zcode.json`，仍创建 `.zcode/config.json` 承载 oh-story 项目 Hooks，不改写根文件）：
    - 保留用户所有未知字段、MCP、plugins、skills/commands disable overrides；
    - **hooks 互斥（避免双触发）**：若本项目经已安装的 oh-story 插件运行（marketplace 安装，仓库根 `.zcode-plugin/plugin.json` 的 `hooks.json` 已全局注册 SessionStart/PreToolUse/PostToolUse），则**跳过**下面把 `config.json.patch` 的 `hooks` 块合并进 `.zcode/config.json`——插件 manifest 已注册这批 hooks，再合并会让同一事件跑两遍（PreToolUse 拦两次、PostToolUse 注入两次）。只有未装插件（直接克隆 / 手动导入 references）时才合并 hooks。不确定时以「ZCode 是否已通过本插件注册这套 hooks」为准；skills/commands/hook 文件/AGENTS 与 config 的非 hook 字段两条路径都照常部署。
@@ -429,7 +429,7 @@ Reasonix（DeepSeek-Reasonix CLI）当前只部署 skills 与 `AGENTS.md`，不�
 7. 验证 opencode 部署（仅当 target_cli 含 opencode 时）：
     - 检查 `.opencode/agents/` 下的 7 个 agent 定义文件是否存在，且 frontmatter 包含 `mode: subagent` 和 `permission` 字段
     - 检查 `.opencode/plugins/story-hooks.ts` 是否存在
-    - 检查 `.opencode/plugins/lib/story_hook_core.js` 存在且 `node --check` 通过（story-hooks.ts import 之，与 `.zcode` 副本字节一致的共享写正文守卫核；置于 `lib/` 子目录以避开 OpenCode 单层 `.opencode/plugins/*.js` 插件自动发现）
+    - 检查 `.opencode/plugins/lib/story_hook_core.js` 与同目录 `book-discovery-contract.json` 存在且有效（story-hooks.ts import 共享核；置于 `lib/` 子目录以避开 OpenCode 单层 `.opencode/plugins/*.js` 插件自动发现）
      - 检查 `.opencode/commands/` 下的 15 个公开 command 文件是否存在
     - 检查 `skills/story-setup/references/agent-references/` 下 reference 文件完整且数量与源目录一致
     - 检查 `opencode.json` 的 `plugin` 数组是否包含 story-hooks 条目
@@ -439,13 +439,13 @@ Reasonix（DeepSeek-Reasonix CLI）当前只部署 skills 与 `AGENTS.md`，不�
     - 检查 `AGENTS.md` 含 Codex story skill routing sections
     - 检查 `.codex/agents/` 下 7 个 `.toml` agent 定义文件存在并可解析
     - 检查 `.codex/hooks.json` 存在且 JSON 有效，包含 `.codex/hooks/story_codex_hook.py` command
-    - 检查 `.codex/hooks/story_codex_hook.py` 存在且 Python 语法有效
+    - 检查 `.codex/hooks/story_codex_hook.py` 与同目录 `book-discovery-contract.json` 存在且有效
     - 检查 `.agents/skills/story-setup/references/agent-references/` 下 reference 文件完整
     - 安装报告必须提示：Codex 需要 trust 项目 `.codex/` 配置层，并在 `/hooks` review/trust 非 managed hooks；部署后新开 Codex 会话让 custom agents 生效；若当前运行时仍返回 `unknown agent_type`，按各 skill 的 fallback 规则降级 solo/direct
 9. 验证 ZCode 部署（仅当 target_cli 含 zcode 时）：
     - 检查根 `AGENTS.md` 含 ZCode `$story-*` 路由、大纲守卫和 solo/direct fallback
     - 检查 `.zcode/skills/` 下 15 个公开 Skill、非 Skill 支持资产 `_shared` 与 `.zcode/commands/` 下 15 个公开 Command，验证 frontmatter、命名和共享扫描器存在
-    - 检查 `.zcode/hooks/story_zcode_hook.js`、`.zcode/hooks/story_hook_core.js` 存在且 `node --check` 通过
+    - 检查 `.zcode/hooks/story_zcode_hook.js`、`.zcode/hooks/story_hook_core.js`、`.zcode/hooks/book-discovery-contract.json` 存在且有效
     - 检查 `.zcode/config.json` JSON 有效，并按「ZCode 部署算法」第 4 步的 hooks 互斥分支校验：未装 oh-story 插件时，`hooks.enabled=true`、仅注册 ZCode 支持事件、所有 `process` args 指向项目 Hook；已装 oh-story 插件（`.zcode-plugin/plugin.json` 已全局注册这批 hooks）时，改为校验 `.zcode/config.json` 不含（或已移除）这批 oh-story hooks 注册——**不得**为了让校验通过而把 `config.json.patch` 的 hooks 块合并回去，否则同一事件双触发
     - 检查 `.agents/skills/story-setup/references/agent-references/` 完整且所有 reference 路径可解析
     - 用 fixture 调用 SessionStart、PreToolUse deny/allow、PostToolUse，确认无发现时 stdout 为空、有输出时符合 ZCode 严格 JSON
@@ -523,8 +523,11 @@ hooks 注册合并按 command 字段去重：
 
 | 文件 | 用途 |
 |------|------|
-| references/templates/hooks/ | 8 个 hook 脚本模板 + `story_hook_core.js`（正文网/字数/大纲守卫/连续性/commit 侦测的共享实现，与 OpenCode/ZCode 同一份）+ `story_hook_cli.js`（bash hook 调核的 node 桥）+ `lib/common.sh`/`lib/sentinel.sh`（正文兜底 `check-prose-after-write.sh` 限 PostToolUse Write/Edit；`cat>`/`tee` 等 Bash 写正文由 Codex Stop 回合末 git 扫描兜，Claude/OpenCode 的 Bash 仅 pre-guard） |
+| references/templates/hooks/ | 8 个 hook 脚本模板 + `story_hook_core.js`（正文网/字数/大纲守卫/连续性/commit 侦测的共享实现，与 OpenCode/ZCode 同一份）+ `story_hook_cli.js`（bash hook 调核的 node 桥）+ `lib/common.sh`/`lib/sentinel.sh`（Claude 的正文前置守卫覆盖 Bash/Write/Edit/MultiEdit；写后检查覆盖成功事件，并对失败 Bash 通过 PostToolUseFailure 检查可能已产生的部分写入；写后只报告、不能撤销写入） |
 | references/zcode/ | ZCode AGENTS、13 Commands、workspace config patch 与严格 JSON Hook runner |
+| [Codex 发现契约](references/codex/hooks/book-discovery-contract.json) | Codex Hook 的有界书目发现参数 |
+| [Codex POSIX runner](references/codex/hooks/run-story-hook.sh) / [Windows runner](references/codex/hooks/run-story-hook.cmd) | Codex 项目 Hook 启动入口 |
+| [OpenCode 发现契约](references/opencode/book-discovery-contract.json) | OpenCode 共享 Hook 核的有界书目发现参数 |
 
 ---
 

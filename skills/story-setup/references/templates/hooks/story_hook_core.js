@@ -3,6 +3,19 @@
 const fs = require("node:fs")
 const path = require("node:path")
 const { spawnSync } = require("node:child_process")
+const discoveryContract = require("./book-discovery-contract.json")
+
+if (discoveryContract.schema_version !== 1 || !Number.isInteger(discoveryContract.marker_max_depth)) {
+  throw new Error("book-discovery-contract.json 无效；重新运行 story-setup 部署")
+}
+
+const ignoredDiscoveryDirs = new Set(discoveryContract.ignored_directories || [])
+
+function skipDiscoveryEntry(entry) {
+  if (entry.isSymbolicLink()) return true
+  if (!entry.isDirectory()) return false
+  return (discoveryContract.ignore_dot_directories && entry.name.startsWith(".")) || ignoredDiscoveryDirs.has(entry.name)
+}
 
 function existingDir(value) {
   if (typeof value !== "string" || !value.trim()) return null
@@ -28,6 +41,21 @@ function resolveTarget(root, target, base = root) {
   return path.isAbsolute(normalized) ? path.resolve(normalized) : path.resolve(base || root, normalized)
 }
 
+function pathUsesSymlink(root, target) {
+  const relative = path.relative(path.resolve(root), path.resolve(target))
+  if (relative === "" || relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) return relative !== ""
+  let current = path.resolve(root)
+  try {
+    for (const part of relative.split(path.sep)) {
+      current = path.join(current, part)
+      if (fs.lstatSync(current).isSymbolicLink()) return true
+    }
+  } catch {
+    return false
+  }
+  return false
+}
+
 function firstLine(file) {
   try {
     return fs.readFileSync(file, "utf8").split(/\r?\n/, 1)[0].trim()
@@ -37,7 +65,7 @@ function firstLine(file) {
 }
 
 function findFirst(base, maxDepth, predicate) {
-  if (maxDepth < 0) return null
+  if (maxDepth <= 0) return null
   let entries = []
   try {
     entries = fs.readdirSync(base, { withFileTypes: true })
@@ -45,13 +73,12 @@ function findFirst(base, maxDepth, predicate) {
     return null
   }
   for (const entry of entries) {
-    if (entry.name.startsWith(".") || entry.name === "node_modules") continue
+    if (skipDiscoveryEntry(entry)) continue
     const full = path.join(base, entry.name)
     if (predicate(full, entry)) return full
   }
-  if (maxDepth === 0) return null
   for (const entry of entries) {
-    if (!entry.isDirectory() || entry.name.startsWith(".") || entry.name === "node_modules") continue
+    if (!entry.isDirectory() || skipDiscoveryEntry(entry)) continue
     const found = findFirst(path.join(base, entry.name), maxDepth - 1, predicate)
     if (found) return found
   }
@@ -62,25 +89,30 @@ function discoverActiveBook(root) {
   const declared = firstLine(path.join(root, ".active-book"))
   if (declared) {
     const candidate = resolveTarget(root, declared)
-    const rel = path.relative(root, candidate)
-    if (!rel.startsWith("..") && existingDir(candidate)) return candidate
+    const realRoot = existingDir(root)
+    const realCandidate = existingDir(candidate)
+    if (realRoot && realCandidate && !pathUsesSymlink(root, candidate)) {
+      const rel = path.relative(realRoot, realCandidate)
+      if (rel !== ".." && !rel.startsWith(`..${path.sep}`) && !path.isAbsolute(rel)) return realCandidate
+    }
   }
-  const tracking = findFirst(root, 4, (_full, entry) => entry.isDirectory() && entry.name === "追踪")
+  const maxDepth = discoveryContract.marker_max_depth
+  const tracking = findFirst(root, maxDepth, (_full, entry) => entry.isDirectory() && entry.name === "追踪")
   if (tracking) return path.dirname(tracking)
-  const body = findFirst(root, 4, (_full, entry) => entry.isDirectory() && entry.name === "正文")
+  const body = findFirst(root, maxDepth, (_full, entry) => entry.isDirectory() && entry.name === "正文")
   if (body) return path.dirname(body)
-  const bodyFile = findFirst(root, 4, (_full, entry) => entry.isFile() && entry.name === "正文.md")
+  const bodyFile = findFirst(root, maxDepth, (_full, entry) => entry.isFile() && entry.name === "正文.md")
   return bodyFile ? path.dirname(bodyFile) : null
 }
 
 function discoverAllBooks(root) {
   const books = new Map()
   function walk(base, depth) {
-    if (depth < 0) return
+    if (depth <= 0) return
     let entries = []
     try { entries = fs.readdirSync(base, { withFileTypes: true }) } catch { return }
     for (const entry of entries) {
-      if (entry.name.startsWith(".") || entry.name === "node_modules") continue
+      if (skipDiscoveryEntry(entry)) continue
       const full = path.join(base, entry.name)
       if (entry.isDirectory() && (entry.name === "追踪" || entry.name === "正文")) {
         books.set(path.dirname(full), path.dirname(full))
@@ -89,11 +121,11 @@ function discoverAllBooks(root) {
       }
     }
     for (const entry of entries) {
-      if (!entry.isDirectory() || entry.name.startsWith(".") || entry.name === "node_modules") continue
+      if (!entry.isDirectory() || skipDiscoveryEntry(entry)) continue
       walk(path.join(base, entry.name), depth - 1)
     }
   }
-  walk(root, 8)
+  walk(root, discoveryContract.marker_max_depth)
   return [...books.values()]
 }
 
@@ -195,34 +227,154 @@ function continuityFindings(root) {
 
 function extractProseTargets(command) {
   const targets = []
-  // 目标 token 三形态（引号段优先）：双引号段 / 单引号段 / 裸词。此前只有一个把引号排除在字符类外
-  // 的裸词式，带空格的引号目标（> "my book/正文/第1章.md"）整条命令抽不到目标就静默放行。
-  // 裸词类只排 ASCII 空白（空格/Tab/CR/LF，shell 真正的分词符）：\s 在 js 与 python 都含 U+3000，
-  // 而全角空格不分词，用 \s 会把「第003章　开局.md」截成「第003章」而漏拦（本项目章名分隔符
-  // [_\- 　] 自带全角空格）。反斜杠转义空格（my\ book）仍不认——resolveTarget 把 \ 归一成路径
-  // 分隔符（Windows 路径），在此解转义会反过来毁掉 book\正文\第1章.md。
-  const bare = `[^ \\t\\r\\n"'<>|;&()]`
-  const token = `"([^"]*正文[^"]*)"|'([^']*正文[^']*)'|["']?(${bare}*正文${bare}*)["']?`
-  for (const source of [`>>?\\s*(?:${token})`, `(?:^|[\\s;&|(){}<>])(?:tee(?:\\s+-a)?|touch)\\s+(?:${token})`]) {
-    const regex = new RegExp(source, "gm")
-    let match
-    while ((match = regex.exec(command)) !== null) {
-      const target = match[1] || match[2] || match[3]
-      if (target) targets.push(target)
-    }
-  }
+  targets.push(...extractRedirectionTargets(command))
   for (const raw of shellSegments(command)) {
     const segment = beforeShellRedirection(raw)
     // 引号感知分词（同 shellWords）：/\s+/ 会把 cp draft.md "my book/正文/第1章.md" 的目标切碎，
     // 末位取到 book/正文/第1章.md —— 判到另一本书上（那本有细纲就直接放行）。
     const words = shellWords(segment)
-    if (words.length >= 2 && (words[0] === "cp" || words[0] === "mv")) {
-      const positional = words.slice(1).filter((word) => !word.startsWith("-"))
+    let commandIndex = 0
+    while (commandIndex < words.length && (/^[A-Za-z_][A-Za-z0-9_]*=/.test(words[commandIndex]) || ["command", "noglob"].includes(words[commandIndex]))) commandIndex++
+    if (words[commandIndex] === "env") {
+      commandIndex++
+      while (commandIndex < words.length && (/^[A-Za-z_][A-Za-z0-9_]*=/.test(words[commandIndex]) || ["-i", "--ignore-environment"].includes(words[commandIndex]))) commandIndex++
+    }
+    const executable = words[commandIndex]
+    const operands = words.slice(commandIndex + 1)
+    if (executable === "tee" || executable === "touch") {
+      let skipValue = false
+      let optionsEnded = false
+      for (const word of operands) {
+        if (skipValue) { skipValue = false; continue }
+        if (!optionsEnded && word === "--") { optionsEnded = true; continue }
+        if (!optionsEnded && executable === "touch" && ["-d", "-r", "-t", "--date", "--reference", "--time"].includes(word)) {
+          skipValue = true
+          continue
+        }
+        if (!optionsEnded && word.startsWith("-")) continue
+        if (word.includes("正文")) targets.push(word)
+      }
+    } else if (words.length >= commandIndex + 2 && (executable === "cp" || executable === "mv")) {
+      const positional = operands.filter((word) => !word.startsWith("-"))
       const destination = positional[positional.length - 1]
       if (destination && destination.includes("正文")) targets.push(destination)
     }
   }
+  return [...new Set(targets)]
+}
+
+// 仅识别引号外的 shell 重定向。正则无法区分 `echo 'x > 正文/第1章.md'` 里的普通文本，
+// 会把只读/输出命令误判为文件写入；这里用一次线性扫描，同时保留带空格的引号路径。
+function extractRedirectionTargets(command) {
+  const targets = []
+  let quote = ""
+  for (let index = 0; index < command.length; index++) {
+    const char = command[index]
+    if (quote) {
+      if (char === quote) quote = ""
+      else if (quote === '"' && char === "\\") index++
+      continue
+    }
+    if (char === "'" || char === '"') {
+      quote = char
+      continue
+    }
+    if (char === "\\") {
+      index++
+      continue
+    }
+    if (char !== ">") continue
+
+    while (command[index + 1] === ">") index++
+    let cursor = index + 1
+    while (/[ \t\r\n]/.test(command[cursor] || "")) cursor++
+
+    let target = ""
+    let targetQuote = ""
+    for (; cursor < command.length; cursor++) {
+      const tokenChar = command[cursor]
+      if (targetQuote) {
+        if (tokenChar === targetQuote) {
+          targetQuote = ""
+        } else if (targetQuote === '"' && tokenChar === "\\") {
+          const next = command[cursor + 1]
+          if (next === '"' || next === "\\") {
+            target += next
+            cursor++
+          } else {
+            target += tokenChar
+          }
+        } else {
+          target += tokenChar
+        }
+        continue
+      }
+      if (tokenChar === "'" || tokenChar === '"') {
+        targetQuote = tokenChar
+        continue
+      }
+      if (/[ \t\r\n<>|;&()]/.test(tokenChar)) break
+      if (tokenChar === "\\") {
+        const next = command[cursor + 1]
+        if (next && /[ \t\r\n<>|;&()'"\\]/.test(next)) {
+          target += next
+          cursor++
+        } else {
+          target += tokenChar
+        }
+      } else {
+        target += tokenChar
+      }
+    }
+    if (target.includes("正文")) targets.push(target)
+    index = Math.max(index, cursor - 1)
+  }
   return targets
+}
+
+function hookToolName(input) {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return ""
+  return String(input.tool_name || input.toolName || input.tool || input.name || "")
+}
+
+function hookToolPayload(input) {
+  if (!input || typeof input !== "object" || Array.isArray(input)) return {}
+  for (const key of ["tool_input", "toolInput", "input", "parameters", "args"]) {
+    const value = input[key]
+    if (value && typeof value === "object" && !Array.isArray(value)) return value
+  }
+  return input
+}
+
+// 完整 hook 事件 -> 全部潜在写入目标。平台薄壳只负责事件 I/O，不再各自解析 Bash 命令。
+function extractHookProseTargets(input) {
+  const payload = hookToolPayload(input)
+  const name = hookToolName(input)
+  const targets = []
+  for (const key of ["file_path", "filePath", "path", "target", "filename"]) {
+    if (typeof payload[key] === "string" && payload[key]) targets.push(payload[key])
+  }
+  const command = typeof payload.command === "string" ? payload.command : ""
+  if (command) {
+    if (/bash/i.test(name) || !name) targets.push(...extractProseTargets(command))
+    else if (/applypatch|patch/i.test(name)) targets.push(...extractPatchTargets(command))
+  }
+  if (/applypatch|patch/i.test(name)) {
+    for (const key of ["patch", "content", "text"]) {
+      if (typeof payload[key] === "string") targets.push(...extractPatchTargets(payload[key]))
+    }
+  }
+  return [...new Set(targets.filter(Boolean))]
+}
+
+function resolveHookProseTargets(root, input) {
+  const inputCwd = existingDir(input && input.cwd)
+  let base = root
+  if (inputCwd) {
+    const relation = path.relative(path.resolve(root), inputCwd)
+    if (relation === "" || (!path.isAbsolute(relation) && relation !== ".." && !relation.startsWith(`..${path.sep}`))) base = inputCwd
+  }
+  return [...new Set(extractHookProseTargets(input).map((target) => resolveTarget(root, target, base)))]
 }
 
 // apply_patch 目标抽取。只认 Add/Update 会漏掉 `*** Move to:`——它是 Update File 段的子指令
@@ -781,6 +933,8 @@ module.exports = {
   trackingCheckpointIssue,
   continuityFindings,
   extractProseTargets,
+  extractHookProseTargets,
+  resolveHookProseTargets,
   extractPatchTargets,
   proseBlockReason,
   isProsePath,

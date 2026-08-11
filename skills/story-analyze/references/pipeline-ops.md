@@ -12,7 +12,10 @@ story-analyze long 拆解管道的运维工具文档：`_progress.md` 模板、�
 # 深度拆解进度：{书名}
 - 小说：{标题} | 总章数：{N} | 输出目录：{路径} | 开始：{日期}
 - 最终状态：{pending/paused_after_stage1/completed/completed_with_errors}
-- schema_version: 2
+- schema_version: 3
+- source_path: 原文/原文.txt
+- source_bytes: {原文 UTF-8 文件字节数}
+- source_sha256: {原文文件 SHA-256，小写 64 位十六进制}
 ## 管道进度
 | 阶段 | 状态 | 进度 | 备注 |
 |------|------|------|------|
@@ -36,9 +39,17 @@ story-analyze long 拆解管道的运维工具文档：`_progress.md` 模板、�
 
 | 版本 | 含义 |
 |------|------|
-| 2 | 当前契约：含「章节边界」表（Stage 0 章节边界子步骤产物）。Stage 1/2/6 全部以该表为切片真值，不再各自跑 regex |
+| 3 | 当前契约：含原文相对路径、字节数、SHA-256 与「章节边界」表。Stage 1/2/6 先校验来源指纹和边界，再以该表为唯一切片真值 |
 
-缺少 `schema_version: 2` 或「章节边界」表时不得续跑；从 Stage 0 章节边界子步骤重建 `_progress.md` 后再恢复。
+缺少 `schema_version: 3`、任一来源字段或「章节边界」表时不得续跑；低于当前版本的进度不在消费阶段迁移，统一从 Stage 0 章节边界子步骤重跑并重建 `_progress.md` 后再恢复。
+
+Stage 1、Stage 2、Stage 6 在读取切片前统一执行：
+
+```bash
+node skills/story-analyze/scripts/chapter-boundary.js validate 拆文库/{书名}/_progress.md
+```
+
+校验器验证 schema、来源路径/字节数/SHA-256、章号唯一连续、起始行严格递增和行号范围，并返回唯一可消费的 `source` 与 `chapters`。失败时停止当前 Stage，禁止自行调整规则或重建临时边界。
 
 **最终状态值说明**：
 
@@ -63,7 +74,8 @@ story-analyze long 拆解管道的运维工具文档：`_progress.md` 模板、�
 
 | 场景 | 处理 |
 |------|------|
-| 章节识别失败 | 提示确认格式；支持自定义正则 |
+| Stage 0 章节识别失败 | 提示确认格式；只在 Stage 0 修正规则并重建 schema v3 |
+| schema/来源指纹/章节边界校验失败 | 停止 Stage 1/2/6；回到 Stage 0 重建，不临时迁移 |
 | 分块中断 | 读 _progress.md 断点恢复 |
 | 聚合质量不达标 | 孤立情节二次分类；阈值放宽至 0.5 |
 | 角色合并冲突 | 记录待确认列表 |
@@ -74,7 +86,7 @@ story-analyze long 拆解管道的运维工具文档：`_progress.md` 模板、�
 ## 恢复机制操作步骤
 
 1. 管道启动时检查输出目录是否已有 `_progress.md`
-2. 校验 `schema_version: 2` 与「章节边界」表；任一缺失即停止，并提示从 Stage 0 章节边界子步骤重建进度文件
+2. 用 `chapter-boundary.js validate` 校验 `schema_version: 3`、来源指纹与「章节边界」表；任一失败即停止，并提示从 Stage 0 章节边界子步骤重建进度文件
 3. 读取断点信息（最后处理章节 + 当前阶段 + 最终状态）
 4. **断点状态为 `paused_after_stage1`**（Stage 1 停靠点）→ 跳过 Stage 0/1，直接从 Stage 2 续跑逐章摘要，不重跑已完成的概要与黄金三章
 5. 其他断点状态 → 从断点所在块的起始章节恢复，覆盖该块已有输出

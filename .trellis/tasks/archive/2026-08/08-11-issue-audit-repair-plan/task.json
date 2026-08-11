@@ -1,0 +1,32 @@
+{
+  "id": "issue-audit-repair-plan",
+  "name": "issue-audit-repair-plan",
+  "title": "修复审计确认的问题",
+  "description": "",
+  "status": "completed",
+  "dev_type": null,
+  "scope": null,
+  "package": null,
+  "priority": "P2",
+  "creator": "nat.yu",
+  "assignee": "nat.yu",
+  "createdAt": "2026-08-11",
+  "completedAt": "2026-08-11",
+  "branch": null,
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [
+    "08-11-claude-bash-prose-hooks",
+    "08-11-stage-boundary-authority",
+    "08-11-review-batch-state",
+    "08-11-scan-contract-parity",
+    "08-11-codex-discovery-token"
+  ],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {}
+}

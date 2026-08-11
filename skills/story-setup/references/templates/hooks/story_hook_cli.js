@@ -31,6 +31,17 @@ function readStdin() {
   }
 }
 
+function readHookInput() {
+  const raw = process.env.HOOK_INPUT || readStdin()
+  if (!raw) return null
+  try {
+    const parsed = JSON.parse(raw)
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : null
+  } catch {
+    return null
+  }
+}
+
 // 与旧 extract_target_path 的 dig 逐字对应：只认 dict 的 file_path/path/filePath，
 // 再往 tool_input/input/parameters/args 里递归；list 不下钻。
 function digTargetPath(value) {
@@ -78,6 +89,35 @@ if (command === "extract-target") {
   const target = digTargetPath(obj)
   if (!target) process.exit(1)
   process.stdout.write(target)
+} else if (command === "extract-targets") {
+  const input = readHookInput()
+  if (!input) process.exit(1)
+  const targets = args[0]
+    ? core.resolveHookProseTargets(args[0], input)
+    : core.extractHookProseTargets(input)
+  if (!targets.length) process.exit(1)
+  process.stdout.write(targets.join("\n"))
+} else if (command === "prose-after-event") {
+  // PostToolUse / PostToolUseFailure 共用同一逐目标检查器。只返回 additionalContext，
+  // 写入已发生，故永不声称阻断或撤销，并始终 exit 0。
+  const root = args[0]
+  const input = readHookInput()
+  if (!root || !input) process.exit(0)
+  const event = input.hook_event_name === "PostToolUseFailure" ? "PostToolUseFailure" : "PostToolUse"
+  const notes = core.resolveHookProseTargets(root, input)
+    .map((target) => core.proseAfterWrite(root, target))
+    .filter(Boolean)
+  if (notes.length) {
+    const prefix = event === "PostToolUseFailure"
+      ? "命令失败但文件可能已改变；以下现存正文已完成写后检查。写后提示不能撤销已经发生的写入。\n\n"
+      : ""
+    process.stdout.write(JSON.stringify({
+      hookSpecificOutput: {
+        hookEventName: event,
+        additionalContext: prefix + notes.join("\n\n"),
+      },
+    }))
+  }
 } else if (command === "prose-net") {
   // 轻量确定性网（含毒句式）+ 字数欠账，对齐旧内嵌 python 第二段的 out 列表（net 逐条 +
   // 可选字数行）。读文件失败静默退出（兜底不反噬流程）。

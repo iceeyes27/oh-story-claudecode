@@ -74,6 +74,31 @@ expect_fire_kw "$TMP/某书/正文/第013章_工程词.md" 工程词
 { printf '# 第14章\n\n'; PAD; printf '\n他握紧拳头一步步走过去缓缓逼近。\n他握紧拳头一步步走过去缓缓逼近。\n他停下了。\n'; } > "$TMP/某书/正文/第014章_复读.md"
 expect_fire_kw "$TMP/某书/正文/第014章_复读.md" 复读
 
+# ④ Bash 成功/失败事件都必须输出合法 additionalContext；失败命令可能已部分写入，
+# 写后检查只能报告、不能宣称撤销。这里直接模拟宿主在命令执行后发出的事件。
+run_payload() {
+  printf '%s' "$1" | CLAUDE_PROJECT_DIR="$TMP" bash "$HOOK" 2>/dev/null
+}
+assert_hook_json() {
+  local out="$1" expected="$2"
+  HOOK_JSON="$out" EXPECTED_EVENT="$expected" node - <<'NODE' || return 1
+const obj = JSON.parse(process.env.HOOK_JSON)
+const hook = obj && obj.hookSpecificOutput
+if (!hook || hook.hookEventName !== process.env.EXPECTED_EVENT || typeof hook.additionalContext !== "string" || !hook.additionalContext) process.exit(1)
+NODE
+}
+
+success_payload="{\"hook_event_name\":\"PostToolUse\",\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"printf x > $TMP/某书/正文/第012章_拒绝.md\"}}"
+success_out="$(run_payload "$success_payload")"
+assert_hook_json "$success_out" PostToolUse || { echo "FAIL: post-Bash success output is not valid hook JSON" >&2; fails=$((fails+1)); }
+printf '%s' "$success_out" | grep -q '元信息泄漏' || { echo "FAIL: post-Bash success missed prose findings" >&2; fails=$((fails+1)); }
+
+failure_payload="{\"hook_event_name\":\"PostToolUseFailure\",\"tool_name\":\"Bash\",\"tool_input\":{\"command\":\"printf x > $TMP/某书/正文/第013章_工程词.md; false\"},\"error\":\"exit 1\"}"
+failure_out="$(run_payload "$failure_payload")"
+assert_hook_json "$failure_out" PostToolUseFailure || { echo "FAIL: post-Bash failure output is not valid hook JSON" >&2; fails=$((fails+1)); }
+printf '%s' "$failure_out" | grep -q '命令失败但文件可能已改变' || { echo "FAIL: post-Bash failure missed partial-write warning" >&2; fails=$((fails+1)); }
+printf '%s' "$failure_out" | grep -q '工程词' || { echo "FAIL: post-Bash failure missed prose findings" >&2; fails=$((fails+1)); }
+
 if [ "$fails" -ne 0 ]; then
   echo "Prose backstop hook tests FAILED ($fails)." >&2
   exit 1

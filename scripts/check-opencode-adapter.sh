@@ -25,11 +25,13 @@ assert_file "$ROOT/AGENTS.md.tmpl"
 assert_file "$ROOT/opencode.json.patch"
 assert_file "$ROOT/plugin.ts"
 assert_file "$ROOT/story_hook_core.js"
+assert_file "$ROOT/book-discovery-contract.json"
 assert_dir "$ROOT/agents"
 assert_dir "$ROOT/commands"
 assert_file "scripts/sync-opencode.py"
 
 python3 -m json.tool "$ROOT/opencode.json.patch" >/dev/null
+python3 -m json.tool "$ROOT/book-discovery-contract.json" >/dev/null
 python3 - <<'PY'
 import json
 from pathlib import Path

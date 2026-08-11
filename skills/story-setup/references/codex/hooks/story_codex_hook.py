@@ -19,6 +19,22 @@ from typing import Any
 HOOK_CWD: Path | None = None
 
 
+def _load_discovery_contract() -> dict[str, Any]:
+    contract_path = Path(__file__).with_name("book-discovery-contract.json")
+    try:
+        contract = json.loads(contract_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise RuntimeError(f"book-discovery-contract.json 无法读取: {exc}") from exc
+    if contract.get("schema_version") != 1 or not isinstance(contract.get("marker_max_depth"), int):
+        raise RuntimeError("book-discovery-contract.json schema 无效")
+    return contract
+
+
+DISCOVERY_CONTRACT = _load_discovery_contract()
+DISCOVERY_MAX_DEPTH = DISCOVERY_CONTRACT["marker_max_depth"]
+DISCOVERY_IGNORED_DIRS = frozenset(DISCOVERY_CONTRACT.get("ignored_directories", []))
+
+
 def read_hook_input() -> dict[str, Any]:
     global HOOK_CWD
     # Read raw UTF-8 bytes, not the locale-decoded text stream: Codex/Claude tool
@@ -103,6 +119,60 @@ def safe_rel(root: Path, path: Path) -> str:
         return str(path)
 
 
+def _path_uses_symlink(root: Path, candidate: Path) -> bool:
+    try:
+        relative = candidate.absolute().relative_to(root.absolute())
+    except ValueError:
+        return True
+    current = root.absolute()
+    for part in relative.parts:
+        current /= part
+        try:
+            if current.is_symlink():
+                return True
+        except OSError:
+            return True
+    return False
+
+
+def _iter_discovery_entries(root: Path):
+    """Yield (path, is_dir) within the generated bounded discovery contract."""
+
+    def walk(base: Path, parent_depth: int):
+        if parent_depth >= DISCOVERY_MAX_DEPTH:
+            return
+        try:
+            with os.scandir(base) as iterator:
+                entries = sorted(iterator, key=lambda entry: entry.name)
+        except OSError:
+            return
+        for entry in entries:
+            try:
+                if entry.is_symlink():
+                    continue
+                is_dir = entry.is_dir(follow_symlinks=False)
+            except OSError:
+                continue
+            if is_dir and (
+                (DISCOVERY_CONTRACT.get("ignore_dot_directories") and entry.name.startswith("."))
+                or entry.name in DISCOVERY_IGNORED_DIRS
+            ):
+                continue
+            child = Path(entry.path)
+            yield child, is_dir
+            if is_dir:
+                yield from walk(child, parent_depth + 1)
+
+    yield from walk(root, 0)
+
+
+def _first_marker(root: Path, name: str, is_dir: bool) -> Path | None:
+    for candidate, candidate_is_dir in _iter_discovery_entries(root):
+        if candidate.name == name and candidate_is_dir == is_dir:
+            return candidate
+    return None
+
+
 def read_active_book(root: Path) -> Path | None:
     active_file = root / ".active-book"
     if active_file.exists():
@@ -112,24 +182,23 @@ def read_active_book(root: Path) -> Path | None:
         # trims then requires non-empty, and the JS hook's firstLine()+truthy guard).
         declared = lines[0].strip() if lines else ""
         if declared:
-            candidate = (root / declared).resolve()
+            raw_candidate = Path(declared)
+            candidate = raw_candidate if raw_candidate.is_absolute() else root / raw_candidate
             try:
-                candidate.relative_to(root.resolve())
-            except Exception:
-                candidate = None  # type: ignore[assignment]
-            if candidate and candidate.exists():
-                return candidate
-    for track in root.glob("**/追踪"):
-        if any(part.startswith(".") for part in track.relative_to(root).parts):
-            continue
+                resolved = candidate.resolve()
+                resolved.relative_to(root.resolve())
+            except (OSError, ValueError):
+                resolved = None
+            if resolved and resolved.is_dir() and not _path_uses_symlink(root, candidate):
+                return resolved
+    track = _first_marker(root, "追踪", True)
+    if track:
         return track.parent
-    for body in root.glob("**/正文"):
-        if any(part.startswith(".") for part in body.relative_to(root).parts):
-            continue
+    body = _first_marker(root, "正文", True)
+    if body:
         return body.parent
-    for body_file in root.glob("**/正文.md"):
-        if any(part.startswith(".") for part in body_file.relative_to(root).parts):
-            continue
+    body_file = _first_marker(root, "正文.md", False)
+    if body_file:
         return body_file.parent
     return None
 
@@ -419,9 +488,11 @@ def _wordcount_finding(abs_path: Path, text: str) -> str | None:
 def _discover_all_books(root: Path) -> list[Path]:
     books: list[Path] = []
     seen: set[str] = set()
-    for pattern in ("**/追踪", "**/正文", "**/正文.md"):
-        for hit in root.glob(pattern):
-            if any(part.startswith(".") for part in hit.relative_to(root).parts):
+    markers = (("追踪", True), ("正文", True), ("正文.md", False))
+    entries = list(_iter_discovery_entries(root))
+    for marker_name, marker_is_dir in markers:
+        for hit, is_dir in entries:
+            if hit.name != marker_name or is_dir != marker_is_dir:
                 continue
             book = hit.parent
             key = str(book.resolve())
@@ -429,6 +500,21 @@ def _discover_all_books(root: Path) -> list[Path]:
                 seen.add(key)
                 books.append(book)
     return books
+
+
+def parse_target_cli(text: str) -> tuple[list[str] | None, str | None]:
+    matches = re.findall(r"^target_cli:[ \t]*(.*)$", text, flags=re.MULTILINE)
+    if not matches:
+        return None, "缺少 target_cli 字段"
+    if len(matches) != 1:
+        return None, "target_cli 字段重复"
+    raw_tokens = matches[0].split(",")
+    tokens = [token.strip() for token in raw_tokens]
+    if not tokens or any(not token for token in tokens):
+        return None, "target_cli 值为空或含空 token"
+    if len(tokens) != len(set(tokens)):
+        return None, "target_cli 含重复 token"
+    return tokens, None
 
 
 def tracking_checkpoint_issue(
@@ -558,9 +644,10 @@ def session_start() -> None:
     sentinel = root / ".story-deployed"
     if sentinel.exists():
         sent_text = sentinel.read_text(encoding="utf-8", errors="ignore")
-        if "target_cli:" not in sent_text:
-            messages.append("[story-setup] .story-deployed 缺少 target_cli 字段；建议重新运行 $story-setup。")
-        elif "codex" not in re.search(r"target_cli:\s*(.*)", sent_text).group(1):  # type: ignore[union-attr]
+        target_clis, target_cli_error = parse_target_cli(sent_text)
+        if target_cli_error:
+            messages.append(f"[story-setup] .story-deployed {target_cli_error}；建议重新运行 $story-setup。")
+        elif "codex" not in target_clis:
             messages.append("[story-setup] 当前部署标记未包含 codex；如需 Codex hooks/agents，请重新运行 $story-setup 并选择 Codex。")
     adapter_message = adapter_health_message(root)
     if adapter_message:

@@ -658,6 +658,26 @@ def require_pattern(path: Path, pattern: str, code: str, message: str) -> List[F
     return [Finding(code, message, path)]
 
 
+def stage_boundary_contract_findings(repo_root: Path, expected_schema: int) -> List[Finding]:
+    """Lock Stage 1/2/6 to the validated Stage 0 boundary table."""
+    findings: List[Finding] = []
+    script = repo_root / "skills/story-analyze/scripts/chapter-boundary.js"
+    skill = repo_root / "skills/story-analyze/SKILL.md"
+    pipeline = repo_root / "skills/story-analyze/references/pipeline-ops.md"
+    style = repo_root / "skills/story-analyze/references/style-profile-generator.md"
+    findings.extend(require_pattern(script, r"CURRENT_SCHEMA_VERSION\s*=\s*{}\b".format(expected_schema), "chapter-boundary-schema", "chapter boundary validator must pin the current schema"))
+    for field in ("source_path", "source_bytes", "source_sha256"):
+        findings.extend(require_pattern(script, re.escape(field), "chapter-boundary-source-fingerprint", "chapter boundary validator must verify {}".format(field)))
+        findings.extend(require_pattern(pipeline, r"^-\s*{}:".format(re.escape(field)), "chapter-boundary-progress-template", "_progress.md template must persist {}".format(field)))
+    findings.extend(require_pattern(skill, r"Stage 1、Stage 2、Stage 6[^\n]*chapter-boundary\.js validate", "chapter-boundary-stage-consumers", "Stage 1/2/6 must invoke the shared boundary validator"))
+    findings.extend(require_pattern(style, r"chapter-boundary\.js validate", "stage6-boundary-validator", "Stage 6 must validate the canonical boundary table"))
+    style_text = read_text(style) or ""
+    forbidden = re.search(r"grep\s+-nE\s+['\"]\^第|调整\s*regex|重新识别章节", style_text, re.IGNORECASE)
+    if forbidden:
+        findings.append(Finding("stage6-boundary-reslicing", "Stage 6 must not grep, adjust regex, or rediscover chapter boundaries", style, excerpt=forbidden.group(0)))
+    return findings
+
+
 def spawn_preflight_findings(
     text: str, manifest: ContractManifest, path: Path
 ) -> List[Finding]:
@@ -1129,6 +1149,7 @@ def validate_repository(repo_root: Path, manifest: ContractManifest) -> List[Fin
         progress_schema_pin_findings(repo_root, manifest.progress_schema_version)
     )
     findings.extend(require_pattern(pipeline, r"章节边界", "chapter-boundary-table", "progress must keep the canonical chapter-boundary table"))
+    findings.extend(stage_boundary_contract_findings(repo_root, manifest.progress_schema_version))
 
     setup_skill = repo_root / "skills/story-setup/SKILL.md"
     actual_setup_version = parse_frontmatter_version(setup_skill)

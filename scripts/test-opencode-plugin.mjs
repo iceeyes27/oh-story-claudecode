@@ -26,6 +26,10 @@ fs.copyFileSync(
   path.join(srcDir, "story_hook_core.js"),
   path.join(deployDir, "lib", "story_hook_core.js")
 );
+fs.copyFileSync(
+  path.join(srcDir, "book-discovery-contract.json"),
+  path.join(deployDir, "lib", "book-discovery-contract.json")
+);
 const pluginPath = path.join(deployDir, "plugin.ts");
 
 async function expectBlocked(action, label) {

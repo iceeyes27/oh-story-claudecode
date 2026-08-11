@@ -2,7 +2,10 @@
 
 - 小说：盘龙（开篇 23 章节选） | 总章数：23 | 输出目录：demo/拆文库-盘龙/ | 开始：2026-06-07
 - 最终状态：completed
-- schema_version: 2
+- schema_version: 3
+- source_path: 原文/原文.txt
+- source_bytes: 195923
+- source_sha256: c59f763d16f308d969121665e55a983720426e912a3f5fe7800123364b86b4d5
 
 ## 管道进度
 

@@ -24,7 +24,8 @@
 
 const fs = require("fs");
 const path = require("path");
-const { ab, sleep, evalJSONBase64, getArg, localDateStamp, runCli } = require("./cdp-utils");
+const { ab, sleep, evalJSONBase64, runCli } = require("./cdp-utils");
+const { parseCli, createTimeSnapshot } = require("./scan-contract");
 
 const BASE_URL = "https://www.jjwxc.net/topten.php";
 
@@ -170,14 +171,28 @@ function fmtWan(s, unit) {
 // 主流程
 // ---------------------------------------------------------------------------
 
-const args = process.argv.slice(2);
-const PORT = parseInt(getArg(args, "--port") || "9222", 10);
-const OUTDIR = getArg(args, "--outdir") || ".";
-const RANKTYPE = getArg(args, "--type") || "12";
-const CHANNEL = getArg(args, "--channel") || "0";
-const TOP = parseInt(getArg(args, "--top") || "10", 10);
-const DETAIL_LIMIT = parseInt(getArg(args, "--detail-limit") || "100", 10);
-const LIST_ONLY = args.includes("--list-only");
+const cli = parseCli(process.argv.slice(2), {
+  "--port": { type: "integer", min: 1, max: 65535, default: 9222 },
+  "--outdir": { type: "string", default: "." },
+  "--type": { type: "enum", values: [...RANK_TYPES.map((r) => r.id), "all"], default: "12" },
+  "--channel": { type: "string", default: "0" },
+  "--top": { type: "integer", min: 1, max: 100, default: 10 },
+  "--detail-limit": { type: "integer", min: 1, max: 100, default: 100 },
+  "--list-only": { type: "flag" },
+});
+if (!/^[0-9]+$/.test(cli.channel)) {
+  const error = new Error("参数错误：\n- 参数 --channel 必须是非负数字频道 ID");
+  error.code = "SCAN_CLI_INVALID";
+  throw error;
+}
+const PORT = cli.port;
+const OUTDIR = cli.outdir;
+const RANKTYPE = cli.type;
+const CHANNEL = cli.channel;
+const TOP = cli.top;
+const DETAIL_LIMIT = cli["detail-limit"];
+const LIST_ONLY = cli["list-only"];
+const SCAN_TIME = createTimeSnapshot();
 
 function scrapeRank(port, rankTypeId, channelId) {
   const rt = RANK_TYPES.find((r) => r.id === rankTypeId);
@@ -280,12 +295,11 @@ function scrapeRank(port, rankTypeId, channelId) {
     quality = "[仅列表-无核心指标]";
   }
 
-  const now = new Date().toISOString();
   const lines = [
     `# 晋江 · ${rt.label}`,
     "",
     `- 来源：${url}`,
-    `- 抓取时间：${now}`,
+    `- 抓取时间：${SCAN_TIME.capturedAt}`,
     `- 频道数：${data.channels.length}`,
     `- 总条目数：${totalBooks}`,
     `- 详情采集：${detailOk} / ${detailPlanned}（每频道前 ${TOP}，上限 ${DETAIL_LIMIT}）`,
@@ -360,9 +374,8 @@ function main() {
         }
 
         const rtInfo = RANK_TYPES.find((r) => r.id === rt);
-        const date = localDateStamp();
         const chLabel = ch === "0" ? "全站" : `频道${ch}`;
-        const filename = `晋江${rtInfo.label}_${chLabel}_${date}.md`;
+        const filename = `晋江${rtInfo.label}_${chLabel}_${SCAN_TIME.dateStamp}.md`;
         fs.mkdirSync(OUTDIR, { recursive: true });
         const filepath = path.join(OUTDIR, filename);
         fs.writeFileSync(filepath, result.content, "utf-8");

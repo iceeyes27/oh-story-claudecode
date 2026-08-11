@@ -15,7 +15,7 @@ ROOT="$TMP_DIR/story-project"
 HOOK="$ROOT/.codex/hooks/story_codex_hook.py"
 mkdir -p "$ROOT/.codex/hooks"
 cp "$HOOK_SRC" "$HOOK"
-cp "$HOOKS_SRC/run-story-hook.sh" "$HOOKS_SRC/run-story-hook.cmd" "$ROOT/.codex/hooks/"
+cp "$HOOKS_SRC/run-story-hook.sh" "$HOOKS_SRC/run-story-hook.cmd" "$HOOKS_SRC/book-discovery-contract.json" "$ROOT/.codex/hooks/"
 chmod +x "$HOOK"
 
 git -C "$ROOT" init -q
@@ -240,7 +240,7 @@ NON_GIT="$TMP_DIR/non-git-story-project"
 NON_GIT_HOOK="$NON_GIT/.codex/hooks/story_codex_hook.py"
 mkdir -p "$NON_GIT/.codex/hooks" "$NON_GIT/book/正文" "$NON_GIT/book/大纲" "$NON_GIT/nested/a/b"
 cp "$HOOK_SRC" "$NON_GIT_HOOK"
-cp "$HOOKS_SRC/run-story-hook.sh" "$HOOKS_SRC/run-story-hook.cmd" "$NON_GIT/.codex/hooks/"
+cp "$HOOKS_SRC/run-story-hook.sh" "$HOOKS_SRC/run-story-hook.cmd" "$HOOKS_SRC/book-discovery-contract.json" "$NON_GIT/.codex/hooks/"
 cp "$REPO_ROOT/skills/story-setup/references/codex/hooks/hooks.json" "$NON_GIT/.codex/hooks.json"
 launcher_cmd="$(
   NON_GIT="$NON_GIT" python3 - <<'PY'
@@ -313,5 +313,118 @@ assert_empty "$out" "missing deployment launcher no-ops silently"
 case "$out" in *//.codex*) fail "launcher executed //.codex/... on missing deployment: $out";; esac
 
 echo "  OK missing-deployment launcher no-op"
+
+# ── 书目发现契约：marker 距根最多 4 层；三端都忽略点目录/node_modules/符号链接。──
+DISCOVERY_ROOT="$TMP_DIR/discovery-project"
+mkdir -p "$DISCOVERY_ROOT/l1/book3/追踪" \
+         "$DISCOVERY_ROOT/l1/l2/book4/正文" \
+         "$DISCOVERY_ROOT/l1/l2/l3/book5/追踪" \
+         "$DISCOVERY_ROOT/node_modules/pkg/book/追踪" \
+         "$DISCOVERY_ROOT/.hidden/book/追踪" \
+         "$DISCOVERY_ROOT/.git/book/追踪" \
+         "$TMP_DIR/outside-book/追踪"
+if ln -s "$TMP_DIR/outside-book" "$DISCOVERY_ROOT/linkout" 2>/dev/null; then
+  HAS_DISCOVERY_SYMLINK=1
+else
+  HAS_DISCOVERY_SYMLINK=0
+fi
+
+expected_books=$'l1/book3\nl1/l2/book4'
+python_books="$(DISCOVERY_ROOT="$DISCOVERY_ROOT" HOOK="$HOOK" python3 - <<'PY'
+import importlib.util, os
+from pathlib import Path
+spec = importlib.util.spec_from_file_location("story_codex_hook", os.environ["HOOK"])
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+root = Path(os.environ["DISCOVERY_ROOT"])
+print("\n".join(sorted(path.relative_to(root).as_posix() for path in module._discover_all_books(root))))
+PY
+)"
+[ "$python_books" = "$expected_books" ] || fail "Python discovery violated depth/prune contract: $python_books"
+
+js_books="$(DISCOVERY_ROOT="$DISCOVERY_ROOT" CORE="$REPO_ROOT/skills/story-setup/references/templates/hooks/story_hook_core.js" node - <<'NODE'
+const path = require("path")
+const core = require(process.env.CORE)
+const root = process.env.DISCOVERY_ROOT
+process.stdout.write(core.discoverAllBooks(root).map((book) => path.relative(root, book).split(path.sep).join("/")).sort().join("\n"))
+NODE
+)"
+[ "$js_books" = "$expected_books" ] || fail "JS discovery violated depth/prune contract: $js_books"
+
+bash_books="$(CLAUDE_PROJECT_DIR="$DISCOVERY_ROOT" COMMON="$REPO_ROOT/skills/story-setup/references/templates/hooks/lib/common.sh" bash -c 'source "$COMMON"; discover_all_books' \
+  | while IFS= read -r book; do printf '%s\n' "${book#"$DISCOVERY_ROOT"/}"; done | sort)"
+[ "$bash_books" = "$expected_books" ] || fail "Bash discovery violated depth/prune contract: $bash_books"
+
+printf '../outside-book\n' > "$DISCOVERY_ROOT/.active-book"
+active_book="$(DISCOVERY_ROOT="$DISCOVERY_ROOT" HOOK="$HOOK" python3 - <<'PY'
+import importlib.util, os
+from pathlib import Path
+spec = importlib.util.spec_from_file_location("story_codex_hook", os.environ["HOOK"])
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+root = Path(os.environ["DISCOVERY_ROOT"])
+book = module.read_active_book(root)
+print(book.relative_to(root).as_posix() if book else "")
+PY
+)"
+[ "$active_book" = "l1/book3" ] || fail "out-of-root .active-book was accepted: $active_book"
+if [ "$HAS_DISCOVERY_SYMLINK" = 1 ]; then
+  printf 'linkout\n' > "$DISCOVERY_ROOT/.active-book"
+  active_book="$(DISCOVERY_ROOT="$DISCOVERY_ROOT" HOOK="$HOOK" python3 - <<'PY'
+import importlib.util, os
+from pathlib import Path
+spec = importlib.util.spec_from_file_location("story_codex_hook", os.environ["HOOK"])
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+root = Path(os.environ["DISCOVERY_ROOT"])
+book = module.read_active_book(root)
+print(book.relative_to(root).as_posix() if book else "")
+PY
+)"
+  [ "$active_book" = "l1/book3" ] || fail "symlink .active-book was accepted: $active_book"
+
+  rm "$DISCOVERY_ROOT/linkout"
+  ln -s "$DISCOVERY_ROOT/l1/l2/book4" "$DISCOVERY_ROOT/linkin"
+  printf 'linkin\n' > "$DISCOVERY_ROOT/.active-book"
+  bash_active_book="$(CLAUDE_PROJECT_DIR="$DISCOVERY_ROOT" COMMON="$REPO_ROOT/skills/story-setup/references/templates/hooks/lib/common.sh" bash -c 'source "$COMMON"; discover_active_book')"
+  bash_active_book="${bash_active_book#"$DISCOVERY_ROOT"/}"
+  [ "$bash_active_book" = "l1/book3" ] || fail "Bash accepted in-root symlink .active-book: $bash_active_book"
+  js_active_book="$(DISCOVERY_ROOT="$DISCOVERY_ROOT" CORE="$REPO_ROOT/skills/story-setup/references/templates/hooks/story_hook_core.js" node - <<'NODE'
+const path = require("path")
+const core = require(process.env.CORE)
+const root = process.env.DISCOVERY_ROOT
+process.stdout.write(path.relative(root, core.discoverActiveBook(root)).split(path.sep).join("/"))
+NODE
+)"
+  [ "$js_active_book" = "l1/book3" ] || fail "JS accepted in-root symlink .active-book: $js_active_book"
+  active_book="$(DISCOVERY_ROOT="$DISCOVERY_ROOT" HOOK="$HOOK" python3 - <<'PY'
+import importlib.util, os
+from pathlib import Path
+spec = importlib.util.spec_from_file_location("story_codex_hook", os.environ["HOOK"])
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+root = Path(os.environ["DISCOVERY_ROOT"])
+book = module.read_active_book(root)
+print(book.relative_to(root).as_posix() if book else "")
+PY
+)"
+  [ "$active_book" = "l1/book3" ] || fail "Python accepted in-root symlink .active-book: $active_book"
+fi
+echo "  OK bounded book discovery parity"
+
+# target_cli 必须按逗号 token 精确判断，不能让 opencode 子串冒充 codex。
+HOOK="$HOOK" python3 - <<'PY' || fail "target_cli strict-token contract failed"
+import importlib.util, os
+spec = importlib.util.spec_from_file_location("story_codex_hook", os.environ["HOOK"])
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+assert module.parse_target_cli("target_cli: opencode\n") == (["opencode"], None)
+assert module.parse_target_cli("target_cli: codex\n") == (["codex"], None)
+assert module.parse_target_cli("target_cli: claude-code, codex\n") == (["claude-code", "codex"], None)
+for text in ("", "target_cli:\n", "target_cli: codex,\n", "target_cli: codex\ntarget_cli: opencode\n"):
+    tokens, error = module.parse_target_cli(text)
+    assert tokens is None and error
+PY
+echo "  OK strict target_cli tokens"
 echo ""
 echo "OK: Codex hook synthetic tests passed"

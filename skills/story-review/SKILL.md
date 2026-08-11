@@ -25,6 +25,15 @@ disable: true
 
 > AI味 / 文字自然度这一维度只有 `narrative-writer` 审，仅 full 模式覆盖。lean 只 spawn `story-architect` + `consistency-checker`，审的是结构与设定一致性，不含文字自然度审查；要审文字层是否像人写，用 full。
 
+### 跨批 findings 状态
+
+- 固定状态文件为 `{书目录}/.story-review/latest.json`，只能由 `scripts/review-state.js` 读写；不得把审查状态写入 `追踪/`、正文、设定或大纲。
+- full/lean 开始时用 `init --book ... --mode full|lean --review-id ... --batch ...`；每批综合完成后用 `update` 并传当前 `expected_state_revision`，全部完成后用 `complete`。批次 JSON 包含 `batch_id`、范围、输入文件 SHA-256、开放 findings 与受影响范围。
+- `status=active` 时只能恢复同一 `review_id`；其他任务必须等待当前任务完成。确需放弃时只可用带当前 `expected_state_revision` 和 `--confirm-abandon-active` 的显式 `reset`。完成状态后才能初始化下一任务。同一批次同一输入重跑为幂等读取，不重复写入。
+- 写入使用目标 revision 的独占申领、申领后的 revision 二次校验和同目录原子替换；冲突立即停止。遗留申领只报告，不自动删除；维护者确认原写入者已停止后，才可用 `release-claim` 并同时匹配 target revision 与 claim_id。
+- 输入摘要变化时，旧开放项标记 `needs_revalidation`，不得当作当前事实直接继承。
+- solo 或用户明确要求只读时，只运行 `status`；不得创建、更新或删除 `.story-review/` 内任何文件。报告必须说明本次新 findings 不可供新会话恢复。
+
 ---
 
 ## Phase 0：预检与降级（必须先执行）

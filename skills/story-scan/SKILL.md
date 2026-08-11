@@ -116,7 +116,11 @@ disable: true
 
 **输出规范**：详见 [references/scan-output-format.md](references/scan-output-format.md)，包含各平台字段定义、输出模板。
 
+四个主采集脚本（番茄、晋江、起点、七猫）统一通过 `scripts/scan-contract.js` 解析参数：未知、重复、缺值、空值、位置参数与越界整数必须在浏览器/网络访问、建目录和写文件前失败。`port` 范围 1-65535，`top`/`detail-limit` 范围 1-100；简介按 Unicode 字符截断 100 字；同一轮文件日期和抓取时间只取一次本地时间快照。
+
 **起点采集目标**（优先运行 `node scripts/qidian-rank-scraper.js --type {榜单} --outdir {输出目录}`；默认 `--mode auto` 会先用 `https://m.qidian.com` 移动端 SSR，PC/CDP 只作回退）：
+
+移动 SSR 与 PC/CDP 的逐书机器字段固定为 14 键：`rank/title/author/genre/status/contractStatus/chargeMode/wordCount/totalRecommend/tags/latestUpdate/url/description/missing_fields`。不可获取的字段写 `null` 并列入 `missing_fields`，不得用空字符串伪装完整。
 
 | 榜单 | URL | 核心字段 |
 |------|-----|----------|
@@ -155,7 +159,12 @@ node scripts/fanqie-rank-scraper.js --channel all --top 15 --outdir {输出目�
 |------|-----|----------|
 | 排行榜总入口 | qimao.com/paihang | 大热榜/新书榜/完结榜，热度为核心指标 |
 
-榜单类型：大热榜（日榜/月榜）、新书榜、完结榜、收藏榜、更新榜，支持男生榜/女生榜切换。
+榜单类型：大热榜（日榜/月榜/总榜）、新书榜、完结榜、收藏榜、更新榜，支持男生榜/女生榜切换。大热榜用 `--period day|month|all`（默认 day）；脚本点击后必须验证实际激活状态。非大热榜显式传 `--period` 立即失败；`--type all` 只给大热榜应用所选周期，其他榜各采一次。
+
+```bash
+node scripts/qimao-rank-scraper.js --channel male --type hot --period day --outdir {输出目录}
+node scripts/qimao-rank-scraper.js --channel female --type hot --period month --outdir {输出目录}
+```
 
 **晋江采集目标**（`scripts/jjwxc-rank-scraper.js`，默认列表 + 详情两步走）：
 
@@ -171,7 +180,7 @@ node scripts/jjwxc-rank-scraper.js --type 12 --list-only                 # 只�
 
 > **晋江硬性要求**：必须有详情页核心指标（收藏数/营养液/积分/字数），脚本默认已补采；采集要点见 [references/scan-output-format.md](references/scan-output-format.md)。
 
-**文件命名（mode=long）**：`{平台}{榜单名称}_{YYYYMMDD}.md`，例：`起点新人签约新书榜_20260425.md`
+**文件命名（mode=long）**：`{平台}{榜单名称}_{YYYYMMDD}.md`；七猫大热榜必须把 `日榜/月榜/总榜` 写入标题、文件头和文件名，避免同日结果互相覆盖。
 
 #### 脚本采集模式（mode=short）
 

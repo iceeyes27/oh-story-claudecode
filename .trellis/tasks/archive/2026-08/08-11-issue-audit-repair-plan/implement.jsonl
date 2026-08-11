@@ -1,0 +1,6 @@
+{"file":".trellis/spec/skills/index.md","reason":"Skill 仓库范围与入口规则"}
+{"file":".trellis/spec/skills/canonical-assets.md","reason":"共享资产与平台副本权威来源"}
+{"file":".trellis/spec/skills/validation.md","reason":"本地验证与禁用 GitHub Actions 约束"}
+{"file":".trellis/tasks/08-11-issue-audit-repair-plan/research/current-evidence.md","reason":"八项缺陷的当前实现证据"}
+{"file":".trellis/tasks/08-11-issue-audit-repair-plan/research/consensus-draft.md","reason":"三维审查后的完整技术决策"}
+{"file":".trellis/tasks/08-11-issue-audit-repair-plan/research/review-consensus.md","reason":"可维护性边界条件回归风险一致结论"}

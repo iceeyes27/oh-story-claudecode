@@ -28,6 +28,7 @@ assert_path ".agents/skills"
 assert_file "$CODEX_DIR/AGENTS.md.tmpl"
 assert_file "$CODEX_DIR/hooks/hooks.json"
 assert_file "$CODEX_DIR/hooks/story_codex_hook.py"
+assert_file "$CODEX_DIR/hooks/book-discovery-contract.json"
 assert_file "$CODEX_DIR/hooks/run-story-hook.sh"
 assert_file "$CODEX_DIR/hooks/run-story-hook.cmd"
 assert_path "$CODEX_DIR/agents"
@@ -37,6 +38,7 @@ assert_file "scripts/test-codex-hook-merge.py"
 assert_file "skills/story-setup/scripts/merge-codex-hooks.py"
 
 python3 -m json.tool "$CODEX_DIR/hooks/hooks.json" >/dev/null
+python3 -m json.tool "$CODEX_DIR/hooks/book-discovery-contract.json" >/dev/null
 python3 - <<'PY'
 from pathlib import Path
 for name in (

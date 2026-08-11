@@ -1,0 +1,4 @@
+{"file":".trellis/spec/skills/canonical-assets.md","reason":"检查共享实现和平台生成副本"}
+{"file":".trellis/spec/skills/validation.md","reason":"执行完整本地质量检查"}
+{"file":".trellis/tasks/08-11-issue-audit-repair-plan/research/consensus-draft.md","reason":"逐项核对 R1-R8 的边界和验证要求"}
+{"file":".trellis/tasks/08-11-issue-audit-repair-plan/research/review-consensus.md","reason":"确认三维审查均已通过"}

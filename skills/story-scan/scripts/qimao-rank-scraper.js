@@ -17,7 +17,8 @@
 
 const fs = require("fs");
 const path = require("path");
-const { ab, sleep, evalJSONBase64, safeStr, scrollLoad, getArg, localDateStamp, runCli } = require("./cdp-utils");
+const { ab, sleep, evalJSONBase64, safeStr, scrollLoad, runCli } = require("./cdp-utils");
+const { parseCli, truncateDescription, createTimeSnapshot } = require("./scan-contract");
 
 const RANK_URL = "https://www.qimao.com/paihang";
 
@@ -40,6 +41,12 @@ const RANK_TYPES = [
   { id: "finish", label: "完结榜" },
   { id: "collect", label: "收藏榜" },
   { id: "update", label: "更新榜" },
+];
+
+const PERIODS = [
+  { id: "day", label: "日榜" },
+  { id: "month", label: "月榜" },
+  { id: "all", label: "总榜" },
 ];
 
 // ---------------------------------------------------------------------------
@@ -65,6 +72,29 @@ function clickTabRetry(port, text) {
   if (clickTab(port, text)) return true;
   sleep(1500);
   return !!clickTab(port, text);
+}
+
+/** 点击后读取页面实际选中状态，不能只把 click() 成功当作切换成功。 */
+function isTabActive(port, text) {
+  const js =
+    "JSON.stringify((()=>{" +
+    "var all=Array.from(document.querySelectorAll('div,span,a,button,li'));" +
+    "var el=all.find(function(e){return (e.textContent||'').trim()===" + safeStr(text) + "});" +
+    "if(!el)return false;" +
+    "for(var node=el,depth=0;node&&depth<4;node=node.parentElement,depth++){" +
+    " var cls=String(node.className||'');" +
+    " if(node.getAttribute('aria-selected')==='true'||node.getAttribute('data-active')==='true'||/(^|[ _-])(active|current|selected)([ _-]|$)/i.test(cls))return true;" +
+    "}" +
+    "return false" +
+    "})())";
+  return !!evalJSONBase64(port, js);
+}
+
+function activatePeriod(port, period) {
+  const info = PERIODS.find((item) => item.id === period);
+  if (!info || !clickTabRetry(port, info.label)) return false;
+  sleep(800);
+  return isTabActive(port, info.label);
 }
 
 /**
@@ -143,13 +173,38 @@ function extractBooksFromText(port) {
 // 主流程
 // ---------------------------------------------------------------------------
 
-const args = process.argv.slice(2);
-const PORT = parseInt(getArg(args, "--port") || "9222", 10);
-const OUTDIR = getArg(args, "--outdir") || ".";
-const CHANNEL = getArg(args, "--channel") || "male";
-const RANKTYPE = getArg(args, "--type") || "hot";
+const rawArgs = process.argv.slice(2);
+const periodExplicit = rawArgs.some((arg) => arg === "--period" || arg.startsWith("--period="));
+const cli = parseCli(rawArgs, {
+  "--port": { type: "integer", min: 1, max: 65535, default: 9222 },
+  "--outdir": { type: "string", default: "." },
+  "--channel": { type: "enum", values: [...CHANNELS.map((c) => c.id), "all"], default: "male" },
+  "--type": { type: "enum", values: [...RANK_TYPES.map((r) => r.id), "all"], default: "hot" },
+  "--period": { type: "enum", values: PERIODS.map((p) => p.id), default: "day" },
+});
+if (periodExplicit && cli.type !== "hot" && cli.type !== "all") {
+  const error = new Error("参数错误：\n- --period 仅适用于 --type hot（大热榜）或 --type all");
+  error.code = "SCAN_CLI_INVALID";
+  throw error;
+}
+const PORT = cli.port;
+const OUTDIR = cli.outdir;
+const CHANNEL = cli.channel;
+const RANKTYPE = cli.type;
+const PERIOD = cli.period;
+const SCAN_TIME = createTimeSnapshot();
 
-function scrapeRank(port, channelId, rankTypeId) {
+function outputFilename(channelId, rankTypeId, period, snapshot = SCAN_TIME) {
+  const channel = CHANNELS.find((item) => item.id === channelId);
+  const rankType = RANK_TYPES.find((item) => item.id === rankTypeId);
+  if (!channel || !rankType) throw new Error("未知七猫榜单参数");
+  const periodInfo = rankTypeId === "hot" ? PERIODS.find((item) => item.id === period) : null;
+  if (rankTypeId === "hot" && !periodInfo) throw new Error("大热榜缺少合法周期");
+  const suffix = periodInfo ? `_${periodInfo.label}` : "";
+  return `七猫${channel.label}${rankType.label}${suffix}_${snapshot.dateStamp}.md`;
+}
+
+function scrapeRank(port, channelId, rankTypeId, period) {
   const ch = CHANNELS.find((c) => c.id === channelId);
   const rt = RANK_TYPES.find((r) => r.id === rankTypeId);
   if (!ch || !rt) {
@@ -157,7 +212,9 @@ function scrapeRank(port, channelId, rankTypeId) {
     return null;
   }
 
-  console.log(`\n→ 采集 七猫${ch.label}${rt.label}...`);
+  const periodInfo = rankTypeId === "hot" ? PERIODS.find((p) => p.id === period) : null;
+  const periodLabel = periodInfo ? periodInfo.label : "";
+  console.log(`\n→ 采集 七猫${ch.label}${rt.label}${periodLabel}...`);
 
   let books, urls;
   try {
@@ -193,6 +250,14 @@ function scrapeRank(port, channelId, rankTypeId) {
     console.log(`  ✓ 切换到${rt.label}`);
     sleep(2000);
 
+    if (periodInfo) {
+      if (!activatePeriod(port, period)) {
+        console.error(`  ✗ 「${periodLabel}」未进入激活状态，拒绝采集错误周期的数据。`);
+        return null;
+      }
+      console.log(`  ✓ 已验证${periodLabel}激活`);
+    }
+
     // 滚动加载更多
     scrollLoad(port, 5);
     sleep(1000);
@@ -225,14 +290,14 @@ function scrapeRank(port, channelId, rankTypeId) {
   const heated = books.filter((b) => b.heat).length;
   console.log(`  ✓ 提取 ${books.length} 本（链接 ${linked}/${books.length}，热度 ${heated}/${books.length}）`);
 
-  const now = new Date().toISOString();
   const lines = [
-    `# 七猫 · ${ch.label} · ${rt.label}`,
+    `# 七猫 · ${ch.label} · ${rt.label}${periodLabel}`,
     "",
     `- 作品页链接：${linked} / ${books.length}`,
     `- 热度命中：${heated} / ${books.length}`,
     `- 来源：${RANK_URL}`,
-    `- 抓取时间：${now}`,
+    `- 周期：${periodLabel || "无"}`,
+    `- 抓取时间：${SCAN_TIME.capturedAt}`,
     `- 条目数：${books.length}`,
     "",
     "---",
@@ -259,7 +324,7 @@ function scrapeRank(port, channelId, rankTypeId) {
         lines.push("");
         lines.push("**简介**");
         lines.push("");
-        lines.push(b.desc);
+        lines.push(truncateDescription(b.desc));
       }
       lines.push("", "---", "");
     } catch (bookErr) {
@@ -278,13 +343,10 @@ function main() {
 
   for (const ch of channels) {
     for (const rt of rankTypes) {
-      const content = scrapeRank(PORT, ch, rt);
+      const content = scrapeRank(PORT, ch, rt, rt === "hot" ? PERIOD : null);
       if (!content) continue;
 
-      const chInfo = CHANNELS.find((c) => c.id === ch);
-      const rtInfo = RANK_TYPES.find((r) => r.id === rt);
-      const date = localDateStamp();
-      const filename = `七猫${chInfo.label}${rtInfo.label}_${date}.md`;
+      const filename = outputFilename(ch, rt, PERIOD, SCAN_TIME);
       fs.mkdirSync(OUTDIR, { recursive: true });
       const filepath = path.join(OUTDIR, filename);
       fs.writeFileSync(filepath, content, "utf-8");
@@ -299,4 +361,4 @@ if (require.main === module) {
   runCli(main, "七猫采集");
 }
 
-module.exports = { extractBooksFromText };
+module.exports = { extractBooksFromText, isTabActive, activatePeriod, outputFilename, PERIODS };

@@ -3,19 +3,6 @@
 const fs = require("node:fs")
 const path = require("node:path")
 const { spawnSync } = require("node:child_process")
-const discoveryContract = require("./book-discovery-contract.json")
-
-if (discoveryContract.schema_version !== 1 || !Number.isInteger(discoveryContract.marker_max_depth)) {
-  throw new Error("book-discovery-contract.json 无效；重新运行 story-setup 部署")
-}
-
-const ignoredDiscoveryDirs = new Set(discoveryContract.ignored_directories || [])
-
-function skipDiscoveryEntry(entry) {
-  if (entry.isSymbolicLink()) return true
-  if (!entry.isDirectory()) return false
-  return (discoveryContract.ignore_dot_directories && entry.name.startsWith(".")) || ignoredDiscoveryDirs.has(entry.name)
-}
 
 function existingDir(value) {
   if (typeof value !== "string" || !value.trim()) return null
@@ -41,21 +28,6 @@ function resolveTarget(root, target, base = root) {
   return path.isAbsolute(normalized) ? path.resolve(normalized) : path.resolve(base || root, normalized)
 }
 
-function pathUsesSymlink(root, target) {
-  const relative = path.relative(path.resolve(root), path.resolve(target))
-  if (relative === "" || relative === ".." || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) return relative !== ""
-  let current = path.resolve(root)
-  try {
-    for (const part of relative.split(path.sep)) {
-      current = path.join(current, part)
-      if (fs.lstatSync(current).isSymbolicLink()) return true
-    }
-  } catch {
-    return false
-  }
-  return false
-}
-
 function firstLine(file) {
   try {
     return fs.readFileSync(file, "utf8").split(/\r?\n/, 1)[0].trim()
@@ -65,6 +37,7 @@ function firstLine(file) {
 }
 
 function findFirst(base, maxDepth, predicate) {
+  // maxDepth 与 `find -maxdepth N` 一致：root 的直属条目深度为 1，深度 N 的条目可见，N+1 不可见。
   if (maxDepth <= 0) return null
   let entries = []
   try {
@@ -73,12 +46,13 @@ function findFirst(base, maxDepth, predicate) {
     return null
   }
   for (const entry of entries) {
-    if (skipDiscoveryEntry(entry)) continue
+    if (entry.name.startsWith(".") || entry.name === "node_modules") continue
     const full = path.join(base, entry.name)
     if (predicate(full, entry)) return full
   }
+  if (maxDepth === 1) return null
   for (const entry of entries) {
-    if (!entry.isDirectory() || skipDiscoveryEntry(entry)) continue
+    if (!entry.isDirectory() || entry.name.startsWith(".") || entry.name === "node_modules") continue
     const found = findFirst(path.join(base, entry.name), maxDepth - 1, predicate)
     if (found) return found
   }
@@ -88,20 +62,21 @@ function findFirst(base, maxDepth, predicate) {
 function discoverActiveBook(root) {
   const declared = firstLine(path.join(root, ".active-book"))
   if (declared) {
-    const candidate = resolveTarget(root, declared)
-    const realRoot = existingDir(root)
-    const realCandidate = existingDir(candidate)
-    if (realRoot && realCandidate && !pathUsesSymlink(root, candidate)) {
-      const rel = path.relative(realRoot, realCandidate)
-      if (rel !== ".." && !rel.startsWith(`..${path.sep}`) && !path.isAbsolute(rel)) return realCandidate
+    const candidate = existingDir(resolveTarget(root, declared))
+    if (candidate) {
+      // root 也要按 realpath 比：existingDir 已把 candidate 解到真实路径，若这里用未解析的
+      // root，项目根位于 symlink 下（macOS /tmp、/var，或软链的家目录/工作目录）时 rel 会
+      // 假性以 ".." 开头，合法的 .active-book 被静默丢弃。bash 用 pwd -P、python 用
+      // root.resolve()，此处对齐两端。
+      const rel = path.relative(existingDir(root) || path.resolve(root), candidate)
+      if (!rel.startsWith("..") && !path.isAbsolute(rel)) return candidate
     }
   }
-  const maxDepth = discoveryContract.marker_max_depth
-  const tracking = findFirst(root, maxDepth, (_full, entry) => entry.isDirectory() && entry.name === "追踪")
+  const tracking = findFirst(root, 4, (_full, entry) => entry.isDirectory() && entry.name === "追踪")
   if (tracking) return path.dirname(tracking)
-  const body = findFirst(root, maxDepth, (_full, entry) => entry.isDirectory() && entry.name === "正文")
+  const body = findFirst(root, 4, (_full, entry) => entry.isDirectory() && entry.name === "正文")
   if (body) return path.dirname(body)
-  const bodyFile = findFirst(root, maxDepth, (_full, entry) => entry.isFile() && entry.name === "正文.md")
+  const bodyFile = findFirst(root, 4, (_full, entry) => entry.isFile() && entry.name === "正文.md")
   return bodyFile ? path.dirname(bodyFile) : null
 }
 
@@ -112,7 +87,7 @@ function discoverAllBooks(root) {
     let entries = []
     try { entries = fs.readdirSync(base, { withFileTypes: true }) } catch { return }
     for (const entry of entries) {
-      if (skipDiscoveryEntry(entry)) continue
+      if (entry.name.startsWith(".") || entry.name === "node_modules") continue
       const full = path.join(base, entry.name)
       if (entry.isDirectory() && (entry.name === "追踪" || entry.name === "正文")) {
         books.set(path.dirname(full), path.dirname(full))
@@ -120,12 +95,13 @@ function discoverAllBooks(root) {
         books.set(path.dirname(full), path.dirname(full))
       }
     }
+    if (depth === 1) return
     for (const entry of entries) {
-      if (!entry.isDirectory() || skipDiscoveryEntry(entry)) continue
+      if (!entry.isDirectory() || entry.name.startsWith(".") || entry.name === "node_modules") continue
       walk(path.join(base, entry.name), depth - 1)
     }
   }
-  walk(root, discoveryContract.marker_max_depth)
+  walk(root, 4)
   return [...books.values()]
 }
 
@@ -225,156 +201,397 @@ function continuityFindings(root) {
   return messages
 }
 
-function extractProseTargets(command) {
-  const targets = []
-  targets.push(...extractRedirectionTargets(command))
-  for (const raw of shellSegments(command)) {
-    const segment = beforeShellRedirection(raw)
-    // 引号感知分词（同 shellWords）：/\s+/ 会把 cp draft.md "my book/正文/第1章.md" 的目标切碎，
-    // 末位取到 book/正文/第1章.md —— 判到另一本书上（那本有细纲就直接放行）。
-    const words = shellWords(segment)
-    let commandIndex = 0
-    while (commandIndex < words.length && (/^[A-Za-z_][A-Za-z0-9_]*=/.test(words[commandIndex]) || ["command", "noglob"].includes(words[commandIndex]))) commandIndex++
-    if (words[commandIndex] === "env") {
-      commandIndex++
-      while (commandIndex < words.length && (/^[A-Za-z_][A-Za-z0-9_]*=/.test(words[commandIndex]) || ["-i", "--ignore-environment"].includes(words[commandIndex]))) commandIndex++
+function readShellWord(value, start) {
+  let word = ""
+  let quote = ""
+  let escaped = false
+  let started = false
+  let index = start
+  for (; index < value.length; index++) {
+    const ch = value[index]
+    if (escaped) {
+      word += ch
+      escaped = false
+      started = true
+      continue
     }
-    const executable = words[commandIndex]
-    const operands = words.slice(commandIndex + 1)
-    if (executable === "tee" || executable === "touch") {
-      let skipValue = false
-      let optionsEnded = false
-      for (const word of operands) {
-        if (skipValue) { skipValue = false; continue }
-        if (!optionsEnded && word === "--") { optionsEnded = true; continue }
-        if (!optionsEnded && executable === "touch" && ["-d", "-r", "-t", "--date", "--reference", "--time"].includes(word)) {
-          skipValue = true
-          continue
-        }
-        if (!optionsEnded && word.startsWith("-")) continue
-        if (word.includes("正文")) targets.push(word)
-      }
-    } else if (words.length >= commandIndex + 2 && (executable === "cp" || executable === "mv")) {
-      const positional = operands.filter((word) => !word.startsWith("-"))
-      const destination = positional[positional.length - 1]
-      if (destination && destination.includes("正文")) targets.push(destination)
+    if (ch === "\\" && quote !== "'") {
+      word += ch
+      escaped = true
+      started = true
+      continue
     }
+    if (quote) {
+      if (ch === quote) quote = ""
+      else word += ch
+      started = true
+      continue
+    }
+    if (ch === '"' || ch === "'") {
+      quote = ch
+      started = true
+      continue
+    }
+    if ([" ", "\t", "\r", "\n", ";", "&", "|", "<", ">", "(", ")"].includes(ch)) break
+    word += ch
+    started = true
   }
-  return [...new Set(targets)]
+  return { word: started ? word : "", next: index }
 }
 
-// 仅识别引号外的 shell 重定向。正则无法区分 `echo 'x > 正文/第1章.md'` 里的普通文本，
-// 会把只读/输出命令误判为文件写入；这里用一次线性扫描，同时保留带空格的引号路径。
-function extractRedirectionTargets(command) {
-  const targets = []
+function readHeredocDelimiter(value, start) {
+  let word = ""
   let quote = ""
-  for (let index = 0; index < command.length; index++) {
-    const char = command[index]
+  let escaped = false
+  let started = false
+  let index = start
+  for (; index < value.length; index++) {
+    const ch = value[index]
+    if (escaped) {
+      word += ch
+      escaped = false
+      started = true
+      continue
+    }
+    if (ch === "\\" && quote !== "'") {
+      const next = value[index + 1] || ""
+      if (quote === '"' && !["$", "`", '"', "\\", "\n"].includes(next)) {
+        word += ch
+      } else {
+        escaped = true
+      }
+      started = true
+      continue
+    }
     if (quote) {
-      if (char === quote) quote = ""
-      else if (quote === '"' && char === "\\") index++
+      if (ch === quote) quote = ""
+      else word += ch
+      started = true
       continue
     }
-    if (char === "'" || char === '"') {
-      quote = char
+    if (ch === '"' || ch === "'") {
+      quote = ch
+      started = true
       continue
     }
-    if (char === "\\") {
+    if ([" ", "\t", "\r", "\n", ";", "&", "|", "<", ">", "(", ")"].includes(ch)) break
+    word += ch
+    started = true
+  }
+  return { word: started ? word : "", next: index }
+}
+
+function heredocDeclarations(line) {
+  const declarations = []
+  let quote = ""
+  let escaped = false
+  for (let index = 0; index < line.length; index++) {
+    const ch = line[index]
+    if (escaped) {
+      escaped = false
+      continue
+    }
+    if (ch === "\\" && quote !== "'") {
+      escaped = true
+      continue
+    }
+    if (quote) {
+      if (ch === quote) quote = ""
+      continue
+    }
+    if (ch === '"' || ch === "'") {
+      quote = ch
+      continue
+    }
+    if (ch !== "<" || line[index + 1] !== "<" || line[index - 1] === "<" || line[index + 2] === "<") continue
+    let cursor = index + 2
+    let stripTabs = false
+    if (line[cursor] === "-") {
+      stripTabs = true
+      cursor++
+    }
+    while (line[cursor] === " " || line[cursor] === "\t") cursor++
+    const parsed = readHeredocDelimiter(line, cursor)
+    if (parsed.word) declarations.push({ delimiter: parsed.word, stripTabs })
+    index = Math.max(index, parsed.next - 1)
+  }
+  return declarations
+}
+
+function maskHeredocBodies(command) {
+  const pending = []
+  return String(command).split("\n").map((line) => {
+    if (pending.length) {
+      const current = pending[0]
+      const comparable = current.stripTabs ? line.replace(/^\t+/, "") : line
+      if (comparable === current.delimiter) {
+        pending.shift()
+        return line
+      }
+      return " ".repeat(line.length)
+    }
+    pending.push(...heredocDeclarations(line))
+    return line
+  }).join("\n")
+}
+
+function commandWordIndex(words) {
+  let index = 0
+  while (index < words.length) {
+    while (index < words.length && (/^[A-Za-z_][A-Za-z0-9_]*=/.test(words[index]) || words[index] === "noglob")) index++
+    if (words[index] === "command") {
+      index++
+      while (index < words.length) {
+        const option = words[index]
+        if (option === "--") { index++; break }
+        if (option === "-v" || option === "-V" || /^-[p]*[vV]/.test(option)) return words.length
+        if (option === "-p" || /^-p+$/.test(option)) { index++; continue }
+        break
+      }
+      continue
+    }
+    if (words[index] === "env") {
+      index++
+      while (index < words.length) {
+        const option = words[index]
+        if (/^[A-Za-z_][A-Za-z0-9_]*=/.test(option) || ["-i", "--ignore-environment"].includes(option)) {
+          index++
+          continue
+        }
+        if (option === "-u" || option === "--unset") {
+          index += 2
+          continue
+        }
+        if (option.startsWith("--unset=") || (/^-u.+/.test(option) && option !== "-u")) {
+          index++
+          continue
+        }
+        if (option === "--") index++
+        break
+      }
+      continue
+    }
+    break
+  }
+  return index
+}
+
+function nestedShellCommand(args) {
+  const valueOptions = new Set(["-o", "+o", "-O", "+O"])
+  for (let index = 0; index < args.length; index++) {
+    const option = args[index]
+    if (option === "--") return ""
+    if (option === "-c" || (/^-[^-]+$/.test(option) && option.slice(1).includes("c"))) {
+      return args[index + 1] || ""
+    }
+    if (valueOptions.has(option)) {
       index++
       continue
     }
-    if (char !== ">") continue
+    if (!option.startsWith("-") && !option.startsWith("+")) break
+  }
+  return ""
+}
 
-    while (command[index + 1] === ">") index++
-    let cursor = index + 1
-    while (/[ \t\r\n]/.test(command[cursor] || "")) cursor++
-
-    let target = ""
-    let targetQuote = ""
-    for (; cursor < command.length; cursor++) {
-      const tokenChar = command[cursor]
-      if (targetQuote) {
-        if (tokenChar === targetQuote) {
-          targetQuote = ""
-        } else if (targetQuote === '"' && tokenChar === "\\") {
-          const next = command[cursor + 1]
-          if (next === '"' || next === "\\") {
-            target += next
-            cursor++
-          } else {
-            target += tokenChar
-          }
-        } else {
-          target += tokenChar
+function commandSubstitutions(command) {
+  const value = String(command)
+  const substitutions = []
+  let quote = ""
+  let escaped = false
+  for (let index = 0; index < value.length; index++) {
+    const ch = value[index]
+    if (escaped) {
+      escaped = false
+      continue
+    }
+    if (ch === "\\" && quote !== "'") {
+      escaped = true
+      continue
+    }
+    if (quote === "'") {
+      if (ch === "'") quote = ""
+      continue
+    }
+    if (ch === '"') {
+      quote = quote === '"' ? "" : '"'
+      continue
+    }
+    if (!quote && ch === "'") {
+      quote = "'"
+      continue
+    }
+    if (ch === "$" && value[index + 1] === "(" && value[index + 2] !== "(") {
+      let depth = 1
+      let innerQuote = ""
+      let innerEscaped = false
+      let end = index + 2
+      for (; end < value.length; end++) {
+        const inner = value[end]
+        if (innerEscaped) { innerEscaped = false; continue }
+        if (inner === "\\" && innerQuote !== "'") { innerEscaped = true; continue }
+        if (innerQuote) {
+          if (inner === innerQuote) innerQuote = ""
+          continue
         }
-        continue
+        if (inner === '"' || inner === "'") { innerQuote = inner; continue }
+        if (inner === "(") depth++
+        else if (inner === ")" && --depth === 0) break
       }
-      if (tokenChar === "'" || tokenChar === '"') {
-        targetQuote = tokenChar
-        continue
+      if (depth === 0) {
+        substitutions.push(value.slice(index + 2, end))
+        index = end
       }
-      if (/[ \t\r\n<>|;&()]/.test(tokenChar)) break
-      if (tokenChar === "\\") {
-        const next = command[cursor + 1]
-        if (next && /[ \t\r\n<>|;&()'"\\]/.test(next)) {
-          target += next
-          cursor++
-        } else {
-          target += tokenChar
-        }
-      } else {
-        target += tokenChar
+      continue
+    }
+    if (ch === "`") {
+      let end = index + 1
+      let tickEscaped = false
+      for (; end < value.length; end++) {
+        const inner = value[end]
+        if (tickEscaped) { tickEscaped = false; continue }
+        if (inner === "\\") { tickEscaped = true; continue }
+        if (inner === "`") break
+      }
+      if (end < value.length) {
+        substitutions.push(value.slice(index + 1, end))
+        index = end
       }
     }
-    if (target.includes("正文")) targets.push(target)
-    index = Math.max(index, cursor - 1)
+  }
+  return substitutions
+}
+
+function redirectTargets(command) {
+  const value = String(command)
+  const targets = []
+  let quote = ""
+  let escaped = false
+  for (let index = 0; index < value.length; index++) {
+    const ch = value[index]
+    if (escaped) { escaped = false; continue }
+    if (ch === "\\" && quote !== "'") { escaped = true; continue }
+    if (quote) {
+      if (ch === quote) quote = ""
+      continue
+    }
+    if (ch === '"' || ch === "'") { quote = ch; continue }
+    if (ch !== ">") continue
+    let cursor = index + (value[index + 1] === ">" ? 2 : 1)
+    if (value[cursor] === "|" || value[cursor] === "&") cursor++
+    while (value[cursor] === " " || value[cursor] === "\t") cursor++
+    const parsed = readShellWord(value, cursor)
+    if (parsed.word.includes("正文")) targets.push(parsed.word)
+    index = Math.max(index, parsed.next - 1)
   }
   return targets
 }
 
-function hookToolName(input) {
-  if (!input || typeof input !== "object" || Array.isArray(input)) return ""
-  return String(input.tool_name || input.toolName || input.tool || input.name || "")
-}
-
-function hookToolPayload(input) {
-  if (!input || typeof input !== "object" || Array.isArray(input)) return {}
-  for (const key of ["tool_input", "toolInput", "input", "parameters", "args"]) {
-    const value = input[key]
-    if (value && typeof value === "object" && !Array.isArray(value)) return value
+function writeOperands(command, args) {
+  const operands = []
+  const valueOptions = command === "touch"
+    ? new Set(["-d", "--date", "-r", "--reference", "-t", "--time"])
+    : new Set()
+  let options = true
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i]
+    if (options && arg === "--") {
+      options = false
+      continue
+    }
+    if (options && valueOptions.has(arg)) {
+      i++
+      continue
+    }
+    if (options && [...valueOptions].some((option) => option.startsWith("--") && arg.startsWith(`${option}=`))) continue
+    if (options && arg.startsWith("-") && arg !== "-") continue
+    operands.push(arg)
   }
-  return input
+  return operands
 }
 
-// 完整 hook 事件 -> 全部潜在写入目标。平台薄壳只负责事件 I/O，不再各自解析 Bash 命令。
-function extractHookProseTargets(input) {
-  const payload = hookToolPayload(input)
-  const name = hookToolName(input)
+function commandBasename(value) {
+  const parts = String(value || "").split(/[\\/]/)
+  return parts[parts.length - 1]
+}
+
+// 目录形态的落盘目标一律用 "/" 拼：path.join 在 Windows 产出反斜杠，会让三端 parity 的
+// 逐字比较在 Windows 上错开（resolveTarget 之后也会把 \ 归一成 /，这里先统一即可）。
+function joinPosix(directory, name) {
+  return `${String(directory).replace(/[\\/]+$/, "")}/${name}`
+}
+
+function copyLikeTargets(command, args) {
+  const positionals = []
+  let targetDirectory = ""
+  let directoryOnly = false
+  let options = true
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i]
+    if (options && arg === "--") {
+      options = false
+      continue
+    }
+    if (options && (arg === "-t" || arg === "--target-directory")) {
+      targetDirectory = args[++i] || ""
+      continue
+    }
+    if (options && arg.startsWith("--target-directory=")) {
+      targetDirectory = arg.slice("--target-directory=".length)
+      continue
+    }
+    if (options && command === "install" && (arg === "-d" || arg === "--directory")) {
+      directoryOnly = true
+      continue
+    }
+    if (options && arg.startsWith("-") && arg !== "-") continue
+    positionals.push(arg)
+  }
+  if (directoryOnly || !positionals.length) return []
+  if (targetDirectory) {
+    return positionals.map((source) => joinPosix(targetDirectory, commandBasename(source)))
+  }
+  if (positionals.length < 2) return []
+  const destination = positionals[positionals.length - 1]
+  const normalized = destination.replace(/\\/g, "/")
+  if (normalized.endsWith("/") || normalized.split("/").pop() === "正文") {
+    return positionals.slice(0, -1).map((source) => joinPosix(destination, commandBasename(source)))
+  }
+  return [destination]
+}
+
+function extractProseTargets(command, depth = 0) {
   const targets = []
-  for (const key of ["file_path", "filePath", "path", "target", "filename"]) {
-    if (typeof payload[key] === "string" && payload[key]) targets.push(payload[key])
+  const scannable = maskHeredocBodies(command)
+  if (depth < 8) {
+    for (const nested of commandSubstitutions(scannable)) {
+      targets.push(...extractProseTargets(nested, depth + 1))
+    }
   }
-  const command = typeof payload.command === "string" ? payload.command : ""
-  if (command) {
-    if (/bash/i.test(name) || !name) targets.push(...extractProseTargets(command))
-    else if (/applypatch|patch/i.test(name)) targets.push(...extractPatchTargets(command))
-  }
-  if (/applypatch|patch/i.test(name)) {
-    for (const key of ["patch", "content", "text"]) {
-      if (typeof payload[key] === "string") targets.push(...extractPatchTargets(payload[key]))
+  targets.push(...redirectTargets(scannable))
+  for (const raw of shellSegments(scannable)) {
+    const segment = beforeShellRedirection(raw)
+    // 引号感知分词（同 shellWords）：/\s+/ 会把 cp draft.md "my book/正文/第1章.md" 的目标切碎，
+    // 末位取到 book/正文/第1章.md —— 判到另一本书上（那本有细纲就直接放行）。
+    const words = shellWords(segment)
+    const commandIndex = commandWordIndex(words)
+    const commandName = commandBasename(words[commandIndex])
+    const commandArgs = words.slice(commandIndex + 1)
+    if (["sh", "bash", "dash", "ksh", "zsh"].includes(commandName)) {
+      const nested = nestedShellCommand(commandArgs)
+      if (nested) targets.push(...extractProseTargets(nested, depth + 1))
+    }
+    if (commandName === "tee" || commandName === "touch") {
+      for (const destination of writeOperands(commandName, commandArgs)) {
+        if (destination.includes("正文")) targets.push(destination)
+      }
+    }
+    if (commandName === "cp" || commandName === "mv" || commandName === "install") {
+      for (const destination of copyLikeTargets(commandName, commandArgs)) {
+        if (destination.includes("正文")) targets.push(destination)
+      }
     }
   }
   return [...new Set(targets.filter(Boolean))]
-}
-
-function resolveHookProseTargets(root, input) {
-  const inputCwd = existingDir(input && input.cwd)
-  let base = root
-  if (inputCwd) {
-    const relation = path.relative(path.resolve(root), inputCwd)
-    if (relation === "" || (!path.isAbsolute(relation) && relation !== ".." && !relation.startsWith(`..${path.sep}`))) base = inputCwd
-  }
-  return [...new Set(extractHookProseTargets(input).map((target) => resolveTarget(root, target, base)))]
 }
 
 // apply_patch 目标抽取。只认 Add/Update 会漏掉 `*** Move to:`——它是 Update File 段的子指令
@@ -422,7 +639,7 @@ function proseBlockReason(root, absolute) {
     if (fs.existsSync(path.join(root, "拆文库", path.basename(book)))) return null
     if (!fs.existsSync(path.join(book, "设定.md"))) return null
     if (!fs.existsSync(path.join(book, "小节大纲.md"))) {
-      return `⛔ 写正文被拦截：${safeRelative(root, absolute)} 缺少同目录 小节大纲.md。先按 story-write 完成「小节大纲.md」再写正文。`
+      return `⛔ 写正文被拦截：${safeRelative(root, absolute)} 缺少同目录 小节大纲.md。先按 story-short-write 完成「小节大纲.md」再写正文。`
     }
     return null
   }
@@ -449,7 +666,7 @@ function proseBlockReason(root, absolute) {
       })
     } catch {}
     if (!found) {
-      return `⛔ 写正文被拦截：第 ${chapter} 章缺少细纲（${safeRelative(root, outlineDir)}/细纲_第${chapter}章.md）。先按 story-write 单章流程补建细纲再写正文。`
+      return `⛔ 写正文被拦截：第 ${chapter} 章缺少细纲（${safeRelative(root, outlineDir)}/细纲_第${chapter}章.md）。先按 story-long-write 单章流程补建细纲再写正文。`
     }
   }
   const checkpointIssue = trackingCheckpointIssue(book, true, exists ? null : Number(chapter) - 1)
@@ -763,7 +980,20 @@ function shellWords(segment) {
   let current = ""
   let started = false
   let quote = ""
+  let escaped = false
   for (const ch of String(segment)) {
+    if (escaped) {
+      current += ch
+      escaped = false
+      started = true
+      continue
+    }
+    if (ch === "\\" && quote !== "'") {
+      current += ch
+      escaped = true
+      started = true
+      continue
+    }
     if (quote) {
       if (ch === quote) quote = ""
       else current += ch
@@ -791,7 +1021,18 @@ function shellSegments(command) {
   const segments = []
   let current = ""
   let quote = ""
+  let escaped = false
   for (const ch of String(command)) {
+    if (escaped) {
+      current += ch
+      escaped = false
+      continue
+    }
+    if (ch === "\\" && quote !== "'") {
+      current += ch
+      escaped = true
+      continue
+    }
     if (quote) {
       current += ch
       if (ch === quote) quote = ""
@@ -816,7 +1057,18 @@ function shellSegments(command) {
 function beforeShellRedirection(segment) {
   let current = ""
   let quote = ""
+  let escaped = false
   for (const ch of String(segment)) {
+    if (escaped) {
+      current += ch
+      escaped = false
+      continue
+    }
+    if (ch === "\\" && quote !== "'") {
+      current += ch
+      escaped = true
+      continue
+    }
     if (quote) {
       current += ch
       if (ch === quote) quote = ""
@@ -933,8 +1185,6 @@ module.exports = {
   trackingCheckpointIssue,
   continuityFindings,
   extractProseTargets,
-  extractHookProseTargets,
-  resolveHookProseTargets,
   extractPatchTargets,
   proseBlockReason,
   isProsePath,

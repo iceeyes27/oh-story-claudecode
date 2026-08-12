@@ -19,22 +19,6 @@ from typing import Any
 HOOK_CWD: Path | None = None
 
 
-def _load_discovery_contract() -> dict[str, Any]:
-    contract_path = Path(__file__).with_name("book-discovery-contract.json")
-    try:
-        contract = json.loads(contract_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        raise RuntimeError(f"book-discovery-contract.json 无法读取: {exc}") from exc
-    if contract.get("schema_version") != 1 or not isinstance(contract.get("marker_max_depth"), int):
-        raise RuntimeError("book-discovery-contract.json schema 无效")
-    return contract
-
-
-DISCOVERY_CONTRACT = _load_discovery_contract()
-DISCOVERY_MAX_DEPTH = DISCOVERY_CONTRACT["marker_max_depth"]
-DISCOVERY_IGNORED_DIRS = frozenset(DISCOVERY_CONTRACT.get("ignored_directories", []))
-
-
 def read_hook_input() -> dict[str, Any]:
     global HOOK_CWD
     # Read raw UTF-8 bytes, not the locale-decoded text stream: Codex/Claude tool
@@ -119,58 +103,37 @@ def safe_rel(root: Path, path: Path) -> str:
         return str(path)
 
 
-def _path_uses_symlink(root: Path, candidate: Path) -> bool:
-    try:
-        relative = candidate.absolute().relative_to(root.absolute())
-    except ValueError:
-        return True
-    current = root.absolute()
-    for part in relative.parts:
-        current /= part
-        try:
-            if current.is_symlink():
-                return True
-        except OSError:
-            return True
-    return False
+def _walk_project_entries(root: Path, max_depth: int = 4):
+    """Yield non-ignored entries below project directories up to max_depth.
 
+    ``max_depth`` matches ``find -maxdepth``: root children are depth 1, entries at
+    depth 4 are visible, and depth 5 is not.
+    Hidden directories, node_modules and directory symlinks are pruned before descent.
+    """
 
-def _iter_discovery_entries(root: Path):
-    """Yield (path, is_dir) within the generated bounded discovery contract."""
-
-    def walk(base: Path, parent_depth: int):
-        if parent_depth >= DISCOVERY_MAX_DEPTH:
+    def walk(base: Path, remaining: int):
+        if remaining <= 0:
             return
         try:
-            with os.scandir(base) as iterator:
-                entries = sorted(iterator, key=lambda entry: entry.name)
+            entries = sorted(base.iterdir(), key=lambda item: item.name)
         except OSError:
             return
-        for entry in entries:
+        visible = [
+            entry
+            for entry in entries
+            if not entry.name.startswith(".") and entry.name != "node_modules"
+        ]
+        yield from visible
+        if remaining == 1:
+            return
+        for entry in visible:
             try:
-                if entry.is_symlink():
-                    continue
-                is_dir = entry.is_dir(follow_symlinks=False)
+                if entry.is_dir() and not entry.is_symlink():
+                    yield from walk(entry, remaining - 1)
             except OSError:
                 continue
-            if is_dir and (
-                (DISCOVERY_CONTRACT.get("ignore_dot_directories") and entry.name.startswith("."))
-                or entry.name in DISCOVERY_IGNORED_DIRS
-            ):
-                continue
-            child = Path(entry.path)
-            yield child, is_dir
-            if is_dir:
-                yield from walk(child, parent_depth + 1)
 
-    yield from walk(root, 0)
-
-
-def _first_marker(root: Path, name: str, is_dir: bool) -> Path | None:
-    for candidate, candidate_is_dir in _iter_discovery_entries(root):
-        if candidate.name == name and candidate_is_dir == is_dir:
-            return candidate
-    return None
+    yield from walk(root, max_depth)
 
 
 def read_active_book(root: Path) -> Path | None:
@@ -182,24 +145,21 @@ def read_active_book(root: Path) -> Path | None:
         # trims then requires non-empty, and the JS hook's firstLine()+truthy guard).
         declared = lines[0].strip() if lines else ""
         if declared:
-            raw_candidate = Path(declared)
-            candidate = raw_candidate if raw_candidate.is_absolute() else root / raw_candidate
+            candidate = (root / declared).resolve()
             try:
-                resolved = candidate.resolve()
-                resolved.relative_to(root.resolve())
-            except (OSError, ValueError):
-                resolved = None
-            if resolved and resolved.is_dir() and not _path_uses_symlink(root, candidate):
-                return resolved
-    track = _first_marker(root, "追踪", True)
-    if track:
-        return track.parent
-    body = _first_marker(root, "正文", True)
-    if body:
-        return body.parent
-    body_file = _first_marker(root, "正文.md", False)
-    if body_file:
-        return body_file.parent
+                candidate.relative_to(root.resolve())
+            except Exception:
+                candidate = None  # type: ignore[assignment]
+            if candidate and candidate.is_dir():
+                return candidate
+    entries = list(_walk_project_entries(root))
+    for marker in ("追踪", "正文"):
+        for entry in entries:
+            if entry.name == marker and entry.is_dir() and not entry.is_symlink():
+                return entry.parent
+    for entry in entries:
+        if entry.name == "正文.md" and entry.is_file() and not entry.is_symlink():
+            return entry.parent
     return None
 
 
@@ -488,33 +448,26 @@ def _wordcount_finding(abs_path: Path, text: str) -> str | None:
 def _discover_all_books(root: Path) -> list[Path]:
     books: list[Path] = []
     seen: set[str] = set()
-    markers = (("追踪", True), ("正文", True), ("正文.md", False))
-    entries = list(_iter_discovery_entries(root))
-    for marker_name, marker_is_dir in markers:
-        for hit, is_dir in entries:
-            if hit.name != marker_name or is_dir != marker_is_dir:
-                continue
-            book = hit.parent
-            key = str(book.resolve())
-            if key not in seen:
-                seen.add(key)
-                books.append(book)
+    for hit in _walk_project_entries(root):
+        try:
+            is_marker = (
+                hit.name in {"追踪", "正文"}
+                and hit.is_dir()
+                and not hit.is_symlink()
+            )
+            is_body_file = (
+                hit.name == "正文.md" and hit.is_file() and not hit.is_symlink()
+            )
+        except OSError:
+            continue
+        if not is_marker and not is_body_file:
+            continue
+        book = hit.parent
+        key = str(book.resolve())
+        if key not in seen:
+            seen.add(key)
+            books.append(book)
     return books
-
-
-def parse_target_cli(text: str) -> tuple[list[str] | None, str | None]:
-    matches = re.findall(r"^target_cli:[ \t]*(.*)$", text, flags=re.MULTILINE)
-    if not matches:
-        return None, "缺少 target_cli 字段"
-    if len(matches) != 1:
-        return None, "target_cli 字段重复"
-    raw_tokens = matches[0].split(",")
-    tokens = [token.strip() for token in raw_tokens]
-    if not tokens or any(not token for token in tokens):
-        return None, "target_cli 值为空或含空 token"
-    if len(tokens) != len(set(tokens)):
-        return None, "target_cli 含重复 token"
-    return tokens, None
 
 
 def tracking_checkpoint_issue(
@@ -571,7 +524,7 @@ def continuity_findings(root: Path) -> list[str]:
     """跨批连续性兜底：① 追踪 staleness（写了章但 续写状态卡没跟上）；
     ② 章节标题去重（两章同名多半是误复制）。模型无关，回合/会话边界提醒，无问题则静默。
     扫描范围 repo-wide（与缺口检测一致），非活跃书也提醒——有意为之，不按 .active-book 收窄；
-    staleness 用 mtime +0.25 秒容差，是启发式 advisory（checkout / 带 -p 拷贝可能偏差）。"""
+    staleness 用 mtime +1 秒容差，是启发式 advisory（checkout / 带 -p 拷贝可能偏差）。"""
     msgs: list[str] = []
     for book in _discover_all_books(root):
         body_dir = book / "正文"
@@ -587,7 +540,7 @@ def continuity_findings(root: Path) -> list[str]:
                 ctx_m = ctx.stat().st_mtime
             except Exception:
                 ctx_m = 0
-            if newest > ctx_m + 0.25:
+            if newest > ctx_m + 1:
                 latest = max(chapters, key=lambda c: c.stat().st_mtime).name
                 msgs.append(f"[continuity] {safe_rel(root, book)}：正文已更新到「{latest}」但续写状态卡更早——为该章提交 tracking_commit.py 事务、check 通过后再续写，禁止分别手改 上下文.md/伏笔.md。")
         # ①b 续写状态卡预算：上下文.md 由事务工具整份重建，硬上限 12288 字节。
@@ -614,44 +567,16 @@ def continuity_findings(root: Path) -> list[str]:
     return msgs
 
 
-def adapter_health_message(root: Path) -> str | None:
-    manager = root / ".agents" / "skills" / "story-setup" / "scripts" / "manage-skill-adapters.js"
-    if not manager.is_file():
-        return None
-    try:
-        result = subprocess.run(
-            ["node", str(manager), "check", f"--root={root}"],
-            cwd=str(root),
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            timeout=15,
-            check=False,
-        )
-    except (OSError, subprocess.SubprocessError):
-        return None
-    if result.returncode == 0:
-        return None
-    report = (result.stdout or "").strip()
-    return "[story-setup] Skill 适配层异常；运行 node .agents/skills/story-setup/scripts/manage-skill-adapters.js repair" + (f"\n{report}" if report else "")
-
-
 def session_start() -> None:
     root = project_root()
     messages: list[str] = []
     sentinel = root / ".story-deployed"
     if sentinel.exists():
         sent_text = sentinel.read_text(encoding="utf-8", errors="ignore")
-        target_clis, target_cli_error = parse_target_cli(sent_text)
-        if target_cli_error:
-            messages.append(f"[story-setup] .story-deployed {target_cli_error}；建议重新运行 $story-setup。")
-        elif "codex" not in target_clis:
+        if "target_cli:" not in sent_text:
+            messages.append("[story-setup] .story-deployed 缺少 target_cli 字段；建议重新运行 $story-setup。")
+        elif "codex" not in re.search(r"target_cli:\s*(.*)", sent_text).group(1):  # type: ignore[union-attr]
             messages.append("[story-setup] 当前部署标记未包含 codex；如需 Codex hooks/agents，请重新运行 $story-setup 并选择 Codex。")
-    adapter_message = adapter_health_message(root)
-    if adapter_message:
-        messages.append(adapter_message)
     book = read_active_book(root)
     if book:
         ctx = book / "追踪" / "上下文.md"
@@ -678,7 +603,18 @@ def _shell_words(segment: str) -> list[str]:
     current = ""
     started = False
     quote = ""
+    escaped = False
     for ch in segment:
+        if escaped:
+            current += ch
+            escaped = False
+            started = True
+            continue
+        if ch == "\\" and quote != "'":
+            current += ch
+            escaped = True
+            started = True
+            continue
         if quote:
             if ch == quote:
                 quote = ""
@@ -707,7 +643,16 @@ def _shell_segments(command: str) -> list[str]:
     segments: list[str] = []
     current = ""
     quote = ""
+    escaped = False
     for ch in command:
+        if escaped:
+            current += ch
+            escaped = False
+            continue
+        if ch == "\\" and quote != "'":
+            current += ch
+            escaped = True
+            continue
         if quote:
             current += ch
             if ch == quote:
@@ -732,7 +677,16 @@ def _before_shell_redirection(segment: str) -> str:
     """去掉首个引号外重定向及其后内容；2> 里的 fd 数字也一并去掉。"""
     current = ""
     quote = ""
+    escaped = False
     for ch in segment:
+        if escaped:
+            current += ch
+            escaped = False
+            continue
+        if ch == "\\" and quote != "'":
+            current += ch
+            escaped = True
+            continue
         if quote:
             current += ch
             if ch == quote:
@@ -748,38 +702,461 @@ def _before_shell_redirection(segment: str) -> str:
     return current
 
 
-def extract_prose_targets_from_command(command: str) -> list[str]:
+def _read_shell_word(value: str, start: int) -> tuple[str, int]:
+    word = ""
+    quote = ""
+    escaped = False
+    started = False
+    index = start
+    while index < len(value):
+        ch = value[index]
+        if escaped:
+            word += ch
+            escaped = False
+            started = True
+            index += 1
+            continue
+        if ch == "\\" and quote != "'":
+            word += ch
+            escaped = True
+            started = True
+            index += 1
+            continue
+        if quote:
+            if ch == quote:
+                quote = ""
+            else:
+                word += ch
+            started = True
+            index += 1
+            continue
+        if ch in ('"', "'"):
+            quote = ch
+            started = True
+            index += 1
+            continue
+        if ch in (" ", "\t", "\r", "\n", ";", "&", "|", "<", ">", "(", ")"):
+            break
+        word += ch
+        started = True
+        index += 1
+    return (word if started else "", index)
+
+
+def _read_heredoc_delimiter(value: str, start: int) -> tuple[str, int]:
+    word = ""
+    quote = ""
+    escaped = False
+    started = False
+    index = start
+    while index < len(value):
+        ch = value[index]
+        if escaped:
+            word += ch
+            escaped = False
+            started = True
+            index += 1
+            continue
+        if ch == "\\" and quote != "'":
+            next_char = value[index + 1:index + 2]
+            if quote == '"' and next_char not in ("$", "`", '"', "\\", "\n"):
+                word += ch
+            else:
+                escaped = True
+            started = True
+            index += 1
+            continue
+        if quote:
+            if ch == quote:
+                quote = ""
+            else:
+                word += ch
+            started = True
+            index += 1
+            continue
+        if ch in ('"', "'"):
+            quote = ch
+            started = True
+            index += 1
+            continue
+        if ch in (" ", "\t", "\r", "\n", ";", "&", "|", "<", ">", "(", ")"):
+            break
+        word += ch
+        started = True
+        index += 1
+    return (word if started else "", index)
+
+
+def _heredoc_declarations(line: str) -> list[tuple[str, bool]]:
+    declarations: list[tuple[str, bool]] = []
+    quote = ""
+    escaped = False
+    index = 0
+    while index < len(line):
+        ch = line[index]
+        if escaped:
+            escaped = False
+            index += 1
+            continue
+        if ch == "\\" and quote != "'":
+            escaped = True
+            index += 1
+            continue
+        if quote:
+            if ch == quote:
+                quote = ""
+            index += 1
+            continue
+        if ch in ('"', "'"):
+            quote = ch
+            index += 1
+            continue
+        if not (
+            ch == "<"
+            and index + 1 < len(line)
+            and line[index + 1] == "<"
+            and (index == 0 or line[index - 1] != "<")
+            and (index + 2 >= len(line) or line[index + 2] != "<")
+        ):
+            index += 1
+            continue
+        cursor = index + 2
+        strip_tabs = False
+        if cursor < len(line) and line[cursor] == "-":
+            strip_tabs = True
+            cursor += 1
+        while cursor < len(line) and line[cursor] in (" ", "\t"):
+            cursor += 1
+        delimiter, cursor = _read_heredoc_delimiter(line, cursor)
+        if delimiter:
+            declarations.append((delimiter, strip_tabs))
+        index = max(index + 1, cursor)
+    return declarations
+
+
+def _mask_heredoc_bodies(command: str) -> str:
+    pending: list[tuple[str, bool]] = []
+    output: list[str] = []
+    for line in command.split("\n"):
+        if pending:
+            delimiter, strip_tabs = pending[0]
+            comparable = re.sub(r"^\t+", "", line) if strip_tabs else line
+            if comparable == delimiter:
+                pending.pop(0)
+                output.append(line)
+            else:
+                output.append(" " * len(line))
+            continue
+        pending.extend(_heredoc_declarations(line))
+        output.append(line)
+    return "\n".join(output)
+
+
+def _command_word_index(words: list[str]) -> int:
+    index = 0
+    while index < len(words):
+        while index < len(words) and (
+            re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", words[index])
+            or words[index] == "noglob"
+        ):
+            index += 1
+        if index < len(words) and words[index] == "command":
+            index += 1
+            while index < len(words):
+                option = words[index]
+                if option == "--":
+                    index += 1
+                    break
+                if option in ("-v", "-V") or re.match(r"^-[p]*[vV]", option):
+                    return len(words)
+                if option == "-p" or re.match(r"^-p+$", option):
+                    index += 1
+                    continue
+                break
+            continue
+        if index < len(words) and words[index] == "env":
+            index += 1
+            while index < len(words):
+                option = words[index]
+                if re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", option) or option in (
+                    "-i",
+                    "--ignore-environment",
+                ):
+                    index += 1
+                    continue
+                if option in ("-u", "--unset"):
+                    index += 2
+                    continue
+                if option.startswith("--unset=") or (re.match(r"^-u.+", option) and option != "-u"):
+                    index += 1
+                    continue
+                if option == "--":
+                    index += 1
+                break
+            continue
+        break
+    return index
+
+
+def _nested_shell_command(args: list[str]) -> str:
+    value_options = {"-o", "+o", "-O", "+O"}
+    index = 0
+    while index < len(args):
+        option = args[index]
+        if option == "--":
+            return ""
+        if option == "-c" or (re.match(r"^-[^-]+$", option) and "c" in option[1:]):
+            return args[index + 1] if index + 1 < len(args) else ""
+        if option in value_options:
+            index += 2
+            continue
+        if not option.startswith(("-", "+")):
+            break
+        index += 1
+    return ""
+
+
+def _command_substitutions(command: str) -> list[str]:
+    substitutions: list[str] = []
+    quote = ""
+    escaped = False
+    index = 0
+    while index < len(command):
+        ch = command[index]
+        if escaped:
+            escaped = False
+            index += 1
+            continue
+        if ch == "\\" and quote != "'":
+            escaped = True
+            index += 1
+            continue
+        if quote == "'":
+            if ch == "'":
+                quote = ""
+            index += 1
+            continue
+        if ch == '"':
+            quote = "" if quote == '"' else '"'
+            index += 1
+            continue
+        if not quote and ch == "'":
+            quote = "'"
+            index += 1
+            continue
+        if ch == "$" and command[index + 1:index + 2] == "(" and command[index + 2:index + 3] != "(":
+            depth = 1
+            inner_quote = ""
+            inner_escaped = False
+            end = index + 2
+            while end < len(command):
+                inner = command[end]
+                if inner_escaped:
+                    inner_escaped = False
+                    end += 1
+                    continue
+                if inner == "\\" and inner_quote != "'":
+                    inner_escaped = True
+                    end += 1
+                    continue
+                if inner_quote:
+                    if inner == inner_quote:
+                        inner_quote = ""
+                    end += 1
+                    continue
+                if inner in ('"', "'"):
+                    inner_quote = inner
+                elif inner == "(":
+                    depth += 1
+                elif inner == ")":
+                    depth -= 1
+                    if depth == 0:
+                        break
+                end += 1
+            if depth == 0:
+                substitutions.append(command[index + 2:end])
+                index = end + 1
+                continue
+        if ch == "`":
+            end = index + 1
+            tick_escaped = False
+            while end < len(command):
+                inner = command[end]
+                if tick_escaped:
+                    tick_escaped = False
+                elif inner == "\\":
+                    tick_escaped = True
+                elif inner == "`":
+                    break
+                end += 1
+            if end < len(command):
+                substitutions.append(command[index + 1:end])
+                index = end + 1
+                continue
+        index += 1
+    return substitutions
+
+
+def _redirect_targets(command: str) -> list[str]:
+    targets: list[str] = []
+    quote = ""
+    escaped = False
+    index = 0
+    while index < len(command):
+        ch = command[index]
+        if escaped:
+            escaped = False
+            index += 1
+            continue
+        if ch == "\\" and quote != "'":
+            escaped = True
+            index += 1
+            continue
+        if quote:
+            if ch == quote:
+                quote = ""
+            index += 1
+            continue
+        if ch in ('"', "'"):
+            quote = ch
+            index += 1
+            continue
+        if ch != ">":
+            index += 1
+            continue
+        cursor = index + (2 if command[index + 1:index + 2] == ">" else 1)
+        if command[cursor:cursor + 1] in ("|", "&"):
+            cursor += 1
+        while command[cursor:cursor + 1] in (" ", "\t"):
+            cursor += 1
+        target, cursor = _read_shell_word(command, cursor)
+        if "正文" in target:
+            targets.append(target)
+        index = max(index + 1, cursor)
+    return targets
+
+
+def _write_operands(command: str, args: list[str]) -> list[str]:
+    operands: list[str] = []
+    value_options = (
+        {"-d", "--date", "-r", "--reference", "-t", "--time"}
+        if command == "touch"
+        else set()
+    )
+    options = True
+    index = 0
+    while index < len(args):
+        arg = args[index]
+        if options and arg == "--":
+            options = False
+            index += 1
+            continue
+        if options and arg in value_options:
+            index += 2
+            continue
+        if options and any(
+            option.startswith("--") and arg.startswith(option + "=")
+            for option in value_options
+        ):
+            index += 1
+            continue
+        if options and arg.startswith("-") and arg != "-":
+            index += 1
+            continue
+        operands.append(arg)
+        index += 1
+    return operands
+
+
+def _command_basename(value: str) -> str:
+    return re.split(r"[\\/]", value or "")[-1]
+
+
+def _join_posix(directory: str, name: str) -> str:
+    """目录形态目标一律用 "/" 拼：Path 在 Windows 产出反斜杠，会破坏三端 parity 的逐字比较。"""
+    return re.sub(r"[\\/]+$", "", directory) + "/" + name
+
+
+def _copy_like_targets(command: str, args: list[str]) -> list[str]:
+    positionals: list[str] = []
+    target_directory = ""
+    directory_only = False
+    options = True
+    index = 0
+    while index < len(args):
+        arg = args[index]
+        if options and arg == "--":
+            options = False
+            index += 1
+            continue
+        if options and arg in ("-t", "--target-directory"):
+            target_directory = args[index + 1] if index + 1 < len(args) else ""
+            index += 2
+            continue
+        if options and arg.startswith("--target-directory="):
+            target_directory = arg[len("--target-directory="):]
+            index += 1
+            continue
+        if options and command == "install" and arg in ("-d", "--directory"):
+            directory_only = True
+            index += 1
+            continue
+        if options and arg.startswith("-") and arg != "-":
+            index += 1
+            continue
+        positionals.append(arg)
+        index += 1
+    if directory_only or not positionals:
+        return []
+    if target_directory:
+        return [_join_posix(target_directory, _command_basename(source)) for source in positionals]
+    if len(positionals) < 2:
+        return []
+    destination = positionals[-1]
+    normalized = destination.replace("\\", "/")
+    if normalized.endswith("/") or normalized.rsplit("/", 1)[-1] == "正文":
+        return [_join_posix(destination, _command_basename(source)) for source in positionals[:-1]]
+    return [destination]
+
+
+def extract_prose_targets_from_command(command: str, depth: int = 0) -> list[str]:
     # Only treat a 正文 path as a write target when it is the destination of an actual
     # write op (redirection / tee / touch / cp|mv dest). Scanning the whole command would
     # flag any heredoc body, doc string, or grep pattern that merely *mentions*
     # 正文/第N章.md and wrongly deny the edit.
-    # 目标 token 三形态（引号段优先）：双引号段 / 单引号段 / 裸词。此前只有一个把引号排除在字符类外
-    # 的裸词式，带空格的引号目标（> "my book/正文/第1章.md"）整条命令抽不到目标就静默放行。
-    # 裸词类只排 ASCII 空白（空格/Tab/CR/LF，shell 真正的分词符）：\s 在 python 与 js 都含 U+3000，
-    # 而全角空格不分词，用 \s 会把「第003章　开局.md」截成「第003章」而漏拦（本项目章名分隔符
-    # [_\- 　] 自带全角空格）。反斜杠转义空格（my\ book）仍不认——resolve_target 把 \ 归一成路径
-    # 分隔符（Windows 路径），在此解转义会反过来毁掉 book\正文\第1章.md。
-    bare = "[^ \t\r\n\"'<>|;&()]"
-    token = "\"([^\"]*正文[^\"]*)\"|'([^']*正文[^']*)'|['\"]?(" + bare + "*正文" + bare + "*)['\"]?"
     targets: list[str] = []
-    for m in re.finditer(r">>?\s*(?:" + token + ")", command):  # > dest, >> dest, cat >dest
-        targets.append(m.group(1) or m.group(2) or m.group(3))
-    # Use an explicit start/separator class, not \b: \b is Unicode-aware in Python re but ASCII-only
-    # in JS, so an ASCII boundary keeps this identical to opencode plugin.ts (parity).
-    for m in re.finditer(r"(?:^|[\s;&|(){}<>])(?:tee(?:\s+-a)?|touch)\s+(?:" + token + ")", command):
-        targets.append(m.group(1) or m.group(2) or m.group(3))
+    scannable = _mask_heredoc_bodies(command)
+    if depth < 8:
+        for nested in _command_substitutions(scannable):
+            targets.extend(extract_prose_targets_from_command(nested, depth + 1))
+    targets.extend(_redirect_targets(scannable))
     # cp/mv: the write destination is the last positional arg of the segment. Parse it (regex can't
     # tell a 正文 source from a 正文 dest, and a trailing 2>/dev/null / >log / || breaks end-anchoring).
-    for raw_segment in _shell_segments(command):
+    for raw_segment in _shell_segments(scannable):
         seg = _before_shell_redirection(raw_segment)
         # 引号感知分词（同 JS 核 shellWords）：str.split() 会按 U+3000 和引号内空格切碎目标，
         # 末位取到 book/正文/第1章.md —— 判到另一本书上（那本有细纲就直接放行）。
         words = _shell_words(seg)
-        if len(words) >= 2 and words[0] in ("cp", "mv"):
-            positionals = [w for w in words[1:] if not w.startswith("-")]
-            if positionals and "正文" in positionals[-1]:
-                targets.append(positionals[-1])
-    return [t for t in targets if t]
+        command_index = _command_word_index(words)
+        command_name = _command_basename(words[command_index]) if command_index < len(words) else ""
+        command_args = words[command_index + 1:]
+        if command_name in ("sh", "bash", "dash", "ksh", "zsh"):
+            nested = _nested_shell_command(command_args)
+            if nested:
+                targets.extend(extract_prose_targets_from_command(nested, depth + 1))
+        if command_name in ("tee", "touch"):
+            targets.extend(
+                destination
+                for destination in _write_operands(command_name, command_args)
+                if "正文" in destination
+            )
+        if command_name in ("cp", "mv", "install"):
+            targets.extend(
+                destination
+                for destination in _copy_like_targets(command_name, command_args)
+                if "正文" in destination
+            )
+    return list(dict.fromkeys(target for target in targets if target))
 
 
 def extract_apply_patch_targets(command: str) -> list[str]:
@@ -856,7 +1233,7 @@ def prose_block_reason(root: Path, abs_path: Path) -> str | None:
             return None
         if not (book_dir / "小节大纲.md").exists():
             # 文案对齐 JS core proseBlockReason（py↔js 由 test-prose-net-parity.sh Part E 锁 parity）
-            return f"⛔ 写正文被拦截：{safe_rel(root, abs_path)} 缺少同目录 小节大纲.md。先按 story-write 完成「小节大纲.md」再写正文。"
+            return f"⛔ 写正文被拦截：{safe_rel(root, abs_path)} 缺少同目录 小节大纲.md。先按 story-short-write 完成「小节大纲.md」再写正文。"
         return None
     if parent != "正文":
         return None
@@ -885,7 +1262,7 @@ def prose_block_reason(root: Path, abs_path: Path) -> str | None:
                     found = True
                     break
         if not found:
-            return f"⛔ 写正文被拦截：第 {num} 章缺少细纲（{safe_rel(root, outline_dir)}/细纲_第{num}章.md）。先按 story-write 单章流程补建细纲再写正文。"
+            return f"⛔ 写正文被拦截：第 {num} 章缺少细纲（{safe_rel(root, outline_dir)}/细纲_第{num}章.md）。先按 story-long-write 单章流程补建细纲再写正文。"
     checkpoint_issue = tracking_checkpoint_issue(
         book_dir,
         require_state=True,

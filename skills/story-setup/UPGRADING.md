@@ -3,13 +3,13 @@
 ## 当前版本
 
 - `setup_skill_version: 1.2.7`
-- `agents_version: 24`
+- `agents_version: 25`
 
 > **本 fork 的取值约定**：`setup_skill_version` 跟随上游 worldwonderer/oh-story-claudecode，不另起 fork 自有版本线。本 fork 的架构差异由 `resolver_strategy: agents-canonical-v1` 连同 `canonical_skills_dir` / `adapter_manifest` 两个上游没有的字段标识，那几行远离上游高频改动区，能自动合并。
 >
 > 原因：`setup_skill_version` 与 `agents_version` 在本文件、`SKILL.md`、`current-contract.json`、`session-start.sh` 里都是相邻行，而上游每次发版都会 bump `agents_version`。两行贴在一起时会落进同一个 diff 块，只要 fork 在其中一行有自己的取值，每次合并上游必然冲突。让 `setup_skill_version` 与上游一致即可消除这类冲突，且不损失任何信息——运行时只用 `agents_version` 判断部署是否过期（见 `check-story-setup-deployment.sh` TS10 的 mixed-version 夹具），`setup_skill_version` 只做仓库内三处一致性校验。
 
-`.story-deployed` 缺失任一字段，或 `agents_version` 缺失 / 非整数 / 小于 `24`，都视为待更新部署。直接重新运行 `/story-setup`（Codex 用 `$story-setup`）；不在运行时逐级兼容历史模板。如项目 `agents_version` 大于 `24`，说明本地 story-setup 比项目旧：先更新 oh-story-claudecode，不得用 v24 降级覆盖。历史版本改动见仓库根目录 `CHANGELOG.md`。
+`.story-deployed` 缺失任一字段，或 `agents_version` 缺失 / 非整数 / 小于 `25`，都视为待更新部署。直接重新运行 `/story-setup`（Codex 用 `$story-setup`）；不在运行时逐级兼容历史模板。如项目 `agents_version` 大于 `25`，说明本地 story-setup 比项目旧：先更新 oh-story-claudecode，不得用 v25 降级覆盖。历史版本改动见仓库根目录 `CHANGELOG.md`。
 
 ## 升级策略
 
@@ -37,7 +37,7 @@
 
 这些文件可能含用户自定义内容：
 - `CLAUDE.md` — 按 marker/section 合并，用户独有 section 保留
-- `.claude/settings.local.json` — hooks 按 command 去重 append，其他配置保留
+- `.claude/settings.local.json` — 按 command 识别 story hooks；已存在的受管 command 会迁移到当前模板的 event/matcher/timeout/if（例如 v25 的 Bash 正文 pre-guard），其他用户 hook 与配置保留
 - `AGENTS.md` — ZCode/OpenCode/Codex/OpenClaw/generic 按 marker/section 合并
 - `.zcode/config.json` — 仅按事件、matcher 和 process args 去重合并 oh-story Hooks，其他字段保留
 
@@ -48,6 +48,14 @@
 - `{书名}/追踪/伏笔.md` — 用户伏笔追踪
 - `.active-book` — 用户活跃书目
 - 短篇项目的 `追踪/` — setup/hooks 不应为短篇自动创建
+
+## v25 当前契约
+
+- Claude Code 的正文前置守卫现在也注册到 Bash：常见的重定向、`tee`、`touch`、`cp`、`mv`、`install` 写入正文时复用共享 JS 核识别目标并执行大纲/追踪门；只读命令里的引号示例与 heredoc 正文提及不拦，并按 hook `cwd` 解析相对路径。该面是**静态 best-effort 识别，不是 shell 沙箱**：环境变量间接路径、运行时生成命令与未列出的任意写文件程序无法可靠静态判定；这类写入应改用 Write/Edit。Bash 命令面依赖 node，node/共享核异常时显式告警后 fail-open；Write/Edit/MultiEdit 的纯 bash 兜底不受影响。
+- Codex Python 与共享 JS 的书目录发现统一限制为项目下 4 层，并剪枝隐藏目录、`node_modules`，避免 SessionStart/Stop 无界扫描和跨端发现范围漂移。
+- narrative-writer 与部署 reference 增加“普通名词不用引号强调”的 Gate B；合法对话、直接引用、书名/代号和场内系统载体原文保留。
+
+重新部署后需**新开会话**，custom agent 与 hooks 才会重新注册。
 
 ## v24 当前契约
 
@@ -80,7 +88,7 @@
 
 1. 在项目根目录重新运行 story-setup。
 2. 运行 `node .agents/skills/story-setup/scripts/manage-skill-adapters.js install --replace-managed-copies` 迁移旧平台副本。
-3. 确认 `.story-deployed` 写入 `agents_version: 24`、`setup_skill_version: 1.2.7`、`resolver_strategy: agents-canonical-v1`、`canonical_skills_dir` 与 `adapter_manifest`。
+3. 确认 `.story-deployed` 写入 `agents_version: 25`、`setup_skill_version: 1.2.7`、`resolver_strategy: agents-canonical-v1`、`canonical_skills_dir` 与 `adapter_manifest`。
 4. 运行 adapter `check`，确认 Skill 入口、agents、hooks/rules 和 references 通过验证。
 5. 新开会话，使 custom agents 与 hooks 按当前文件重新注册。
 6. **长篇在写项目必做**：检查每本书的 `追踪/_tracking-state.json` 是否存在。不存在就是旧追踪结构，按下方「追踪模型迁移」重建，否则写下一章会被拦。
@@ -116,7 +124,20 @@
 
 ## 版本变更
 
-### v24 (当前)
+### v25 (当前)
+
+- `.story-deployed` 的 `agents_version` 升级到 `25`（`setup_skill_version` 仍为 `1.2.7`）。
+- **Bash 正文写入守卫（#316）**：正文前置守卫注册到 Bash，复用共享核识别重定向/tee/touch/cp/mv/install 的写入目标；只读命令的引号示例与 heredoc 正文提及不拦，相对路径按 hook cwd 解析。静态 best-effort 识别、非 shell 沙箱，node/共享核异常时显式告警后 fail-open。
+- **书目录发现收敛（#319）**：Codex Python 与共享 JS 的书目录发现统一限制项目下 4 层，剪枝隐藏目录与 node_modules；`.active-book` 不再能经目录 symlink 逃出项目根。中文书名在 Windows 非 UTF-8 区域下的容纳判断改按字节比较，避免合法声明被静默丢弃。
+- **settings.local.json 稳定身份迁移**：新增 `scripts/merge-claude-settings.py`，按稳定 hook 身份迁移历史 matcher 并保留用户 hook 与顶层字段，重复执行幂等。
+- **扫榜采集字段补全（#339 #340 #341）**：七猫大热榜实现 `--period day|month|all`；起点补齐字数/总推荐/签约/收费模式四字段，缺失明确 `[待补]`；四采集器统一非法参数快速失败。
+- **拆文切片单一真值（#333）**：story-long-analyze Stage 6 只读 `_progress.md` 章节边界表，不再二次切片。
+- **跨批审查落盘（#343）**：story-review 新增 `.story-review/state.md` 跨批审查落盘契约，未解决 findings 跨批继承；story-review 版本 1.1.0 → 1.1.1（本 fork 为 1.2.0）。
+- **引号强调收口（#315）**：写作 reference 与 narrative-writer Gate B 增加「普通名词不用引号强调」，合法对话/直接引用/书名代号/场内系统载体原文保留。
+- **写正文守卫核整份采纳上游（本 fork 合并取舍）**：三端共享 JS 核 + Codex `story_codex_hook.py` + `guard-outline-before-prose.sh` 整份取上游，换来更严谨的 shell 分词器（`readShellWord`/`readHeredocDelimiter`）与四端 byte-parity。随之**丢弃三处 fork 早前的加固**，如需恢复须在上游核上手动重加（会与后续上游合并再冲突）：① `book-discovery-contract.json` 外置发现配置改回上游硬编码「项目下 4 层 + 剪枝隐藏目录/node_modules」（4 个平台副本保留为无害 vestigial，未被 require）；② 无 node / 坏 node 时 Bash 命令目标提取的纯 bash 兜底 → 上游设计为 fail-open 放行（宁可漏拦不可误伤），原生二进制安装用 Bash 写正文不再被拦，Write/Edit/MultiEdit 仍有纯 bash 兜底；③ Codex hook 的 `parse_target_cli` 严格逗号 token 校验 → 上游用内联 `re.search` 子串判定。
+- **扫榜采集子系统保留 fork 版（本 fork 合并取舍）**：`story-scan` 有自成体系的 `scan-contract.js` 校验层与更多采集器（heiyan 等），上游 `story-long-scan` 的 qidian/qimao 单采集器改进（#339/#340 字段补全/period）与之不兼容，故 qidian/qimao 采集器与 `test-scan-runtime.js` 保留 fork 版，未采纳上游这部分改进。
+
+### v24
 
 - `.story-deployed` 的 `agents_version` 升级到 `24`（`setup_skill_version` 仍为 `1.2.7`）。
 - Claude 写正文守卫补齐追踪检查点；长篇开书 Phase 1-3 改为按需加载。

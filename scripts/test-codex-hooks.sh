@@ -123,22 +123,12 @@ assert_denied "$out" "imported project must not permanently bypass invalid track
 
 echo "  OK outline-before-prose guard"
 
-# A Bash command that only MENTIONS a prose path (grep / echo arg / doc) must not be treated
-# as a write target; only real write ops (redirection / tee / touch / cp|mv dest) count.
+# The shared parser's full syntax matrix lives in test-prose-net-parity.sh. Here we only verify
+# that the Codex adapter forwards one write and one read-only mention correctly.
 out="$(run_hook pre-tool-prose-guard '{"tool_name":"Bash","tool_input":{"command":"grep -n book/正文/第7章.md notes.md"}}')"
 assert_empty "$out" "command merely mentioning prose path is not denied"
-out="$(run_hook pre-tool-prose-guard '{"tool_name":"Bash","tool_input":{"command":"echo book/正文/第7章.md >> changelog.md"}}')"
-assert_empty "$out" "prose path as echo arg before non-prose redirect is not denied"
-out="$(run_hook pre-tool-prose-guard '{"tool_name":"Bash","tool_input":{"command":"echo x | tee book/正文/第7章_x.md"}}')"
-assert_denied "$out" "tee write to prose without outline is still denied"
-out="$(run_hook pre-tool-prose-guard '{"tool_name":"Bash","tool_input":{"command":"touch book/正文/第7章_x.md"}}')"
-assert_denied "$out" "touch write to prose without outline is denied"
-out="$(run_hook pre-tool-prose-guard '{"tool_name":"Bash","tool_input":{"command":"cp draft.md book/正文/第7章_x.md"}}')"
-assert_denied "$out" "cp write to prose without outline is denied"
-out="$(run_hook pre-tool-prose-guard '{"tool_name":"Bash","tool_input":{"command":"cp draft.md book/正文/第7章_x.md 2>/dev/null"}}')"
-assert_denied "$out" "cp write with trailing redirect is denied (dest still parsed)"
-out="$(run_hook pre-tool-prose-guard '{"tool_name":"Bash","tool_input":{"command":"cp book/正文/第1章.md backup.md"}}')"
-assert_empty "$out" "cp FROM a prose file (source, not dest) is not denied"
+out="$(run_hook pre-tool-prose-guard '{"tool_name":"Bash","tool_input":{"command":"cat draft.md > book/正文/第7章_x.md"}}')"
+assert_denied "$out" "write to prose without outline is denied"
 
 echo "  OK prose command-scan precision"
 
@@ -213,6 +203,104 @@ assert_additional_context "$out" "session-start continuity"
 echo "$out" | grep -q '续写状态卡更早' || fail "session-start missed 追踪 staleness: $out"
 echo "$out" | grep -q '标题重复' || fail "session-start missed dup-title: $out"
 echo "  OK session-start continuity (追踪 staleness + dup-title)"
+
+# 目录发现只看推荐结构深度，且不进入 node_modules/隐藏目录。Bash/Python/共享 JS 核应一致。
+DISCOVERY_ROOT="$TMP_DIR/discovery-root"
+mkdir -p "$DISCOVERY_ROOT/shallow/追踪" \
+  "$DISCOVERY_ROOT/node_modules/fake/追踪" \
+  "$DISCOVERY_ROOT/.hidden/fake/追踪" \
+  "$DISCOVERY_ROOT/a/b/c/d/e/deep/追踪"
+python_discovered="$(python3 - "$HOOK_SRC" "$DISCOVERY_ROOT" <<'PY'
+import importlib.util, sys
+from pathlib import Path
+spec = importlib.util.spec_from_file_location("story_codex_hook", sys.argv[1])
+module = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(module)
+root = Path(sys.argv[2])
+active = module.read_active_book(root)
+all_books = "|".join(sorted(p.relative_to(root).as_posix() for p in module._discover_all_books(root)))
+print(f"{active.relative_to(root).as_posix() if active else ''};{all_books}")
+PY
+)"
+[ "$python_discovered" = "shallow;shallow" ] || fail "Codex discovery crossed depth/ignored dirs: $python_discovered"
+node_discovered="$(node - "$HOOKS_SRC/../../templates/hooks/story_hook_core.js" "$DISCOVERY_ROOT" <<'JS'
+const core = require(process.argv[2]);
+const path = require("node:path");
+const root = process.argv[3];
+const active = core.discoverActiveBook(root);
+const allBooks = core.discoverAllBooks(root).map((p) => path.relative(root, p).split(path.sep).join("/")).sort().join("|");
+process.stdout.write(`${active ? path.relative(root, active).split(path.sep).join("/") : ""};${allBooks}`);
+JS
+)"
+[ "$node_discovered" = "shallow;shallow" ] || fail "JS discovery crossed depth/ignored dirs: $node_discovered"
+bash_discovered="$(CLAUDE_PROJECT_DIR="$DISCOVERY_ROOT" bash -s -- "$HOOKS_SRC/../../templates/hooks/lib/common.sh" "$DISCOVERY_ROOT" <<'SH'
+source "$1"
+root="$(project_root)"
+active="$(discover_active_book)"
+all_books="$(discover_all_books | while IFS= read -r p; do printf '%s\n' "${p#$root/}"; done | sort | paste -sd '|' -)"
+printf '%s;%s' "${active#$root/}" "$all_books"
+SH
+)"
+[ "$bash_discovered" = "shallow;shallow" ] || fail "Bash discovery crossed depth/ignored dirs: $bash_discovered"
+
+# `.active-book` 不能通过目录 symlink 逃到项目根外；无效声明统一回落自动发现。
+OUTSIDE_BOOK="$TMP_DIR/outside-book"
+mkdir -p "$OUTSIDE_BOOK/追踪"
+# Windows/MSYS 没有创建符号链接的权限时 ln -s 会静默退化成「复制目录」：逃逸场景根本没复现，
+# 复制出来的 escape/追踪 还会被后面的深度断言当成一本书。必须确认真的拿到 symlink 才跑这段。
+if ln -s "$OUTSIDE_BOOK" "$DISCOVERY_ROOT/escape" 2>/dev/null && [ -L "$DISCOVERY_ROOT/escape" ]; then
+  printf '%s\n' 'escape' > "$DISCOVERY_ROOT/.active-book"
+  python_active="$(python3 - "$HOOK_SRC" "$DISCOVERY_ROOT" <<'PY'
+import importlib.util, sys
+from pathlib import Path
+spec=importlib.util.spec_from_file_location("h",sys.argv[1]);m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+r=Path(sys.argv[2]); p=m.read_active_book(r); print(p.relative_to(r).as_posix() if p else "")
+PY
+)"
+  node_active="$(node - "$HOOKS_SRC/../../templates/hooks/story_hook_core.js" "$DISCOVERY_ROOT" <<'JS'
+const c=require(process.argv[2]),p=require('node:path'),r=process.argv[3],v=c.discoverActiveBook(r);process.stdout.write(v?p.relative(r,v).split(p.sep).join('/'):"");
+JS
+)"
+  bash_active="$(CLAUDE_PROJECT_DIR="$DISCOVERY_ROOT" bash -s -- "$HOOKS_SRC/../../templates/hooks/lib/common.sh" <<'SH'
+source "$1"; discover_active_book
+SH
+)"
+  [ "$python_active" = "shallow" ] || fail "Python accepted out-of-root .active-book symlink: $python_active"
+  [ "$node_active" = "shallow" ] || fail "JS accepted out-of-root .active-book symlink: $node_active"
+  DISCOVERY_REAL="$(cd "$DISCOVERY_ROOT" && pwd -P)"
+  [ "$bash_active" = "$DISCOVERY_REAL/shallow" ] || fail "Bash accepted out-of-root .active-book symlink: $bash_active"
+  rm -f "$DISCOVERY_ROOT/.active-book"
+  rm -f "$DISCOVERY_ROOT/escape"
+else
+  # ln -s 失败或退化成复制：清掉残留，避免污染下面的 maxdepth 4 发现断言。
+  rm -rf "$DISCOVERY_ROOT/escape"
+fi
+
+# `find -maxdepth 4` 的边界：marker 本身在深度 4 可见，深度 5 不可见；三端不能 off-by-one。
+mkdir -p "$DISCOVERY_ROOT/a/b/book/追踪" "$DISCOVERY_ROOT/a/b/c/book/追踪"
+python_books="$(python3 - "$HOOK_SRC" "$DISCOVERY_ROOT" <<'PY'
+import importlib.util, sys
+from pathlib import Path
+spec = importlib.util.spec_from_file_location("story_codex_hook", sys.argv[1])
+module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+root = Path(sys.argv[2])
+print("|".join(sorted(p.relative_to(root).as_posix() for p in module._discover_all_books(root))))
+PY
+)"
+node_books="$(node - "$HOOKS_SRC/../../templates/hooks/story_hook_core.js" "$DISCOVERY_ROOT" <<'JS'
+const core = require(process.argv[2]); const path = require("node:path"); const root = process.argv[3];
+process.stdout.write(core.discoverAllBooks(root).map((p) => path.relative(root,p).split(path.sep).join("/")).sort().join("|"));
+JS
+)"
+bash_books="$(CLAUDE_PROJECT_DIR="$DISCOVERY_ROOT" bash -s -- "$HOOKS_SRC/../../templates/hooks/lib/common.sh" "$DISCOVERY_ROOT" <<'SH'
+source "$1"; root="$(project_root)"
+discover_all_books | while IFS= read -r p; do printf '%s\n' "${p#$root/}"; done | sort | paste -sd '|' -
+SH
+)"
+[ "$python_books" = "a/b/book|shallow" ] || fail "Python depth-4 discovery mismatch: $python_books"
+[ "$node_books" = "a/b/book|shallow" ] || fail "JS depth-4 discovery mismatch: $node_books"
+[ "$bash_books" = "a/b/book|shallow" ] || fail "Bash depth-4 discovery mismatch: $bash_books"
+echo "  OK bounded directory discovery (depth 4, hidden/node_modules pruned, Bash/JS/Python parity)"
 
 nested="$ROOT/nested/a/b"
 mkdir -p "$nested"
@@ -323,9 +411,13 @@ mkdir -p "$DISCOVERY_ROOT/l1/book3/追踪" \
          "$DISCOVERY_ROOT/.hidden/book/追踪" \
          "$DISCOVERY_ROOT/.git/book/追踪" \
          "$TMP_DIR/outside-book/追踪"
-if ln -s "$TMP_DIR/outside-book" "$DISCOVERY_ROOT/linkout" 2>/dev/null; then
+# Windows/MSYS 无 symlink 权限时 ln -s 会静默退化成复制目录：linkout 会变成含 book 的真实目录，
+# 污染下面的 maxdepth 发现断言。必须用 [ -L ] 确认拿到真符号链接，退化时清掉残留并跳过依赖它的
+# 逃逸用例（与本文件上方逃逸测试同一处理）。
+if ln -s "$TMP_DIR/outside-book" "$DISCOVERY_ROOT/linkout" 2>/dev/null && [ -L "$DISCOVERY_ROOT/linkout" ]; then
   HAS_DISCOVERY_SYMLINK=1
 else
+  rm -rf "$DISCOVERY_ROOT/linkout"
   HAS_DISCOVERY_SYMLINK=0
 fi
 
@@ -340,7 +432,7 @@ root = Path(os.environ["DISCOVERY_ROOT"])
 print("\n".join(sorted(path.relative_to(root).as_posix() for path in module._discover_all_books(root))))
 PY
 )"
-[ "$python_books" = "$expected_books" ] || fail "Python discovery violated depth/prune contract: $python_books"
+[ "${python_books//$'\r'/}" = "$expected_books" ] || fail "Python discovery violated depth/prune contract: $python_books"
 
 js_books="$(DISCOVERY_ROOT="$DISCOVERY_ROOT" CORE="$REPO_ROOT/skills/story-setup/references/templates/hooks/story_hook_core.js" node - <<'NODE'
 const path = require("path")
@@ -367,7 +459,7 @@ book = module.read_active_book(root)
 print(book.relative_to(root).as_posix() if book else "")
 PY
 )"
-[ "$active_book" = "l1/book3" ] || fail "out-of-root .active-book was accepted: $active_book"
+[ "${active_book//$'\r'/}" = "l1/book3" ] || fail "out-of-root .active-book was accepted: $active_book"
 if [ "$HAS_DISCOVERY_SYMLINK" = 1 ]; then
   printf 'linkout\n' > "$DISCOVERY_ROOT/.active-book"
   active_book="$(DISCOVERY_ROOT="$DISCOVERY_ROOT" HOOK="$HOOK" python3 - <<'PY'
@@ -381,7 +473,7 @@ book = module.read_active_book(root)
 print(book.relative_to(root).as_posix() if book else "")
 PY
 )"
-  [ "$active_book" = "l1/book3" ] || fail "symlink .active-book was accepted: $active_book"
+  [ "${active_book//$'\r'/}" = "l1/book3" ] || fail "symlink .active-book was accepted: $active_book"
 
   rm "$DISCOVERY_ROOT/linkout"
   ln -s "$DISCOVERY_ROOT/l1/l2/book4" "$DISCOVERY_ROOT/linkin"
@@ -408,23 +500,12 @@ book = module.read_active_book(root)
 print(book.relative_to(root).as_posix() if book else "")
 PY
 )"
-  [ "$active_book" = "l1/book3" ] || fail "Python accepted in-root symlink .active-book: $active_book"
+  [ "${active_book//$'\r'/}" = "l1/book3" ] || fail "Python accepted in-root symlink .active-book: $active_book"
 fi
 echo "  OK bounded book discovery parity"
 
-# target_cli 必须按逗号 token 精确判断，不能让 opencode 子串冒充 codex。
-HOOK="$HOOK" python3 - <<'PY' || fail "target_cli strict-token contract failed"
-import importlib.util, os
-spec = importlib.util.spec_from_file_location("story_codex_hook", os.environ["HOOK"])
-module = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(module)
-assert module.parse_target_cli("target_cli: opencode\n") == (["opencode"], None)
-assert module.parse_target_cli("target_cli: codex\n") == (["codex"], None)
-assert module.parse_target_cli("target_cli: claude-code, codex\n") == (["claude-code", "codex"], None)
-for text in ("", "target_cli:\n", "target_cli: codex,\n", "target_cli: codex\ntarget_cli: opencode\n"):
-    tokens, error = module.parse_target_cli(text)
-    assert tokens is None and error
-PY
-echo "  OK strict target_cli tokens"
+# 注：本 fork v25 起写正文守卫核（含 Codex story_codex_hook.py）整份采纳上游实现。上游用
+# 内联 `re.search(r"target_cli:\s*(.*)")` 判定 codex，未提供 fork 早前的 `parse_target_cli`
+# 严格逗号 token 校验，故此处不再断言该函数。若需恢复严格 token 判定，见 UPGRADING.md v25。
 echo ""
 echo "OK: Codex hook synthetic tests passed"

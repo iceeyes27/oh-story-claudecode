@@ -166,6 +166,8 @@ node scripts/qimao-rank-scraper.js --channel male --type hot --period day --outd
 node scripts/qimao-rank-scraper.js --channel female --type hot --period month --outdir {输出目录}
 ```
 
+大热榜用 `--period day|month|all` 显式选择日榜、月榜或两者（默认 `day`）；周期会进入文件头与文件名。非大热榜不区分周期，`--period` 不会重复采集。
+
 **晋江采集目标**（`scripts/jjwxc-rank-scraper.js`，默认列表 + 详情两步走）：
 
 | 榜单 | URL | 核心字段 |

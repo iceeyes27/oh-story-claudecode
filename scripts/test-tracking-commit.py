@@ -74,6 +74,7 @@ def transaction(
     character: bool = False,
     foreshadow: bool = False,
     timeline: bool = False,
+    chapter_gap: dict[str, object] | None = None,
     next_commitment: str = "结算百万粉任务并承接老兵主题。",
 ) -> dict[str, object]:
     character_changes = [{"name": "江晨", "change": "作品价值获军内高层确认"}] if character else []
@@ -108,7 +109,7 @@ def transaction(
         if timeline
         else []
     )
-    return {
+    document = {
         "schema_version": 1,
         "mode": mode,
         "chapter": chapter,
@@ -129,6 +130,9 @@ def transaction(
         },
         "character_snapshots": {"江晨": snapshot()} if character else {},
     }
+    if chapter_gap is not None:
+        document["chapter_gap"] = chapter_gap
+    return document
 
 
 def load_tool_module():
@@ -339,6 +343,107 @@ class TrackingCommitTests(unittest.TestCase):
         self.assertTrue((tracking / "逐章记录/第028章.md").exists())
         self.assertEqual(self.read_state()["imported_through_chapter"], 27)
         self.run_tool("check")
+
+    def test_append_can_atomically_declare_an_exact_chapter_gap(self) -> None:
+        self.init(last_chapter=103)
+        self.run_tool(
+            "commit",
+            transaction(
+                106,
+                chapter_gap={
+                    "start_chapter": 104,
+                    "end_chapter": 105,
+                    "reason": "作者明确保留章号，内容并入相邻章节。",
+                },
+            ),
+        )
+        state = self.read_state()
+        self.assertEqual(state["last_committed_chapter"], 106)
+        self.assertEqual(
+            state["chapter_gaps"],
+            [{
+                "start_chapter": 104,
+                "end_chapter": 105,
+                "reason": "作者明确保留章号，内容并入相邻章节。",
+                "declared_at_chapter": 106,
+            }],
+        )
+        self.assertFalse((self.project / "追踪/逐章记录/第104章.md").exists())
+        self.assertFalse((self.project / "追踪/逐章记录/第105章.md").exists())
+        self.assertTrue((self.project / "追踪/逐章记录/第106章.md").exists())
+        result = self.run_tool("check")
+        self.assertIn('"start_chapter": 104', result.stdout)
+        self.run_tool("commit", transaction(107))
+        self.run_tool("check")
+
+        revision = self.run_tool("commit", transaction(104, mode="revision"), expect=2)
+        self.assertIn("cannot revise unwritten gap chapter 104", revision.stderr)
+        skipped = self.run_tool("commit", transaction(109), expect=2)
+        self.assertIn("chapter_gap is required", skipped.stderr)
+
+    def test_chapter_gap_requires_exact_boundaries_and_append_mode(self) -> None:
+        self.init(last_chapter=10)
+        cases = [
+            ({"start_chapter": 12, "end_chapter": 12, "reason": "保留编号。"}, "start_chapter must be 11"),
+            ({"start_chapter": 11, "end_chapter": 11, "reason": "保留编号。"}, "end_chapter must be 12"),
+            ({"start_chapter": 12, "end_chapter": 11, "reason": "保留编号。"}, "must not be empty or reversed"),
+        ]
+        for gap, message in cases:
+            with self.subTest(gap=gap):
+                result = self.run_tool("commit", transaction(13, chapter_gap=gap), expect=2)
+                self.assertIn(message, result.stderr)
+                self.assertEqual(self.read_state()["last_committed_chapter"], 10)
+
+        continuous = self.run_tool(
+            "commit",
+            transaction(11, chapter_gap={"start_chapter": 11, "end_chapter": 11, "reason": "错误缺口。"}),
+            expect=2,
+        )
+        self.assertIn("continuous append", continuous.stderr)
+        revision = self.run_tool(
+            "commit",
+            transaction(10, mode="revision", chapter_gap={"start_chapter": 8, "end_chapter": 9, "reason": "错误缺口。"}),
+            expect=2,
+        )
+        self.assertIn("only allowed in an append", revision.stderr)
+
+    def test_legacy_state_without_chapter_gaps_accepts_first_gap_append(self) -> None:
+        self.init(last_chapter=10)
+        state_path = self.project / "追踪/_tracking-state.json"
+        state = self.read_state()
+        state.pop("chapter_gaps")
+        state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+        self.run_tool(
+            "commit",
+            transaction(13, chapter_gap={"start_chapter": 11, "end_chapter": 12, "reason": "保留编号。"}),
+        )
+        self.assertEqual(self.read_state()["chapter_gaps"][0]["declared_at_chapter"], 13)
+        self.run_tool("check")
+
+    def test_overlapping_persisted_chapter_gaps_are_rejected(self) -> None:
+        self.init(last_chapter=10)
+        state_path = self.project / "追踪/_tracking-state.json"
+        state = self.read_state()
+        state["chapter_gaps"] = [
+            {"start_chapter": 2, "end_chapter": 4, "reason": "旧缺口一。", "declared_at_chapter": 5},
+            {"start_chapter": 4, "end_chapter": 5, "reason": "旧缺口二。", "declared_at_chapter": 6},
+        ]
+        state["imported_through_chapter"] = 1
+        state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+        result = self.run_tool("check", expect=2)
+        self.assertIn("overlapping or duplicate ranges", result.stderr)
+
+    def test_check_rejects_a_delta_inside_a_declared_gap(self) -> None:
+        self.init(last_chapter=10)
+        self.run_tool(
+            "commit",
+            transaction(13, chapter_gap={"start_chapter": 11, "end_chapter": 12, "reason": "保留编号。"}),
+        )
+        (self.project / "追踪/逐章记录/第011章.md").write_text("# 伪造记录\n", encoding="utf-8")
+        result = self.run_tool("check", expect=2)
+        self.assertIn("exists inside a declared chapter gap", result.stderr)
 
     def test_imported_chapter_revision_creates_an_overlay_record(self) -> None:
         self.init(last_chapter=20)

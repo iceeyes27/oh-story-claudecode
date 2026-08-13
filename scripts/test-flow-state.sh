@@ -91,7 +91,21 @@ expect_json_field "$TMP_DIR/long-ch2-blocked.json" "data.current_chapter === 2" 
 printf '# 第002章细纲\n' > "$BOOK/大纲/细纲_第002章.md"
 node "$FLOW" --dir "$BOOK" --json detect > "$TMP_DIR/long-ch2-ready.json"
 expect_json_field "$TMP_DIR/long-ch2-ready.json" "data.current_phase === 'chapter_writing'" "chapter 2 ready after outline"
-expect_json_field "$TMP_DIR/long-ch2-ready.json" "data.artifacts.includes('正文/第001章_*.md')" "previous chapter artifact recorded"
+expect_json_field "$TMP_DIR/long-ch2-ready.json" "data.artifacts.includes('正文/第001章_开篇.md')" "previous chapter artifact recorded"
+
+# --- 3b. Volume subdirectories are scanned recursively; backups and non-chapter files are ignored ---
+VOLUME_BOOK="$TMP_DIR/long-volume"
+mkdir -p "$VOLUME_BOOK/设定" "$VOLUME_BOOK/大纲" "$VOLUME_BOOK/追踪" \
+  "$VOLUME_BOOK/正文/第1卷_开篇" "$VOLUME_BOOK/正文/第2卷_转折"
+printf '# 题材定位\n' > "$VOLUME_BOOK/设定/题材定位.md"
+printf '{}\n' > "$VOLUME_BOOK/追踪/_tracking-state.json"
+printf '# 第106章\n' > "$VOLUME_BOOK/正文/第2卷_转折/第106章_归队.md"
+printf '# 第999章 原稿\n' > "$VOLUME_BOOK/正文/第2卷_转折/第999章_原稿_废稿.md"
+printf '# 目录\n' > "$VOLUME_BOOK/正文/第2卷_转折/目录.md"
+printf '# 第107章细纲\n' > "$VOLUME_BOOK/大纲/细纲_第107章.md"
+node "$FLOW" --dir "$VOLUME_BOOK" --json detect > "$TMP_DIR/long-volume.json"
+expect_json_field "$TMP_DIR/long-volume.json" "data.current_chapter === 107" "nested volume chapter advances flow state"
+expect_json_field "$TMP_DIR/long-volume.json" "data.artifacts.includes('正文/第2卷_转折/第106章_归队.md')" "nested volume artifact recorded"
 
 # --- 4. --write creates the persistent flow-state file; read returns it ---
 node "$FLOW" --dir "$BOOK" --json --write detect > /dev/null

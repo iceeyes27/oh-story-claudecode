@@ -284,6 +284,29 @@ def test_context_retirement_must_be_declared_not_silent() -> None:
         ),
         "explicit context retirement",
     )
+
+
+def test_chapter_gaps_are_explicit_atomic_transactions() -> None:
+    protocol = read("skills/story-write/references/tracking-transaction.md")
+    require_all(
+        protocol,
+        (
+            "`chapter_gap`",
+            "start_chapter",
+            "end_chapter",
+            "declared_at_chapter",
+            "只允许出现在 append",
+            "不能自动推断",
+            "缺口内不生成逐章记录",
+        ),
+        "explicit chapter gap protocol",
+    )
+    daily = read("skills/story-write/references/workflow-daily.md")
+    require_all(
+        daily,
+        ("作者明确要求保留", "顶层 `chapter_gap`", "缺口内不得生成正文或逐章记录", "不自行跳号"),
+        "daily chapter gap workflow",
+    )
     daily = read("skills/story-write/references/workflow-daily.md")
     require_all(
         daily,

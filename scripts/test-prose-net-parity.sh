@@ -736,36 +736,47 @@ run_bash_guard_parity() {
   command -v python3 >/dev/null 2>&1 || return 1
   local tmp; tmp="$(mktemp -d)"; trap 'rm -rf "$tmp"' RETURN
 
-  # scenario|last_committed|ctx_revision|schema|outline_ch|target_ch|target_exists|拆文库|state
+  # scenario|last_committed|ctx_revision|schema|outline_ch|target_ch|target_exists|拆文库|state|layout|gap
   # state=none 时 last/ctx/schema 无意义。target_exists=1 走续写路径（不判细纲，仍判追踪）。
   local scenarios="
-nostate|-|-|-|1|1|0|0|none
-nooutline|-|-|-|-|1|0|0|none
-importwindow|-|-|-|-|1|0|1|none
-importstate|0|0|4|1|3|0|1|yes
-valid|0|0|4|1|1|0|0|yes
-skipahead|0|0|4|3|3|0|0|yes
-existing|1|0|4|1|1|1|0|yes
-existing_mismatch|1|9|4|1|1|1|0|yes
-badschema|0|0|3|1|1|0|0|yes
-revisionbackup|5|0|4|3|3|0|0|yes
+nostate|-|-|-|1|1|0|0|none|direct|0
+nooutline|-|-|-|-|1|0|0|none|direct|0
+importwindow|-|-|-|-|1|0|1|none|direct|0
+importstate|0|0|4|1|3|0|1|yes|direct|0
+valid|0|0|4|1|1|0|0|yes|direct|0
+skipahead|0|0|4|3|3|0|0|yes|direct|0
+existing|1|0|4|1|1|1|0|yes|direct|0
+existing_mismatch|1|9|4|1|1|1|0|yes|direct|0
+badschema|0|0|3|1|1|0|0|yes|direct|0
+revisionbackup|5|0|4|3|3|0|0|yes|direct|0
+volumevalid|0|0|4|1|1|0|0|yes|volume|0
+gapdeclared|106|0|4|106|106|0|0|yes|volume|1
+gapblocked|106|0|4|104|104|0|0|yes|volume|1
 "
   local out_bash="$tmp/bash.txt" out_js="$tmp/js.txt"
   : > "$out_bash"; : > "$out_js"
 
   local line
-  while IFS='|' read -r name last ctx schema outline target exists lib state; do
+  while IFS='|' read -r name last ctx schema outline target exists lib state layout gap; do
     [ -n "${name:-}" ] || continue
     local proj="$tmp/$name" book="$tmp/$name/书"
     mkdir -p "$book/大纲" "$book/正文" "$book/追踪"
+    local prose_dir="$book/正文"
+    if [ "$layout" = "volume" ]; then
+      prose_dir="$book/正文/第2卷_测试"
+      mkdir -p "$prose_dir"
+    fi
     [ "$lib" = "1" ] && mkdir -p "$proj/拆文库/书"
     [ "$outline" != "-" ] && printf '# 细纲\n' > "$book/大纲/细纲_第00${outline}章.md"
     if [ "$state" = "yes" ]; then
-      printf '{"schema_version":%s,"state_revision":0,"last_committed_chapter":%s}\n' "$schema" "$last" \
-        > "$book/追踪/_tracking-state.json"
+      if [ "$gap" = "1" ]; then
+        printf '{"schema_version":%s,"state_revision":0,"last_committed_chapter":%s,"chapter_gaps":[{"start_chapter":104,"end_chapter":105,"reason":"保留编号","declared_at_chapter":106}]}\n' "$schema" "$last" > "$book/追踪/_tracking-state.json"
+      else
+        printf '{"schema_version":%s,"state_revision":0,"last_committed_chapter":%s}\n' "$schema" "$last" > "$book/追踪/_tracking-state.json"
+      fi
       printf '> 状态修订：%s。\n' "$ctx" > "$book/追踪/上下文.md"
     fi
-    local abs="$book/正文/第00${target}章_测试.md"
+    local abs="$prose_dir/第00${target}章_测试.md"
     [ "$exists" = "1" ] && printf '# 第%s章 测试\n正文。\n' "$target" > "$abs"
 
     # bash 侧：exit 2 = 拦，0 = 放行
@@ -800,6 +811,10 @@ existing pass
 existing_mismatch block
 badschema block
 revisionbackup pass"
+  expect="$expect
+volumevalid pass
+gapdeclared pass
+gapblocked block"
   while read -r want_name want_verdict; do
     [ -n "$want_name" ] || continue
     grep -qx "$want_name :: $want_verdict" "$out_bash" || {
@@ -838,7 +853,7 @@ run_bash_guard_parity
 rc_guard=$?
 set -e
 case "$rc_guard" in
-  0) echo "写正文守卫 parity：Claude bash guard == JS core（10 组工程场景：无 state/缺细纲/导入窗口/跳章/续写/派生修订不一致/坏 schema/回炉备份，含 node 缺席 fail-open）。" ;;
+  0) echo "写正文守卫 parity：Claude bash guard == JS core（13 组工程场景：无 state/缺细纲/导入窗口/跳章/续写/显式缺口/嵌套分卷/派生修订不一致/坏 schema/回炉备份，含 node 缺席 fail-open）。" ;;
   1) echo "写正文守卫 parity：跳过（无 node/python3 运行时）。" ;;
   *) fails=$((fails + 1)) ;;
 esac

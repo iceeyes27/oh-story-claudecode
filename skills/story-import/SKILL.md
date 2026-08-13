@@ -54,7 +54,7 @@ disable: true
 
 书名目录下有 `追踪/` 与正文、但没有 `追踪/_tracking-state.json` 时，项目停在 v0.7.2 及更早的追踪结构上。正文和 `设定/`、`大纲/`、`拆文库/` 都不受影响，**只需重建 `追踪/`**，不重跑 Phase 2 拆解、不碰正文：
 
-1. 数清最后一个完整章号 `N`（`正文/第NNN章_*.md` 的最大值）。
+1. 递归检查 `正文/`（含分卷子目录）并数清最后一个完整章号 `N`（规范 `第NNN章_*.md` 的最大值，排除目录、原稿备份和非规范 Markdown）。
 2. 从旧 `追踪/` 现有文件（角色状态、伏笔、时间线等，文件名按项目实际情况）和最近 3-5 章正文，重建当前状态：核心角色快照、未回收伏笔、已揭示时间线事件、长期约束、下一章承诺。角色快照的反推方法见 [references/character-state-reverse.md](references/character-state-reverse.md)。
 3. 按 [references/tracking-transaction.md](references/tracking-transaction.md) 的初始化事务格式构造 JSON，`last_chapter` 写 `N`（第 1..N 章不伪造逐章记录），执行 `tracking_commit.py init`。
 4. `init` 会把旧追踪结构按原样整体移入 `追踪/_旧追踪存档/` 再建当前协议——旧内容不删除、不参与解析，留给作者查阅。

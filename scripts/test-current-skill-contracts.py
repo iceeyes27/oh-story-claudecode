@@ -838,7 +838,7 @@ def test_rubric_parity_guard() -> None:
 def test_issue_315_333_343_prompt_contracts() -> None:
     """写作引号、Stage 6 切片真值、跨批 review 持久化必须有单一明确契约。"""
 
-    anti_ai = (REPO_ROOT / "skills/story-long-write/references/anti-ai-writing.md").read_text(
+    anti_ai = (REPO_ROOT / "skills/_shared/references/anti-ai-writing.md").read_text(
         encoding="utf-8"
     )
     writer = (
@@ -854,10 +854,12 @@ def test_issue_315_333_343_prompt_contracts() -> None:
     )
 
     style = (
-        REPO_ROOT / "skills/story-long-analyze/references/style-profile-generator.md"
+        REPO_ROOT / "skills/story-analyze/references/style-profile-generator.md"
     ).read_text(encoding="utf-8")
     require(
-        "只读 `_progress.md`" in style and "章节边界" in style,
+        "Stage 6 不定位章节分隔符" in style
+        and "chapter-boundary.js validate" in style
+        and "chapters[]" in style,
         "#333: Stage 6 must read the persisted chapter-boundary table",
     )
     for stale in ("正确 Grep 模式", "相应调整 regex", "拿到 grep 的", "用 Step 4 grep"):

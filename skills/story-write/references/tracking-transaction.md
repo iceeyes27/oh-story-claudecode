@@ -25,7 +25,7 @@ Markdown 只负责给作者和 Agent 阅读，工具不再反向解析 Markdown�
 
 - `init`：只在 `_tracking-state.json` 不存在时执行，绝不覆盖已初始化项目。
 - `commit`：读取唯一权威状态，在内存中完成合并、引用检查、全部视图渲染和容量检查；随后写逐章记录与派生视图，最后原子替换 `_tracking-state.json` 作为唯一提交点。
-- `check`：严格验证 state schema、逐章记录连续性/规范名/体积、固定 7 栏、角色快照硬上限、派生文件集合，以及所有派生视图与 state 的逐字一致性。
+- `check`：严格验证 state schema、导入范围外每个非缺口章节的逐章记录、缺口内无伪记录、规范名/体积、固定 7 栏、角色快照硬上限、派生文件集合，以及所有派生视图与 state 的逐字一致性。
 
 同一本书只允许工作流串行提交，不支持多个 Agent 或终端并发写。`expected_state_revision` 用于拒绝基于旧状态构造的顺序 stale transaction，不是并发锁。
 
@@ -131,9 +131,22 @@ Markdown 只负责给作者和 Agent 阅读，工具不再反向解析 Markdown�
 }
 ```
 
+只有作者明确保留一段未写章号、且本次真实章节跨过该区间时，`mode=append` 事务增加一个顶层 `chapter_gap`：
+
+```json
+"chapter_gap": {
+  "start_chapter": 104,
+  "end_chapter": 105,
+  "reason": "作者明确保留章号，内容并入相邻章节。"
+}
+```
+
+工具会把 `declared_at_chapter` 设为本次提交章号并持久化到 `_tracking-state.json.chapter_gaps`。缺口内不生成逐章记录，后续 `revision` 也不能把缺口章当成已写章节。
+
 约束：
 
 - 构造事务前运行 `check`，把当前 `state_revision` 原样写入 `expected_state_revision`；若状态已经变化，重新读取 state 并重构事务。
+- 常规 append 必须提交 `last_committed_chapter + 1`，且不得携带 `chapter_gap`。只有本次真实章号大于该值时才允许声明缺口；`start_chapter` 必须等于旧状态章号加一，`end_chapter` 必须等于本次章号减一，区间不得为空、倒序、重叠或覆盖导入范围。`chapter_gap` 只允许出现在 append，不能用于 revision，也不能自动推断。
 - `context` 的允许字段随子命令不同：`init` 收 `position`、`long_term_constraints`、`active_character_names`、`continuity_risks`、`recent_chapters`、`next_chapter_commitments` 六项；`commit` 只收前四项。`recent_chapters` 与 `next_chapter_commitments` 在 commit 时由工具从当前视图和本章 `delta` 派生，手填会在任何写入前被拒（`context contains unsupported fields: ...`，exit 2）。照 init 示例套 commit 事务是最容易踩的一处。
 - `character_snapshots` 中出现的角色视为核心复用角色，必须同时出现在 `character_changes`；已经建立快照的核心角色再次变化时必须提交新快照。
 - 角色快照的四个列表不限制条数，只限制单项长度和最终文件总字节：目标 ≤4096 字节，超过警告；硬上限 8192 字节，超过则在任何写入前拒绝。

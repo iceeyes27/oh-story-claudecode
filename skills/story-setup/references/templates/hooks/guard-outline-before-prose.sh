@@ -102,7 +102,6 @@ case "$TARGET" in
 esac
 
 BASE="$(basename "$ABS")"
-PARENT="$(basename "$(dirname "$ABS")")"
 
 case "$BASE" in
   正文.md)
@@ -122,8 +121,7 @@ case "$BASE" in
     fi
     ;;
   *)
-    # 长篇分章正文：父目录须为「正文」，文件名形如 第N章...
-    [ "$PARENT" = "正文" ] || exit 0
+    # 长篇分章正文：允许 正文/ 直属或分卷子目录，文件名形如 第N章...
     case "$BASE" in
       第*章*.md) ;;
       *) exit 0 ;;
@@ -131,7 +129,13 @@ case "$BASE" in
     # 章号（去前导零）
     NUM="$(printf '%s' "$BASE" | sed -n 's/^第0*\([0-9][0-9]*\)章.*/\1/p')"
     [ -z "$NUM" ] && exit 0
-    BOOK_DIR="$(dirname "$(dirname "$ABS")")"
+    BODY_DIR="$(dirname "$ABS")"
+    while [ "$(basename "$BODY_DIR")" != "正文" ]; do
+      NEXT_DIR="$(dirname "$BODY_DIR")"
+      [ "$NEXT_DIR" != "$BODY_DIR" ] || exit 0
+      BODY_DIR="$NEXT_DIR"
+    done
+    BOOK_DIR="$(dirname "$BODY_DIR")"
     # story-import 迁移：已有 拆文库/{书名}/ 分析源时放行（细纲由章节摘要反推、晚于正文迁移）。
     # 一旦 追踪/_tracking-state.json 存在即进入当前追踪协议，不再因为保留了 拆文库/ 分析资产
     # 而永久绕过守卫（与 story_hook_core.js 的同一判定保持一致）。
@@ -183,16 +187,15 @@ case "$BASE" in
     # 放行（宁可漏拦不可误伤）——写后网与 SKILL 同轮铁律仍兜底。判据现算自上一章文件，无状态。
     PREV=$((NUM - 1))
     if [ "$PREV" -ge 1 ] && node -e "" >/dev/null 2>&1 && [ -f "$CLI" ]; then
-      PROSE_DIR="$(dirname "$ABS")"
       PREV_FILE=""
       # glob 已按字典序，但同章号的原稿备份（workflow-revision 的「备份原稿」产物）
       # 也会命中；显式跳过 _原稿_，与 JS 核 / codex py 取同一个「上一章」。
-      for f in "$PROSE_DIR"/第*章*.md; do
+      while IFS= read -r f; do
         [ -e "$f" ] || continue
         case "$(basename "$f")" in *_原稿_*) continue ;; esac
         pnum="$(basename "$f" | sed -n 's/^第0*\([0-9][0-9]*\)章.*/\1/p')"
         if [ "$pnum" = "$PREV" ]; then PREV_FILE="$f"; break; fi
-      done
+      done < <(find "$BODY_DIR" -type f -name '第*章*.md' -print 2>/dev/null | LC_ALL=C sort)
       if [ -n "$PREV_FILE" ] && ! head -n 6 "$PREV_FILE" | grep -qE '去味(：|:)跳过'; then
         TOXIC="$(node "$CLI" prose-toxic "$PREV_FILE" 2>/dev/null || true)"
         if [ -n "$TOXIC" ]; then

@@ -134,6 +134,31 @@ function listMarkdownFiles(dir) {
   return fs.readdirSync(dir).filter((name) => name.endsWith('.md'));
 }
 
+function listChapterFiles(bodyDir) {
+  const chapters = [];
+  function walk(dir) {
+    let entries = [];
+    try {
+      entries = fs.readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory() && !entry.isSymbolicLink()) {
+        walk(full);
+        continue;
+      }
+      if (!entry.isFile() || entry.name.includes('_原稿_')) continue;
+      const match = entry.name.match(/^第0*(\d{1,4})章.*\.md$/);
+      if (match) chapters.push({ chapter: Number(match[1]), file: full });
+    }
+  }
+  if (isDir(bodyDir)) walk(bodyDir);
+  return chapters.sort((left, right) => left.chapter - right.chapter || left.file.localeCompare(right.file));
+}
+
 function detectMode(book) {
   if (exists(path.join(book, '正文.md'))) return 'short';
   return 'long';
@@ -141,12 +166,7 @@ function detectMode(book) {
 
 function findHighestChapter(book) {
   const bodyDir = path.join(book, '正文');
-  let max = 0;
-  for (const name of listMarkdownFiles(bodyDir)) {
-    const match = name.match(/^第(\d{1,4})章/);
-    if (match) max = Math.max(max, Number(match[1]));
-  }
-  return max;
+  return listChapterFiles(bodyDir).reduce((max, item) => Math.max(max, item.chapter), 0);
 }
 
 function hasOutlineFor(book, chapter) {
@@ -206,7 +226,11 @@ function detectLongState(book, activeBook) {
     nextAction = 'write_chapter';
     known.push(`第${pad3(currentChapter)}章细纲`);
     artifacts.push(`大纲/细纲_第${pad3(currentChapter)}章.md`);
-    if (lastChapter > 0) artifacts.push(`正文/第${pad3(lastChapter)}章_*.md`);
+    if (lastChapter > 0) {
+      const matching = listChapterFiles(path.join(book, '正文')).filter((item) => item.chapter === lastChapter);
+      const latest = matching[matching.length - 1];
+      artifacts.push(latest ? path.relative(book, latest.file).split(path.sep).join('/') : `正文/**/第${pad3(lastChapter)}章_*.md`);
+    }
   }
 
   return {

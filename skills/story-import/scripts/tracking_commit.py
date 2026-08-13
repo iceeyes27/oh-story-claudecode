@@ -741,7 +741,7 @@ def normalize_state(document: object) -> dict[str, Any]:
         root,
         {
             "schema_version", "book_title", "last_committed_chapter", "imported_through_chapter",
-            "state_revision", "context", "characters", "foreshadow", "timeline",
+            "state_revision", "chapter_gaps", "context", "characters", "foreshadow", "timeline",
         },
         "tracking state",
     )
@@ -749,6 +749,30 @@ def normalize_state(document: object) -> dict[str, Any]:
     last_chapter = as_int(root.get("last_committed_chapter"), "tracking state.last_committed_chapter")
     imported_through = as_int(root.get("imported_through_chapter"), "tracking state.imported_through_chapter")
     require(imported_through <= last_chapter, "imported chapter cutoff exceeds current chapter")
+    chapter_gaps: list[dict[str, Any]] = []
+    for index, raw_gap in enumerate(as_list(root.get("chapter_gaps", []), "tracking state.chapter_gaps")):
+        label = f"tracking state.chapter_gaps[{index}]"
+        gap = as_mapping(raw_gap, label)
+        require_known_keys(gap, {"start_chapter", "end_chapter", "reason", "declared_at_chapter"}, label)
+        start = as_int(gap.get("start_chapter"), f"{label}.start_chapter", minimum=1)
+        end = as_int(gap.get("end_chapter"), f"{label}.end_chapter", minimum=1)
+        declared = as_int(gap.get("declared_at_chapter"), f"{label}.declared_at_chapter", minimum=1)
+        require(start <= end, f"{label} must not be empty or reversed")
+        require(start > imported_through, f"{label} overlaps the imported chapter range")
+        require(declared == end + 1, f"{label}.declared_at_chapter must immediately follow the gap")
+        require(declared <= last_chapter, f"{label} was declared after the current chapter")
+        chapter_gaps.append({
+            "start_chapter": start,
+            "end_chapter": end,
+            "reason": clean_text(gap.get("reason"), f"{label}.reason", max_bytes=360),
+            "declared_at_chapter": declared,
+        })
+    chapter_gaps.sort(key=lambda item: (item["start_chapter"], item["end_chapter"]))
+    for previous, current in zip(chapter_gaps, chapter_gaps[1:]):
+        require(
+            previous["end_chapter"] < current["start_chapter"],
+            "tracking state.chapter_gaps contains overlapping or duplicate ranges",
+        )
     context = validate_context_input(root.get("context"), include_initial_fields=True)
     require(
         context["position"]["volume_start_chapter"] <= max(1, last_chapter),
@@ -772,6 +796,7 @@ def normalize_state(document: object) -> dict[str, Any]:
         "last_committed_chapter": last_chapter,
         "imported_through_chapter": imported_through,
         "state_revision": as_int(root.get("state_revision"), "tracking state.state_revision"),
+        "chapter_gaps": chapter_gaps,
         "context": context,
         "characters": characters,
         "foreshadow": foreshadow,
@@ -822,6 +847,7 @@ def normalize_initial_document(document: object) -> dict[str, Any]:
             "last_committed_chapter": last_chapter,
             "imported_through_chapter": last_chapter,
             "state_revision": 0,
+            "chapter_gaps": [],
             "context": context,
             "characters": snapshots,
             "foreshadow": foreshadow,
@@ -836,7 +862,7 @@ def normalize_transaction(state: dict[str, Any], document: object) -> dict[str, 
         root,
         {
             "schema_version", "mode", "chapter", "chapter_title", "expected_state_revision",
-            "delta", "context", "character_snapshots",
+            "chapter_gap", "delta", "context", "character_snapshots",
         },
         "transaction",
     )
@@ -847,10 +873,41 @@ def normalize_transaction(state: dict[str, Any], document: object) -> dict[str, 
     expected_revision = as_int(root.get("expected_state_revision"), "expected_state_revision")
     require(expected_revision == state["state_revision"], "tracking state changed since this transaction was prepared")
     last = state["last_committed_chapter"]
+    raw_gap = root.get("chapter_gap")
+    chapter_gap = None
     if mode == "append":
-        require(chapter == last + 1, f"append chapter must be {last + 1}, got {chapter}")
+        if chapter == last + 1:
+            require(raw_gap is None, "a continuous append must not declare chapter_gap")
+        else:
+            require(chapter > last + 1, f"append chapter must be {last + 1}, got {chapter}")
+            require(raw_gap is not None, f"append chapter {chapter} skips chapters; chapter_gap is required")
+            gap = as_mapping(raw_gap, "chapter_gap")
+            require_known_keys(gap, {"start_chapter", "end_chapter", "reason"}, "chapter_gap")
+            start = as_int(gap.get("start_chapter"), "chapter_gap.start_chapter", minimum=1)
+            end = as_int(gap.get("end_chapter"), "chapter_gap.end_chapter", minimum=1)
+            require(start <= end, "chapter_gap must not be empty or reversed")
+            require(start == last + 1, f"chapter_gap.start_chapter must be {last + 1}")
+            require(end == chapter - 1, f"chapter_gap.end_chapter must be {chapter - 1}")
+            require(
+                not any(
+                    start <= existing["end_chapter"] and end >= existing["start_chapter"]
+                    for existing in state["chapter_gaps"]
+                ),
+                "chapter_gap overlaps an existing declared gap",
+            )
+            chapter_gap = {
+                "start_chapter": start,
+                "end_chapter": end,
+                "reason": clean_text(gap.get("reason"), "chapter_gap.reason", max_bytes=360),
+                "declared_at_chapter": chapter,
+            }
     else:
+        require(raw_gap is None, "chapter_gap is only allowed in an append transaction")
         require(chapter <= last, f"cannot revise unwritten chapter {chapter}; last committed chapter is {last}")
+        require(
+            not any(gap["start_chapter"] <= chapter <= gap["end_chapter"] for gap in state["chapter_gaps"]),
+            f"cannot revise unwritten gap chapter {chapter}",
+        )
     context = validate_context_input(root.get("context"), include_initial_fields=False)
     snapshots = normalize_snapshots(root.get("character_snapshots", {}))
     existing_names = {portable_name_key(name): name for name in state["characters"]}
@@ -868,6 +925,7 @@ def normalize_transaction(state: dict[str, Any], document: object) -> dict[str, 
         "mode": mode,
         "chapter": chapter,
         "title": clean_text(root.get("chapter_title"), "chapter_title", max_bytes=240),
+        "chapter_gap": chapter_gap,
         "delta": delta,
         "context": context,
         "snapshots": snapshots,
@@ -889,6 +947,8 @@ def merge_transaction(state: dict[str, Any], transaction: dict[str, Any]) -> dic
     chapter = transaction["chapter"]
     if transaction["mode"] == "append":
         next_state["last_committed_chapter"] = chapter
+        if transaction["chapter_gap"] is not None:
+            next_state["chapter_gaps"].append(transaction["chapter_gap"])
     next_state["state_revision"] += 1
     next_state["characters"].update(transaction["snapshots"])
 
@@ -1073,7 +1133,14 @@ def check_project(project: Path) -> dict[str, Any]:
     state = load_state(project)
     last_chapter = state["last_committed_chapter"]
     required_delta_start = state["imported_through_chapter"] + 1
+    gap_chapters = {
+        chapter
+        for gap in state["chapter_gaps"]
+        for chapter in range(gap["start_chapter"], gap["end_chapter"] + 1)
+    }
     for chapter in range(required_delta_start, last_chapter + 1):
+        if chapter in gap_chapters:
+            continue
         require(delta_path(tracking, chapter).exists(), f"chapter delta {chapter} is missing")
     for path in (tracking / "逐章记录").glob("第*章.md"):
         match = re.fullmatch(r"第(\d+)章\.md", path.name)
@@ -1081,6 +1148,7 @@ def check_project(project: Path) -> dict[str, Any]:
         chapter = as_int(int(match.group(1)), f"chapter delta {path.name}", minimum=1)
         require(path == delta_path(tracking, chapter), f"chapter delta {chapter} filename is not canonical")
         require(chapter <= last_chapter, f"chapter delta {chapter} exceeds last_committed_chapter")
+        require(chapter not in gap_chapters, f"chapter delta {chapter} exists inside a declared chapter gap")
         require(path.stat().st_size <= DELTA_MAX_BYTES, f"chapter delta {chapter} exceeds {DELTA_MAX_BYTES} bytes")
 
     expected_views = render_views(state)
@@ -1128,6 +1196,7 @@ def main() -> int:
             {
                 "last_committed_chapter": result["last_committed_chapter"],
                 "state_revision": result["state_revision"],
+                "chapter_gaps": result["chapter_gaps"],
             },
             ensure_ascii=False,
         )

@@ -326,7 +326,7 @@ disable: true
 	11. **禁用词扫描**：先过**最毒句式速查**（实测最易漏，命中即改）：①「不是A，(而)是B」全家族——含「没有X，没有Y(，只是Z)」排比否定、「是B，不是A」反序、「他没X，也没有Y。他只是Z」先抑后扬，；②声线反差「声音不大/不高…却…」；③「，带着……」万能状语；④预告/总结收尾「没人知道…」「(这)才刚刚开始/开头」「正朝着…压过去」「即将拉开序幕」「这一刻…」；⑤叙述里短词加引号强调（他是被请来"把关"的）。再复核 detector 的 `formulaic-parallelism` advisory：跨段「不是A。/也不是B。/只是C。」、`至于X不X，怎么X`、同动词 `不V A，不V B` 即使写在台词里也不能跳过，确属人物当场的功能性表达才保留。然后对照 `../_shared/references/banned-words.md` 全表：一级词（高频AI腔）命中即替换；二级词（低频/语境相关）高频出现时替换，偶发可参考 `../_shared/references/anti-ai-writing.md` 定性裁定
 12. **更新追踪**：按 workflow-daily「每章提交一次追踪事务」构造 JSON，执行 `scripts/tracking_commit.py commit`。工具先在内存完成全部合并/渲染/容量校验，再生成逐章记录、角色/伏笔/时间线/上下文派生视图，最后原子替换 `_tracking-state.json`。失败按类型处理：**写入失败**（工具不可用、权限被拒、磁盘满）时 `_tracking-state.json` 未推进，保留原事务 JSON 直接重跑同一 `commit`；**校验失败**要按报错改事务本身再提交，重跑同一份结果不变；**派生视图被手改**导致 `check` 报不一致时，重新提交该章的 `mode=revision` 事务让工具整份重建（`expected_state_revision` 取 `追踪/_tracking-state.json` 的 `state_revision` 字段——`check` 失败时只往 stderr 打 ERROR，不输出 JSON）。任何情况都不手改派生文件。本章首次引入会复用的具名角色/势力时，仍按 Phase 3 规则补建静态 `设定/` 档案。
 13. **中途快照**（长篇写作安全网）：每连续写完 3 章，在继续前执行以下快照操作：
-   - 执行 `scripts/tracking_commit.py check`，确认 `_tracking-state.json` 有效、逐章记录连续且未超限、所有派生视图一致、续写状态卡恰好 7 栏且 ≤12288 字节
+   - 执行 `scripts/tracking_commit.py check`，确认 `_tracking-state.json` 有效、所有非导入且非显式缺口章节都有规范逐章记录且未超限、所有派生视图一致、续写状态卡恰好 7 栏且 ≤12288 字节
    - 用 `ls -la 正文/` 确认最近 3 个章节文件已成功写入磁盘且大小正常（>100 bytes）
    - 如果发现文件缺失或大小异常，立即重新写入
    - 快照完成后可继续写作

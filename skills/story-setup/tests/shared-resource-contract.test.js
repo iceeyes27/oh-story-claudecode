@@ -8,7 +8,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const test = require('node:test');
 
-const ROOT = path.resolve(__dirname, '..', '..', '..');
+const ROOT = path.resolve(__dirname, '..', '..', '..', '..');
 const SHARED = path.join(ROOT, '.agents', 'skills', '_shared');
 
 test('shared prose rules and scanners have one canonical entity', () => {
@@ -67,6 +67,47 @@ test('AI scanner flushes complete JSON before returning a blocking exit code', (
   assert.equal(result.status, 1, result.stderr);
   const payload = JSON.parse(result.stdout);
   assert.equal(payload.findings.filter((finding) => finding.type === 'em-dash').length, files.length);
+});
+
+test('AI scanner catches double-dangling identity shifts without flagging explicit identities', (t) => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'dangling-identity-'));
+  t.after(() => fs.rmSync(temp, { recursive: true, force: true }));
+  const prose = path.join(temp, 'chapter.md');
+  fs.writeFileSync(prose, [
+    '醒来的，成了他。',
+    '重新睁眼的，已经变成了她。',
+    '穿越过来的，换成了另一个自己。',
+    '活下来的，是顾青禾。',
+    '醒来后，他已经成了江澈。',
+    '最后留下来的那个人，成了他的证人。',
+  ].join('\n'), 'utf8');
+  const scanner = path.join(SHARED, 'scripts', 'check-ai-patterns.js');
+  const result = spawnSync(process.execPath, [scanner, '--json', '--fail-on=blocking', prose], { encoding: 'utf8' });
+  assert.equal(result.status, 1, result.stderr);
+  const payload = JSON.parse(result.stdout);
+  const findings = payload.findings.filter((finding) => finding.type === 'banned-word-dangling-identity');
+  assert.deepEqual(findings.map((finding) => finding.line), [1, 2, 3]);
+});
+
+test('AI scanner catches body-shell metaphors without flagging literal or concrete body descriptions', (t) => {
+  const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'body-shell-metaphor-'));
+  t.after(() => fs.rmSync(temp, { recursive: true, force: true }));
+  const prose = path.join(temp, 'chapter.md');
+  fs.writeFileSync(prose, [
+    '他坐得很僵，整个人像被抽走了骨头，只剩一层皮撑着。',
+    '她好像被卸掉了骨架，剩下一副皮囊支着。',
+    '那人仿佛没了骨头，只剩空壳支着。',
+    '他瘦得皮包骨，扶着墙坐下。',
+    '模型的骨架被拆掉，只剩外壳支着。',
+    '赵二强像被抽空了一样，靠着墙站了半天。',
+    '他瘫在靠背里，肩膀塌着，石膏外的脚趾一动不动。',
+  ].join('\n'), 'utf8');
+  const scanner = path.join(SHARED, 'scripts', 'check-ai-patterns.js');
+  const result = spawnSync(process.execPath, [scanner, '--json', '--fail-on=blocking', prose], { encoding: 'utf8' });
+  assert.equal(result.status, 1, result.stderr);
+  const payload = JSON.parse(result.stdout);
+  const findings = payload.findings.filter((finding) => finding.type === 'banned-word-body-shell');
+  assert.deepEqual(findings.map((finding) => finding.line), [1, 2, 3]);
 });
 
 test('canonical source agent templates reference the .agents bundle only', () => {

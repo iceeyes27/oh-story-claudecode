@@ -29,6 +29,8 @@ Detect high-risk AI-flavor prose patterns that need human rewrite:
   - 反序对比 (是A，不是B — not-is 的反序变种, 实战漏网句式)
   - 预告式总结收尾 (文末窗口 没人知道/才刚刚开始/正朝着…压了过去, 实战漏网句式)
   - 引号强调滥用 (叙述里 1-4 字短词加引号强调，密度型)
+  - 双端悬空的“的”字身份跳转句 (动作/状态+的，成了+代词)
+  - 空壳式人体失真比喻 (骨头/骨架被抽走，只剩皮壳支撑)
 
 Each finding carries severity: blocking by default for generation/deslop cleanup (not-is-comparison / em-dash / voice-contrast / negation-parade / negation-only-parallel / reverse-not-is / trailer-ending). This is a local style/readability gate, not an AIGC detector score; functional human text can be marked for review instead of hard-edited for a detector.
 或 advisory (period-stutter / long-paragraph / micro-action-tic / action-list-tic / abstract-summary-tic / cliche-density-tic / metaphor-density-tic / reasoning-chain-tic / system-notice-formality-tic / overcompressed-prose-tic / low-connective-density-tic / quote-emphasis-tic / formulaic-parallelism，是提示，justified 的长推理/氛围段可保留)。
@@ -430,6 +432,8 @@ function scanProsePatterns(proseLines) {
   findings.push(...findBannedWordsExact(proseLines));
   findings.push(...findSynestheticMetaphor(proseLines));
   findings.push(...findAntithesis(proseLines));
+  findings.push(...findDanglingIdentityShift(proseLines));
+  findings.push(...findBodyShellMetaphor(proseLines));
   findings.push(...findContrastRhetorical(proseLines));
   findings.push(...findGreyCrackInHead(proseLines));
   findings.push(...findSummarySlogan(proseLines));
@@ -1490,90 +1494,53 @@ function loadBannedExactPhrases() {
 
 
 
-var _synaCache = null;
+var _regexSectionCache = null;
+function loadRegexSectionPatterns(cacheKey, headingPattern) {
+  if (!_regexSectionCache) _regexSectionCache = new Map();
+  if (_regexSectionCache.has(cacheKey)) return _regexSectionCache.get(cacheKey);
+  const result = { patterns: [], error: null };
+  try {
+    const mdPath = path.join(__dirname, '..', 'references', 'banned-words.md');
+    const md = fs.readFileSync(mdPath, 'utf8');
+    const lines = md.split(/\r?\n/);
+    let inSec = false;
+    for (const raw of lines) {
+      const line = raw.trim();
+      if (/^##\s/.test(line)) {
+        inSec = headingPattern.test(line);
+        continue;
+      }
+      if (!inSec) continue;
+      const m = line.match(/^\/(.+)\/$/);
+      if (m) {
+        try { result.patterns.push(new RegExp(m[1], 'g')); } catch (e) { /* skip invalid regex */ }
+      }
+    }
+  } catch (error) {
+    result.error = error.message;
+  }
+  _regexSectionCache.set(cacheKey, result);
+  return result;
+}
+
 function loadSynaPatterns() {
-  if (_synaCache) return _synaCache;
-  const result = { patterns: [], error: null };
-  try {
-    const mdPath = path.join(__dirname, '..', 'references', 'banned-words.md');
-    const md = fs.readFileSync(mdPath, 'utf8');
-    const lines = md.split(/\r?\n/);
-    let inSec = false;
-    for (const raw of lines) {
-      const line = raw.trim();
-      if (/^##\s/.test(line)) {
-        inSec = /^##\s*通感隐喻/.test(line);
-        continue;
-      }
-      if (!inSec) continue;
-      const m = line.match(/^\/(.+)\/$/);
-      if (m) {
-        try { result.patterns.push(new RegExp(m[1], 'g')); } catch (e) { /* skip invalid regex */ }
-      }
-    }
-  } catch (error) {
-    result.error = error.message;
-  }
-  _synaCache = result;
-  return result;
+  return loadRegexSectionPatterns('syna', /^##\s*通感隐喻/);
 }
 
-
-
-var _antithesisCache = null;
 function loadAntithesisPatterns() {
-  if (_antithesisCache) return _antithesisCache;
-  const result = { patterns: [], error: null };
-  try {
-    const mdPath = path.join(__dirname, '..', 'references', 'banned-words.md');
-    const md = fs.readFileSync(mdPath, 'utf8');
-    const lines = md.split(/\r?\n/);
-    let inSec = false;
-    for (const raw of lines) {
-      const line = raw.trim();
-      if (/^##\s/.test(line)) {
-        inSec = /^##\s*对仗反义俏皮话/.test(line);
-        continue;
-      }
-      if (!inSec) continue;
-      const m = line.match(/^\/(.+)\/$/);
-      if (m) {
-        try { result.patterns.push(new RegExp(m[1], 'g')); } catch (e) { /* skip invalid regex */ }
-      }
-    }
-  } catch (error) {
-    result.error = error.message;
-  }
-  _antithesisCache = result;
-  return result;
+  return loadRegexSectionPatterns('antithesis', /^##\s*对仗反义俏皮话/);
 }
 
-var _contrastCache = null;
+function loadDanglingIdentityPatterns() {
+  return loadRegexSectionPatterns('dangling-identity', /^##\s*双端悬空的[“\"]的[”\"]字身份跳转句/);
+}
+
+function loadBodyShellPatterns() {
+  return loadRegexSectionPatterns('body-shell', /^##\s*空壳式人体失真比喻/);
+}
+
 function loadContrastPatterns() {
-  if (_contrastCache) return _contrastCache;
-  const result = { patterns: [], error: null };
-  try {
-    const mdPath = path.join(__dirname, '..', 'references', 'banned-words.md');
-    const md = fs.readFileSync(mdPath, 'utf8');
-    const lines = md.split(/\r?\n/);
-    let inSec = false;
-    for (const raw of lines) {
-      const line = raw.trim();
-      if (/^##\s/.test(line)) {
-        inSec = /^##\s*反问式内省/.test(line) || /^##\s*伪深刻对比/.test(line);
-        continue;
-      }
-      if (!inSec) continue;
-      const m = line.match(/^\/(.+)\/$/);
-      if (m) {
-        try { result.patterns.push(new RegExp(m[1], 'g')); } catch (e) { /* skip invalid regex */ }
-      }
-    }
-  } catch (error) {
-    result.error = error.message;
-  }
-  _contrastCache = result;
-  return result;
+  return loadRegexSectionPatterns('contrast', /^##\s*(?:反问式内省|伪深刻对比)/);
 }
 
 var _whitelistCache = null;
@@ -1715,6 +1682,70 @@ function findAntithesis(proseLines) {
           type: 'banned-word-antithesis',
           severity: 'blocking',
           message: '对仗反义俏皮话[' + hit + ']：banned-words.md 对仗反义俏皮话规则，工整对称反义金句（如"X轻，Y不轻"）是 AI 写作套路，出现即改；改成角色自然口语或具体动作/物件/对话，不要同义词轮换。',
+          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+function findDanglingIdentityShift(proseLines) {
+  const { patterns, error } = loadDanglingIdentityPatterns();
+  if (error || patterns.length === 0) return ruleLoadFailure('双端悬空的“的”字身份跳转句', error);
+  const whitelist = loadWhitelist();
+  const findings = [];
+
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const narrative = stripQuoted(trimmed);
+    for (const re of patterns) {
+      re.lastIndex = 0;
+      let match;
+      while ((match = re.exec(narrative)) !== null) {
+        const hit = match[0];
+        const idx = match.index;
+        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
+        findings.push({
+          line: lineNo,
+          column: idx + 1,
+          type: 'banned-word-dangling-identity',
+          severity: 'blocking',
+          message: '双端悬空的“的”字身份跳转句[' + hit + ']：左端省掉中心语或经历者，右端只用代词代替新身份，再靠逗号制造伪停顿，导致“谁醒来、谁成了谁”同时含混；补齐时间、经历者和新身份中的必要信息，改成完整主谓句。',
+          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+function findBodyShellMetaphor(proseLines) {
+  const { patterns, error } = loadBodyShellPatterns();
+  if (error || patterns.length === 0) return ruleLoadFailure('空壳式人体失真比喻', error);
+  const whitelist = loadWhitelist();
+  const findings = [];
+
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const narrative = stripQuoted(trimmed);
+    for (const re of patterns) {
+      re.lastIndex = 0;
+      let match;
+      while ((match = re.exec(narrative)) !== null) {
+        const hit = match[0];
+        const idx = match.index;
+        // 本规则已经由「比喻标记＋骨架消失＋皮壳支撑」三重条件限死，不能让项目级
+        // 单词白名单（如“仿佛”）仅凭局部重叠豁免整句；只接受整条命中被显式放行。
+        if (whitelist.has(hit)) continue;
+        findings.push({
+          line: lineNo,
+          column: idx + 1,
+          type: 'banned-word-body-shell',
+          severity: 'blocking',
+          message: '空壳式人体失真比喻[' + hit + ']：用“骨架被抽走＋只剩皮壳支撑”代替可见反应，身体逻辑失真，且容易与“僵、绷直”等姿态互相冲突；改成上下文中能看见的姿态、动作或生理反应，不要换一套人体比喻。',
           excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
         });
       }

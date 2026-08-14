@@ -79,3 +79,24 @@
 ### Status
 
 [OK] **Completed**
+
+
+## Session 4: 可追溯分析结果层
+
+**Date**: 2026-08-14
+**Task**: 可追溯分析结果层
+**Branch**: `main`
+
+### Summary
+
+为 story-analyze long 增加来源指纹、Stage 2 恢复、版本化关系结果、证据校验与当前契约回归；41 项 Node 测试和 30 个 Skill 静态检查通过。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `6283b2f` | (see git log) |
+
+### Status
+
+[OK] **Completed**

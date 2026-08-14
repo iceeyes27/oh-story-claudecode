@@ -25,6 +25,7 @@ EXPECTED_MANIFEST_KEYS = {
     "agents_version",
     "topic_decision_phase",
     "progress_schema_version",
+    "analysis_manifest_schema_version",
     "expected_demo_outline_count",
     "primary_benchmark_artifacts",
     "required_outline_sections",
@@ -40,6 +41,7 @@ class ContractManifest:
     agents_version: int
     topic_decision_phase: int
     progress_schema_version: int
+    analysis_manifest_schema_version: int
     primary_benchmark_artifacts: Tuple[str, ...]
     required_outline_sections: Tuple[Tuple[str, str], ...]
     expected_demo_outline_count: int
@@ -323,6 +325,7 @@ def load_manifest(path: Path) -> Tuple[Optional[ContractManifest], List[Finding]
         "agents_version",
         "topic_decision_phase",
         "progress_schema_version",
+        "analysis_manifest_schema_version",
         "expected_demo_outline_count",
     ):
         if key not in raw:
@@ -387,6 +390,7 @@ def load_manifest(path: Path) -> Tuple[Optional[ContractManifest], List[Finding]
         agents_version=raw["agents_version"],
         topic_decision_phase=raw["topic_decision_phase"],
         progress_schema_version=raw["progress_schema_version"],
+        analysis_manifest_schema_version=raw["analysis_manifest_schema_version"],
         primary_benchmark_artifacts=tuple(artifacts),
         required_outline_sections=tuple((item["rule"], item["demo"]) for item in sections),
         expected_demo_outline_count=raw["expected_demo_outline_count"],
@@ -675,6 +679,43 @@ def stage_boundary_contract_findings(repo_root: Path, expected_schema: int) -> L
     forbidden = re.search(r"grep\s+-nE\s+['\"]\^第|调整\s*regex|重新识别章节", style_text, re.IGNORECASE)
     if forbidden:
         findings.append(Finding("stage6-boundary-reslicing", "Stage 6 must not grep, adjust regex, or rediscover chapter boundaries", style, excerpt=forbidden.group(0)))
+    return findings
+
+
+def analysis_manifest_contract_findings(repo_root: Path, expected_schema: int) -> List[Finding]:
+    """Keep the traceable analysis CLI, docs, and tests on one schema."""
+    findings: List[Finding] = []
+    script = repo_root / "skills/story-analyze/scripts/analysis-manifest.js"
+    tests = repo_root / "skills/story-analyze/scripts/analysis-manifest.test.js"
+    skill = repo_root / "skills/story-analyze/SKILL.md"
+    reference = repo_root / "skills/story-analyze/references/analysis-manifest.md"
+    output_templates = repo_root / "skills/story-analyze/references/output-templates.md"
+
+    findings.extend(require_pattern(
+        script,
+        r"SCHEMA_VERSION\s*=\s*{}\b".format(expected_schema),
+        "analysis-manifest-schema",
+        "analysis manifest CLI must pin the current schema",
+    ))
+    findings.extend(require_pattern(
+        reference,
+        r"analysis schema\s+{}\b".format(expected_schema),
+        "analysis-manifest-schema",
+        "analysis manifest reference must pin the current schema",
+    ))
+    for command in ("init", "validate", "begin-stage", "record-chapter", "resume", "complete-stage", "publish-relations"):
+        findings.extend(require_pattern(
+            reference,
+            r"analysis-manifest\.js[^\n]*\b{}\b".format(re.escape(command)),
+            "analysis-manifest-doc-command",
+            "analysis manifest reference must document {}".format(command),
+        ))
+    findings.extend(require_pattern(skill, r"_analysis-manifest\.json", "analysis-manifest-skill", "story-analyze must initialize the analysis manifest"))
+    findings.extend(require_pattern(skill, r"complete-stage[^\n]*--allow-failures", "analysis-manifest-partial-failure", "Stage 2 partial failures must require an explicit flag"))
+    findings.extend(require_pattern(skill, r"publish-relations", "analysis-manifest-publish", "Stage 4c must publish a versioned relationship result"))
+    findings.extend(require_pattern(output_templates, r"relations-draft\.json", "analysis-manifest-draft-template", "Stage 4c output templates must define the relationship draft"))
+    findings.extend(require_pattern(tests, r"publishRelations", "analysis-manifest-tests", "analysis manifest publish behavior must have a regression test"))
+    findings.extend(require_pattern(tests, r"completed_with_errors", "analysis-manifest-tests", "analysis manifest partial failures must have a regression test"))
     return findings
 
 
@@ -1150,6 +1191,7 @@ def validate_repository(repo_root: Path, manifest: ContractManifest) -> List[Fin
     )
     findings.extend(require_pattern(pipeline, r"章节边界", "chapter-boundary-table", "progress must keep the canonical chapter-boundary table"))
     findings.extend(stage_boundary_contract_findings(repo_root, manifest.progress_schema_version))
+    findings.extend(analysis_manifest_contract_findings(repo_root, manifest.analysis_manifest_schema_version))
 
     setup_skill = repo_root / "skills/story-setup/SKILL.md"
     actual_setup_version = parse_frontmatter_version(setup_skill)

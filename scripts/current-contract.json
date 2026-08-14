@@ -4,6 +4,7 @@
   "agents_version": 25,
   "topic_decision_phase": 5,
   "progress_schema_version": 3,
+  "analysis_manifest_schema_version": 1,
   "primary_benchmark_artifacts": [
     "剧情/情绪模块.md",
     "剧情/节奏.md"

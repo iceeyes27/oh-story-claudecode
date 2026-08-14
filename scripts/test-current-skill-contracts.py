@@ -305,6 +305,35 @@ def test_progress_schema_pins_are_repo_wide() -> None:
     )
 
 
+def test_analysis_manifest_schema_contract() -> None:
+    current = repository_manifest().analysis_manifest_schema_version
+    stale = flagged_paths(
+        manifest_with(analysis_manifest_schema_version=current + 1),
+        "analysis-manifest-schema",
+    )
+    for relative in (
+        "skills/story-analyze/scripts/analysis-manifest.js",
+        "skills/story-analyze/references/analysis-manifest.md",
+    ):
+        require(
+            relative in stale,
+            "analysis manifest schema bump must update {}, got {}".format(
+                relative, sorted(stale)
+            ),
+        )
+
+    raw = json.loads((SCRIPT_DIR / "current-contract.json").read_text(encoding="utf-8"))
+    raw["analysis_manifest_schema_version"] = "1"
+    with tempfile.TemporaryDirectory() as tmp:
+        malformed = Path(tmp) / "wrong-analysis-schema.json"
+        malformed.write_text(json.dumps(raw, ensure_ascii=False), encoding="utf-8")
+        _, findings = VALIDATOR.load_manifest(malformed)
+    require(
+        "manifest-value-type" in finding_codes(findings),
+        "analysis manifest schema must be a positive integer",
+    )
+
+
 def test_stage6_cannot_rediscover_chapter_boundaries() -> None:
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
@@ -885,6 +914,7 @@ def main() -> int:
     test_sibling_bullets_do_not_lend_the_missing_condition()
     test_undecodable_markdown_is_a_named_failure()
     test_progress_schema_pins_are_repo_wide()
+    test_analysis_manifest_schema_contract()
     test_stage6_cannot_rediscover_chapter_boundaries()
     test_deeply_nested_fallback_keeps_all_governing_ancestors()
     test_stale_scan_phase_reference_accepts_backticks()

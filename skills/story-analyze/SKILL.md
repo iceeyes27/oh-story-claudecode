@@ -184,6 +184,11 @@ disable: true
 │       └── {势力名}.md   # 内容 >= 200 字时独立；不足合并到 世界观/背景设定.md
 ├── 拆文报告.md
 ├── 文风.md          # Stage 6 文风：句长/标点/对话潜台词/情绪交替 + 原文锚点范例片段
+├── _analysis-manifest.json  # analysis schema 1：来源、Stage、逐章尝试与结果修订
+├── _analysis/
+│   ├── relations-draft.json
+│   └── results/
+│       └── relationships-v0001.json
 └── _progress.md
 ```
 
@@ -225,11 +230,11 @@ disable: true
 
 | 阶段 | 名称 | 输入 | 输出 | 完成标志 |
 |------|------|------|------|----------|
-| 0 | 概要提取 | 原始文本 | 概要.md（**首版 200 字 thin first-pass** + 章节索引；full plot-aware 500-1000 字版在 Stage 5 落盘覆盖）+ **Stage 0.5 章节边界表写入 `_progress.md`**（详见下方说明） | 章节结构识别完成 + 章节边界落盘 |
+| 0 | 概要提取 | 原始文本 | 概要.md（**首版 200 字 thin first-pass** + 章节索引；full plot-aware 500-1000 字版在 Stage 5 落盘覆盖）+ **Stage 0.5 章节边界表写入 `_progress.md` 并初始化 `_analysis-manifest.json`**（详见下方说明） | 章节结构识别完成 + 章节边界与分析清单验证通过 |
 | 1 | 黄金三章 | 经 schema v3 章节边界表校验的前3章原文切片 | 第1章_深度拆解.md / 第2章_深度拆解.md / 第3章_深度拆解.md（每章一个文件）。非人形反派（灵气复苏/末世/国运等抽象对抗型）出现在前三章时，在本阶段一并按抽象对抗型路由分析（核心对抗面/紧迫感来源/升级机制/叙事替代）。 | 3章拆解完成 → **停靠产出快速预览.md** |
-| 2 | 逐章摘要 | 经 schema v3 章节边界表校验的逐章原文切片 | 章节摘要.md（含情节点+角色+**关键信息与扩写技法**+**逐章写法公式**）。逐章写法公式必须提取情绪流向、节奏配比、结构公式、核心技巧、章尾卡点与伏笔。角色过滤（龙套不提取、别名归类）。每章10-40情节点（密度150-200字/个，按字数动态调节；公式低于10时仍按硬下限10拆足关键步骤）。**并行模式：每章 spawn chapter-extractor agent**。**计数验证：摘要数 == 章节数，不等则标记失败章节**。 | 所有章节处理完成 |
+| 2 | 逐章摘要 | 经 schema v3 章节边界表校验的逐章原文切片 | 章节摘要.md（含情节点+角色+**关键信息与扩写技法**+**逐章写法公式**）。逐章写法公式必须提取情绪流向、节奏配比、结构公式、核心技巧、章尾卡点与伏笔。角色过滤（龙套不提取、别名归类）。每章10-40情节点（密度150-200字/个，按字数动态调节；公式低于10时仍按硬下限10拆足关键步骤）。**并行模式：每章 spawn chapter-extractor agent**。每章成功/失败均写入分析清单，恢复时只处理待处理与失败章节。**计数验证：摘要数 == 章节数，不等则标记失败章节**。 | 全部成功，或显式确认 `completed_with_errors` |
 | 3 | 聚合分析 | 全部章节摘要 | 剧情/*.md + README.md + 故事线.md + **节奏.md + 情绪模块.md**。**故事框架识别**（前置，决定聚合策略）。**两步法剧情聚合**（先从摘要识别剧情大纲，再按大纲分配情节点）。**关键信息推进索引**（按章节/剧情线追踪信息如何被扩写）。**情绪触动点与爆发节奏**（爽点/虐点/期待点的铺垫→释放→余波）。**全书情绪节奏总览**（情绪折线、爽点频率、小/中/大高潮位置、冲突升级路径、跨章伏笔地图、小/中/大循环单元）。**读者需求 / 情绪引擎 / 爽文套路框架**（沉淀为可复现模块卡）。**角色合并**（跨章节去重+别名归一）。**角色分级**（主角/反派/核心配角/功能角色）。**散落情节兜底**（6步，含覆盖率验证）。**桥段标签**（每个剧情模块按 deconstruction-notes.md 桥段词表打标，best-effort，无匹配留空）。**质量检查**（阈值详见 material-decomposition.md 质量阈值体系）。 | 质量检查通过 |
-| 4 | 设定+关系（4a/4b/4c） | **4a**：Stage 2 情节点+章节摘要（不依赖 Stage 3，与 3 并行）；**4b/4c**：Stage 3 合并后角色数据+情节点 | 设定/*.md + 角色/*.md。**4a 设定**（世界观/金手指/势力，从 Stage 2 mention 数据归纳）。**4b 角色完整档案**（两阶段模型：Stage 2 轻量提及 → Stage 4b 完整档案；别名解析置信度≥0.85自动合并）。**4c 角色关系提取**（从情节点提取，不从原文；含演变追踪+最终状态合并+隐含推断）。非人形反派在 4a 做完整抽象对抗型分析。 | 4a/4b/4c 全部完成 |
+| 4 | 设定+关系（4a/4b/4c） | **4a**：Stage 2 情节点+章节摘要（不依赖 Stage 3，与 3 并行）；**4b/4c**：Stage 3 合并后角色数据+情节点 | 设定/*.md + 角色/*.md。**4a 设定**（世界观/金手指/势力，从 Stage 2 mention 数据归纳）。**4b 角色完整档案**（两阶段模型：Stage 2 轻量提及 → Stage 4b 完整档案；别名解析置信度≥0.85自动合并）。**4c 角色关系提取**（从情节点提取，不从原文；含演变追踪+最终状态合并+隐含推断），并发布带证据指纹的 `_analysis/results/relationships-vNNNN.json`。非人形反派在 4a 做完整抽象对抗型分析。 | 4a/4b/4c 完成，关系结果发布并验证 |
 | 5 | 汇总报告 | 全部输出 | 拆文报告.md（含「读者需求 / 情绪引擎」「关键信息与扩写技法总览」「全书情绪节奏总览」「节奏与情绪触动点」「循环单元」「跨章伏笔地图」「冲突升级路径」「可复现模块」摘要，并指向 `剧情/节奏.md` / `剧情/情绪模块.md`；含「写法技巧」清单，覆盖一笔两用/延迟揭示/视角欺骗/对比锚点/行为循环/身体反应替代心理描写/**跨章回扣**——物品/意象在不同章节承担不同功能）+ **概要.md 全书 500-1000 字版**（plot-aware，覆盖 Stage 0 的 200 字 thin first-pass） | 报告 + 全书概要生成完成 |
 | 6 | 文风 | 拆文报告.md + 章节/第1-3章_深度拆解.md + 章节/*_摘要.md + 原文/原文.txt | 文风.md（整书级写作技法视图：句长/标点/对话潜台词/情绪交替周期 + 4-6 段原文锚点范例片段 + 分层模仿建议，硬上限 ~4000 字。详见 [style-profile-protocol.md](references/style-profile-protocol.md) + [style-profile-generator.md](references/style-profile-generator.md)） | 文风落盘 `拆文库/{书名}/文风.md` |
 
@@ -246,6 +251,15 @@ Stage 0 完成概要 + 章节索引之后、转入 Stage 1 之前，**必须**�
 - `_progress.md` 顶部 `schema_version: 3` 同时落盘
 
 **统一消费门**：Stage 1、Stage 2、Stage 6 在读取任何原文切片前，都运行 `node skills/story-analyze/scripts/chapter-boundary.js validate 拆文库/{书名}/_progress.md`，只使用其返回的 `source.path` 与 `chapters[]`。当前章终点取下一章 `start_line - 1`，末章取原文末行；不得自行重新识别章节。校验失败立即停止当前 Stage，并回到 Stage 0 重建。
+
+章节边界通过后立即初始化并验证分析清单：
+
+```bash
+node skills/story-analyze/scripts/analysis-manifest.js init 拆文库/{书名}/_progress.md
+node skills/story-analyze/scripts/analysis-manifest.js validate 拆文库/{书名}/_analysis-manifest.json
+```
+
+清单的字段、Stage 2 记录命令与 Stage 4c 关系草稿契约见 [analysis-manifest.md](references/analysis-manifest.md)。
 
 **低版本进度处理**：`schema_version` 低于 3 时不在 Stage 1/2/6 临时迁移，也不保留原边界继续运行；统一回到 Stage 0 重跑原文识别，生成来源指纹和 schema v3 边界表。
 
@@ -322,6 +336,8 @@ Stage 2 使用 chapter-extractor agent 并行处理每章，替代原来的串�
 
 ### 调用方式
 
+开始分发前执行 `analysis-manifest.js begin-stage ... 2` 和 `analysis-manifest.js resume ...`；只分发 `pending_chapters` 与 `failed_chapters`。
+
 每条章节 prompt **必须以「材料声明」前缀开头**（即下方 prompt 字符串首段）——给子代理正确语境，避免它把通俗题材的正常戏剧化剧情误判为有害内容而拒绝拆解。前缀是固定文本，逐字带上，不要改写或省略。
 
 ```python
@@ -370,11 +386,13 @@ Agent(
 ```
 
 **最终落盘规则**：
-- haiku 首次通过 → 写入 `章节/第{N}章_摘要.md`，`_progress.md` 标记 `success`
+- haiku 首次通过 → 写入 `章节/第{N}章_摘要.md`，`_progress.md` 标记 `success`，并执行 `record-chapter ... {N} success --output 章节/第{N}章_摘要.md`
 - haiku 失败 + 同模型 retry 通过 → 同上，备注 `retry_same_model`
 - 质量失败 + sonnet retry 通过 → 同上，备注 `retry_sonnet`
-- sonnet retry 仍失败 → 章节标记 `⚠️ 跳过`，失败原因写入 `_progress.md` 「失败记录」表，拆文报告中注明
+- sonnet retry 仍失败 → 章节标记 `⚠️ 跳过`，失败原因写入 `_progress.md` 「失败记录」表，同时执行 `record-chapter ... {N} failed --error "{错误摘要}"`，拆文报告中注明
 - 单章失败不阻断管道；批次全部 spawn 完成后才决定是否进入 Stage 3
+
+全部成功时执行 `complete-stage ... 2`。仍有失败章节但决定继续 Stage 3 时执行 `complete-stage ... 2 --allow-failures`，状态记为 `completed_with_errors`；不得在存在待处理章节时完成 Stage 2。
 
 ### Agent 不可用降级
 
@@ -395,7 +413,7 @@ ls 章节/*_摘要.md | sed -E 's/.*第([0-9]+)章.*/\1 &/' | sort -n | cut -d' 
 - `grep -cE '^P[0-9]+ ' _章节摘要汇总.md` == 各摘要 `^P` 行数之和
 - `grep -cE '^\*\*概要\*\*' _章节摘要汇总.md` == 摘要文件数（`**概要**` 每章一行，chapter-extractor 并行输出与串行摘要模板都有；不用 `## 第N章` 头——串行摘要模板没有章节头，会误判）
 
-Stage 3 / 4a / 4c / 散落情节兜底改为**只读一次 `_章节摘要汇总.md`** 并在上下文中复用，替代每阶段 `glob 章节/*_摘要.md` 重扫（同一份语料的 4-5 次冷读降为 1 次）。
+Stage 3 / 4a / 4c / 散落情节兜底改为**只读一次 `_章节摘要汇总.md`** 并在上下文中复用，替代每阶段 `glob 章节/*_摘要.md` 重扫（同一份语料的 4-5 次冷读降为 1 次）。Stage 4c 同时生成 `_analysis/relations-draft.json`，再用 `analysis-manifest.js publish-relations` 发布不可变关系修订；草稿与证据字段见 [analysis-manifest.md](references/analysis-manifest.md)。
 
 **仅当语料能放进上下文时才生成汇总文件**：>500 章、或合并后 `_章节摘要汇总.md` 过大放不进上下文时**跳过本步骤**，改走 [material-decomposition.md](references/material-decomposition.md)「处理批次 → A. 子代理并行模式」：按 10-20 章/批 spawn 子代理，子代理在自己上下文里读该批摘要、只回传 ≤8K tokens 的降维聚合，主线程仅合并聚合结果（必要时分层两两合并）。**主线程不逐章读原始摘要**——跳过汇总文件不等于回到逐文件扫描，那对大书同样放不下。`_章节摘要汇总.md` 不替代 `章节/*_摘要.md`——单章文件仍是落盘真源，Stage 6 文风采样、人工复核照用单章文件。管道结束（Stage 6 后）删除 `_章节摘要汇总.md`——它是派生临时文件，不随 `拆文库/` 交付（`拆文库/` 会被 story-import 保留为写作工程）。
 
@@ -412,8 +430,8 @@ Stage 3-5 的分块策略（规模分级、智能分块、跨块合并、输出�
 ## 长篇恢复机制
 
 1. 管道启动时检查输出目录是否已有 _progress.md
-2. 如有，先运行章节边界校验器；`schema_version` 低于 3、来源变化、表损坏或边界错误都停止续跑并回到 Stage 0 重跑、重建 schema v3
-3. 校验通过后读取断点信息（最后处理章节 + 当前阶段 + 最终状态）
+2. 如有，先运行章节边界校验器，再执行 `analysis-manifest.js init`（存量目录缺少清单时创建）和 `validate`；`schema_version` 低于 3、来源变化、表损坏、边界错误或结果指纹变化都停止续跑并回到对应来源阶段检查
+3. 校验通过后读取断点信息；Stage 2 以 `analysis-manifest.js resume` 返回的待处理与失败章节为准
 4. **断点状态为 `paused_after_stage1`**（Stage 1 停靠点）→ 跳过 Stage 0/1，直接从 Stage 2 续跑逐章摘要，不重跑已完成的概要与黄金三章。
 5. 其他断点状态 → 从断点所在块的起始章节恢复，覆盖该块已有输出。
 
@@ -524,6 +542,7 @@ Stage 6 内容写完后，**不**立刻 append `6` 到 `stages_completed[]`。�
 | [references/output-templates.md](references/output-templates.md) | 管道全程：各 Stage 输出模板 + 快速预览报告模板 + `剧情/节奏.md` / `剧情/情绪模块.md` 模板 + 通用速查表 |
 | [references/material-decomposition.md](references/material-decomposition.md) | Stage 2-5：素材拆解方法论 + 质量阈值 + 分块策略；Stage 6 另见文风资料 |
 | [references/pipeline-ops.md](references/pipeline-ops.md) | 管道运维：_progress.md 模板、错误处理、恢复机制操作步骤 |
+| [references/analysis-manifest.md](references/analysis-manifest.md) | Stage 0.5/2/4c：分析清单、逐章尝试、恢复和关系结果修订契约 |
 | [references/deconstruction-notes.md](references/deconstruction-notes.md) | 拆书方法+影视拆解+抽象拆解法+题材实战 |
 | [references/style-profile-protocol.md](references/style-profile-protocol.md) | Stage 6：文风模板 + 可信度/可用性说明 |
 | [references/style-profile-generator.md](references/style-profile-generator.md) | Stage 6：文风生成 SOP（6 步，含中文数字章节识别 + 全角冒号基调 grep） |

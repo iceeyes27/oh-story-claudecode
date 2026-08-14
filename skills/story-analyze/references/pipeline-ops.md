@@ -51,6 +51,15 @@ node skills/story-analyze/scripts/chapter-boundary.js validate 拆文库/{书名
 
 校验器验证 schema、来源路径/字节数/SHA-256、章号唯一连续、起始行严格递增和行号范围，并返回唯一可消费的 `source` 与 `chapters`。失败时停止当前 Stage，禁止自行调整规则或重建临时边界。
 
+边界校验通过后，长篇管道初始化并验证 `_analysis-manifest.json`：
+
+```bash
+node skills/story-analyze/scripts/analysis-manifest.js init 拆文库/{书名}/_progress.md
+node skills/story-analyze/scripts/analysis-manifest.js validate 拆文库/{书名}/_analysis-manifest.json
+```
+
+Stage 2 用 `begin-stage`、`record-chapter`、`resume`、`complete-stage` 记录真实执行历史；Stage 4c 用 `publish-relations` 生成不可变关系结果。完整命令与草稿格式见 [analysis-manifest.md](analysis-manifest.md)。
+
 **最终状态值说明**：
 
 | 状态值 | 含义 |
@@ -79,6 +88,8 @@ node skills/story-analyze/scripts/chapter-boundary.js validate 拆文库/{书名
 | 分块中断 | 读 _progress.md 断点恢复 |
 | 聚合质量不达标 | 孤立情节二次分类；阈值放宽至 0.5 |
 | 角色合并冲突 | 记录待确认列表 |
+| 分析清单、章节输出或关系结果指纹变化 | 停止当前操作；检查来源与对应产物，不手工修改清单 |
+| Stage 2 有失败章节 | 默认继续重试；明确按部分失败策略进入 Stage 3 时使用 `complete-stage ... 2 --allow-failures` |
 | 输出目录冲突 | 追加不覆盖；冲突标 `[重新分析]` |
 
 ---
@@ -86,7 +97,7 @@ node skills/story-analyze/scripts/chapter-boundary.js validate 拆文库/{书名
 ## 恢复机制操作步骤
 
 1. 管道启动时检查输出目录是否已有 `_progress.md`
-2. 用 `chapter-boundary.js validate` 校验 `schema_version: 3`、来源指纹与「章节边界」表；任一失败即停止，并提示从 Stage 0 章节边界子步骤重建进度文件
-3. 读取断点信息（最后处理章节 + 当前阶段 + 最终状态）
+2. 用 `chapter-boundary.js validate` 校验 `schema_version: 3`、来源指纹与「章节边界」表，再执行 `analysis-manifest.js init`（存量目录缺少清单时创建）和 `validate`，校验逐章输出与已发布结果；任一失败即停止并检查对应来源阶段
+3. 读取断点信息；Stage 2 再执行 `analysis-manifest.js resume`，只恢复待处理与失败章节
 4. **断点状态为 `paused_after_stage1`**（Stage 1 停靠点）→ 跳过 Stage 0/1，直接从 Stage 2 续跑逐章摘要，不重跑已完成的概要与黄金三章
 5. 其他断点状态 → 从断点所在块的起始章节恢复，覆盖该块已有输出

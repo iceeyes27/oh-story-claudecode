@@ -176,6 +176,22 @@ def _list_chapter_files(body_dir: Path) -> list[tuple[int, Path]]:
     return sorted(chapters, key=lambda item: (item[0], str(item[1])))
 
 
+def _path_uses_symlink(root: Path, candidate: Path) -> bool:
+    try:
+        relative = candidate.absolute().relative_to(root.absolute())
+    except ValueError:
+        return True
+    current = root.absolute()
+    for part in relative.parts:
+        current /= part
+        try:
+            if current.is_symlink():
+                return True
+        except OSError:
+            return True
+    return False
+
+
 def read_active_book(root: Path) -> Path | None:
     active_file = root / ".active-book"
     if active_file.exists():
@@ -185,12 +201,14 @@ def read_active_book(root: Path) -> Path | None:
         # trims then requires non-empty, and the JS hook's firstLine()+truthy guard).
         declared = lines[0].strip() if lines else ""
         if declared:
-            candidate = (root / declared).resolve()
+            raw_candidate = Path(declared)
+            candidate_path = raw_candidate if raw_candidate.is_absolute() else root / raw_candidate
             try:
+                candidate = candidate_path.resolve()
                 candidate.relative_to(root.resolve())
-            except Exception:
-                candidate = None  # type: ignore[assignment]
-            if candidate and candidate.is_dir():
+            except (OSError, ValueError):
+                candidate = None
+            if candidate and candidate.is_dir() and not _path_uses_symlink(root, candidate_path):
                 return candidate
     entries = list(_walk_project_entries(root))
     for marker in ("追踪", "正文"):

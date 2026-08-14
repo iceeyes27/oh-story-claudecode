@@ -43,7 +43,7 @@ discover_active_book() {
     # 不在库里 export（避免给调用方留全局副作用，与文件头「不覆盖调用方 shell 选项」一致）。
     active=$(LC_ALL=C sed -n '1p' "$root/.active-book" | LC_ALL=C sed 's/^[[:space:]]*//;s/[[:space:]]*$//' || true)
     if [ -n "$active" ]; then
-      local active_path active_real
+      local active_path active_real active_has_symlink relative cursor part
       active_path=$(resolve_project_path "$active")
       # 逃逸判定「确证才拒」：只有确实解析出 realpath、且按字节确认它落在项目根之外时才丢弃声明，
       # 其余一律沿用原有的纯字符串行为。cd+pwd -P 要让 OS 解析整条中文路径，Windows 非 UTF-8
@@ -52,7 +52,28 @@ discover_active_book() {
       # 容纳判断放进 LC_ALL=C 子 shell 按字节比：pattern 与串都含中文 UTF-8，GBK 下按多字节
       # 解码会判为非法序列而不匹配。子 shell 内赋值不外泄，符合文件头「不覆盖调用方 shell 选项」。
       active_real=$(cd "$active_path" 2>/dev/null && pwd -P || true)
-      if [ -n "$active_real" ] && ! (
+      active_has_symlink=0
+      case "$active_path" in
+        "$root"/*)
+          relative=${active_path#"$root"/}
+          cursor=$root
+          while IFS= read -r part; do
+            [ -n "$part" ] || continue
+            cursor="$cursor/$part"
+            if [ -L "$cursor" ]; then
+              active_has_symlink=1
+              break
+            fi
+          done <<EOF
+$(printf '%s' "$relative" | tr '/' '\n')
+EOF
+          ;;
+        "$root") ;;
+        *) active_has_symlink=1 ;;
+      esac
+      if [ "$active_has_symlink" = 1 ]; then
+        : # 明确经过符号链接，按发现契约丢弃声明
+      elif [ -n "$active_real" ] && ! (
         export LC_ALL=C
         case "$active_real" in
           "$root"|"$root"/*) exit 0 ;;

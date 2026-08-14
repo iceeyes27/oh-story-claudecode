@@ -194,8 +194,12 @@ echo "  OK stop content sweep (git-changed only)"
 # ── SessionStart continuity: 追踪 staleness（写了章但 上下文.md 没跟上）+ 章节标题去重 ──
 mkdir -p "$ROOT/contbook/正文" "$ROOT/contbook/追踪"
 write_clean_state "$ROOT/contbook"
-printf '旧上下文\n' > "$ROOT/contbook/追踪/上下文.md"
-sleep 1
+printf '> 状态修订：0\n旧上下文\n' > "$ROOT/contbook/追踪/上下文.md"
+python3 - "$ROOT/contbook/追踪/上下文.md" <<'PY'
+import os, sys, time
+old = time.time() - 5
+os.utime(sys.argv[1], (old, old))
+PY
 printf '# 第1章 决战\n正文。\n' > "$ROOT/contbook/正文/第001章_决战.md"
 printf '# 第2章 决战\n正文。\n' > "$ROOT/contbook/正文/第002章_决战.md"
 out="$(run_hook session-start '{"hook_event_name":"SessionStart"}')"

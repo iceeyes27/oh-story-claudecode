@@ -2,6 +2,15 @@
   "version": 1,
   "groups": [
     {
+      "name": "prose-outline-copy-detector",
+      "source": "skills/_shared/scripts/check-outline-copy.js",
+      "targets": [
+        "skills/story-setup/scripts/check-outline-copy.js",
+        "skills/story-deslop/scripts/check-outline-copy.js",
+        "skills/story-write/scripts/check-outline-copy.js"
+      ]
+    },
+    {
       "name": "story-tracking-transaction",
       "source": "skills/story-write/scripts/tracking_commit.py",
       "targets": [

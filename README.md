@@ -21,6 +21,10 @@
 > v0.8.0 起：完整小说复合检查依赖的 `ai-flavor-scan`、`dialogue-naturalness-scan`、`jargon-verb-scan` 纳入跨平台公开发布，公开 Skill/Command 增至 14 个；Claude marketplace 与版本信息同步到 0.8.0，并修复本地适配、测试路径及 Node 18/22 的 OpenCode 检查差异。
 > 当前公开集合另含 `batch-pollution-detector`，共 15 个，保证 `story-deslop` 文件模式的脚本污染预检在跨平台部署后不会缺席。
 >
+> v0.7.6 起：重点在正文那一段。写正文的 `narrative-writer` 有三条规则一直在空转——「写完必须立即统计字数」给的是一条 Bash 命令，可它的工具白名单里没有 Bash，同一句话又禁掉了模型估算，于是「字数达标是硬性要求」背后没有任何可执行判据；「返回前报出句长分布」同样只能编，而主会话正拿它做质量校验；「正文逐项展开细纲」是最高优先级的明令，放宽的那半边却只写在主 skill 里、从不进 spawn 提示词，子代理只看见限制，就按一个情节点一段平推成流水账。三条都已修好，实跑首次落盘即进验收区间（对照组不到下限的 73%）。新增细纲照搬检测：细纲把情节点写成成品散文句时正文只剩誊抄，配套的「复沓锚句」字段让必须逐字进正文的原话（誓言、系统面板、案卷原话）不被误判。另外 Claude Code 上用 Bash 重定向写正文也会被大纲/追踪守卫拦下，以及每次会话固定加载的文本再降两成（开书 −30%、回炉 −41%）。**本版 `agents_version` 为 25**，已部署项目需重新运行 `/story-setup` 并新开会话。
+>
+> v0.7.5 起：稳定版。补上 Claude Code 写正文守卫缺的追踪检查点门——另三端从 v0.7.3 起就有，主力端此前会静默写出若干章没有追踪的正文；长篇 `story-long-write` 每次触发都整份进上下文的 SKILL.md 从 82 KB 降到 54 KB（开书三阶段抽成按需读的 `workflow-setup.md`，日更不再为用不上的建纲步骤付费）；清掉一批过度累加的限制指令，其中一条把正文里普通的「他说」判成了违规。**本版 `agents_version` 为 24**，已部署项目需重新运行 `/story-setup` 并新开会话。
+>
 > 已同步上游 v0.7.5：Claude 写正文守卫补齐追踪检查点；长篇开书 Phase 1-3 移入 `story-write/references/workflow-setup.md` 按需加载；清理把普通「说」判违规等过度限制。**部署契约为 `agents_version: 24`，已部署项目需重跑 `/story-setup` 并新开会话。**
 >
 > 已同步上游 v0.7.3/v0.7.4：导入书与外部对标彻底分离；长篇追踪改用 `_tracking-state.json` + `tracking_commit.py` 单一事务模型；修复部署端误判、多端参考包误报、Windows 文风采样、章节目录误切片、审查评分漂移、静态字数双标准和黑岩频道覆盖。上游 split Skill 的改动已迁入本 fork 的 `story-write` / `story-analyze` / `story-scan` 统一入口。

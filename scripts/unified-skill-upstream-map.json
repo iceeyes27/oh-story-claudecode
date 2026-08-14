@@ -1,5 +1,5 @@
 {
-  "upstream_baseline": "1eae178058ce41962de0d465147965af891479dc",
+  "upstream_baseline": "0a34c6998263026ec6160320a89692cdaa53fe69",
   "mappings": [
     { "source": "skills/story-long-write", "target": "skills/story-write" },
     { "source": "skills/story-short-write", "target": "skills/story-write" },

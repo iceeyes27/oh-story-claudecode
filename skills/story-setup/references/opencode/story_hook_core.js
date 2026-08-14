@@ -28,6 +28,21 @@ function resolveTarget(root, target, base = root) {
   return path.isAbsolute(normalized) ? path.resolve(normalized) : path.resolve(base || root, normalized)
 }
 
+function pathUsesSymlink(root, candidate) {
+  const relative = path.relative(path.resolve(root), path.resolve(candidate))
+  if (relative.startsWith("..") || path.isAbsolute(relative)) return true
+  let current = path.resolve(root)
+  for (const part of relative.split(path.sep).filter(Boolean)) {
+    current = path.join(current, part)
+    try {
+      if (fs.lstatSync(current).isSymbolicLink()) return true
+    } catch {
+      return true
+    }
+  }
+  return false
+}
+
 function firstLine(file) {
   try {
     return fs.readFileSync(file, "utf8").split(/\r?\n/, 1)[0].trim()
@@ -62,14 +77,15 @@ function findFirst(base, maxDepth, predicate) {
 function discoverActiveBook(root) {
   const declared = firstLine(path.join(root, ".active-book"))
   if (declared) {
-    const candidate = existingDir(resolveTarget(root, declared))
+    const declaredPath = resolveTarget(root, declared)
+    const candidate = existingDir(declaredPath)
     if (candidate) {
       // root 也要按 realpath 比：existingDir 已把 candidate 解到真实路径，若这里用未解析的
       // root，项目根位于 symlink 下（macOS /tmp、/var，或软链的家目录/工作目录）时 rel 会
       // 假性以 ".." 开头，合法的 .active-book 被静默丢弃。bash 用 pwd -P、python 用
       // root.resolve()，此处对齐两端。
       const rel = path.relative(existingDir(root) || path.resolve(root), candidate)
-      if (!rel.startsWith("..") && !path.isAbsolute(rel)) return candidate
+      if (!rel.startsWith("..") && !path.isAbsolute(rel) && !pathUsesSymlink(root, declaredPath)) return candidate
     }
   }
   const tracking = findFirst(root, 4, (_full, entry) => entry.isDirectory() && entry.name === "追踪")

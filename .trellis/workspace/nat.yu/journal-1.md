@@ -100,3 +100,25 @@
 ### Status
 
 [OK] **Completed**
+
+
+## Session 5: 复合检查覆盖契约与写作 Hook 修复
+
+**Date**: 2026-08-17
+**Task**: 复合检查覆盖契约与写作 Hook 修复
+**Branch**: `main`
+
+### Summary
+
+完成七阶段复合检查覆盖清单、过滤项状态契约与测试；修复写作后置 Hook、跨平台连续性判定、静态路径和旧提示；已完成本地质量检查。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `47cc4c4` | (see git log) |
+| `7fb8d53` | (see git log) |
+
+### Status
+
+[OK] **Completed**

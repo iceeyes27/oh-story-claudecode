@@ -1,0 +1,180 @@
+{
+  "version": 1,
+  "countUnit": "required-check-items",
+  "status": ["PASS", "FAIL", "BLOCKED", "SKIPPED"],
+  "skipPolicy": {
+    "allowedOnlyWhen": "not-applicable",
+    "requiresReason": true
+  },
+  "completion": {
+    "stageCount": 7,
+    "requiredResultForEveryItem": true,
+    "successText": "复合检查完成：7/7，过滤项 {completed}/{required}",
+    "blockedText": "复合检查未完成：{completed}/{required}，原因：{reason}"
+  },
+  "triggers": {
+    "full": ["检查", "检查这本小说", "帮我检查", "检查一下当前书", "检查当前书"],
+    "explicitSingleItem": ["检查 AI 味", "检查对话", "检查黑话", "检查自然度", "检查结构"],
+    "excludedVersionCheck": ["检查更新", "有新版本吗", "升级", "更新工具箱"]
+  },
+  "stages": [
+    {
+      "id": "review",
+      "order": 1,
+      "route": "story-review",
+      "mode": "full",
+      "dependencies": ["story-review"],
+      "filters": [
+        {"id": "review-normalize-punctuation", "label": "标点确定性预检", "executor": "skills/_shared/scripts/normalize-punctuation.js", "scope": "正文文件", "required": true, "report": "format findings"},
+        {"id": "review-ai-patterns", "label": "AI 句式确定性预检", "executor": "skills/_shared/scripts/check-ai-patterns.js", "scope": "正文文件", "required": true, "report": "prose findings"},
+        {"id": "review-degeneration", "label": "退化确定性预检", "executor": "skills/_shared/scripts/check-degeneration.js", "scope": "正文文件", "required": true, "report": "prose findings"},
+        {"id": "review-subject-switch", "label": "主语与视角连续性", "executor": "skills/_shared/scripts/check-subject-switch.js", "scope": "正文段落", "required": true, "report": "advisory findings"},
+        {"id": "review-chapter-boundary", "label": "跨章边界连续性", "executor": "skills/_shared/scripts/check-chapter-boundary.js", "scope": "相邻章节", "required": true, "report": "advisory findings"},
+        {"id": "review-structure-logic", "label": "结构与逻辑", "executor": "skills/story-review/SKILL.md", "scope": "正文、细纲、追踪", "required": true, "report": "findings"},
+        {"id": "review-setting-consistency", "label": "设定一致性", "executor": "skills/story-review/SKILL.md", "scope": "正文、设定、追踪", "required": true, "report": "findings"},
+        {"id": "review-character-voice", "label": "人物与声口", "executor": "skills/story-review/SKILL.md", "scope": "正文、角色档案", "required": true, "report": "findings"},
+        {"id": "review-timeline-space", "label": "时间线与空间连续性", "executor": "skills/story-review/SKILL.md", "scope": "连续章节、时间线", "required": true, "report": "findings"},
+        {"id": "review-evidence-program-boundary", "label": "证据因果与程序边界", "executor": "skills/story-review/SKILL.md", "scope": "正文、案件资料、追踪", "required": true, "report": "findings"},
+        {"id": "review-plot-progression", "label": "剧情循环与高潮构建", "executor": "skills/story-review/SKILL.md", "scope": "章节事件链", "required": true, "report": "findings"},
+        {"id": "review-foreshadow-tracking", "label": "伏笔状态与跨批状态", "executor": "skills/story-review/SKILL.md", "scope": "伏笔、追踪、审查状态", "required": true, "report": "findings"},
+        {"id": "review-platform-fit", "label": "平台适配", "executor": "skills/story-review/SKILL.md", "scope": "题材定位、目标平台、正文", "required": true, "report": "findings"}
+      ]
+    },
+    {
+      "id": "ai-flavor",
+      "order": 2,
+      "route": "ai-flavor-scan",
+      "mode": "nine-layer",
+      "dependencies": ["ai-flavor-scan"],
+      "filters": [
+        {"id": "ai-01-banned-words", "label": "硬禁用词", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
+        {"id": "ai-02-rhetoric-library", "label": "AI 修辞词库", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
+        {"id": "ai-03-fused-metaphor", "label": "抽象融合比喻", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "正文全文及上下文", "required": true, "report": "findings"},
+        {"id": "ai-03b-abstract-erasure", "label": "物理清除动词与抽象对象", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "正文全文及上下文", "required": true, "report": "findings"},
+        {"id": "ai-04-empty-summary", "label": "排比与空洞总结", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "正文全文及上下文", "required": true, "report": "findings"},
+        {"id": "ai-04b-instruction-book", "label": "说明书式平铺与情绪说明书", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "正文旁白与台词", "required": true, "report": "findings"},
+        {"id": "ai-04c-subject-continuity", "label": "主语连贯与视角断裂", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "相邻正文段落", "required": true, "report": "advisory findings"},
+        {"id": "ai-04d-chapter-continuity", "label": "跨章信息续接", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "相邻章节", "required": true, "report": "advisory findings"},
+        {"id": "ai-05-jargon-single-character", "label": "高频黑话单字", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "正文全文及上下文", "required": true, "report": "findings"},
+        {"id": "ai-06-coined-collocation", "label": "生造词与强行搭配", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "正文全文及上下文", "required": true, "report": "findings"},
+        {"id": "ai-07-telegraphic-writing", "label": "欠写作与电报体", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "正文全文及场景上下文", "required": true, "report": "findings"},
+        {"id": "ai-08a-physical-attribute", "label": "物理属性匹配", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "物体接触描写", "required": true, "report": "findings"},
+        {"id": "ai-08b-force-result", "label": "力度与结果匹配", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "动作与结果描写", "required": true, "report": "findings"},
+        {"id": "ai-08c-object-feeling", "label": "宾语与感受匹配", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "痛感、感受与动作描写", "required": true, "report": "findings"},
+        {"id": "ai-08d-abstract-object", "label": "抽象对象与物理动作匹配", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "抽象对象动作描写", "required": true, "report": "findings"},
+        {"id": "ai-08e-state-ownership", "label": "状态归属匹配", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "状态、属性与承载对象", "required": true, "report": "findings"},
+        {"id": "ai-09-persona-cliche", "label": "装人设套路组合", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "重点场景及全文抽查", "required": true, "report": "findings"}
+      ]
+    },
+    {
+      "id": "novel-deslop",
+      "order": 3,
+      "route": "story-deslop",
+      "mode": "novel",
+      "dependencies": ["story-deslop", "batch-pollution-detector"],
+      "filters": [
+        {"id": "deslop-preflight-punctuation", "label": "标点预检", "executor": "skills/_shared/scripts/normalize-punctuation.js", "scope": "正文文件", "required": true, "report": "format findings"},
+        {"id": "deslop-preflight-ai-patterns", "label": "AI 句式预检", "executor": "skills/_shared/scripts/check-ai-patterns.js", "scope": "正文文件", "required": true, "report": "blocking and advisory findings"},
+        {"id": "deslop-preflight-degeneration", "label": "退化预检", "executor": "skills/_shared/scripts/check-degeneration.js", "scope": "正文文件", "required": true, "report": "blocking and advisory findings"},
+        {"id": "deslop-pollution-duplicates", "label": "脚本插入重复句检测", "executor": "skills/batch-pollution-detector/scripts/find-duplicates.py", "scope": "正文跨文件长句", "required": true, "report": "pollution findings"},
+        {"id": "deslop-pollution-balance", "label": "引号括号平衡检测", "executor": "skills/batch-pollution-detector/scripts/check-balance.py", "scope": "正文文件", "required": true, "report": "pollution findings"},
+        {"id": "deslop-gate-a-banned-words", "label": "Gate A 禁用词", "executor": "skills/story-deslop/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
+        {"id": "deslop-gate-b-formula", "label": "Gate B 句式套路", "executor": "skills/story-deslop/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
+        {"id": "deslop-gate-c-psychology", "label": "Gate C 心理与重复描写", "executor": "skills/story-deslop/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
+        {"id": "deslop-gate-d-rhythm", "label": "Gate D 节奏与标点", "executor": "skills/story-deslop/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
+        {"id": "deslop-gate-e-dialogue", "label": "Gate E 对话腔调", "executor": "skills/story-deslop/SKILL.md", "scope": "正文台词", "required": true, "report": "findings"},
+        {"id": "deslop-gate-f-ending", "label": "Gate F 结尾升华", "executor": "skills/story-deslop/SKILL.md", "scope": "章节结尾", "required": true, "report": "findings"},
+        {"id": "deslop-gate-g-explanation", "label": "Gate G 解释腔与上帝视角", "executor": "skills/story-deslop/SKILL.md", "scope": "正文旁白", "required": true, "report": "findings"},
+        {"id": "deslop-whitelist-protection", "label": "白名单与保护规则", "executor": "skills/story-deslop/SKILL.md", "scope": "项目白名单、保护区和剧情功能", "required": true, "report": "coverage record"},
+        {"id": "deslop-deletion-ratio", "label": "删除比例与信息保留", "executor": "skills/story-deslop/SKILL.md", "scope": "修改建议或既有修改记录", "required": true, "report": "coverage record"},
+        {"id": "deslop-reread", "label": "去味后回读门禁", "executor": "skills/story-deslop/SKILL.md", "scope": "正文修改范围", "required": true, "report": "coverage record"}
+      ]
+    },
+    {
+      "id": "dialogue-naturalness",
+      "order": 4,
+      "route": "dialogue-naturalness-scan",
+      "mode": "full",
+      "dependencies": ["dialogue-naturalness-scan"],
+      "filters": [
+        {"id": "dialogue-regression-cases", "label": "历史判例复扫", "executor": "skills/dialogue-naturalness-scan/SKILL.md", "scope": "正文台词", "required": true, "report": "findings"},
+        {"id": "dialogue-root-grep", "label": "书面腔与模糊指代定向扫描", "executor": "skills/dialogue-naturalness-scan/SKILL.md", "scope": "正文台词", "required": true, "report": "findings"},
+        {"id": "dialogue-semantic-read", "label": "分批重写对照通读", "executor": "skills/dialogue-naturalness-scan/SKILL.md", "scope": "正文台词全文", "required": true, "report": "findings"},
+        {"id": "dialogue-vague-reference", "label": "模糊指代", "executor": "skills/dialogue-naturalness-scan/SKILL.md", "scope": "正文台词", "required": true, "report": "findings"},
+        {"id": "dialogue-bookish-register", "label": "书面腔混进口语", "executor": "skills/dialogue-naturalness-scan/SKILL.md", "scope": "非正式台词", "required": true, "report": "findings"},
+        {"id": "dialogue-awkward-collocation", "label": "别扭动宾与搭配", "executor": "skills/dialogue-naturalness-scan/SKILL.md", "scope": "正文台词", "required": true, "report": "findings"},
+        {"id": "dialogue-expository-parallelism", "label": "说明文式对仗定性", "executor": "skills/dialogue-naturalness-scan/SKILL.md", "scope": "正文台词", "required": true, "report": "findings"},
+        {"id": "dialogue-abstract-metaphor", "label": "抽象隐喻动词与浮空形容词", "executor": "skills/dialogue-naturalness-scan/SKILL.md", "scope": "正文台词", "required": true, "report": "findings"},
+        {"id": "dialogue-point-making", "label": "点题式与扁平说理金句", "executor": "skills/dialogue-naturalness-scan/SKILL.md", "scope": "正文台词", "required": true, "report": "advisory findings"},
+        {"id": "dialogue-process-ultimatum", "label": "流程式通牒", "executor": "skills/dialogue-naturalness-scan/SKILL.md", "scope": "冲突场景台词", "required": true, "report": "findings"},
+        {"id": "dialogue-voice-mismatch", "label": "人物声口错位", "executor": "skills/dialogue-naturalness-scan/SKILL.md", "scope": "正文台词与角色设定", "required": true, "report": "findings"}
+      ]
+    },
+    {
+      "id": "jargon-verb",
+      "order": 5,
+      "route": "jargon-verb-scan",
+      "mode": "full",
+      "dependencies": ["jargon-verb-scan"],
+      "filters": [
+        {"id": "jargon-known-regressions", "label": "已修判例复扫", "executor": "skills/jargon-verb-scan/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
+        {"id": "jargon-root-grep", "label": "行业名词根定向扫描", "executor": "skills/jargon-verb-scan/SKILL.md", "scope": "正文全文及上下文", "required": true, "report": "findings"},
+        {"id": "jargon-semantic-read", "label": "非从业者可理解性通读", "executor": "skills/jargon-verb-scan/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"}
+      ]
+    },
+    {
+      "id": "general-deslop",
+      "order": 6,
+      "route": "story-deslop",
+      "mode": "general",
+      "dependencies": ["story-deslop"],
+      "filters": [
+        {"id": "general-language-detection", "label": "语言检测", "executor": "skills/story-deslop/SKILL.md", "scope": "正文及对外文案", "required": true, "report": "coverage record"},
+        {"id": "general-scene-detection", "label": "场景检测", "executor": "skills/story-deslop/SKILL.md", "scope": "输入文本", "required": true, "report": "coverage record"},
+        {"id": "general-source-fallback", "label": "参考资料与单文件模式", "executor": "skills/story-deslop/SKILL.md", "scope": "可用参考资料", "required": true, "report": "coverage record"},
+        {"id": "general-rewrite-level", "label": "改写档位", "executor": "skills/story-deslop/SKILL.md", "scope": "输入文本", "required": true, "report": "coverage record"},
+        {"id": "general-edit-scope", "label": "编辑范围", "executor": "skills/story-deslop/SKILL.md", "scope": "输入文本", "required": true, "report": "coverage record"},
+        {"id": "general-tier-severity", "label": "Tier 严重度", "executor": "skills/story-deslop/SKILL.md", "scope": "问题片段", "required": true, "report": "findings"},
+        {"id": "general-protected-spans", "label": "Protected Spans 与不改区", "executor": "skills/story-deslop/SKILL.md", "scope": "事实、术语、引用和用户指定保留内容", "required": true, "report": "coverage record"},
+        {"id": "general-positive-style", "label": "正向风格目标", "executor": "skills/story-deslop/SKILL.md", "scope": "输入文本和目标语域", "required": true, "report": "coverage record"},
+        {"id": "general-output-contract", "label": "输出合同", "executor": "skills/story-deslop/SKILL.md", "scope": "检查报告", "required": true, "report": "coverage record"},
+        {"id": "general-reread", "label": "通用模式回读检查", "executor": "skills/story-deslop/SKILL.md", "scope": "输出文本或报告", "required": true, "report": "coverage record"}
+      ]
+    },
+    {
+      "id": "humanizer",
+      "order": 7,
+      "route": "humanizer",
+      "mode": "bilingual",
+      "dependencies": ["humanizer"],
+      "filters": [
+        {"id": "humanizer-language", "label": "语言模式识别", "executor": "skills/humanizer/SKILL.md", "scope": "正文全文", "required": true, "report": "coverage record"},
+        {"id": "humanizer-significance", "label": "过度强调意义与趋势", "executor": "skills/humanizer/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
+        {"id": "humanizer-notability", "label": "过度强调知名度与媒体报道", "executor": "skills/humanizer/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
+        {"id": "humanizer-ing-analysis", "label": "以 -ing 结尾的肤浅分析", "executor": "skills/humanizer/SKILL.md", "scope": "英文或混排段落", "required": true, "report": "findings"},
+        {"id": "humanizer-promotional", "label": "宣传和广告式语言", "executor": "skills/humanizer/SKILL.md", "scope": "正文及对外文案", "required": true, "report": "findings"},
+        {"id": "humanizer-vague-attribution", "label": "模糊归因和含糊措辞", "executor": "skills/humanizer/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
+        {"id": "humanizer-challenges-outlook", "label": "提纲式挑战与未来展望", "executor": "skills/humanizer/SKILL.md", "scope": "正文及文案", "required": true, "report": "findings"},
+        {"id": "humanizer-ai-vocabulary", "label": "过度使用 AI 词汇", "executor": "skills/humanizer/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
+        {"id": "humanizer-copula-avoidance", "label": "系动词回避", "executor": "skills/humanizer/SKILL.md", "scope": "英文或混排段落", "required": true, "report": "findings"},
+        {"id": "humanizer-negative-parallelism", "label": "否定式排比", "executor": "skills/humanizer/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
+        {"id": "humanizer-rule-of-three", "label": "三段式过度使用", "executor": "skills/humanizer/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
+        {"id": "humanizer-synonym-cycling", "label": "刻意换词与同义词循环", "executor": "skills/humanizer/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
+        {"id": "humanizer-false-ranges", "label": "虚假范围", "executor": "skills/humanizer/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
+        {"id": "humanizer-em-dash", "label": "破折号过度使用", "executor": "skills/humanizer/SKILL.md", "scope": "正文及文案", "required": true, "report": "findings"},
+        {"id": "humanizer-boldface", "label": "粗体过度使用", "executor": "skills/humanizer/SKILL.md", "scope": "Markdown 文本", "required": true, "report": "findings"},
+        {"id": "humanizer-inline-headings", "label": "内联标题垂直列表", "executor": "skills/humanizer/SKILL.md", "scope": "Markdown 文本", "required": true, "report": "findings"},
+        {"id": "humanizer-title-case", "label": "标题大小写模式", "executor": "skills/humanizer/SKILL.md", "scope": "英文 Markdown 文本", "required": true, "report": "findings"},
+        {"id": "humanizer-emojis", "label": "表情符号模式", "executor": "skills/humanizer/SKILL.md", "scope": "正文及文案", "required": true, "report": "findings"},
+        {"id": "humanizer-curly-quotes", "label": "弯引号模式", "executor": "skills/humanizer/SKILL.md", "scope": "英文或混排文本", "required": true, "report": "findings"},
+        {"id": "humanizer-collaboration-artifacts", "label": "协作交流痕迹", "executor": "skills/humanizer/SKILL.md", "scope": "正文及文案", "required": true, "report": "findings"},
+        {"id": "humanizer-cutoff-disclaimer", "label": "知识截止日期免责声明", "executor": "skills/humanizer/SKILL.md", "scope": "正文及文案", "required": true, "report": "findings"},
+        {"id": "humanizer-servile-tone", "label": "谄媚或卑躬屈膝语气", "executor": "skills/humanizer/SKILL.md", "scope": "正文及文案", "required": true, "report": "findings"},
+        {"id": "humanizer-filler-phrases", "label": "填充短语", "executor": "skills/humanizer/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
+        {"id": "humanizer-excessive-hedging", "label": "过度限定", "executor": "skills/humanizer/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
+        {"id": "humanizer-generic-conclusion", "label": "通用积极结论", "executor": "skills/humanizer/SKILL.md", "scope": "章节及文案结尾", "required": true, "report": "findings"},
+        {"id": "humanizer-final-reread", "label": "最终快速检查与回读", "executor": "skills/humanizer/SKILL.md", "scope": "已检查范围", "required": true, "report": "coverage record"}
+      ]
+    }
+  ]
+}

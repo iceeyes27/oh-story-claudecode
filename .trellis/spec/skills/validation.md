@@ -70,3 +70,52 @@ Correct: 读取 platform-skill-set.json，并额外复制 skills/_shared/。
 ## Local-only expectation
 
 本 fork 不使用 GitHub Actions。提交前必须在本地运行与改动范围对应的静态与脚本校验；涉及跨平台行为时应在对应系统验证。增加或改变校验规则时，必须补充 `scripts/test-*.py` 或 `scripts/test-*.sh` 回归，证明新规则不会扩大豁免范围。
+
+## Composite Check and Post-Event Hook Contract
+
+### 1. Scope / Trigger
+
+修改 `skills/story/SKILL.md` 复合检查路由、复合检查内部过滤项、或 Claude 写作后 Hook 时触发。
+
+### 2. Signatures
+
+- 复合检查清单：`skills/story/references/composite-check-manifest.json`。
+- Claude CLI：`node story_hook_cli.js prose-after-event <project-root>`，输入来自 stdin 或 `HOOK_INPUT`。
+
+### 3. Contracts
+
+- 清单必须声明七个有序阶段；当前清单登记 95 个必检项。
+- 每个必检项必须有唯一 `id`、`executor`、`scope`、`required` 和 `report`。
+- Hook 输入使用 `hook_event_name`、`tool_name`、`tool_input`；Write/Edit/MultiEdit 读取 `file_path`、`path`、`filePath`，Bash 读取 `command`、`cmd` 或 `script`。
+- 有正文发现时输出 `hookSpecificOutput.hookEventName` 和非空 `additionalContext`；失败 Bash 事件前置“命令失败但文件可能已改变：”。
+
+### 4. Validation & Error Matrix
+
+| 条件 | 结果 |
+| --- | --- |
+| 必检项缺少记录 | 复合检查不能报告完成 |
+| 过滤器发现问题 | 记录 `FAIL`，继续执行后续项目 |
+| 输入不可读或执行器缺失 | 记录 `BLOCKED`，不能报告完成 |
+| `SKIPPED` 无原因 | 契约测试失败 |
+| Hook 无目标、非正文或无发现 | 静默退出 |
+| Hook 输入无法解析 | 静默退出，不改变工具结果 |
+
+### 5. Good / Base / Bad Cases
+
+- Good：七阶段全部有结论，95 个必检项均有状态，输出 `过滤项 95/95`。
+- Base：某项发现问题但仍执行后续项目，输出 `FAIL` 而不是中断。
+- Bad：只报告七个阶段名称，或把无法读取的文件静默排除后输出完成。
+
+### 6. Tests Required
+
+- `node --test skills/story/tests/composite-check-contract.test.js`：阶段顺序、95 项覆盖、依赖来源、漏项、阻断、触发词和旧入口提示。
+- `bash scripts/test-prose-backstop-hook.sh`：Bash 成功/失败、Write、Edit、MultiEdit 的合法 Hook JSON 与正文发现。
+- `bash scripts/test-story-continuity.sh`：章节号与 tracking state 判定，不依赖固定 mtime 延迟。
+- `bash scripts/check-story-setup-deployment.sh`：部署模板必须包含 `prose-after-event` 路由。
+
+### 7. Wrong vs Correct
+
+```text
+Wrong: 只检查 story-review，并把“七阶段已列出”当成复合检查完成。
+Correct: 读取 composite-check-manifest.json，逐项记录状态；只有阶段和全部必检项都有结果时才报告完成。
+```

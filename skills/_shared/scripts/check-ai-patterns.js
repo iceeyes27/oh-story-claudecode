@@ -435,6 +435,9 @@ function scanProsePatterns(proseLines) {
   findings.push(...findDanglingIdentityShift(proseLines));
   findings.push(...findBodyShellMetaphor(proseLines));
   findings.push(...findContrastRhetorical(proseLines));
+  findings.push(...findPhysicalClear(proseLines));
+  findings.push(...findAbstractObjectForced(proseLines));
+  findings.push(...findPainAsObject(proseLines));
   findings.push(...findGreyCrackInHead(proseLines));
   findings.push(...findSummarySlogan(proseLines));
   findings.push(...findEnglishResidue(proseLines));
@@ -1543,6 +1546,18 @@ function loadContrastPatterns() {
   return loadRegexSectionPatterns('contrast', /^##\s*(?:反问式内省|伪深刻对比)/);
 }
 
+function loadPhysicalClearPatterns() {
+  return loadRegexSectionPatterns('physical-clear', /^##\s*物理清除动词/);
+}
+
+function loadAbstractObjectForcedPatterns() {
+  return loadRegexSectionPatterns('abstract-object-forced', /^##\s*抽象对象被当物理对象处理/);
+}
+
+function loadPainAsObjectPatterns() {
+  return loadRegexSectionPatterns('pain-as-object', /^##\s*痛感\/感受当物理动作的可数宾语/);
+}
+
 var _whitelistCache = null;
 function loadWhitelist() {
   if (_whitelistCache) return _whitelistCache;
@@ -1777,6 +1792,99 @@ function findContrastRhetorical(proseLines) {
           type: 'contrast-rhetorical',
           severity: 'blocking',
           message: '反问式内省/伪深刻对比[' + hit + ']：用「倒被X吓住？」式伪深刻反问做内省，靠过去/现在反差+模糊指代（一沓纸/那页东西/这玩意）撑"人物复杂"，是高级 AI 味；改成角色当下可见的具体动作/生理反应（手抖/手顿/把纸翻过去）或本书招牌"裂痕"装置展示，对象写具体（这份材料/这份协议），去掉文艺腔反问。',
+          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+// 物理清除动词 × 抽象对象：把抽象域（时间/记忆/痕迹/棱角）当实物"抹平/冲走/刮掉"，blocking。
+function findPhysicalClear(proseLines) {
+  const { patterns, error } = loadPhysicalClearPatterns();
+  if (error || patterns.length === 0) return ruleLoadFailure('物理清除动词×抽象对象', error);
+  const whitelist = loadWhitelist();
+  const findings = [];
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const narrative = stripQuoted(trimmed);
+    for (const re of patterns) {
+      re.lastIndex = 0;
+      let match;
+      while ((match = re.exec(narrative)) !== null) {
+        const hit = match[0];
+        const idx = match.index;
+        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
+        findings.push({
+          line: lineNo,
+          column: idx + 1,
+          type: 'banned-word-physical-clear',
+          severity: 'blocking',
+          message: '物理清除动词×抽象对象[' + hit + ']：把时间/记忆/痕迹等抽象域当实物去抹平/冲走/刮掉，出现即改；用具体说法（趁痕迹还在→别让证据被清掉、把记忆冲走→记不起来了）。',
+          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+// 抽象对象被当物理对象处理：目光/视线/情绪/声音被"压/钉/砸/拽"等施力，blocking。
+function findAbstractObjectForced(proseLines) {
+  const { patterns, error } = loadAbstractObjectForcedPatterns();
+  if (error || patterns.length === 0) return ruleLoadFailure('抽象对象被当物理对象处理', error);
+  const whitelist = loadWhitelist();
+  const findings = [];
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const narrative = stripQuoted(trimmed);
+    for (const re of patterns) {
+      re.lastIndex = 0;
+      let match;
+      while ((match = re.exec(narrative)) !== null) {
+        const hit = match[0];
+        const idx = match.index;
+        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
+        findings.push({
+          line: lineNo,
+          column: idx + 1,
+          type: 'banned-word-abstract-forced',
+          severity: 'blocking',
+          message: '抽象对象被当物理对象处理[' + hit + ']：目光/视线/情绪/声音不是物理实体，不能被压/钉/砸/拽；改成"落/停/移/转"等视线自身动作，或改主体为实体。',
+          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+// 痛感/感受当物理动作的可数宾语："刮出+一道/阵/股+感受"，blocking。
+function findPainAsObject(proseLines) {
+  const { patterns, error } = loadPainAsObjectPatterns();
+  if (error || patterns.length === 0) return ruleLoadFailure('痛感/感受当物理动作的可数宾语', error);
+  const whitelist = loadWhitelist();
+  const findings = [];
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const narrative = stripQuoted(trimmed);
+    for (const re of patterns) {
+      re.lastIndex = 0;
+      let match;
+      while ((match = re.exec(narrative)) !== null) {
+        const hit = match[0];
+        const idx = match.index;
+        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
+        findings.push({
+          line: lineNo,
+          column: idx + 1,
+          type: 'banned-word-pain-object',
+          severity: 'blocking',
+          message: '痛感/感受当物理动作的可数宾语[' + hit + ']：痛感是身体反应不是物体，不能被"刮出/划出"；写痛感的性质（蜇/灼/锐/钝）或身体反应（缩手/倒吸气/咬牙）。',
           excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
         });
       }

@@ -5,8 +5,9 @@
 // Claude 侧 hook 是 bash（settings.json 挂 bash 脚本），归核逻辑走这里 require 的
 // 共享核 story_hook_core.js——和 OpenCode/ZCode 用的是同一份，由 check-shared-files
 // 保证字节相同。归核（单份实现在 core）的面：正文网/字数（prose-net）、路径抽取
-// （extract-target）、Bash 正文写入前置门（prose-command-guard）、git commit 侦测
-// （is-git-commit）、连续性（continuity）、追踪检查点（tracking-checkpoint）。
+// （extract-target）、Bash 正文写入前置门（prose-command-guard）、写后事件适配
+// （prose-after-event）、git commit 侦测（is-git-commit）、连续性（continuity）、
+// 追踪检查点（tracking-checkpoint）。
 // 尚未归核、各端独立实现的面：
 //   - Write/Edit/MultiEdit 的大纲/细纲阻断判定：Claude 走 guard-outline-before-prose.sh
 //     纯 bash。它必须在无 node 的运行时也拦得住（官方推荐的原生二进制装法不带 Node），
@@ -53,6 +54,27 @@ const digTargetPath = (value) => digString(value, ["file_path", "path", "filePat
 const digCommand = (value) => digString(value, ["command", "cmd", "script"], true)
 const digWorkingDirectory = (value) =>
   digString(value, ["cwd", "working_directory", "workingDirectory"])
+
+function collectTargetPaths(value, targets = new Set(), depth = 0) {
+  if (depth > 8 || value === null || value === undefined) return targets
+  if (Array.isArray(value)) {
+    for (const item of value) collectTargetPaths(item, targets, depth + 1)
+    return targets
+  }
+  if (!value || typeof value !== "object") return targets
+  for (const key of ["file_path", "path", "filePath"]) {
+    if (typeof value[key] === "string" && value[key]) targets.add(value[key])
+  }
+  for (const key of [...NESTED_INPUT_KEYS, "edits", "changes", "files", "operations"]) {
+    collectTargetPaths(value[key], targets, depth + 1)
+  }
+  return targets
+}
+
+function withinRoot(root, candidate) {
+  const relative = path.relative(path.resolve(root), path.resolve(candidate))
+  return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative))
+}
 
 const [command, ...args] = process.argv.slice(2)
 
@@ -117,6 +139,54 @@ if (command === "extract-target") {
   const wordcount = core.wordcountFinding(absolute, text)
   if (wordcount) out.push(wordcount)
   if (out.length) process.stdout.write(out.join("\n"))
+} else if (command === "prose-after-event") {
+  // Claude PostToolUse/PostToolUseFailure JSON → 写后正文目标 → 共享核检查。
+  // Write/Edit/MultiEdit 从 file_path/path/filePath 提取目标；Bash 同时解析 command
+  // 内的重定向、tee、cp、mv、install 和嵌套 shell。无目标、非正文或无发现时静默，
+  // 有发现时只输出 Claude 合法 hook JSON，不改变工具成功/失败结果。
+  const root = args[0]
+  const raw = process.env.HOOK_INPUT || readStdin()
+  try {
+    if (!root || !raw) process.exit(0)
+    const obj = JSON.parse(raw)
+    const rootDir = path.resolve(root)
+    const eventRaw = digString(obj, ["hook_event_name", "hookEventName", "event"], true)
+    const event = eventRaw === "PostToolUseFailure" ? "PostToolUseFailure" : "PostToolUse"
+    const tool = digString(obj, ["tool_name", "toolName", "name"], true)
+    let base = rootDir
+    const requestedBase = core.existingDir(digWorkingDirectory(obj))
+    if (requestedBase && withinRoot(rootDir, requestedBase)) base = requestedBase
+
+    const targets = new Set()
+    for (const target of collectTargetPaths(obj)) {
+      const absolute = core.resolveTarget(rootDir, target, base)
+      if (withinRoot(rootDir, absolute)) targets.add(absolute)
+    }
+    const shellCommand = digCommand(obj)
+    if (tool === "Bash" || shellCommand) {
+      for (const target of core.extractProseTargets(shellCommand)) {
+        const absolute = core.resolveTarget(rootDir, target, base)
+        if (withinRoot(rootDir, absolute)) targets.add(absolute)
+      }
+    }
+
+    const contexts = []
+    for (const absolute of targets) {
+      const finding = core.proseAfterWrite(rootDir, absolute)
+      if (finding) contexts.push(finding)
+    }
+    if (!contexts.length) process.exit(0)
+    const warning = event === "PostToolUseFailure" ? "命令失败但文件可能已改变：\n" : ""
+    process.stdout.write(JSON.stringify({
+      hookSpecificOutput: {
+        hookEventName: event,
+        additionalContext: warning + contexts.join("\n\n"),
+      },
+    }))
+  } catch {
+    // Hook output must never turn malformed host input into a tool failure.
+    process.exit(0)
+  }
 } else if (command === "prose-toxic") {
   // 毒句式确定性检测单跑（供 guard 前置门 / 手工复扫调用；prose-net 已含同一组结果）。
   // 契约：stdout 空 = 干净；非空 = findings 行（每行一条，末行为清零要求 + 完整扫描提示）。

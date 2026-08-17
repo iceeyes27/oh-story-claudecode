@@ -586,11 +586,21 @@ def tracking_checkpoint_issue(
     return None
 
 
+def _last_committed_chapter(book: Path) -> int | None:
+    state = book / "追踪" / "_tracking-state.json"
+    try:
+        document = json.loads(state.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError):
+        return None
+    value = document.get("last_committed_chapter") if isinstance(document, dict) else None
+    return value if type(value) is int else None
+
+
 def continuity_findings(root: Path) -> list[str]:
-    """跨批连续性兜底：① 追踪 staleness（写了章但 续写状态卡没跟上）；
+    """跨批连续性：① 追踪 staleness（写了章但 续写状态卡没跟上）；
     ② 章节标题去重（两章同名多半是误复制）。模型无关，回合/会话边界提醒，无问题则静默。
     扫描范围 repo-wide（与缺口检测一致），非活跃书也提醒——有意为之，不按 .active-book 收窄；
-    staleness 用 mtime +1 秒容差，是启发式 advisory（checkout / 带 -p 拷贝可能偏差）。"""
+    staleness 以章节号和 tracking state 为主，不依赖文件 mtime。"""
     msgs: list[str] = []
     for book in _discover_all_books(root):
         body_dir = book / "正文"
@@ -601,13 +611,14 @@ def continuity_findings(root: Path) -> list[str]:
         if checkpoint_issue:
             msgs.append(f"[continuity] {safe_rel(root, book)}：{checkpoint_issue}。")
         if chapters and ctx.exists():
-            newest = max((c.stat().st_mtime for c in chapters), default=0)
-            try:
-                ctx_m = ctx.stat().st_mtime
-            except Exception:
-                ctx_m = 0
-            if newest > ctx_m + 1:
-                latest = max(chapters, key=lambda c: c.stat().st_mtime).name
+            committed = _last_committed_chapter(book)
+            chapter_numbers = {
+                c: int(match.group(1))
+                for c in chapters
+                if (match := re.match(r"^第0*(\d+)章", c.name))
+            }
+            latest = max(chapter_numbers, key=chapter_numbers.get, default=None)
+            if committed is not None and latest is not None and chapter_numbers[latest] > committed:
                 msgs.append(f"[continuity] {safe_rel(root, book)}：正文已更新到「{latest}」但续写状态卡更早——为该章提交 tracking_commit.py 事务、check 通过后再续写，禁止分别手改 上下文.md/伏笔.md。")
         # ①b 续写状态卡预算：上下文.md 由事务工具整份重建，硬上限 12288 字节。
         # 若不处理，每章读取量会随章节数增长，最终达到 O(N^2)。这里只提醒、不阻止；应把超出规定的区块移到 追踪/逐章记录/。
@@ -1298,7 +1309,7 @@ def prose_block_reason(root: Path, abs_path: Path) -> str | None:
             return None
         if not (book_dir / "小节大纲.md").exists():
             # 文案对齐 JS core proseBlockReason（py↔js 由 test-prose-net-parity.sh Part E 锁 parity）
-            return f"⛔ 写正文被拦截：{safe_rel(root, abs_path)} 缺少同目录 小节大纲.md。先按 story-short-write 完成「小节大纲.md」再写正文。"
+            return f"⛔ 写正文被拦截：{safe_rel(root, abs_path)} 缺少同目录 小节大纲.md。先按 story-write mode=short 完成「小节大纲.md」再写正文。"
         return None
     chapter_info = _long_chapter_info(abs_path)
     if chapter_info is None:
@@ -1323,7 +1334,7 @@ def prose_block_reason(root: Path, abs_path: Path) -> str | None:
                     found = True
                     break
         if not found:
-            return f"⛔ 写正文被拦截：第 {num} 章缺少细纲（{safe_rel(root, outline_dir)}/细纲_第{num}章.md）。先按 story-long-write 单章流程补建细纲再写正文。"
+            return f"⛔ 写正文被拦截：第 {num} 章缺少细纲（{safe_rel(root, outline_dir)}/细纲_第{num}章.md）。先按 story-write mode=long 单章流程补建细纲再写正文。"
     checkpoint_issue = tracking_checkpoint_issue(
         book_dir,
         require_state=True,

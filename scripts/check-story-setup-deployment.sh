@@ -141,6 +141,8 @@ done < <(grep -RhoE '^source[[:space:]]+"[^"]+"' "$HOOKS_DIR"/*.sh | sed -E 's/^
 # （node 缺失时 hook 自身 exit 0、session-start.sh 会话起点提示一次，此处按开发机有 node 校验）。
 assert_file "$HOOKS_DIR/story_hook_core.js"
 assert_file "$HOOKS_DIR/story_hook_cli.js"
+assert_grep 'prose-after-event' "$HOOKS_DIR/story_hook_cli.js" "story_hook_cli.js must implement prose-after-event"
+assert_grep 'prose-after-event' "$HOOKS_DIR/check-prose-after-write.sh" "check-prose-after-write.sh must use prose-after-event"
 if command -v node >/dev/null 2>&1; then
   node --check "$HOOKS_DIR/story_hook_core.js" || fail "story_hook_core.js node syntax invalid"
   node --check "$HOOKS_DIR/story_hook_cli.js" || fail "story_hook_cli.js node syntax invalid"

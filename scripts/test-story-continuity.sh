@@ -65,6 +65,7 @@ done
 T2="$(mktemp -d)"; make_book "$T2"
 printf '# 第1章 开端\n正文。\n' > "$T2/某书/正文/第001章_开端.md"
 printf '# 第2章 转折\n正文。\n' > "$T2/某书/正文/第002章_转折.md"
+printf '%s\n' '{"schema_version":4,"state_revision":0,"last_committed_chapter":2}' > "$T2/某书/追踪/_tracking-state.json"
 sleep 1
 printf '%s\n' '> 状态修订：0' '新上下文，已更新到第2章' > "$T2/某书/追踪/上下文.md"
 out="$(run "$T2")"

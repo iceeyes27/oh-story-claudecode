@@ -99,6 +99,18 @@ assert_hook_json "$failure_out" PostToolUseFailure || { echo "FAIL: post-Bash fa
 printf '%s' "$failure_out" | grep -q '命令失败但文件可能已改变' || { echo "FAIL: post-Bash failure missed partial-write warning" >&2; fails=$((fails+1)); }
 printf '%s' "$failure_out" | grep -q '工程词' || { echo "FAIL: post-Bash failure missed prose findings" >&2; fails=$((fails+1)); }
 
+# ⑤ Write/Edit/MultiEdit 的路径字段也必须走同一事件适配器。
+for tool in Write Edit MultiEdit; do
+  case "$tool" in
+    MultiEdit) tool_input="{\"edits\":[{\"file_path\":\"$TMP/某书/正文/第011章_截断.md\"}]}" ;;
+    *) tool_input="{\"file_path\":\"$TMP/某书/正文/第011章_截断.md\"}" ;;
+  esac
+  event_payload="{\"hook_event_name\":\"PostToolUse\",\"tool_name\":\"$tool\",\"tool_input\":$tool_input}"
+  event_out="$(run_payload "$event_payload")"
+  assert_hook_json "$event_out" PostToolUse || { echo "FAIL: post-$tool output is not valid hook JSON" >&2; fails=$((fails+1)); }
+  printf '%s' "$event_out" | grep -q '截断' || { echo "FAIL: post-$tool missed prose findings" >&2; fails=$((fails+1)); }
+done
+
 if [ "$fails" -ne 0 ]; then
   echo "Prose backstop hook tests FAILED ($fails)." >&2
   exit 1

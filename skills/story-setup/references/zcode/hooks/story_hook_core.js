@@ -207,6 +207,18 @@ function trackingCheckpointIssue(book, requireState = false, expectedLastCommitt
   return null
 }
 
+function lastCommittedChapter(book) {
+  const state = path.join(book, "追踪", "_tracking-state.json")
+  try {
+    const document = JSON.parse(fs.readFileSync(state, "utf8"))
+    return Number.isInteger(document && document.last_committed_chapter)
+      ? document.last_committed_chapter
+      : null
+  } catch {
+    return null
+  }
+}
+
 function continuityFindings(root) {
   const messages = []
   for (const book of discoverAllBooks(root)) {
@@ -220,10 +232,13 @@ function continuityFindings(root) {
     }
     if (chapters.length && fs.existsSync(context)) {
       try {
-        const newest = Math.max(...chapters.map((file) => fs.statSync(file).mtimeMs))
-        const contextTime = fs.statSync(context).mtimeMs
-        if (newest > contextTime + 1000) {
-          const latest = chapters.reduce((left, right) => fs.statSync(left).mtimeMs > fs.statSync(right).mtimeMs ? left : right)
+        // 章节号与 tracking state 是主判据；文件 mtime 受 Windows 低精度和批量写入
+        // 顺序影响，只能作为历史兼容信息，不能决定正文是否已提交。
+        const latestChapter = Math.max(...chapters.map((file) => longChapterInfo(file)?.chapter || 0))
+        const committedChapter = lastCommittedChapter(book)
+        if (Number.isInteger(committedChapter) && latestChapter > committedChapter) {
+          const latest = chapters.reduce((left, right) =>
+            (longChapterInfo(left)?.chapter || 0) > (longChapterInfo(right)?.chapter || 0) ? left : right)
           messages.push(`[continuity] ${safeRelative(root, book)}：正文已更新到「${path.basename(latest)}」但续写状态卡更早——为该章提交 tracking_commit.py 事务、check 通过后再续写，禁止分别手改 上下文.md/伏笔.md。`)
         }
       } catch {}
@@ -692,7 +707,7 @@ function proseBlockReason(root, absolute) {
     if (fs.existsSync(path.join(root, "拆文库", path.basename(book)))) return null
     if (!fs.existsSync(path.join(book, "设定.md"))) return null
     if (!fs.existsSync(path.join(book, "小节大纲.md"))) {
-      return `⛔ 写正文被拦截：${safeRelative(root, absolute)} 缺少同目录 小节大纲.md。先按 story-short-write 完成「小节大纲.md」再写正文。`
+      return `⛔ 写正文被拦截：${safeRelative(root, absolute)} 缺少同目录 小节大纲.md。先按 story-write mode=short 完成「小节大纲.md」再写正文。`
     }
     return null
   }
@@ -718,7 +733,7 @@ function proseBlockReason(root, absolute) {
       })
     } catch {}
     if (!found) {
-      return `⛔ 写正文被拦截：第 ${chapter} 章缺少细纲（${safeRelative(root, outlineDir)}/细纲_第${chapter}章.md）。先按 story-long-write 单章流程补建细纲再写正文。`
+      return `⛔ 写正文被拦截：第 ${chapter} 章缺少细纲（${safeRelative(root, outlineDir)}/细纲_第${chapter}章.md）。先按 story-write mode=long 单章流程补建细纲再写正文。`
     }
   }
   const checkpointIssue = trackingCheckpointIssue(book, true, exists ? null : Number(chapter) - 1)

@@ -24,7 +24,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { ab, sleep, evalJSONBase64, runCli } = require("./cdp-utils");
+const { ab, sleep, evalJSONBase64, localDateStamp, runCli } = require("./cdp-utils");
 const { parseCli, createTimeSnapshot } = require("./scan-contract");
 
 const BASE_URL = "https://www.jjwxc.net/topten.php";
@@ -383,7 +383,7 @@ function main() {
 
         const rtInfo = RANK_TYPES.find((r) => r.id === rt);
         const chLabel = ch === "0" ? "全站" : `频道${ch}`;
-        const filename = `晋江${rtInfo.label}_${chLabel}_${SCAN_TIME.dateStamp}.md`;
+        const filename = `晋江${rtInfo.label}_${chLabel}_${localDateStamp()}.md`;
         fs.mkdirSync(OUTDIR, { recursive: true });
         const filepath = path.join(OUTDIR, filename);
         fs.writeFileSync(filepath, result.content, "utf-8");

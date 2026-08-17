@@ -14,6 +14,7 @@
 | `check-current-skill-contracts.sh` + `.py` + `current-contract.json` | 从结构化 manifest 校验当前版本、Phase、schema、主产物、细纲契约与 GitHub Actions 禁用策略；保留 legacy/path 守卫并拦截缺主产物后的静默替代 | 提交前本地 |
 | `check-unified-skill-upstream-drift.py` + `unified-skill-upstream-map.json` | 上游 split skill 改动后强制人工映射到 unified skill；`--report` 只读输出 source -> target 迁移清单 | 合并上游后；提交前本地 |
 | `check-shared-files.sh` | 调 `sync-shared-assets.py check` 验 runtime 副本，再验共享 reference 字节一致 | 提交前本地 |
+| `check-scan-runtime-policy.sh` | scraper 输出文件名依赖本地日期 helper；CDP 探测/Windows 监听解析的源码策略 | 提交前本地；这些依赖方向无法由隔离 helper 测试证明 |
 | `check-story-setup-deployment.sh` | story-setup 部署/运行时回归（慢，>2min） | story-setup 改动后本地 |
 | `check-hook-regex-sync.sh` | `detect-story-gaps.sh` 伏笔状态检测行为 | 相关改动后本地 |
 | `check-hook-locale-safety.sh` | 部署 hook 在 Windows 中文 GBK 区域的字节安全 | hook 改动后本地 |
@@ -46,6 +47,7 @@
 | `test-shared-assets.py` | 共享资产 manifest 的 drift、sync、路径越界、basename 单一 owner 与未登记重复检测 | 本地 |
 | `test-normalize-punctuation.js` | 标点归一化的只读检查、frontmatter/fence、CRLF、引号模式与幂等性 | 本地 |
 | `test-scan-runtime.js` | CDP argv 边界/报错/JSON 契约与 7 个 scraper 无副作用 import | 本地 |
+| `test-scan-runtime-policy.py` | 变异验证 scan/browser 静态策略不会被无关或死代码关键词骗过 | 本地；改 `check-scan-runtime-policy.sh` 后 |
 | `test-opencode-plugin.mjs` | 直接执行 OpenCode TypeScript plugin，验大纲守卫、Bash 绕过、写后检查与 compact 恢复 | 被 `check-opencode-adapter.sh` 调用 |
 | `test-codex-cli-e2e.sh` | 隔离 HOME 后用真实 Codex CLI 检查完整仓库 Skill 的发现结果 | 可选本地；需已安装 `codex` |
 | `test-zcode-hooks.sh` | ZCode 严格 JSON Hook、正文守卫与连续性回归 | 本地 |

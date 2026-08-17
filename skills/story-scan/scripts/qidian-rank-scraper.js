@@ -29,7 +29,7 @@
 const fs = require("fs");
 const https = require("https");
 const path = require("path");
-const { ab, sleep, evalJSON, scrollLoad, runCli } = require("./cdp-utils");
+const { ab, sleep, evalJSON, scrollLoad, localDateStamp, runCli } = require("./cdp-utils");
 const {
   parseCli,
   createTimeSnapshot,
@@ -533,7 +533,7 @@ async function main() {
       }
 
       const rtInfo = RANK_TYPES.find((r) => r.id === rt);
-      const filename = `起点${rtInfo.label}_${SCAN_TIME.dateStamp}.md`;
+      const filename = `起点${rtInfo.label}_${localDateStamp()}.md`;
       fs.mkdirSync(OUTDIR, { recursive: true });
       const filepath = path.join(OUTDIR, filename);
       fs.writeFileSync(filepath, content, "utf-8");

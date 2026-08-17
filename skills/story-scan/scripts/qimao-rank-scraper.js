@@ -17,7 +17,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { ab, sleep, evalJSONBase64, safeStr, scrollLoad, runCli } = require("./cdp-utils");
+const { ab, sleep, evalJSONBase64, safeStr, scrollLoad, localDateStamp, runCli } = require("./cdp-utils");
 const { parseCli, truncateDescription, createTimeSnapshot } = require("./scan-contract");
 
 const RANK_URL = "https://www.qimao.com/paihang";
@@ -346,7 +346,7 @@ function main() {
       const content = scrapeRank(PORT, ch, rt, rt === "hot" ? PERIOD : null);
       if (!content) continue;
 
-      const filename = outputFilename(ch, rt, PERIOD, SCAN_TIME);
+      const filename = outputFilename(ch, rt, PERIOD, localDateStamp());
       fs.mkdirSync(OUTDIR, { recursive: true });
       const filepath = path.join(OUTDIR, filename);
       fs.writeFileSync(filepath, content, "utf-8");

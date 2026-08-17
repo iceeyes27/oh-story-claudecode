@@ -20,7 +20,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { ab, sleep, evalJSONBase64, scrollLoad, runCli } = require("./cdp-utils");
+const { ab, sleep, evalJSONBase64, scrollLoad, localDateStamp, runCli } = require("./cdp-utils");
 const { parseCli, truncateDescription, createTimeSnapshot } = require("./scan-contract");
 
 // 一次详情请求的并发批大小。番茄详情页用同步 XHR 拉取，批太大会撞上
@@ -406,7 +406,7 @@ function main() {
         const content = scrapeChannel(ch, ty);
         if (!content) continue;
 
-        const filename = `番茄${channelLabel(ch)}${typeLabel(ty)}_全题材_${SCAN_TIME.dateStamp}.md`;
+        const filename = `番茄${channelLabel(ch)}${typeLabel(ty)}_全题材_${localDateStamp()}.md`;
         fs.mkdirSync(OUTDIR, { recursive: true });
         const filepath = path.join(OUTDIR, filename);
         fs.writeFileSync(filepath, content, "utf-8");

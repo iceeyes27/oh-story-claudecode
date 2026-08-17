@@ -158,7 +158,7 @@ After updating, if a project has already run `/story-setup`, re-run `/story-setu
 | `humanizer` | `/humanizer` | Remove AI writing traces from Chinese or English text |
 | `story-import` | `/story-import` | Reverse import — parse existing novels into standard project structure |
 | `story-review` | `/story-review` | Multi-perspective review — 4-agent adversarial review + Fanqie/Qidian/Zhihu scoring rubrics |
-| `story-cover` | `/story-cover` | Cover generation — title & genre analysis + GPT-Image-2 image generation |
+| `story-cover` | `/story-cover` | Cover generation — title/genre analysis + GPT-Image-2 via Codex included usage or API fallback |
 | `browser-cdp` | `/browser-cdp` | Browser control — CDP protocol for scraping with reusable login sessions |
 
 > `story-deslop` uses local prose linting: blocking applies only to deterministic style/punctuation issues, while other findings require read-through judgment; external detectors such as Zhuque are self-check references, not replacements for human review.

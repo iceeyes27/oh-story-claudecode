@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 5
-- **Last Active**: 2026-08-17
+- **Total Sessions**: 6
+- **Last Active**: 2026-08-18
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~124 | Active |
+| `journal-1.md` | ~145 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 6 | 2026-08-18 | 增强通用去 AI 味与保真翻译 | `81775b6` | `main` |
 | 5 | 2026-08-17 | 复合检查覆盖契约与写作 Hook 修复 | `47cc4c4`, `7fb8d53` | `main` |
 | 4 | 2026-08-14 | 可追溯分析结果层 | `6283b2f` | `main` |
 | 3 | 2026-08-11 | 修复故事工具链审查问题 | `a7b87cf` | `main` |

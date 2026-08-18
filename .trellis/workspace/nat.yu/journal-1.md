@@ -122,3 +122,24 @@
 ### Status
 
 [OK] **Completed**
+
+
+## Session 6: 增强通用去 AI 味与保真翻译
+
+**Date**: 2026-08-18
+**Task**: 增强通用去 AI 味与保真翻译
+**Branch**: `main`
+
+### Summary
+
+为 story-deslop general 模式增加改写、审稿与结构保真翻译路由，新增渐进参考资产和契约测试，并完成平台、共享资产与小说回归验证。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `81775b6` | (see git log) |
+
+### Status
+
+[OK] **Completed**

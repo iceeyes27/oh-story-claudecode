@@ -1,7 +1,7 @@
 ---
 name: story-deslop
-version: 2.0.0
-description: "去AI味/说人话（小说正文+通用中文统一入口）。mode=novel 走网文去AI味 7 Gate 系统（禁用词/句式/心理/节奏/对话/结尾/解释腔），配合脚本和禁用词表；mode=general 走通用中文'说人话'（场景分级/Tier/档位/scope/误杀防护），适用于 chat/status/docs/public-writing。触发方式：/story-deslop、/去AI味、「去AI味」「说人话」「太AI了」「别像模板」「自然一点」——按输入类型自动路由。"
+version: 2.1.0
+description: "去AI味/说人话（小说正文+通用中文统一入口）。mode=novel 走网文去AI味 7 Gate 系统（禁用词/句式/心理/节奏/对话/结尾/解释腔），配合脚本和禁用词表；mode=general 处理 chat/status/docs/public-writing 的改写、审稿与显式触发的结构保真翻译。触发方式：/story-deslop、/去AI味、「去AI味」「说人话」「太AI了」「别像模板」「自然一点」——按输入类型自动路由。"
 metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
 disable: true
 ---
@@ -11,7 +11,7 @@ disable: true
 把文本从「像模型在表演写作」拉回「像具体人在当前场景下表达」。本 skill 提供两种模式，按输入类型自动路由，也可由用户显式指定。
 
 - **`mode = novel`**：网文小说正文去 AI 味。走 7 Gate 系统（禁用词 / 句式 / 心理 / 节奏 / 对话 / 结尾 / 解释腔），配合本地脚本、禁用词表与白名单。
-- **`mode = general`**：通用中文「说人话」。走场景分级（chat / status / docs / public-writing）+ Tier 分级 + 档位 + scope + 误杀防护，适用于非小说正文的中英文改写与审稿。
+- **`mode = general`**：通用文本处理。支持非小说正文的中英文改写、审稿，以及用户明确要求的结构保真翻译。
 
 > Agent 兼容性：检查专业 agent 是否可用时，按 `.claude/agents/{agent}.md` → `.opencode/agents/{agent}.md` → `.codex/agents/{agent}.toml` 的顺序查找。Codex 原生子代理调用优先使用同名 `agent_type`；如果当前 Codex 运行时返回 `unknown agent_type` 或未暴露 custom-agent registry，必须降级为 solo/direct。检测到 `.zcode/` 时同样直接 solo/direct，因为 ZCode 3.3.4 不执行项目 custom agents；报告 `Fallback: project custom agents unavailable -> solo`。Claude/OpenCode 兼容面保留 `subagent_type`。
 >
@@ -38,12 +38,14 @@ disable: true
 ### 路由后行为
 
 - 选定 `mode = novel` → 进入「小说去 AI 味模式」章节，按 7 Gate + 脚本 + 禁用词表流程执行。
-- 选定 `mode = general` → 进入「通用说人话模式」章节，按场景分级 + Tier + 档位 + scope 流程执行。
+- 选定 `mode = general` → 进入「通用说人话模式」章节，再按用户请求选择 `rewrite / review / translation` 子任务。
 - 用户可在任何时候切换模式：明示 `切到 novel / 切到 general` 或重新指定 `mode=` 即可。
 
 ### 共享判断（两种模式都适用）
 
-如果文本主要是代码、日志、命令、配置、接口名、报错，或用户要的是逐字翻译 / 保留原文风格 / 仿官方模板 / 事实校对，**不进入任何模式**——直接告知用户本 skill 不适用，并说明原因。
+如果文本主要是代码、日志、命令、配置、接口名、报错，默认不进入任何模式；用户明确要求翻译其中的自然语言说明时，只翻译说明文字并保护技术内容。仿官方模板、仿特定品牌 voice 或事实校对不属于本 skill。
+
+翻译只由「翻译」「译成某语言」「结构保真翻译」等明确请求触发。外文、中英混排或代码片段本身都不能自动触发翻译。
 
 ---
 
@@ -487,7 +489,7 @@ node .agents/skills/_shared/scripts/normalize-punctuation.js <正文文件...>
 
 ## 通用说人话模式（mode = general）
 
-> 适用：非小说正文的中英文 chat / status / docs / public-writing 改写与审稿。通用规则已内置在本文件；外部参考集不随本仓库分发。
+> 适用：非小说正文的中英文 chat / status / docs / public-writing 改写、审稿与显式触发的结构保真翻译。AI 痕迹索引、审稿指南和翻译保护规则随本 skill 分发，并按子任务渐进读取。
 
 ### When to use
 
@@ -496,12 +498,30 @@ node .agents/skills/_shared/scripts/normalize-punctuation.js <正文文件...>
 - 用户明确说「去 AI 味」「说人话」「自然一点」「别像模板」「别太像 ChatGPT」
 - 需要改写中文或英文 `chat`、`status`、`docs`、`public-writing`
 - 需要先判断文本该轻改、中改还是重改
+- 用户明确要求「翻译」「译成某语言」或「结构保真翻译」
 
 在下面这些需求里不要硬套：
 
-- 用户要逐字翻译、保留原文风格、仿官方模板或仿特定品牌 voice
-- 文本主要是代码、日志、命令、配置、接口名、报错
+- 用户要仿官方模板或仿特定品牌 voice
+- 文本主要是代码、日志、命令、配置、接口名、报错；仅当用户明确要求翻译其中的自然语言说明时进入 `translation`，技术内容仍原样保护
 - 用户要的是事实校对，不是风格改写
+
+### Task routing
+
+选定 `mode = general` 后，只执行一个主子任务：
+
+| 子任务 | 触发条件 | 读取范围 | 默认输出 |
+|---|---|---|---|
+| `rewrite` | 用户要求改写、去 AI 味、说人话 | 先执行本文件；需要深查时读取 [AI 痕迹索引](references/general-ai-trace-index.md)，只补读相关问题族 | 一个推荐版本 |
+| `review` | 用户要求审稿、标问题、判断哪里像 AI | 先读 [AI 痕迹索引](references/general-ai-trace-index.md)，再从 [审稿指南](references/general-ai-trace-guide.md) 读取相关问题族 | 最重要的 Top 5-10 个问题 |
+| `translation` | 用户明确要求翻译或指定目标语言 | 只读 [翻译保护规则](references/translation-guardrails.md)；除非同时要求去 AI 味，否则不加载审稿指南 | 仅目标语言文本 |
+
+路由边界：
+
+- 外文、中英混排、代码或 Markdown 本身不触发 `translation`。
+- `rewrite` 不默认读取完整审稿指南；只在索引命中后读取对应章节。
+- `review` 只报告最重要的 Top 5-10 个问题，不枚举所有可疑点。
+- `translation` 不使用 Scene / Tier / level / scope；同时要求翻译和去 AI 味时，先翻译，再在原结构内做 `minimal + in-place` 轻改。
 
 ### Core stance
 
@@ -511,7 +531,9 @@ node .agents/skills/_shared/scripts/normalize-punctuation.js <正文文件...>
 - 不用机械同义词替换表。默认可以删句、并句、降调、换主语、去总结式收尾；如果进入 `in-place` scope，就只做句内改写。
 - 短语表默认只列代表项，不追求穷举所有变体。遇到新口癖，先按现有模式归类，再决定要不要补词。
 
-### Execution order
+### Rewrite / review execution order
+
+本节只适用于 `rewrite / review`；`translation` 直接执行翻译保护规则。
 
 按固定顺序做，不要跳步：
 
@@ -520,7 +542,7 @@ node .agents/skills/_shared/scripts/normalize-punctuation.js <正文文件...>
 3. 判 Tier：`Tier 1 / Tier 2 / Tier 3`，按问题命中强度判断，不要把 Tier 当作改写力度
 4. 再判档位：`minimal / standard / aggressive`
 5. 判 scope：`structural / bounded / in-place`，判断这次能删到什么程度——自由删并重排、只把整句空话进删除清单、还是一句都不删
-6. 先执行本文件里的最小规则；如运行环境提供通用参考集，再按问题类型补看 Protected Spans、Positive Style Contract、微操作手册、结构反模式和相关短语表；如果目标是「改完能直接发」，或文本明显属于 README、release note、论坛帖、issue 回复，再补看 Scene Packs、真实样本评测和改写示例。
+6. 先执行本文件里的最小规则；需要深查时读取 [AI 痕迹索引](references/general-ai-trace-index.md)，再从 [审稿指南](references/general-ai-trace-guide.md) 读取命中的问题族，不整份加载。
 7. 回读拆成两步：先做保真回读，再按需做残留味回读
 8. 输出：默认只给单一推荐版本；用户明确要求「先标问题，不改写」时切到 `annotation mode`
 
@@ -767,6 +789,12 @@ Tier 表示问题命中强度，与严重度分级规则保持一致，不表示
 
 默认输出一个推荐版本，不默认输出审稿过程、多版本比稿或逐条点评。
 
+#### Translation output
+
+- 只输出目标语言文本，不附翻译过程、原文复述或额外总结。
+- 标题、段落、空行、列表、引用、表格、代码块、链接和图片结构保持对应。
+- 同时要求翻译和去 AI 味时，只在相同结构内做 `minimal + in-place` 轻改；信息与结构冲突时，以 [翻译保护规则](references/translation-guardrails.md) 为准。
+
 #### Annotation mode
 
 只有在用户明确要求下面这类事情时才启用：
@@ -801,7 +829,9 @@ Tier 表示问题命中强度，与严重度分级规则保持一致，不表示
 - `保留了系统主语和术语，避免失真。`
 - `这里只做轻改，避免把正式公告写成口语贴。`
 
-### 8. Required reread checks
+### 8. Rewrite / review required reread checks
+
+本节只适用于 `rewrite / review`；`translation` 执行翻译保护规则中的「信息守恒回读」和「结构回读」。
 
 提交改写前，把回读固定拆成两步，不要混着做：
 
@@ -851,21 +881,11 @@ Tier 表示问题命中强度，与严重度分级规则保持一致，不表示
 
 ### 通用模式参考导航
 
-- 本文件可以单独执行；完整模式可配合外部通用参考集一起工作
-- 想先看「改成什么样才算更像人」：看 Positive Style Contract
-- 想先看哪些数字、引用、命令、参数不能漂：看 Protected Spans
-- 想看中文高频短语：看中文禁用短语表
-- 想看英文高频短语：看 English Banned Phrases
-- 想看句子和段落层面的结构问题：看结构反模式
-- 想按 `Tier 1 / 2 / 3` 校准命中规则：看严重度分级
-- 遇到具体病灶怎么动手：看微操作手册
-- 想确认某个场景什么不能乱动：看场景禁改表
-- 想校准误杀边界或做静态回归：看边界案例集
-- 想看真实样本评测：看真实样本评测
-- 想看默认改写和 `annotation mode` 的对照：看改写示例
-- 想处理没收录进词表的同类变体：先看微操作手册里的「变体归并」规则，再决定要不要补词
+- [AI 痕迹索引](references/general-ai-trace-index.md)：`rewrite` 深查和 `review` 的第一入口；先定位问题族，再读取细则。
+- [审稿指南](references/general-ai-trace-guide.md)：只按索引链接读取相关章节；规则用于上下文判断，不是必须清零的扫描器。
+- [翻译保护规则](references/translation-guardrails.md)：仅供显式 `translation` 使用，规定保护区、信息守恒和结构保真检查。
 
-默认做法是：先用本文件完成「场景、Tier、档位、输出合同」的主判断，再按问题类型补读可用的外部通用参考集；只有在单文件安装场景里，才停留在本文件的基础规则。
+默认做法：先确定子任务，再读取该子任务最少需要的文件。不要在普通改写中加载完整审稿指南，也不要在纯翻译中加载 AI 痕迹规则。
 
 ---
 

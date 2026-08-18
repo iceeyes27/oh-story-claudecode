@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/skills/index.md", "reason": "Skill 层审查入口"}
+{"file": ".trellis/spec/skills/canonical-assets.md", "reason": "核查边界与权威路径"}
+{"file": ".trellis/spec/skills/validation.md", "reason": "核查回归范围"}
+{"file": ".trellis/tasks/08-18-general-deslop-enhancement/research/upstream-comparison.md", "reason": "核查上游功能是否只做选择性适配"}

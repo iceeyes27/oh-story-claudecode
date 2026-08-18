@@ -1,0 +1,4 @@
+{"file": ".trellis/spec/skills/index.md", "reason": "Skill 层规范入口"}
+{"file": ".trellis/spec/skills/canonical-assets.md", "reason": "权威资产与自包含边界"}
+{"file": ".trellis/spec/skills/validation.md", "reason": "本地验证与平台契约"}
+{"file": ".trellis/tasks/08-18-general-deslop-enhancement/research/upstream-comparison.md", "reason": "上游取舍与本地差距"}

@@ -265,6 +265,46 @@ def test_cross_skill_paths_in_runtime_scripts_fail() -> None:
         assert "scripts/runner.cmd:1" in result.stdout, result.stdout
 
 
+def test_router_manifest_may_declare_public_skill_executors() -> None:
+    with tempfile.TemporaryDirectory(prefix="story-static-router-manifest-") as tmp:
+        root = Path(tmp)
+        build_agent_catalog(root)
+        write(
+            root / "skills/story/SKILL.md",
+            "---\nname: story\ndescription: Story router\n---\n# Story\n",
+        )
+        write(
+            root / "skills/story/references/composite-check-manifest.json",
+            '{"executor":"skills/story-review/SKILL.md"}\n',
+        )
+        write(
+            root / "skills/story-review/SKILL.md",
+            "---\nname: story-review\ndescription: Story review\n---\n# Review\n",
+        )
+
+        result = run(root)
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert "[cross-skill-reference]" not in result.stdout, result.stdout
+
+
+def test_contract_tests_may_reference_other_skills() -> None:
+    with tempfile.TemporaryDirectory(prefix="story-static-contract-test-") as tmp:
+        root = Path(tmp)
+        build_agent_catalog(root)
+        write(
+            root / "skills/demo/SKILL.md",
+            "---\nname: demo\ndescription: Demo\n---\n# Demo\n",
+        )
+        write(
+            root / "skills/demo/tests/dependency-contract.test.js",
+            "// Assert that story-setup/scripts/helper.js remains published.\n",
+        )
+
+        result = run(root)
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert "[cross-skill-reference]" not in result.stdout, result.stdout
+
+
 def test_foundation_browser_cdp_reference_passes() -> None:
     with tempfile.TemporaryDirectory(prefix="story-static-foundation-") as tmp:
         root = Path(tmp)
@@ -384,6 +424,10 @@ def test_templates_and_web_assets_are_scanned_for_cross_skill_paths() -> None:
             root / "skills/demo/assets/styles.css",
             "/* derived from story-setup/assets/base.css */\n",
         )
+        write(
+            root / "skills/demo/assets/tests/runtime.js",
+            "// Runtime asset still references story-setup/scripts/helper.js.\n",
+        )
 
         result = run(root)
         assert result.returncode == 1, result.stdout + result.stderr
@@ -392,6 +436,7 @@ def test_templates_and_web_assets_are_scanned_for_cross_skill_paths() -> None:
             "references/opencode.json.patch:1",
             "assets/index.html:1",
             "assets/styles.css:1",
+            "assets/tests/runtime.js:1",
         ):
             assert f"[cross-skill-reference] skills/demo/{asset}" in result.stdout, result.stdout
 
@@ -549,6 +594,8 @@ def main() -> None:
     test_fenced_examples_do_not_leak_into_validation()
     test_fullwidth_paren_agent_refs_are_validated()
     test_cross_skill_paths_in_runtime_scripts_fail()
+    test_router_manifest_may_declare_public_skill_executors()
+    test_contract_tests_may_reference_other_skills()
     test_foundation_browser_cdp_reference_passes()
     test_canonical_shared_reference_passes()
     test_external_urls_are_not_cross_skill_paths()

@@ -3,13 +3,15 @@ const fs = require('node:fs');
 const path = require('node:path');
 const test = require('node:test');
 
-const repoRoot = path.resolve(__dirname, '..', '..', '..');
+const skillsRoot = path.resolve(__dirname, '..', '..');
+const sourceRoot = path.dirname(skillsRoot);
 const skillRoot = path.resolve(__dirname, '..');
 const skill = fs.readFileSync(path.join(skillRoot, 'SKILL.md'), 'utf8');
 const index = fs.readFileSync(path.join(skillRoot, 'references', 'general-ai-trace-index.md'), 'utf8');
 const guide = fs.readFileSync(path.join(skillRoot, 'references', 'general-ai-trace-guide.md'), 'utf8');
 const translation = fs.readFileSync(path.join(skillRoot, 'references', 'translation-guardrails.md'), 'utf8');
-const packageJson = JSON.parse(fs.readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
+const packagePath = path.join(sourceRoot, 'package.json');
+const isSourceRepository = fs.existsSync(path.join(sourceRoot, 'scripts', 'platform-skill-set.json'));
 
 function githubSlug(heading) {
   return heading
@@ -99,7 +101,10 @@ test('novel mode and shared scanner contracts remain present', () => {
   assert.match(skill, /7 Gate/);
 });
 
-test('the repository contract suite includes the general-mode test', () => {
+test('the repository contract suite includes the general-mode test', {
+  skip: !isSourceRepository && 'source repository metadata is not installed with Skills',
+}, () => {
+  const packageJson = JSON.parse(fs.readFileSync(packagePath, 'utf8'));
   assert.match(
     packageJson.scripts['test:contracts'],
     /skills\/story-deslop\/tests\/general-mode-contract\.test\.js/,

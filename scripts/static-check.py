@@ -72,6 +72,12 @@ PROJECT_WORKFLOW_SKILL_PREFIX = "trellis-"
 # 变更日志按定义记录历史状态：其内联路径是「当时」的引用（含已删/已移动/跨 skill 的旧文件），
 # 不是当前运行时依赖，不作跨 skill / 死链校验（与 check-current-skill-contracts.py 的跳过一致）。
 CHANGELOG_DOCS = frozenset({"UPGRADING.md", "CHANGELOG.md"})
+# Router manifests declare public Skill executors; they are orchestration
+# contracts, not direct runtime imports. Their dedicated contract tests verify
+# that every declared executor exists and belongs to the published Skill set.
+CROSS_SKILL_ROUTER_MANIFESTS = frozenset(
+    {"story/references/composite-check-manifest.json"}
+)
 EXTERNAL_URL_RE = re.compile(
     r"(?i)\b(?:https?|ftp)://[^\s<>\"'`]+"
 )
@@ -414,6 +420,12 @@ def cross_skill_path_issues(skill_dir: Path, root: Path) -> list[Issue]:
         if not path.is_file() or path.suffix.lower() not in SKILL_TEXT_SUFFIXES:
             continue
         if path.name in CHANGELOG_DOCS:
+            continue
+        relative_path = path.relative_to(skills_dir).as_posix()
+        relative_parts = Path(relative_path).parts
+        if len(relative_parts) > 1 and relative_parts[1] == "tests":
+            continue
+        if relative_path in CROSS_SKILL_ROUTER_MANIFESTS:
             continue
         text = path.read_text(encoding="utf-8")
         for line_number, line in enumerate(text.splitlines(), start=1):

@@ -6,6 +6,7 @@
 # Bash 目标解析、正文判定和内容检查统一走 story_hook_core.js；本文件只负责 Claude Hook I/O。
 # node 不可用时静默放行，session-start.sh 会报告运行依赖缺失。
 set -euo pipefail
+export LC_ALL=C
 
 source "$(dirname "$0")/lib/common.sh"
 

@@ -8,8 +8,8 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const test = require('node:test');
 
-const ROOT = path.resolve(__dirname, '..', '..', '..', '..');
-const SHARED = path.join(ROOT, '.agents', 'skills', '_shared');
+const SKILLS = path.resolve(__dirname, '..', '..');
+const SHARED = path.join(SKILLS, '_shared');
 
 test('shared prose rules and scanners have one canonical entity', () => {
   const names = new Set([
@@ -22,11 +22,11 @@ test('shared prose rules and scanners have one canonical entity', () => {
       const full = path.join(directory, entry.name);
       if (entry.isDirectory()) walk(full);
       else if (names.has(entry.name)) {
-        found.push(path.relative(path.join(ROOT, '.agents', 'skills'), full).split(path.sep).join('/'));
+        found.push(path.relative(SKILLS, full).split(path.sep).join('/'));
       }
     }
   }
-  walk(path.join(ROOT, '.agents', 'skills'));
+  walk(SKILLS);
   assert.deepEqual(found.sort(), [
     '_shared/references/anti-ai-writing.md',
     '_shared/references/banned-words.md',
@@ -112,7 +112,7 @@ test('AI scanner catches body-shell metaphors without flagging literal or concre
 
 test('canonical source agent templates reference the .agents bundle only', () => {
   const roots = [
-    path.join(ROOT, '.agents', 'skills', 'story-setup', 'references', 'templates', 'agents'),
+    path.join(SKILLS, 'story-setup', 'references', 'templates', 'agents'),
   ];
   const stale = [];
   for (const directory of roots) {
@@ -121,7 +121,7 @@ test('canonical source agent templates reference the .agents bundle only', () =>
       const file = path.join(directory, entry);
       const text = fs.readFileSync(file, 'utf8');
       if (/\.(?:claude|codex|opencode|zcode)\/skills\/story-setup\/references\/agent-references\//.test(text)) {
-        stale.push(path.relative(ROOT, file));
+        stale.push(path.relative(SKILLS, file));
       }
     }
   }
@@ -130,10 +130,10 @@ test('canonical source agent templates reference the .agents bundle only', () =>
 
 test('story consumers do not call removed skill-local prose scanners', () => {
   const files = [
-    path.join(ROOT, '.agents', 'skills', 'story-write', 'SKILL.md'),
-    path.join(ROOT, '.agents', 'skills', 'story-write', 'references', 'workflow-daily.md'),
-    path.join(ROOT, '.agents', 'skills', 'story-write', 'references', 'writing-workflow.md'),
-    path.join(ROOT, '.agents', 'skills', 'story-setup', 'UPGRADING.md'),
+    path.join(SKILLS, 'story-write', 'SKILL.md'),
+    path.join(SKILLS, 'story-write', 'references', 'workflow-daily.md'),
+    path.join(SKILLS, 'story-write', 'references', 'writing-workflow.md'),
+    path.join(SKILLS, 'story-setup', 'UPGRADING.md'),
   ];
   for (const file of files) {
     const text = fs.readFileSync(file, 'utf8');

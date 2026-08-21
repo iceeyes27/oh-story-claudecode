@@ -143,3 +143,26 @@
 ### Status
 
 [OK] **Completed**
+
+
+## Session 7: 候选系统（作者拍板）落地到 story-write
+
+**Date**: 2026-08-21
+**Task**: 候选系统（作者拍板）落地到 story-write
+**Branch**: `main`
+
+### Summary
+
+借鉴 narralume「AI 出候选，作者拍板」，为 story-write 长篇引入 opt-in 候选系统：正文先落书根 候选/、追踪不提前推进、采用时 candidate-commit.py 原子并入正稿并回放追踪、采用前质量门拦 blocking、重写/弃用归档不硬删。纯 SKILL 层编排，不改 agent、不动跨端 hook，agents_version 维持 25。发版 v0.8.1。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `bb7f2b2` | (see git log) |
+| `b00fd9a` | (see git log) |
+| `33054da` | (see git log) |
+
+### Status
+
+[OK] **Completed**

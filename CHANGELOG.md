@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 
 - **候选系统（作者拍板）**。用户意图含「候选 / 逐章确认 / 先给我看」时进入候选模式：正文先落到书根 `候选/`（刻意不在 `正文/` 下，避免写后 hook 把候选认成正式章节），追踪不提前推进——`_tracking-state.json` 只反映已批准正文，候选自带待回放的追踪事务 JSON。作者「采用第X章 / 全部采用」由新脚本 `skills/story-write/scripts/candidate-commit.py` 原子并入正稿 + 回放追踪（先移动、失败回滚，可安全重跑）；「重写 / 弃用」归档到 `候选/_历史/` 而非硬删，正稿与追踪不动。
 - **采用前质量门**。`candidate-commit.py promote` 移动前对候选正文跑 `check-ai-patterns.js` 与 `check-degeneration.js`（`--fail-on=blocking`），blocking 命中拒绝并入正稿；`<!-- 去味:跳过 -->` 标记或 `--no-scan` 显式豁免，node/脚本缺失放行。低质量候选进不了正稿，与写作时 SKILL 写后手动扫描互补。
+- **`legal-domain-veracity-scan` 律政实务与证据合规扫描**（第 16 个公开 Skill）。检测律政/刑侦/职场小说的司法实务硬伤：律师自制证据自称铁证、IT 术语生搬硬套、证明力背书主体错位、调查取证权限越界、免责条款效力一刀切、庭审质证规范。已接入 `story` 路由表和复合检查流水线（第 6 阶段，非司法题材按清单 SKIPPED）；复合检查同步扩展为八阶段，`ai-flavor-scan` 清单补齐第 4e 层「旁白口号腔」与第 10 层「章节标题 AI 味」。
 
 ## v0.8.0
 

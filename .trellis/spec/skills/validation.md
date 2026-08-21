@@ -46,8 +46,8 @@
 
 ### 5. Good / Base / Bad Cases
 
-- Good：15 个公开 Skill、`_shared`、15 个 command 和各 marketplace 一致。
-- Base：仓库内 `.agents/skills` 发现全部 30 个 Skill，公开集合为 15 个。
+- Good：16 个公开 Skill、`_shared`、16 个 command 和各 marketplace 一致。
+- Base：仓库内 `.agents/skills` 发现全部 31 个 Skill，公开集合为 16 个。
 - Bad：平台只安装 `story` 与 10 个旧公开 Skill，却宣称复合检查 7/7。
 
 ### 6. Tests Required

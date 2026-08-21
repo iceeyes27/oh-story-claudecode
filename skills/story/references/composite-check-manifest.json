@@ -7,9 +7,9 @@
     "requiresReason": true
   },
   "completion": {
-    "stageCount": 7,
+    "stageCount": 8,
     "requiredResultForEveryItem": true,
-    "successText": "复合检查完成：7/7，过滤项 {completed}/{required}",
+    "successText": "复合检查完成：8/8，过滤项 {completed}/{required}",
     "blockedText": "复合检查未完成：{completed}/{required}，原因：{reason}"
   },
   "triggers": {
@@ -44,7 +44,7 @@
       "id": "ai-flavor",
       "order": 2,
       "route": "ai-flavor-scan",
-      "mode": "nine-layer",
+      "mode": "ten-layer",
       "dependencies": ["ai-flavor-scan"],
       "filters": [
         {"id": "ai-01-banned-words", "label": "硬禁用词", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "正文全文", "required": true, "report": "findings"},
@@ -55,6 +55,7 @@
         {"id": "ai-04b-instruction-book", "label": "说明书式平铺与情绪说明书", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "正文旁白与台词", "required": true, "report": "findings"},
         {"id": "ai-04c-subject-continuity", "label": "主语连贯与视角断裂", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "相邻正文段落", "required": true, "report": "advisory findings"},
         {"id": "ai-04d-chapter-continuity", "label": "跨章信息续接", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "相邻章节", "required": true, "report": "advisory findings"},
+        {"id": "ai-04e-narration-slogan", "label": "旁白口号腔", "executor": "skills/_shared/scripts/check-ai-patterns.js", "scope": "正文旁白及章末收尾句", "required": true, "report": "blocking findings"},
         {"id": "ai-05-jargon-single-character", "label": "高频黑话单字", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "正文全文及上下文", "required": true, "report": "findings"},
         {"id": "ai-06-coined-collocation", "label": "生造词与强行搭配", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "正文全文及上下文", "required": true, "report": "findings"},
         {"id": "ai-07-telegraphic-writing", "label": "欠写作与电报体", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "正文全文及场景上下文", "required": true, "report": "findings"},
@@ -63,7 +64,8 @@
         {"id": "ai-08c-object-feeling", "label": "宾语与感受匹配", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "痛感、感受与动作描写", "required": true, "report": "findings"},
         {"id": "ai-08d-abstract-object", "label": "抽象对象与物理动作匹配", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "抽象对象动作描写", "required": true, "report": "findings"},
         {"id": "ai-08e-state-ownership", "label": "状态归属匹配", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "状态、属性与承载对象", "required": true, "report": "findings"},
-        {"id": "ai-09-persona-cliche", "label": "装人设套路组合", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "重点场景及全文抽查", "required": true, "report": "findings"}
+        {"id": "ai-09-persona-cliche", "label": "装人设套路组合", "executor": "skills/ai-flavor-scan/SKILL.md", "scope": "重点场景及全文抽查", "required": true, "report": "findings"},
+        {"id": "ai-10-chapter-title", "label": "章节标题 AI 味与模板套路", "executor": "skills/_shared/scripts/check-chapter-titles.js", "scope": "全书章节标题", "required": true, "report": "findings"}
       ]
     },
     {
@@ -123,8 +125,24 @@
       ]
     },
     {
-      "id": "general-deslop",
+      "id": "legal-domain-veracity",
       "order": 6,
+      "route": "legal-domain-veracity-scan",
+      "mode": "full",
+      "dependencies": ["legal-domain-veracity-scan"],
+      "applicability": "律政、刑侦、职场等涉司法实务题材必检；题材完全不涉法律实务时允许整阶段 SKIPPED，须写明题材判断依据",
+      "filters": [
+        {"id": "legal-01-self-made-evidence", "label": "电子取证自证清白硬伤", "executor": "skills/legal-domain-veracity-scan/SKILL.md", "scope": "取证与存证情节", "required": true, "report": "findings"},
+        {"id": "legal-02-tech-jargon-mismatch", "label": "技术动作与行业术语错位", "executor": "skills/legal-domain-veracity-scan/SKILL.md", "scope": "涉技术取证描写", "required": true, "report": "findings"},
+        {"id": "legal-03-attestation-authority", "label": "证明力背书主体错位", "executor": "skills/legal-domain-veracity-scan/SKILL.md", "scope": "证据封装与背书情节", "required": true, "report": "findings"},
+        {"id": "legal-04-investigation-overreach", "label": "调查取证权限越界", "executor": "skills/legal-domain-veracity-scan/SKILL.md", "scope": "调查取证情节", "required": true, "report": "findings"},
+        {"id": "legal-05-waiver-oversimplification", "label": "免责条款效力一刀切", "executor": "skills/legal-domain-veracity-scan/SKILL.md", "scope": "协议与条款定性情节", "required": true, "report": "findings"},
+        {"id": "legal-06-courtroom-decorum", "label": "法庭对抗口吻与质证规范", "executor": "skills/legal-domain-veracity-scan/SKILL.md", "scope": "庭审与仲裁场景", "required": true, "report": "findings"}
+      ]
+    },
+    {
+      "id": "general-deslop",
+      "order": 7,
       "route": "story-deslop",
       "mode": "general",
       "dependencies": ["story-deslop"],
@@ -143,7 +161,7 @@
     },
     {
       "id": "humanizer",
-      "order": 7,
+      "order": 8,
       "route": "humanizer",
       "mode": "bilingual",
       "dependencies": ["humanizer"],

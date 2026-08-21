@@ -291,6 +291,25 @@
       ]
     },
     {
+      "name": "legal-domain-veracity-scan",
+      "description": "小说律政实务与证据合规扫描。检查取证程序、证明力背书、调查权限和庭审质证的司法硬伤。",
+      "source": "./",
+      "strict": false,
+      "version": "1.0.0",
+      "category": "novel-quality",
+      "keywords": [
+        "legal",
+        "evidence",
+        "novel",
+        "律政",
+        "证据",
+        "chinese"
+      ],
+      "skills": [
+        "./skills/legal-domain-veracity-scan"
+      ]
+    },
+    {
       "name": "humanizer",
       "description": "去除文本中的 AI 写作痕迹（中英双语），自动按输入语言选择模式。",
       "source": "./",

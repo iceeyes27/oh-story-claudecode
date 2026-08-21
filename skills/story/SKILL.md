@@ -23,7 +23,8 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 | 选题决策 | 写什么能爆、帮我选题、选题方向 | `/story-scan` (mode=long) |
 | 短篇扫榜 | 短篇排行、知乎盐言排行 | `/story-scan` (mode=short) |
 | 去 AI 味 | 去 AI 味、太 AI、去味、说人话 | `/story-deslop` |
-| 小说复合检查 | 检查、检查这本小说、帮我检查、检查一下当前书 | 依次执行 `story-review` → `ai-flavor-scan` → `story-deslop` (mode=novel) → `dialogue-naturalness-scan` → `jargon-verb-scan` → `story-deslop` (mode=general) → `humanizer` |
+| 小说复合检查 | 检查、检查这本小说、帮我检查、检查一下当前书 | 依次执行 `story-review` → `ai-flavor-scan` → `story-deslop` (mode=novel) → `dialogue-naturalness-scan` → `jargon-verb-scan` → `legal-domain-veracity-scan`（涉司法实务题材） → `story-deslop` (mode=general) → `humanizer` |
+| 律政专业度 | 检查律政专业度、证据合法性、取证程序、司法硬伤 | `/legal-domain-veracity-scan` |
 | 封面 | 封面、封面图 | `/story-cover` |
 | 环境部署 | 准备写书、搭环境、初始化 | `/story-setup` |
 | 浏览器操控 | 浏览器、抓取、登录态 | `/browser-cdp` |
@@ -77,14 +78,15 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 复合检查的阶段、过滤器和检查项以 `references/composite-check-manifest.json` 为唯一清单。用户只说“检查”且未限定单项时，不得缩减成一次 `story-review`，必须按清单顺序完成：
 
 1. `story-review`：结构、逻辑、设定、人物、时间线、伏笔和平台适配。
-2. `ai-flavor-scan`：正文九层 AI 味实扫，覆盖禁用词、AI 修辞、融合比喻、空洞总结、黑话单字、生造搭配、欠写作、物理语义错配五类和装人设套路组合。
+2. `ai-flavor-scan`：正文十层 AI 味实扫，覆盖禁用词、AI 修辞、融合比喻、空洞总结与旁白口号腔、黑话单字、生造搭配、欠写作、物理语义错配、装人设套路组合和章节标题模板套路。
 3. `story-deslop`（mode=novel）：正文 AI 味 7 Gate。
 4. `dialogue-naturalness-scan`：台词自然度专项，检查模糊指代、书面腔、别扭搭配和解释式台词。
 5. `jargon-verb-scan`：行业词或专业名词硬当动词专项，检查被行话隐藏的真实动作。
-6. `story-deslop`（mode=general）：正文及对外文案的套路腔、空话和模板感。
-7. `humanizer`：通用 AI 痕迹复核；纯中文正文只作模式复核。
+6. `legal-domain-veracity-scan`：律政实务与证据合规专项，检查取证程序、证明力背书和庭审规范硬伤；题材完全不涉司法实务时整阶段按清单标 `SKIPPED` 并写明判断依据。
+7. `story-deslop`（mode=general）：正文及对外文案的套路腔、空话和模板感。
+8. `humanizer`：通用 AI 痕迹复核；纯中文正文只作模式复核。
 
-开始前输出当前书名、正文目录、章节总数、七阶段识别结果和清单中的必检项总数。每完成一个阶段，立即输出该阶段的独立结论，至少包含：执行状态、实际检查范围、该阶段必检项数、已返回结果数、问题数量和关键发现。阶段内部必须逐项登记覆盖记录：
+开始前输出当前书名、正文目录、章节总数、八阶段识别结果和清单中的必检项总数。每完成一个阶段，立即输出该阶段的独立结论，至少包含：执行状态、实际检查范围、该阶段必检项数、已返回结果数、问题数量和关键发现。阶段内部必须逐项登记覆盖记录：
 
 ```text
 filter_id | status | scope | findings | reason
@@ -92,7 +94,7 @@ filter_id | status | scope | findings | reason
 
 `PASS` 表示已执行且无发现，`FAIL` 表示已执行且有发现，`BLOCKED` 表示无法执行，`SKIPPED` 仅能用于清单允许的非适用项并写明原因。普通发现问题不能中断后续过滤器和阶段；输入不可读、范围不完整或没有等价执行器时必须报告阻断，不得静默跳过。Reviewer agent 不可用但 `story-review` 按自身规则完成 solo 降级时，必须标明降级，不能减少清单项目。
 
-只有七个阶段全部有结论、每个必检项都有状态且没有未说明的 `BLOCKED` 或 `SKIPPED` 时，才允许输出清单规定的 `复合检查完成：7/7，过滤项 M/M`；未达到条件不得宣称检查完成。
+只有八个阶段全部有结论、每个必检项都有状态且没有未说明的 `BLOCKED` 或 `SKIPPED` 时，才允许输出清单规定的 `复合检查完成：8/8，过滤项 M/M`；未达到条件不得宣称检查完成。
 
 用户未明确要求修改时，复合检查只读，不写正文文件。
 

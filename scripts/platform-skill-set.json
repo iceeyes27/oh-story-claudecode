@@ -7,6 +7,7 @@
     "dialogue-naturalness-scan",
     "humanizer",
     "jargon-verb-scan",
+    "legal-domain-veracity-scan",
     "story",
     "story-analyze",
     "story-cover",

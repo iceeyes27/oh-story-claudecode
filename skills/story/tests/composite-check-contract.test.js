@@ -57,24 +57,25 @@ function publishedSkills() {
   );
 }
 
-test('generic novel check requires all seven stages and the manifest contract', () => {
+test('generic novel check requires all eight stages and the manifest contract', () => {
   const expectedStages = [
     ['review', 'story-review'],
     ['ai-flavor', 'ai-flavor-scan'],
     ['novel-deslop', 'story-deslop'],
     ['dialogue-naturalness', 'dialogue-naturalness-scan'],
     ['jargon-verb', 'jargon-verb-scan'],
+    ['legal-domain-veracity', 'legal-domain-veracity-scan'],
     ['general-deslop', 'story-deslop'],
     ['humanizer', 'humanizer'],
   ];
 
-  assert.equal(manifest.stages.length, 7);
+  assert.equal(manifest.stages.length, 8);
   assert.deepEqual(manifest.skipPolicy, {allowedOnlyWhen: 'not-applicable', requiresReason: true});
   assert.deepEqual(
     manifest.stages.map((stage) => [stage.id, stage.route]),
     expectedStages,
   );
-  assert.deepEqual(manifest.stages.map((stage) => stage.order), [1, 2, 3, 4, 5, 6, 7]);
+  assert.deepEqual(manifest.stages.map((stage) => stage.order), [1, 2, 3, 4, 5, 6, 7, 8]);
   assert.equal(new Set(allItems().map((item) => item.id)).size, allItems().length);
   assert.ok(allItems().length >= 90, 'manifest must enumerate internal checks, not only seven routes');
 
@@ -89,13 +90,13 @@ test('generic novel check requires all seven stages and the manifest contract', 
   }
 
   assert.match(skill, /composite-check-manifest\.json/);
-  assert.match(skill, /ai-flavor-scan.*正文九层/s);
+  assert.match(skill, /ai-flavor-scan.*正文十层/s);
   assert.match(skill, /每个必检项都有状态/);
-  assert.match(skill, /复合检查完成：7\/7，过滤项 M\/M/);
+  assert.match(skill, /复合检查完成：8\/8，过滤项 M\/M/);
   assert.match(skill, /不得静默跳过/);
 });
 
-test('AI flavor manifest preserves all nine layers and five semantic mismatch checks', () => {
+test('AI flavor manifest preserves all ten layers and five semantic mismatch checks', () => {
   const stage = manifest.stages.find((item) => item.id === 'ai-flavor');
   const ids = new Set(stage.filters.map((item) => item.id));
   for (const id of [
@@ -103,6 +104,7 @@ test('AI flavor manifest preserves all nine layers and five semantic mismatch ch
     'ai-02-rhetoric-library',
     'ai-03-fused-metaphor',
     'ai-04-empty-summary',
+    'ai-04e-narration-slogan',
     'ai-05-jargon-single-character',
     'ai-06-coined-collocation',
     'ai-07-telegraphic-writing',
@@ -112,6 +114,7 @@ test('AI flavor manifest preserves all nine layers and five semantic mismatch ch
     'ai-08d-abstract-object',
     'ai-08e-state-ownership',
     'ai-09-persona-cliche',
+    'ai-10-chapter-title',
   ]) {
     assert.ok(ids.has(id), `missing AI flavor filter: ${id}`);
   }

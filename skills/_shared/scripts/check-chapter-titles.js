@@ -65,12 +65,27 @@ const PATTERN_JINYU = [
 ];
 
 /**
- * 规则2: 抽象比喻当标题（blocking）
+ * 规则1b: 偏正修饰从句 / 剧情摘要压缩句式（blocking）
+ * 禁止将细纲梗概（如“刚出事就递笔”）压缩为“刚出事就递来的笔”这类 AI 偏正从句
+ */
+const PATTERN_RELATIVE_CLAUSE = [
+  { re: /^(刚|一|在|从|被|把|死后|事后|出事|之前|之后).+?的.+$/, desc: '偏正修饰从句（"刚/从/被/把/死后...的..."剧情摘要腔，请改为具体名词或动作）' },
+  { re: /^.+[，,].*?(与|和).+$/, desc: '散文式"X，与/和Y"并列句' },
+  { re: /^.+二字[，,].+$/, desc: '"XX二字，"抽象口号句' },
+  { re: /^谁.+谁.+谁.+$/, desc: '三段式排比设问句' },
+  { re: /^.+不能再.+$/, desc: '大纲式叙事说明句' },
+  { re: /^.+是谁[划抹删写弄].+$/, desc: '设问句式' },
+  { re: /^(我也想|今晚看|单子不是|空海也|抢海的人|懂行的人).+$/, desc: '口语化/否定式大纲从句，请改为干脆硬质物证或动作' },
+];
+
+/**
+ * 规则2: 抽象比喻与假大空套路词当标题（blocking）
  */
 const ABSTRACT_METAPHORS = [
   /拼图/, /画线/, /余波/, /交锋/, /底色/, /暗涌/,
   /注脚/, /锚点/, /坐标/, /切面/, /刻度/,
   /余温/, /余烬/, /余响/, /回声/,
+  /定鼎/, /称雄/, /破晓/, /暗流再起/,
 ];
 
 /**
@@ -85,9 +100,9 @@ const PATTERN_SHUANGQING = [
 ];
 
 /**
- * 规则4: 过长标题（advisory）
+ * 规则4: 过长标题（blocking，标准 2~6 字，严禁超过 7 字）
  */
-const MAX_TITLE_LEN = 15;
+const MAX_TITLE_LEN = 7;
 
 /**
  * 规则5: 模板句式频次检测（advisory）
@@ -131,6 +146,11 @@ for (const ch of chapters) {
       findings.push({ num: ch.num, title: ch.title, rule: '金句对仗', severity: 'blocking', desc: p.desc });
     }
   }
+  for (const p of PATTERN_RELATIVE_CLAUSE) {
+    if (p.re.test(ch.title)) {
+      findings.push({ num: ch.num, title: ch.title, rule: '偏正从句/摘要腔', severity: 'blocking', desc: p.desc });
+    }
+  }
   for (const re of ABSTRACT_METAPHORS) {
     if (re.test(ch.title)) {
       findings.push({ num: ch.num, title: ch.title, rule: '抽象比喻', severity: 'blocking', desc: `含抽象比喻词「${ch.title.match(re)[0]}」` });
@@ -142,7 +162,16 @@ for (const ch of chapters) {
     }
   }
   if (ch.title.length > MAX_TITLE_LEN) {
-    findings.push({ num: ch.num, title: ch.title, rule: '标题过长', severity: 'advisory', desc: `${ch.title.length}字，超过${MAX_TITLE_LEN}字阈值` });
+    findings.push({ num: ch.num, title: ch.title, rule: '标题过长', severity: 'blocking', desc: `${ch.title.length}字，超过${MAX_TITLE_LEN}字上限（标准为2~6字，最长7字）` });
+  }
+  // 规则4b: 叠床架屋重字检测（如《海上海警》《断水断电》等4字内同字出现2次）
+  if (ch.title.length <= 4 && !/^[0-9一二三四五六七八九十百千]+$/.test(ch.title)) {
+    for (const c of ch.title) {
+      if (ch.title.split(c).length - 1 >= 2) {
+        findings.push({ num: ch.num, title: ch.title, rule: '叠字重字', severity: 'blocking', desc: `4字内包含重复单字「${c}」，属于叠床架屋式口水化命名` });
+        break;
+      }
+    }
   }
 }
 
@@ -165,15 +194,67 @@ for (const [key, nums] of Object.entries(templateCounts)) {
   }
 }
 
-// 规则6: 重复/撞车
+// 规则6: 重复/撞车与相邻同质化检测
+const MONEY_PATTERN = /[一二两三四五六七八九十百千万\d]+(万|千|百|块|元)/;
+const STOP_CHARS = '的了一是个不没在有和与从到被把';
+
 for (let i = 0; i < chapters.length; i++) {
+  const chA = chapters[i];
+  const cleanA = chA.title.replace(/[0-9，。！？、""''：；\s]/g, '');
+
   for (let j = i + 1; j < chapters.length; j++) {
-    if (isSimilar(chapters[i].title, chapters[j].title)) {
+    const chB = chapters[j];
+    const cleanB = chB.title.replace(/[0-9，。！？、""''：；\s]/g, '');
+    const dist = chB.num - chA.num;
+
+    // 6.1 完全重名（blocking）
+    if (chA.title === chB.title) {
       findings.push({
-        num: chapters[i].num, title: chapters[i].title,
-        rule: '标题撞车', severity: 'blocking',
-        desc: `与第${chapters[j].num}章「${chapters[j].title}」高度相似`,
+        num: chA.num, title: chA.title,
+        rule: '标题完全重名', severity: 'blocking',
+        desc: `与第${chB.num}章「${chB.title}」完全重名`,
       });
+    }
+    // 6.2 近距离子串复读（10章内，长度>=2的子串完全包含，blocking）
+    else if (dist <= 10 && Math.min(cleanA.length, cleanB.length) >= 2 && (cleanA.includes(cleanB) || cleanB.includes(cleanA))) {
+      findings.push({
+        num: chA.num, title: chA.title,
+        rule: '标题近距离子串复读', severity: 'blocking',
+        desc: `与第${chB.num}章「${chB.title}」存在近距离子串重复（距离仅${dist}章），请拉开差异`,
+      });
+    }
+    // 6.3 远距离高重合度（4字以上后缀或包含，blocking）
+    else if (dist > 10 && isSimilar(chA.title, chB.title)) {
+      findings.push({
+        num: chA.num, title: chA.title,
+        rule: '标题高度相似', severity: 'blocking',
+        desc: `与第${chB.num}章「${chB.title}」高度相似`,
+      });
+    }
+
+    // 6.4 相邻章节（3章内）金额数字连撞（blocking）
+    if (dist <= 3 && MONEY_PATTERN.test(chA.title) && MONEY_PATTERN.test(chB.title)) {
+      findings.push({
+        num: chA.num, title: chA.title,
+        rule: '相邻金额命名连撞', severity: 'blocking',
+        desc: `与第${chB.num}章「${chB.title}」连续使用金额数字命名（距离${dist}章），形成模板疲劳，请改为硬物证或具体动作`,
+      });
+    }
+
+    // 6.5 相邻章节（2章内）核心实词撞车（blocking）
+    if (dist <= 2) {
+      for (let k = 0; k < cleanA.length - 1; k++) {
+        const gram = cleanA.substr(k, 2);
+        if (STOP_CHARS.includes(gram[0]) || STOP_CHARS.includes(gram[1])) continue;
+        if (cleanB.includes(gram)) {
+          findings.push({
+            num: chA.num, title: chA.title,
+            rule: '相邻章节核心词撞车', severity: 'blocking',
+            desc: `与第${chB.num}章「${chB.title}」共享词汇「${gram}」，请拉开命名差异`,
+          });
+          break;
+        }
+      }
     }
   }
 }

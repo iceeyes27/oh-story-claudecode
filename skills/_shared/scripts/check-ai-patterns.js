@@ -28,6 +28,7 @@ Detect high-risk AI-flavor prose patterns that need human rewrite:
   - 否定校正式排比 (不讲A，只讲B；不求C，只求D, 实战漏网句式)
   - 反序对比 (是A，不是B — not-is 的反序变种, 实战漏网句式)
   - 预告式总结收尾 (文末窗口 没人知道/才刚刚开始/正朝着…压了过去, 实战漏网句式)
+  - 旁白口号腔 (引号外叙述喊口号 不胜不休/正义必胜/法治的晴空/正义的铁壁, 实战漏网 F)
   - 引号强调滥用 (叙述里 1-4 字短词加引号强调，密度型)
   - 双端悬空的“的”字身份跳转句 (动作/状态+的，成了+代词)
   - 空壳式人体失真比喻 (骨头/骨架被抽走，只剩皮壳支撑)
@@ -113,6 +114,32 @@ const ABSTRACT_AUTHORITY_PATTERNS = [
   /认的是[^。！？!?\n]{0,12}水里那口真/g,
   /认活路/g,
   /长骨头/g,
+];
+
+// 旁白口号腔（实战漏网 F，2026-08-19 从《法援律师》168 章全量扫描固化）：
+// 叙述者跳出剧情替全书喊口号——「法援律师用铁一般的证据与法条，逐一击穿了……，
+// 必将在法治的晴空下……，正义必胜！」。判据：把句子抽出来读，像不像电视普法节目的
+// 旁白字幕/法治宣传片解说词。像 → 命中。只扫引号外叙述（maskQuoted），引号内台词
+// 由 dialogue-naturalness-scan 第 6 类覆盖，不重复计；in-world 群聊/群众口号
+// （如家长群刷「正义必胜」）在引号内被 mask 排除。
+// 校准：修复前《法援律师》全书 20+ 处旁白命中；修复后 0 命中（群聊豁免）。
+const NARRATION_SLOGAN_PATTERNS = [
+  /不胜不休|正义必胜|朗朗乾坤|朗朗晴空|公道自在人心|依法维权到底|公平正义重见天日/g,
+  /正义的(?:审判|锁链|巨浪|钟声|铁壁|利剑|之剑|之笔|铁拳|法网|利刃|防线)/g,
+  /法治的(?:晴空|轨道|底线|威严|蓝天|审判)/g,
+  /正义(?:绝不|永不|终将|必将)(?:向|对|被|让|洗|还|守|来|到|低|妥|缺)/g,
+  /胜利(?:终将|必将)属于/g,
+  /(?:法援律师|律师团队|我们)(?:用|以|拿|紧握|手握着|的目光坚定如铁)/g,
+  /(?:筑起|铸就|扛起|举起|高擎)(?:了)?(?:正义|法治|法律的)(?:铁壁|屏障|盾牌|巨伞|大旗|旗帜|长城)/g,
+  /(?:撕开|揭开|撕碎|击穿|戳穿|砸碎)(?:了)?(?:一切|所有)?(?:虚伪|伪善|伪装)(?:面具|外壳|皮|壁)/g,
+  /(?:真相|正义|公理)(?:终将|必将|一定|迟早会)大白(?:于天下)?/g,
+  /(?:光明|阳光|黎明)(?:终将|必将)来临|(?:黑夜|黑暗)终将过去/g,
+  /(?:告慰|不负)[^。！？!?\n]{0,12}(?:在天之灵|亡灵)/g,
+  /(?:任何|一切)[^。！？!?\n]{0,12}(?:违法|践踏|亵渎|阴谋|黑恶)[^。！？!?\n]{0,12}(?:必将|都将|都会)[^。！？!?\n]{0,8}(?:严惩|制裁|付出代价|无处遁形|灰飞烟灭|化为乌有)/g,
+  /(?:铸就|奠定|树立|打造|建立)(?:了)?(?:一座|一道)?(?:坚如磐石|永不磨灭|坚不可摧|崇高无暇|不可动摇)?(?:的)?(?:堡垒|丰碑|长城|奇迹|基石|神话|大厦|伟业|铠甲)/g,
+  /(?:粉碎|击碎|挫败)(?:了)?(?:来自|所有)?(?:各方|一切|旧官僚|对手|国际金融)?(?:的)?(?:暗算|阴谋|企图|挑衅|围剿|反扑|计划|妄想)/g,
+  /一场(?:体制|商业|金融|暗流)?(?:层面)?(?:的)?(?:暗流)?交锋[^。！？!?\n]{0,20}(?:化为无形|落幕|定鼎)/g,
+  /地位愈发(?:固若金汤|坚不可摧|牢不可破|不可动摇)/g,
 ];
 
 // 解释链密度：常见“他知道/他明白/这意味着/必须需要”
@@ -440,6 +467,7 @@ function scanProsePatterns(proseLines) {
   findings.push(...findPainAsObject(proseLines));
   findings.push(...findGreyCrackInHead(proseLines));
   findings.push(...findSummarySlogan(proseLines));
+  findings.push(...findNarrationSlogan(proseLines));
   findings.push(...findEnglishResidue(proseLines));
   findings.push(...findProcessTermAsObject(proseLines));
   return findings;
@@ -492,6 +520,45 @@ function findVoiceContrast(proseLines) {
         severity: 'blocking',
         message: '音量反差腔：「声音不大/不高…却/但…」是 AI 高频反差模板；删掉音量铺垫，直接写声音落进场子的具体效果（谁停了手、哪排安静了）。',
         excerpt: compact(text.slice(match.index, match.index + match[0].length)),
+      });
+    }
+  }
+
+  return findings;
+}
+
+// 旁白口号腔：逐处 blocking。只扫引号外叙述；摘录取自 mask 前原文保持可读。
+function findNarrationSlogan(proseLines) {
+  const findings = [];
+
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const masked = maskQuoted(text);
+    const spans = [];
+    for (const pattern of NARRATION_SLOGAN_PATTERNS) {
+      pattern.lastIndex = 0;
+      let match;
+      while ((match = pattern.exec(masked)) !== null) {
+        spans.push([match.index, match.index + match[0].length]);
+      }
+    }
+    spans.sort((a, b) => a[0] - b[0]);
+
+    let lastEnd = -1;
+    for (const [start, end] of spans) {
+      if (start < lastEnd) {
+        lastEnd = Math.max(lastEnd, end);
+        continue;
+      }
+      lastEnd = end;
+      findings.push({
+        line: lineNo,
+        column: start + 1,
+        type: 'narration-slogan',
+        severity: 'blocking',
+        message: '旁白口号腔：叙述者跳出剧情喊口号（「不胜不休/正义必胜/法治的晴空/正义的铁壁」家族），读着像普法宣传片解说词。删掉口号尾，收束成角色当下可见的场景/动作/物件（窗外、白板、证据链、灯光、卷宗），情绪留给下一章钩子，不替读者下结论。',
+        excerpt: compact(text.slice(Math.max(0, start - 12), Math.min(text.length, end + 12))),
       });
     }
   }

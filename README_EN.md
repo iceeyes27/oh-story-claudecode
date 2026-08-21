@@ -18,6 +18,8 @@ Professional authors follow a three-step method:
 
 Built around four pillars: reverse-engineering hits · plot modularization · layered state management · human-AI collaboration.
 
+> Starting in v0.8.1: inspired by [narralume](https://github.com/abligail/narralume)'s "AI proposes candidates, the author decides", `story-write` (long-form) gains an opt-in **candidate system**. In candidate mode prose lands under the book-root `候选/` directory and tracking does NOT advance early; on the author's "adopt" the new `candidate-commit.py` atomically merges the candidate into the final `正文/` and replays the tracking transaction, passing a quality gate first (blocking hits are refused), while "rewrite/discard" archives instead of hard-deleting. Pure SKILL-level orchestration — no change to narrative-writer, no cross-platform hook surgery, `agents_version` stays 25, and with candidate mode off behavior is byte-identical to v0.8.0. See `skills/story-write/references/candidate-workflow.md`.
+>
 > Starting in v0.8.0: the complete novel check's three specialist dependencies — `ai-flavor-scan`, `dialogue-naturalness-scan`, and `jargon-verb-scan` — are included in the cross-platform public release, bringing the published Skill/Command set to 14. The Claude marketplace and release metadata now use 0.8.0, and local adapter drift, stale test paths, and Node 18/22 OpenCode checks are repaired.
 > The current public set also includes `batch-pollution-detector`, for 15 total, so `story-deslop` file-mode pollution checks remain available after cross-platform deployment.
 >

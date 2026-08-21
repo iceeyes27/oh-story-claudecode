@@ -48,7 +48,9 @@
 | 弃用第X章 / 不要这版 | 归档候选，正稿与追踪不动 | `candidate-commit.py reject --project {书名} --chapter X` |
 | 有哪些待审 | 列出候选目录待审项 | `candidate-commit.py list --project {书名}` |
 
-**promote 语义**（见脚本内注释）：先移动正文到正稿（同盘 rename 原子），再回放追踪事务；回放失败自动把正文移回候选、追踪不推进，修好事务后重跑同一条 promote 即可。promote 拒绝覆盖已存在的正稿（避免误清正文）。
+**promote 语义**（见脚本内注释）：先过**质量门**，再移动正文到正稿（同盘 rename 原子），再回放追踪事务；回放失败自动把正文移回候选、追踪不推进，修好事务后重跑同一条 promote 即可。promote 拒绝覆盖已存在的正稿（避免误清正文）。
+
+**采用前质量门**（低质量候选进不了正稿）：promote 移动前对候选正文跑现成的 `check-ai-patterns.js` 与 `check-degeneration.js`（`--fail-on=blocking`），blocking 命中即拒绝采用、正稿与追踪不动。这是硬关卡，与写作时 SKILL 写后手动扫描互补（写时给即时反馈、采用时兜底）。豁免同写后 hook：候选标题行下 6 行内加 `<!-- 去味:跳过 -->`，或 `promote --no-scan` 显式绕过。node 或脚本缺失时放行（不误伤）。
 
 **采用后**：正稿出现新章，`tracking_commit.py check` 应通过且 `state_revision` 推进；随后可继续写下一章（回到写作阶段）。
 

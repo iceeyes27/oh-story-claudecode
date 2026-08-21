@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## v0.8.1
+
+> 借鉴 [narralume](https://github.com/abligail/narralume) 的「AI 出候选，作者拍板」，为 `story-write` 长篇引入**候选系统**（opt-in）。纯 SKILL 层编排，不改 narrative-writer、不动跨端 hook，`agents_version` 维持 25，未开启候选时行为与 v0.8.0 逐字节一致。
+
+### 新增
+
+- **候选系统（作者拍板）**。用户意图含「候选 / 逐章确认 / 先给我看」时进入候选模式：正文先落到书根 `候选/`（刻意不在 `正文/` 下，避免写后 hook 把候选认成正式章节），追踪不提前推进——`_tracking-state.json` 只反映已批准正文，候选自带待回放的追踪事务 JSON。作者「采用第X章 / 全部采用」由新脚本 `skills/story-write/scripts/candidate-commit.py` 原子并入正稿 + 回放追踪（先移动、失败回滚，可安全重跑）；「重写 / 弃用」归档到 `候选/_历史/` 而非硬删，正稿与追踪不动。
+- **采用前质量门**。`candidate-commit.py promote` 移动前对候选正文跑 `check-ai-patterns.js` 与 `check-degeneration.js`（`--fail-on=blocking`），blocking 命中拒绝并入正稿；`<!-- 去味:跳过 -->` 标记或 `--no-scan` 显式豁免，node/脚本缺失放行。低质量候选进不了正稿，与写作时 SKILL 写后手动扫描互补。
+
 ## v0.8.0
 
 > 本 fork 的公开技能与跨平台适配版本；已同步下方上游 v0.7.6 的正文写作修复。

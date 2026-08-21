@@ -78,9 +78,19 @@ class CandidateCommitTests(unittest.TestCase):
     def read_state(self) -> dict:
         return json.loads((self.project / "追踪/_tracking-state.json").read_text(encoding="utf-8"))
 
-    def make_candidate(self, chapter: int, *, with_transaction: bool = True, tx_overrides: dict | None = None) -> Path:
+    # 触发 check-ai-patterns blocking 的短句（reverse-not-is + negation-parade）。
+    TOXIC = "他想要的是尊严，而不是金钱。他知道，这世上没有光，没有声音，没有温度。"
+
+    def make_candidate(
+        self,
+        chapter: int,
+        *,
+        with_transaction: bool = True,
+        tx_overrides: dict | None = None,
+        body: str | None = None,
+    ) -> Path:
         prose = self.candidate_dir / f"第{chapter:03d}章_测试章名.md"
-        prose.write_text(f"# 第{chapter}章\n候选正文内容。\n", encoding="utf-8")
+        prose.write_text(body if body is not None else f"# 第{chapter}章\n候选正文内容。\n", encoding="utf-8")
         if with_transaction:
             doc = transaction(chapter)
             if tx_overrides:
@@ -182,6 +192,26 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertTrue(by_chapter[1]["has_transaction"])
         self.assertFalse(by_chapter[2]["has_transaction"])
         self.assertFalse(by_chapter[1]["final_exists"])
+
+    def test_promote_quality_gate_blocks_toxic(self) -> None:
+        self.make_candidate(1, body=f"# 第1章\n{self.TOXIC}\n")
+        self._candidate(["promote", "--chapter", "1"], expect=2)
+        # 未过质量门：正稿与追踪不变，候选仍在原处。
+        self.assertEqual(self.final_files(), [])
+        self.assertEqual(self.read_state()["state_revision"], 0)
+        self.assertTrue((self.candidate_dir / "第001章_测试章名.md").exists())
+
+    def test_promote_no_scan_bypasses_gate(self) -> None:
+        self.make_candidate(1, body=f"# 第1章\n{self.TOXIC}\n")
+        self._candidate(["promote", "--chapter", "1", "--no-scan"])
+        self.assertEqual(self.final_files(), ["第001章_测试章名.md"])
+        self.assertEqual(self.read_state()["state_revision"], 1)
+
+    def test_promote_exemption_marker_bypasses_gate(self) -> None:
+        self.make_candidate(1, body=f"# 第1章\n<!-- 去味:跳过 -->\n{self.TOXIC}\n")
+        self._candidate(["promote", "--chapter", "1"])
+        self.assertEqual(self.final_files(), ["第001章_测试章名.md"])
+        self.assertEqual(self.read_state()["state_revision"], 1)
 
     def test_promote_all_in_order(self) -> None:
         self.make_candidate(1)

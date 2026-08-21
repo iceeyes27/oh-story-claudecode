@@ -20,6 +20,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -37,6 +38,13 @@ TRANSACTION_SUFFIX = "_追踪事务.json"
 # 第001章_章名 / 第1章 —— 允许前导零，章号取阿拉伯数字。
 CHAPTER_PREFIX = re.compile(r"^第0*(\d+)章")
 TRACKING_TOOL = Path(__file__).resolve().parent / "tracking_commit.py"
+
+# promote 质量门：采用前对候选正文跑现成扫描脚本，blocking 命中拒绝并入正稿。
+# 写作时的即时反馈由 SKILL 写后手动扫描承担；这里是「低质量候选进不了正稿」的硬关卡。
+SHARED_SCRIPTS = Path(__file__).resolve().parent.parent.parent / "_shared" / "scripts"
+SCAN_SCRIPTS = ("check-ai-patterns.js", "check-degeneration.js")
+# 与写后 hook 一致的显式豁免：候选标题行下 6 行内含该标记则跳过质量门。
+EXEMPTION = re.compile(r"去味(：|:)跳过")
 
 
 def emit(text: str, *, error: bool = False) -> None:
@@ -178,8 +186,46 @@ def replay_tracking(project: Path, transaction_path: Path) -> None:
         raise CandidateError(f"追踪事务回放失败（追踪未推进，可修复后重跑同一 promote）：\n{detail}")
 
 
-def promote_chapter(project: Path, chapter: int) -> dict[str, Any]:
+def scan_gate(prose: Path) -> str | None:
+    """采用前的质量门：对候选正文跑 blocking 扫描；命中返回发现文本，干净/豁免/不可用返回 None。
+
+    node 缺失或脚本缺失一律放行（宁可漏拦不误伤，与写后 hook「缺失放行」一致）。
+    候选标题行下 6 行内含 `去味:跳过` 显式豁免时跳过。
+    """
+    try:
+        head = "\n".join(prose.read_text(encoding="utf-8").split("\n", 6)[:6])
+    except OSError:
+        return None
+    if EXEMPTION.search(head):
+        return None
+    node = shutil.which("node")
+    if node is None:
+        return None
+    blocked: list[str] = []
+    for name in SCAN_SCRIPTS:
+        script = SHARED_SCRIPTS / name
+        if not script.exists():
+            continue
+        result = subprocess.run(
+            [node, str(script), "--check", "--fail-on=blocking", str(prose)],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+        if result.returncode != 0:
+            blocked.append(f"[{name}]\n{(result.stdout or result.stderr or '').strip()}")
+    return "\n\n".join(blocked) if blocked else None
+
+
+def promote_chapter(project: Path, chapter: int, *, skip_scan: bool = False) -> dict[str, Any]:
     prose = find_prose_candidate(project, chapter)
+    if not skip_scan:
+        findings = scan_gate(prose)
+        require(
+            findings is None,
+            f"第{chapter}章候选未过质量门，拒绝并入正稿（先按发现改写，或在标题行下加 "
+            f"<!-- 去味:跳过 --> 显式豁免，或 promote 加 --no-scan 绕过）：\n{findings}",
+        )
     transaction = find_transaction(project, chapter)
     require(
         transaction is not None,
@@ -235,12 +281,12 @@ def reject_chapter(project: Path, chapter: int, *, rewrite: bool) -> dict[str, A
     }
 
 
-def promote_all(project: Path) -> list[dict[str, Any]]:
+def promote_all(project: Path, *, skip_scan: bool = False) -> list[dict[str, Any]]:
     chapters = sorted(
         {entry["chapter"] for entry in list_candidates(project) if entry["chapter"] is not None}
     )
     require(chapters, "候选目录没有可采用的正文")
-    return [promote_chapter(project, chapter) for chapter in chapters]
+    return [promote_chapter(project, chapter, skip_scan=skip_scan) for chapter in chapters]
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -252,6 +298,7 @@ def build_parser() -> argparse.ArgumentParser:
     group = promote.add_mutually_exclusive_group(required=True)
     group.add_argument("--chapter", type=int, help="采用指定章号")
     group.add_argument("--all", action="store_true", help="按章号升序采用全部候选")
+    promote.add_argument("--no-scan", action="store_true", help="绕过采用前质量门（显式覆盖）")
 
     reject = sub.add_parser("reject", help="归档被拒/被替换的候选（正稿与追踪不动）")
     reject.add_argument("--project", type=Path, required=True)
@@ -267,7 +314,11 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         if args.command == "promote":
-            result: Any = promote_all(args.project) if args.all else promote_chapter(args.project, args.chapter)
+            result: Any = (
+                promote_all(args.project, skip_scan=args.no_scan)
+                if args.all
+                else promote_chapter(args.project, args.chapter, skip_scan=args.no_scan)
+            )
         elif args.command == "reject":
             result = reject_chapter(args.project, args.chapter, rewrite=args.rewrite)
         else:

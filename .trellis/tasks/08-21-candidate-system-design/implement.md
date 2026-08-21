@@ -14,6 +14,13 @@
 
 **MVP 外（未做，留扩展）**：步骤 2 agent 原生参数、步骤 5 中 hook 路径覆盖候选（`check-story-setup-deployment.sh` 的 `Claude Bash prose pre-guard` FAIL 为 **main 既有**、与本任务无关）、日更批量候选、dashboard 审阅视图、短篇候选、README/CHANGELOG（步骤 6，待用户决定是否本轮提交时再补）。
 
+## 追加（2026-08-21，用户要求扩展）
+
+- **质量门覆盖候选**：用户在「hook 覆盖候选 vs promote 关卡」中选了 **promote 关卡**（零 hook 改动、零 parity 风险）。`candidate-commit.py promote` 移动前跑 `check-ai-patterns.js` + `check-degeneration.js`（`--fail-on=blocking`），blocking 拒绝采用；`<!-- 去味:跳过 -->` / `--no-scan` 豁免，node/脚本缺失放行。测试增至 13（+3 门测试）。
+- **文档 + 发版**：CHANGELOG `## v0.8.1`、README/README_EN 顶部说明；4 个 plugin manifest 版本 0.8.0→0.8.1。
+- **hook 写时覆盖候选（改 story_hook_core.js + story_codex_hook.py）未做**：经评估为 parity 锁最紧核心的双实现手术，用户选择用 promote 关卡等效达成目标，故不动 hook。
+- 验证：candidate(13)/tracking(31)/static(30)/skill-contracts 全绿；reasonix adapter 的 `python3 -m json.tool` FAIL 为本机 WindowsApps python3 stub（exit 49）所致、main 同样失败、CI Linux 不受影响。
+
 
 ## 步骤 0 — 基线固化（回归护栏）
 - [ ] 跑现有相关测试建立绿基线：

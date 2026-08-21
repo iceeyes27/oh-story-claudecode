@@ -18,6 +18,8 @@
 
 围绕四条线展开：爆款逆向 · 剧情模块化重组 · 上下文状态分层管理 · 人机协同。
 
+> v0.8.1 起：借鉴 [narralume](https://github.com/abligail/narralume)「AI 出候选，作者拍板」，为 `story-write` 长篇引入**候选系统**（opt-in）。候选模式下正文先落到书根 `候选/`，追踪不提前推进；作者「采用」时由 `candidate-commit.py` 原子并入正稿并回放追踪，采用前先过质量门（blocking 命中拒绝），「重写/弃用」归档不硬删。纯 SKILL 层编排，不改 narrative-writer、不动跨端 hook，`agents_version` 维持 25，未开启候选时行为与 v0.8.0 逐字节一致。详见 `skills/story-write/references/candidate-workflow.md`。
+>
 > v0.8.0 起：完整小说复合检查依赖的 `ai-flavor-scan`、`dialogue-naturalness-scan`、`jargon-verb-scan` 纳入跨平台公开发布，公开 Skill/Command 增至 14 个；Claude marketplace 与版本信息同步到 0.8.0，并修复本地适配、测试路径及 Node 18/22 的 OpenCode 检查差异。
 > 当前公开集合另含 `batch-pollution-detector`，共 15 个，保证 `story-deslop` 文件模式的脚本污染预检在跨平台部署后不会缺席。
 >

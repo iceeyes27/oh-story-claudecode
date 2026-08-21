@@ -1,6 +1,8 @@
 # 候选工作流（Candidate Workflow）
 
-借鉴 narralume「AI 出候选，作者拍板」：候选模式下正文先落到 `正文/候选/`，作者显式采用后才并入正稿 `正文/` 并推进追踪。追踪只在采用时推进——`_tracking-state.json` 永远只反映已批准正文。
+借鉴 narralume「AI 出候选，作者拍板」：候选模式下正文先落到书根 `候选/`，作者显式采用后才并入正稿 `正文/` 并推进追踪。追踪只在采用时推进——`_tracking-state.json` 永远只反映已批准正文。
+
+> **候选目录为何在书根、不在 `正文/` 下**：写后 hook 会把 `正文/` 下（含任意子目录）的 `第N章*.md` 认成正式章节并卷进章节序号 / 追踪欠账门 / gap 检测。候选章按设计尚未提交追踪，若放 `正文/候选/` 会与 hook 冲突。放书根 `候选/` 后 hook 直接跳过候选文件，彻底隔离。
 
 本流程**完全在 SKILL 层编排**：narrative-writer 的输出路径本就是 prompt 参数，追踪事务 JSON 本就由主会话构造。候选模式只是「改输出路径 + 暂存事务不 commit + 增加审批门」，不改 agent 定义、不 bump `agents_version`。
 
@@ -13,9 +15,10 @@
 ## 目录约定
 
 ```
-{书名}/正文/
-├── 第001章_章名.md              # 正稿（已采用）
-└── 候选/
+{书名}/
+├── 正文/
+│   └── 第001章_章名.md          # 正稿（已采用）
+└── 候选/                        # 书根，刻意不在 正文/ 之下
     ├── 第002章_章名.md          # 待批准正文
     ├── 第002章_追踪事务.json    # 待回放的追踪事务（主会话构造，不 commit）
     └── _历史/
@@ -26,8 +29,8 @@
 
 沿用 SKILL.md Phase 4 单章写作流程的写前准备、模块召回、细纲边界等全部规则，只有两处分支：
 
-1. **step 7 正文执行**：给 narrative-writer 的「输出路径」传 `正文/候选/第{N}章_{章名}.md`（而不是 `正文/`）。其余 prompt 材料不变。
-2. **step 12 更新追踪**：**不执行 `tracking_commit.py commit`**。改为把本该提交的追踪事务 JSON 原样写到 `正文/候选/第{N}章_追踪事务.json` 暂存。事务 JSON 的构造规则与直写模式完全一致（`mode` / `chapter` / `delta` / `context` / `character_snapshots` 等），`expected_state_revision` 可省略，promote 时按当前状态自动刷新。
+1. **step 7 正文执行**：给 narrative-writer 的「输出路径」传 `候选/第{N}章_{章名}.md`（书根候选目录，而不是 `正文/`）。其余 prompt 材料不变。
+2. **step 12 更新追踪**：**不执行 `tracking_commit.py commit`**。改为把本该提交的追踪事务 JSON 原样写到 `候选/第{N}章_追踪事务.json` 暂存。事务 JSON 的构造规则与直写模式完全一致（`mode` / `chapter` / `delta` / `context` / `character_snapshots` 等），`expected_state_revision` 可省略，promote 时按当前状态自动刷新。
 
 写后质量网照常：step 10-11 元信息/禁用词扫描与 Phase 5「写后同轮清零」的确定性收尾脚本（`check-ai-patterns.js` / `check-degeneration.js` / `normalize-punctuation.js` / `check-outline-copy.js`）都**作用于候选文件**，blocking 当轮清零后再提示作者审阅。作者看到的必须是已清理文本。
 

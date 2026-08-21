@@ -53,8 +53,10 @@ class CandidateCommitTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory()
         self.project = Path(self.temporary.name) / "候选测试书"
         self.project.mkdir()
-        self.candidate_dir = self.project / "正文" / "候选"
+        # 候选目录在书根，刻意不放 正文/ 下（避免写后 hook 把候选认成正式章节）。
+        self.candidate_dir = self.project / "候选"
         self.candidate_dir.mkdir(parents=True)
+        (self.project / "正文").mkdir()
         # 初始化追踪状态（last_committed_chapter=0, state_revision=0）。
         self._tracking("init", initial_document(last_chapter=0))
 

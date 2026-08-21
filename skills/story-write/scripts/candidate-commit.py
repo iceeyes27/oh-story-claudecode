@@ -2,7 +2,11 @@
 """候选系统：把待批准正文并入正稿，或归档被拒/被替换的候选。
 
 设计不变式（见任务 08-21-candidate-system-design/design.md）：
-- 候选正文写在 ``正文/候选/``，与正稿 ``正文/`` 物理隔离。
+- 候选正文写在书根 ``候选/``（**不在 ``正文/`` 之下**），与正稿 ``正文/`` 物理隔离。
+  放在书根而非 ``正文/候选/`` 是刻意的：写后 hook 的 longChapterInfo 会把任一
+  ``正文`` 祖先下的 ``第N章*.md`` 认成正式章节、listChapterFiles 又递归遍历 ``正文/``，
+  若候选在 ``正文/`` 下会被卷进章节序号/追踪欠账门/gap 检测，与「候选未提交追踪」冲突。
+  放书根后 longChapterInfo 找不到 ``正文`` 祖先，hook 直接跳过候选文件。
 - 候选章自带待回放的追踪事务 JSON（``第XXX章_追踪事务.json``）；``_tracking-state.json``
   只在采用（promote）时推进，永远只反映已批准正文。
 - promote = 移动正文 + 回放追踪事务，采用「先移动、失败回滚」以保证可安全重跑。
@@ -57,7 +61,8 @@ def body_root(project: Path) -> Path:
 
 
 def candidate_root(project: Path) -> Path:
-    return body_root(project) / CANDIDATE_DIR
+    # 书根下的 候选/，刻意不放在 正文/ 之下（见模块 docstring）。
+    return project.resolve() / CANDIDATE_DIR
 
 
 def history_root(project: Path) -> Path:

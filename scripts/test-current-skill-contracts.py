@@ -864,6 +864,89 @@ def test_rubric_parity_guard() -> None:
         )
 
 
+def test_style_profile_is_not_a_book_existence_probe() -> None:
+    """文风.md 不能兼任对标书目录存在性探针。"""
+
+    rules = {rule.code: rule for rule in VALIDATOR.LEGACY_RULES}
+    explorer = "skills/story-setup/references/templates/agents/story-explorer.md"
+    cases = {
+        "style-profile-as-book-existence-probe": (
+            explorer,
+            "3. **对标书路径查找**：优先探 `{项目}/对标/{书名}/文风.md`，"
+            "回退探 `拆文库/{书名}/文风.md`；探针是文件不是目录\n",
+            "3. **对标书路径查找（只判书目录有效性，不判文风）**："
+            "优先探 `{项目}/对标/{书名}/**/*`，回退探 `拆文库/{书名}/**/*`；"
+            "**不得用 `文风.md` 兼作目录存在性探针**\n",
+        ),
+        "legacy-outline-budget-total": (
+            "skills/story-write/references/workflow-setup.md",
+            "末尾写一行 `预算合计：X字（目标Y，范围Y-Z）`。\n",
+            "末尾写一行 `目标字数合计：下限X字（章目标Y，范围Y-Z）`。\n",
+        ),
+    }
+    for code, (relative_path, bad, good) in cases.items():
+        rule = rules[code]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            path = root / relative_path
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(bad, encoding="utf-8")
+            require(
+                finding_codes(VALIDATOR.check_absent_rule(root, rule)) == {code},
+                "{} must reject the pre-fix wording".format(code),
+            )
+            path.write_text(good, encoding="utf-8")
+            require(
+                not VALIDATOR.check_absent_rule(root, rule),
+                "{} must accept the canonical wording".format(code),
+            )
+
+    probe_rule = rules["style-profile-as-book-existence-probe"]
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        path = root / explorer
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            "若字段缺失或已忽略 → `Glob 对标/*/文风.md`，取字典序第一个\n",
+            encoding="utf-8",
+        )
+        require(
+            finding_codes(VALIDATOR.check_absent_rule(root, probe_rule))
+            == {"style-profile-as-book-existence-probe"},
+            "benchmark enumeration must not filter candidates by 文风.md",
+        )
+
+    budget_rule = rules["legacy-outline-budget-total"]
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        path = root / "skills/story-write/references/workflow-setup.md"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("不得再写旧字段 `预算合计`。\n", encoding="utf-8")
+        require(
+            not VALIDATOR.check_absent_rule(root, budget_rule),
+            "an explicit prohibition of 预算合计 must stay documentable",
+        )
+
+
+def test_outline_total_and_profile_gap_parity() -> None:
+    """跨文件契约必须在真仓库上真命中。"""
+
+    manifest = repository_manifest()
+    expected_clean = {
+        "explorer-book-dir-probe",
+        "explorer-profile-missing-distinct",
+        "daily-profile-missing-custom-style",
+        "outline-total-field-parity",
+        "outline-total-canonical-format",
+    }
+    actual = finding_codes(VALIDATOR.validate_repository(REPO_ROOT, manifest))
+    leaked = sorted(expected_clean & actual)
+    require(
+        not leaked,
+        "repository must satisfy the profile-gap / outline-total contracts: {}".format(leaked),
+    )
+
+
 def main() -> int:
     test_manifest_contract()
     test_bad_fallbacks_fail()
@@ -886,6 +969,8 @@ def main() -> int:
     test_structured_outline_contract()
     test_upgrading_version_contract()
     test_github_actions_stay_disabled()
+    test_style_profile_is_not_a_book_existence_probe()
+    test_outline_total_and_profile_gap_parity()
     print("OK: current-contract manifest, structure, and fallback regressions passed")
     return 0
 

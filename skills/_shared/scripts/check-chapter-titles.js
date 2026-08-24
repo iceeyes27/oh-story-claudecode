@@ -79,6 +79,22 @@ const PATTERN_RELATIVE_CLAUSE = [
 ];
 
 /**
+ * 规则1c: 设问/疑问标题（blocking / advisory）
+ * 标题以疑问或设问形式出现，读者无法落地为具体物证/动作/冲突，
+ * 违反「章节命名硬门禁」rule 3（严禁完整叙事句或设问口号）。
+ * - 问号结尾 / 句末疑问词「吗」「么」 /「有多X」设问式：blocking（明确的疑问形态）
+ * - 以疑问词（怎么/为何/什么/谁/哪/几/多少…）开头的悬念式标题：advisory
+ *   此类常作对抗冲突/悬念，本身可能合规，仅标记供人工复核，不直接判 blocking
+ */
+const PATTERN_QUESTION = [
+  { re: /[?？]$/, desc: '标题以问号结尾（疑问/设问形态，无法落地为物证）', sev: 'blocking' },
+  { re: /吗[?？]?$/, desc: '标题以「吗」结尾（句末疑问词，设问口号腔）', sev: 'blocking' },
+  { re: /么[?？]?$/, desc: '标题以「么」结尾（句末疑问词，设问口号腔）', sev: 'blocking' },
+  { re: /有多/, desc: '「有多X」设问式（如《这水有多白》），请改为具体物证/动作', sev: 'blocking' },
+  { re: /^(怎么|怎样|如何|为何|为什么|为啥|干什么|什么|谁|哪|几|多少)/, desc: '以疑问词开头的设问/疑问标题，请确认能否落地为具体物证/冲突（悬念式可保留）', sev: 'advisory' },
+];
+
+/**
  * 规则2: 抽象比喻与假大空套路词当标题（blocking）
  */
 const ABSTRACT_METAPHORS = [
@@ -149,6 +165,11 @@ for (const ch of chapters) {
   for (const p of PATTERN_RELATIVE_CLAUSE) {
     if (p.re.test(ch.title)) {
       findings.push({ num: ch.num, title: ch.title, rule: '偏正从句/摘要腔', severity: 'blocking', desc: p.desc });
+    }
+  }
+  for (const p of PATTERN_QUESTION) {
+    if (p.re.test(ch.title)) {
+      findings.push({ num: ch.num, title: ch.title, rule: '设问/疑问标题', severity: p.sev || 'blocking', desc: p.desc });
     }
   }
   for (const re of ABSTRACT_METAPHORS) {

@@ -34,6 +34,7 @@
 | 脚本 | 测什么 | 何时跑 |
 |---|---|---|
 | `test-ai-patterns.sh` | 确定性 AI 句式检测器 `check-ai-patterns.js` 回归 | 本地 |
+| `test-chapter-titles.js` | 章节标题设问规则回归：明确疑问形态 blocking、悬念式疑问词开头 advisory | 改 `check-chapter-titles.js` 后本地 |
 | `test-degeneration.sh` | 模型退化检测器 `check-degeneration.js` 回归 | 本地 |
 | `test-prose-net-parity.sh` | 正文后置「轻量确定性网」Claude/OpenCode/Codex/ZCode parity | 本地（调 check-hook-regex-sync） |
 | `test-prose-backstop-hook.sh` | `check-prose-after-write.sh` 回归 | 本地 |

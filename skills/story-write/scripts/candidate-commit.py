@@ -40,7 +40,7 @@ CHAPTER_PREFIX = re.compile(r"^第0*(\d+)章")
 TRACKING_TOOL = Path(__file__).resolve().parent / "tracking_commit.py"
 
 # promote 质量门：采用前对候选正文跑现成扫描脚本，blocking 命中拒绝并入正稿。
-# 写作时的即时反馈由 SKILL 写后手动扫描承担；这里是「低质量候选进不了正稿」的硬关卡。
+# 确定性检查通过不代表正文自然或没有 AI 痕迹；候选仍需作者审读。
 SHARED_SCRIPTS = Path(__file__).resolve().parent.parent.parent / "_shared" / "scripts"
 SCAN_SCRIPTS = ("check-ai-patterns.js", "check-degeneration.js")
 # 与写后 hook 一致的显式豁免：候选标题行下 6 行内含该标记则跳过质量门。
@@ -187,31 +187,32 @@ def replay_tracking(project: Path, transaction_path: Path) -> None:
 
 
 def scan_gate(prose: Path) -> str | None:
-    """采用前的质量门：对候选正文跑 blocking 扫描；命中返回发现文本，干净/豁免/不可用返回 None。
-
-    node 缺失或脚本缺失一律放行（宁可漏拦不误伤，与写后 hook「缺失放行」一致）。
-    候选标题行下 6 行内含 `去味:跳过` 显式豁免时跳过。
-    """
+    """返回确定性检查失败信息；只有显式豁免或全部检查通过时返回 None。"""
     try:
         head = "\n".join(prose.read_text(encoding="utf-8").split("\n", 6)[:6])
-    except OSError:
-        return None
+    except OSError as error:
+        return f"无法读取候选正文：{error}"
     if EXEMPTION.search(head):
         return None
     node = shutil.which("node")
     if node is None:
-        return None
+        return "未找到 node，无法执行采用前确定性检查；明确跳过时使用 --no-scan"
     blocked: list[str] = []
     for name in SCAN_SCRIPTS:
         script = SHARED_SCRIPTS / name
         if not script.exists():
+            blocked.append(f"[{name}] 扫描器不存在：{script}")
             continue
-        result = subprocess.run(
-            [node, str(script), "--check", "--fail-on=blocking", str(prose)],
-            capture_output=True,
-            text=True,
-            encoding="utf-8",
-        )
+        try:
+            result = subprocess.run(
+                [node, str(script), "--check", "--fail-on=blocking", str(prose)],
+                capture_output=True,
+                text=True,
+                encoding="utf-8",
+            )
+        except OSError as error:
+            blocked.append(f"[{name}] 无法执行：{error}")
+            continue
         if result.returncode != 0:
             blocked.append(f"[{name}]\n{(result.stdout or result.stderr or '').strip()}")
     return "\n\n".join(blocked) if blocked else None
@@ -223,8 +224,8 @@ def promote_chapter(project: Path, chapter: int, *, skip_scan: bool = False) -> 
         findings = scan_gate(prose)
         require(
             findings is None,
-            f"第{chapter}章候选未过质量门，拒绝并入正稿（先按发现改写，或在标题行下加 "
-            f"<!-- 去味:跳过 --> 显式豁免，或 promote 加 --no-scan 绕过）：\n{findings}",
+            f"第{chapter}章候选未通过采用前确定性检查，拒绝并入正稿。"
+            f"先修正文或检查环境；明确跳过时，在标题后加 <!-- 去味:跳过 --> 或使用 --no-scan：\n{findings}",
         )
     transaction = find_transaction(project, chapter)
     require(
@@ -298,7 +299,7 @@ def build_parser() -> argparse.ArgumentParser:
     group = promote.add_mutually_exclusive_group(required=True)
     group.add_argument("--chapter", type=int, help="采用指定章号")
     group.add_argument("--all", action="store_true", help="按章号升序采用全部候选")
-    promote.add_argument("--no-scan", action="store_true", help="绕过采用前质量门（显式覆盖）")
+    promote.add_argument("--no-scan", action="store_true", help="显式跳过采用前确定性质量检查")
 
     reject = sub.add_parser("reject", help="归档被拒/被替换的候选（正稿与追踪不动）")
     reject.add_argument("--project", type=Path, required=True)

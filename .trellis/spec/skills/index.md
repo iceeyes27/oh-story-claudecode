@@ -10,6 +10,7 @@
 | --- | --- |
 | [Canonical assets](./canonical-assets.md) | `skills/` 中的共享与独立 Skill 资产 |
 | [Validation](./validation.md) | `scripts/`、本地验证和任何影响 Skill 契约的修改 |
+| [Long-form chapter artifacts](./longform-artifacts.md) | `story-write long` 的骨架、候选、正稿、流程状态与采用边界 |
 
 ## Entry rule
 

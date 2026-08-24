@@ -34,13 +34,20 @@ initial_document = _fixtures.initial_document
 transaction = _fixtures.transaction
 
 
-def run(tool: Path, args: list[str], *, expect: int = 0) -> subprocess.CompletedProcess[str]:
+def run(
+    tool: Path,
+    args: list[str],
+    *,
+    expect: int = 0,
+    env: dict[str, str] | None = None,
+) -> subprocess.CompletedProcess[str]:
     completed = subprocess.run(
         [sys.executable, str(tool), *args],
         text=True,
         capture_output=True,
         check=False,
         encoding="utf-8",
+        env=env,
     )
     assert completed.returncode == expect, (
         f"expected {expect} got {completed.returncode}\nSTDOUT:{completed.stdout}\nSTDERR:{completed.stderr}"
@@ -72,8 +79,19 @@ class CandidateCommitTests(unittest.TestCase):
             args.extend(["--input", str(path)])
         return run(TRACKING_TOOL, args, expect=expect)
 
-    def _candidate(self, args: list[str], *, expect: int = 0):
-        return run(TOOL, [*args, "--project", str(self.project)] if "--project" not in args else args, expect=expect)
+    def _candidate(
+        self,
+        args: list[str],
+        *,
+        expect: int = 0,
+        env: dict[str, str] | None = None,
+    ):
+        return run(
+            TOOL,
+            [*args, "--project", str(self.project)] if "--project" not in args else args,
+            expect=expect,
+            env=env,
+        )
 
     def read_state(self) -> dict:
         return json.loads((self.project / "追踪/_tracking-state.json").read_text(encoding="utf-8"))
@@ -200,6 +218,15 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertEqual(self.final_files(), [])
         self.assertEqual(self.read_state()["state_revision"], 0)
         self.assertTrue((self.candidate_dir / "第001章_测试章名.md").exists())
+
+    def test_promote_quality_gate_fails_when_node_is_unavailable(self) -> None:
+        self.make_candidate(1)
+        env = os.environ.copy()
+        env["PATH"] = ""
+        result = self._candidate(["promote", "--chapter", "1"], expect=2, env=env)
+        self.assertIn("未找到 node", result.stderr)
+        self.assertEqual(self.final_files(), [])
+        self.assertEqual(self.read_state()["state_revision"], 0)
 
     def test_promote_no_scan_bypasses_gate(self) -> None:
         self.make_candidate(1, body=f"# 第1章\n{self.TOXIC}\n")

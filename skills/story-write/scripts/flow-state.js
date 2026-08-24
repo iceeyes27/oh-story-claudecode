@@ -6,7 +6,7 @@ const path = require('path');
 
 const USAGE = `Usage: node flow-state.js [--dir <workspace-or-book>] [--json] <command> [args]
 
-写作阶段披露状态工具。只判断 story-write 当前阶段和资料范围，不生成正文。
+写作阶段披露状态工具。只判断 story-write 当前阶段和资料范围，不生成骨架或正文。
 
 Commands:
   detect [--write]      从项目文件推断流程状态；--write 写入 追踪/写作流程状态.json
@@ -54,7 +54,10 @@ const VALID_NEXT_ACTIONS = new Set([
   'build_setting',
   'build_outline',
   'init_tracking',
-  'write_chapter',
+  'write_chapter', // 兼容升级前已经写入的流程状态；detect 不再生成此动作。
+  'write_chapter_skeleton',
+  'expand_chapter_skeleton',
+  'review_candidate',
   'quality_check',
   'build_short_setting',
   'write_short_body',
@@ -147,6 +150,7 @@ function listChapterFiles(bodyDir) {
       if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
       const full = path.join(dir, entry.name);
       if (entry.isDirectory() && !entry.isSymbolicLink()) {
+        if (entry.name === '候选' || entry.name === '_历史') continue;
         walk(full);
         continue;
       }
@@ -174,6 +178,11 @@ function hasOutlineFor(book, chapter) {
   if (!isDir(outlineDir)) return false;
   const expected = `细纲_第${pad3(chapter)}章.md`;
   return exists(path.join(outlineDir, expected));
+}
+
+function findChapterFile(root, chapter) {
+  const matching = listChapterFiles(root).filter((item) => item.chapter === chapter);
+  return matching.length ? matching[matching.length - 1] : null;
 }
 
 function detectLongState(book, activeBook) {
@@ -222,14 +231,32 @@ function detectLongState(book, activeBook) {
     missing.push('结构化追踪');
   } else {
     currentPhase = 'chapter_writing';
-    currentStage = lastChapter === 0 ? 'ready_first_chapter' : 'ready_next_chapter';
-    nextAction = 'write_chapter';
     known.push(`第${pad3(currentChapter)}章细纲`);
     artifacts.push(`大纲/细纲_第${pad3(currentChapter)}章.md`);
     if (lastChapter > 0) {
-      const matching = listChapterFiles(path.join(book, '正文')).filter((item) => item.chapter === lastChapter);
-      const latest = matching[matching.length - 1];
+      const latest = findChapterFile(path.join(book, '正文'), lastChapter);
       artifacts.push(latest ? path.relative(book, latest.file).split(path.sep).join('/') : `正文/**/第${pad3(lastChapter)}章_*.md`);
+    }
+
+    const skeleton = findChapterFile(path.join(book, '骨架'), currentChapter);
+    const candidate = findChapterFile(path.join(book, '候选'), currentChapter);
+    if (candidate) {
+      currentStage = 'candidate_review';
+      nextAction = 'review_candidate';
+      known.push(`第${pad3(currentChapter)}章候选正文`);
+      artifacts.push(toSlash(path.relative(book, candidate.file)));
+      if (skeleton) {
+        known.push(`第${pad3(currentChapter)}章骨架`);
+        artifacts.push(toSlash(path.relative(book, skeleton.file)));
+      }
+    } else if (skeleton) {
+      currentStage = 'skeleton_ready';
+      nextAction = 'expand_chapter_skeleton';
+      known.push(`第${pad3(currentChapter)}章骨架`);
+      artifacts.push(toSlash(path.relative(book, skeleton.file)));
+    } else {
+      currentStage = lastChapter === 0 ? 'ready_first_skeleton' : 'ready_next_skeleton';
+      nextAction = 'write_chapter_skeleton';
     }
   }
 

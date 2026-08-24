@@ -76,7 +76,22 @@ printf '{}\n' > "$BOOK/追踪/_tracking-state.json"
 node "$FLOW" --dir "$BOOK" --json detect > "$TMP_DIR/long-ready.json"
 expect_json_field "$TMP_DIR/long-ready.json" "data.current_phase === 'chapter_writing'" "chapter writing phase detected"
 expect_json_field "$TMP_DIR/long-ready.json" "data.current_chapter === 1" "first chapter selected"
-expect_json_field "$TMP_DIR/long-ready.json" "data.next_action === 'write_chapter'" "write action selected"
+expect_json_field "$TMP_DIR/long-ready.json" "data.next_action === 'write_chapter_skeleton'" "skeleton action selected"
+
+# --- 2b. Skeleton and candidate are planning/review states, not completed chapters ---
+mkdir -p "$BOOK/骨架" "$BOOK/候选"
+printf '# 第001章骨架\n' > "$BOOK/骨架/第001章_开篇.md"
+node "$FLOW" --dir "$BOOK" --json detect > "$TMP_DIR/long-skeleton-ready.json"
+expect_json_field "$TMP_DIR/long-skeleton-ready.json" "data.current_chapter === 1" "skeleton does not advance formal chapter"
+expect_json_field "$TMP_DIR/long-skeleton-ready.json" "data.current_stage === 'skeleton_ready'" "skeleton-ready stage detected"
+expect_json_field "$TMP_DIR/long-skeleton-ready.json" "data.next_action === 'expand_chapter_skeleton'" "skeleton expansion action selected"
+
+printf '# 第001章候选正文\n' > "$BOOK/候选/第001章_开篇.md"
+node "$FLOW" --dir "$BOOK" --json detect > "$TMP_DIR/long-candidate-review.json"
+expect_json_field "$TMP_DIR/long-candidate-review.json" "data.current_chapter === 1" "candidate does not advance formal chapter"
+expect_json_field "$TMP_DIR/long-candidate-review.json" "data.current_stage === 'candidate_review'" "candidate review stage detected"
+expect_json_field "$TMP_DIR/long-candidate-review.json" "data.next_action === 'review_candidate'" "candidate review action selected"
+rm -rf "$BOOK/骨架" "$BOOK/候选"
 
 # --- 3. Existing chapter advances to next chapter and requires matching outline ---
 printf '# 正文\n' > "$BOOK/正文.tmp"
@@ -101,6 +116,8 @@ printf '# 题材定位\n' > "$VOLUME_BOOK/设定/题材定位.md"
 printf '{}\n' > "$VOLUME_BOOK/追踪/_tracking-state.json"
 printf '# 第106章\n' > "$VOLUME_BOOK/正文/第2卷_转折/第106章_归队.md"
 printf '# 第999章 原稿\n' > "$VOLUME_BOOK/正文/第2卷_转折/第999章_原稿_废稿.md"
+mkdir -p "$VOLUME_BOOK/正文/候选"
+printf '# 第999章 候选\n' > "$VOLUME_BOOK/正文/候选/第999章_不应计入.md"
 printf '# 目录\n' > "$VOLUME_BOOK/正文/第2卷_转折/目录.md"
 printf '# 第107章细纲\n' > "$VOLUME_BOOK/大纲/细纲_第107章.md"
 node "$FLOW" --dir "$VOLUME_BOOK" --json detect > "$TMP_DIR/long-volume.json"
@@ -117,6 +134,9 @@ expect_json_field "$TMP_DIR/read.json" "data.current_chapter === 2" "read return
 node "$FLOW" --dir "$BOOK" --json update '{"current_stage":"validate","next_action":"quality_check"}' > "$TMP_DIR/update.json"
 expect_json_field "$TMP_DIR/update.json" "data.current_stage === 'validate'" "update changes current stage"
 expect_json_field "$TMP_DIR/update.json" "data.schema_version === 1" "schema version preserved"
+node "$FLOW" --dir "$BOOK" --json update '{"next_action":"write_chapter"}' > /dev/null
+node "$FLOW" --dir "$BOOK" --json update '{"current_stage":"legacy_state_check"}' > "$TMP_DIR/legacy-update.json"
+expect_json_field "$TMP_DIR/legacy-update.json" "data.next_action === 'write_chapter'" "legacy write action remains readable during migration"
 expect_exit 2 "update rejects unknown field" node "$FLOW" --dir "$BOOK" --json update '{"unexpected":true}'
 expect_exit 2 "update rejects unsafe artifact path" node "$FLOW" --dir "$BOOK" --json update '{"artifacts":["../outside.md"]}'
 

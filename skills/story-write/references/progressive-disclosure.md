@@ -19,16 +19,17 @@
   "current_phase": "chapter_writing",
   "current_book": "书名",
   "current_chapter": 21,
-  "current_stage": "draft",
-  "known_inputs": ["题材定位", "卷纲", "本章细纲", "续写状态卡"],
+  "current_stage": "skeleton_ready",
+  "known_inputs": ["题材定位", "卷纲", "本章细纲", "续写状态卡", "本章骨架"],
   "missing_inputs": [],
   "artifacts": [
     "设定/题材定位.md",
     "大纲/细纲_第021章.md",
-    "追踪/上下文.md"
+    "追踪/上下文.md",
+    "骨架/第021章_章名.md"
   ],
   "execution_status": "ready",
-  "next_action": "write_chapter"
+  "next_action": "expand_chapter_skeleton"
 }
 ```
 
@@ -40,12 +41,12 @@
 | `current_phase` | `topic`、`setting`、`outline`、`chapter_writing`、`revision`、`quality_check`、`publish_ready` |
 | `current_book` | 当前书名或相对目录 |
 | `current_chapter` | 当前要写、改或检查的章节号；短篇可省略 |
-| `current_stage` | 阶段内位置，如 `detect`、`plan`、`draft`、`validate`、`repair`、`done` |
+| `current_stage` | 阶段内位置，如 `detect`、`plan`、`ready_first_skeleton`、`skeleton_ready`、`candidate_review`、`validate`、`repair`、`done` |
 | `known_inputs` | 已识别且本阶段会使用的资料 |
 | `missing_inputs` | 阻塞当前阶段的最小缺失项 |
 | `artifacts` | 本阶段允许读取或写入的主要文件 |
 | `execution_status` | `ready`、`blocked`、`running`、`needs_repair`、`done` |
-| `next_action` | 下一步动作名，必须能映射到本 skill 的流程 |
+| `next_action` | 下一步动作名，必须能映射到本 skill 的流程；长篇章节阶段依次为 `write_chapter_skeleton`、`expand_chapter_skeleton`、`review_candidate` |
 
 ## 阶段读取规则
 
@@ -54,7 +55,7 @@
 | `topic` | `选题决策.md`、扫榜结果、对标候选索引 | 正文全文、全部角色档案 |
 | `setting` | 题材参考、对标情绪/节奏、核心角色资料 | 未来章节正文、无关题材包 |
 | `outline` | 设定、卷纲、对标结构、契约规则 | 正文全文 |
-| `chapter_writing` | 本章细纲、上一章正文、续写状态卡、本章出场角色、相关伏笔、题材正文提示卡 | 全部正文、全部对标章节 |
+| `chapter_writing` | 本章细纲、上一章正式正文、续写状态卡、本章出场角色、相关伏笔；按阶段加读同章骨架或候选正文 | 全部正文、全部对标章节、其他章骨架或候选 |
 | `revision` | 被修改章节、该章时点状态、相邻章节、相关追踪 | 不相关卷的正文 |
 | `quality_check` | 本次检查范围、质量规则、扫描脚本 | 非检查范围正文 |
 | `publish_ready` | 待发布章节、平台格式规则、发布队列 | 大纲和设定全文 |
@@ -79,10 +80,11 @@
 
 1. 完成选题确认后，进入 `setting`。
 2. 写完核心设定后，进入 `outline`。
-3. 生成可写细纲后，进入 `chapter_writing`。
-4. 每章正文通过质量检查后，推进 `current_chapter`。
-5. 用户要求修改旧章时，临时进入 `revision`，完成后回到修改前阶段。
-6. 用户只说“检查”时，进入 `quality_check`，保持只读，除非用户明确要求修改。
+3. 生成可写细纲后，进入 `chapter_writing/ready_*_skeleton`，下一步生成章节骨架。
+4. 骨架通过结构验证后，进入 `chapter_writing/skeleton_ready`；骨架不推进正式章号或追踪。
+5. 收到成稿候选后，进入 `chapter_writing/candidate_review`；只有候选采用并通过追踪事务后才推进 `current_chapter`。
+6. 用户要求修改旧章时，临时进入 `revision`，完成后回到修改前阶段。
+7. 用户只说“检查”时，进入 `quality_check`，保持只读，除非用户明确要求修改。
 
 ## 与状态库的分工
 
@@ -94,5 +96,5 @@
 
 - 状态文件不存在：从目录结构和追踪文件推断；推断成功后继续。
 - 状态字段缺失：补齐能从文件得到的字段，只问无法推断的必需项。
-- 状态与正文冲突：以正文和追踪事务为准，更新流程状态。
+- 状态与产物冲突：正式故事事实以 `正文/` 和追踪事务为准；骨架与候选只能决定流程阶段，不能覆盖事实状态。
 - `missing_inputs` 非空：停止进入下一阶段，只报告缺失项和修复动作。

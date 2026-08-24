@@ -166,3 +166,24 @@
 ### Status
 
 [OK] **Completed**
+
+
+## Session 8: 长篇章节骨架模式
+
+**Date**: 2026-08-24
+**Task**: 长篇章节骨架模式
+**Branch**: `main`
+
+### Summary
+
+将长篇默认章节产物改为可验证骨架，成稿进入书根候选，作者采用后才推进正稿与追踪；补齐失败即拒绝的采用前检查和回归测试。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `196e304` | (see git log) |
+
+### Status
+
+[OK] **Completed**

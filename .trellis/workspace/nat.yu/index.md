@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 7
-- **Last Active**: 2026-08-21
+- **Total Sessions**: 8
+- **Last Active**: 2026-08-24
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~168 | Active |
+| `journal-1.md` | ~189 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 8 | 2026-08-24 | 长篇章节骨架模式 | `196e304` | `main` |
 | 7 | 2026-08-21 | 候选系统（作者拍板）落地到 story-write | `bb7f2b2`, `b00fd9a`, `33054da` | `main` |
 | 6 | 2026-08-18 | 增强通用去 AI 味与保真翻译 | `81775b6` | `main` |
 | 5 | 2026-08-17 | 复合检查覆盖契约与写作 Hook 修复 | `47cc4c4`, `7fb8d53` | `main` |

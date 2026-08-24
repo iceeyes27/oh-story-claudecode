@@ -138,6 +138,22 @@ In Trellis, command templates (e.g., `record-session.md`) exist in **multiple pl
 
 ---
 
+## Filesystem Path Containment Across Runtime Layers
+
+Shell launchers and Node/Python runtimes may receive different absolute spellings for the same file. On macOS, `pwd -P` resolves `/var` to `/private/var` and `/tmp` to `/private/tmp`; a host event can still report the lexical alias. Comparing only `path.resolve()` results then rejects a valid in-project target. The opposite error is also possible: a path can look lexically inside the project while a symlink resolves outside it.
+
+### Checklist: Before Adding A Path Boundary
+
+- [ ] Compare physical paths (`realpath`) for the project root and target, not only normalized strings.
+- [ ] If the target may not exist yet, resolve its nearest existing ancestor and reattach the missing suffix.
+- [ ] Accept two aliases that resolve to the same in-root object.
+- [ ] Reject an in-root lexical path whose physical target escapes through a symlink.
+- [ ] Cover both directions in an integration test that crosses the launcher/runtime boundary.
+
+**Real-world example**: The Claude post-write hook used `pwd -P` for its root but `path.resolve()` for event targets. A macOS fixture rooted under `/var` became `/private/var` on one side only, so all prose findings were silently discarded. Centralizing physical containment in the shared hook core fixed both alias acceptance and symlink-escape rejection.
+
+---
+
 ## Generated Runtime Template Upgrade Consistency
 
 Some generated files are both documentation and runtime input. In Trellis,

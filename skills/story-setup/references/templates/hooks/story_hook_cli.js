@@ -71,11 +71,6 @@ function collectTargetPaths(value, targets = new Set(), depth = 0) {
   return targets
 }
 
-function withinRoot(root, candidate) {
-  const relative = path.relative(path.resolve(root), path.resolve(candidate))
-  return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative))
-}
-
 const [command, ...args] = process.argv.slice(2)
 
 if (command === "extract-target") {
@@ -105,10 +100,7 @@ if (command === "extract-target") {
     if (!shellCommand) process.exit(0)
     let base = root
     const requestedBase = core.existingDir(digWorkingDirectory(obj))
-    if (requestedBase) {
-      const relative = path.relative(path.resolve(root), requestedBase)
-      if (!relative.startsWith("..") && !path.isAbsolute(relative)) base = requestedBase
-    }
+    if (requestedBase && core.pathWithin(root, requestedBase)) base = requestedBase
     const seen = new Set()
     for (const target of core.extractProseTargets(shellCommand)) {
       const absolute = core.resolveTarget(root, target, base)
@@ -155,18 +147,18 @@ if (command === "extract-target") {
     const tool = digString(obj, ["tool_name", "toolName", "name"], true)
     let base = rootDir
     const requestedBase = core.existingDir(digWorkingDirectory(obj))
-    if (requestedBase && withinRoot(rootDir, requestedBase)) base = requestedBase
+    if (requestedBase && core.pathWithin(rootDir, requestedBase)) base = requestedBase
 
     const targets = new Set()
     for (const target of collectTargetPaths(obj)) {
       const absolute = core.resolveTarget(rootDir, target, base)
-      if (withinRoot(rootDir, absolute)) targets.add(absolute)
+      if (core.pathWithin(rootDir, absolute)) targets.add(absolute)
     }
     const shellCommand = digCommand(obj)
     if (tool === "Bash" || shellCommand) {
       for (const target of core.extractProseTargets(shellCommand)) {
         const absolute = core.resolveTarget(rootDir, target, base)
-        if (withinRoot(rootDir, absolute)) targets.add(absolute)
+        if (core.pathWithin(rootDir, absolute)) targets.add(absolute)
       }
     }
 

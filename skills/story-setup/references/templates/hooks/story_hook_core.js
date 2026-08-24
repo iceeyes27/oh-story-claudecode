@@ -14,9 +14,33 @@ function existingDir(value) {
   }
 }
 
+// 路径范围判定必须比较物理路径，不能只比较 path.resolve() 的词法结果。macOS 的
+// /var -> /private/var、/tmp -> /private/tmp 会让同一文件出现两种绝对路径；反过来，
+// 项目内符号链接也可能把词法上“在根内”的路径指到根外。目标尚不存在时逐级寻找最近的
+// 已存在祖先并 realpath，再把缺失后缀接回，兼顾写入前与写入后事件。
+function canonicalPath(value) {
+  const resolved = path.resolve(value)
+  let cursor = resolved
+  const missing = []
+  while (true) {
+    try {
+      return path.join(fs.realpathSync(cursor), ...missing.reverse())
+    } catch {}
+    const parent = path.dirname(cursor)
+    if (parent === cursor) return resolved
+    missing.push(path.basename(cursor))
+    cursor = parent
+  }
+}
+
+function pathWithin(root, candidate) {
+  const relative = path.relative(canonicalPath(root), canonicalPath(candidate))
+  return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative))
+}
+
 function safeRelative(root, target) {
   try {
-    const rel = path.relative(path.resolve(root), path.resolve(target))
+    const rel = path.relative(canonicalPath(root), canonicalPath(target))
     return rel && !rel.startsWith("..") ? rel.split(path.sep).join("/") : String(target)
   } catch {
     return String(target)
@@ -1241,6 +1265,8 @@ function stagedMarkdownWarnings(root) {
 
 module.exports = {
   existingDir,
+  canonicalPath,
+  pathWithin,
   safeRelative,
   resolveTarget,
   firstLine,

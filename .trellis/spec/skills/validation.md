@@ -48,11 +48,11 @@
 
 - Good：16 个公开 Skill、`_shared`、16 个 command 和各 marketplace 一致。
 - Base：仓库内 `.agents/skills` 发现全部 31 个 Skill，公开集合为 16 个。
-- Bad：平台只安装 `story` 与 10 个旧公开 Skill，却宣称复合检查 7/7。
+- Bad：平台只安装 `story` 与 10 个旧公开 Skill，却宣称复合检查 8/8。
 
 ### 6. Tests Required
 
-- `skills/story/tests/composite-check-contract.test.js`：断言七阶段顺序和公开依赖集合。
+- `skills/story/tests/composite-check-contract.test.js`：断言八阶段顺序、103 个必检项和公开依赖集合。
 - `scripts/skill-publication-coverage.test.js`：断言公开与本地专用集合无遗漏、无重叠且原因非空。
 - 平台检查：断言 marketplace、commands、frontmatter、manifest 与清单一一对应。
 - 平台 AGENTS 路由模板中的 Skill 名称也必须与 `platform-skill-set.json` 一致，禁止保留已删除的 `story-long-*` / `story-short-*` 名称。
@@ -84,9 +84,10 @@ Correct: 读取 platform-skill-set.json，并额外复制 skills/_shared/。
 
 ### 3. Contracts
 
-- 清单必须声明七个有序阶段；当前清单登记 95 个必检项。
+- 清单必须声明八个有序阶段；当前清单登记 103 个必检项。
 - 每个必检项必须有唯一 `id`、`executor`、`scope`、`required` 和 `report`。
 - Hook 输入使用 `hook_event_name`、`tool_name`、`tool_input`；Write/Edit/MultiEdit 读取 `file_path`、`path`、`filePath`，Bash 读取 `command`、`cmd` 或 `script`。
+- Hook 的项目根、工作目录和目标文件必须先按物理路径归一化再做范围判断：允许 `/var` 与 `/private/var`、项目根别名等同对象路径，拒绝词法位于根内但经符号链接逃到根外的目标。
 - 有正文发现时输出 `hookSpecificOutput.hookEventName` 和非空 `additionalContext`；失败 Bash 事件前置“命令失败但文件可能已改变：”。
 
 ### 4. Validation & Error Matrix
@@ -102,20 +103,20 @@ Correct: 读取 platform-skill-set.json，并额外复制 skills/_shared/。
 
 ### 5. Good / Base / Bad Cases
 
-- Good：七阶段全部有结论，95 个必检项均有状态，输出 `过滤项 95/95`。
+- Good：八阶段全部有结论，103 个必检项均有状态，输出 `复合检查完成：8/8，过滤项 103/103`。
 - Base：某项发现问题但仍执行后续项目，输出 `FAIL` 而不是中断。
-- Bad：只报告七个阶段名称，或把无法读取的文件静默排除后输出完成。
+- Bad：只报告八个阶段名称，或把无法读取的文件静默排除后输出完成。
 
 ### 6. Tests Required
 
-- `node --test skills/story/tests/composite-check-contract.test.js`：阶段顺序、95 项覆盖、依赖来源、漏项、阻断、触发词和旧入口提示。
-- `bash scripts/test-prose-backstop-hook.sh`：Bash 成功/失败、Write、Edit、MultiEdit 的合法 Hook JSON 与正文发现。
+- `node --test skills/story/tests/composite-check-contract.test.js`：阶段顺序、103 项覆盖、规范同步、依赖来源、漏项、阻断、触发词和旧入口提示。
+- `bash scripts/test-prose-backstop-hook.sh`：Bash 成功/失败、Write、Edit、MultiEdit 的合法 Hook JSON 与正文发现，并覆盖物理同路径别名及符号链接逃逸。
 - `bash scripts/test-story-continuity.sh`：章节号与 tracking state 判定，不依赖固定 mtime 延迟。
 - `bash scripts/check-story-setup-deployment.sh`：部署模板必须包含 `prose-after-event` 路由。
 
 ### 7. Wrong vs Correct
 
 ```text
-Wrong: 只检查 story-review，并把“七阶段已列出”当成复合检查完成。
+Wrong: 只检查 story-review，并把“八阶段已列出”当成复合检查完成。
 Correct: 读取 composite-check-manifest.json，逐项记录状态；只有阶段和全部必检项都有结果时才报告完成。
 ```

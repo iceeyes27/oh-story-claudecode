@@ -11,6 +11,7 @@ const sourceRoot = path.dirname(skillsRoot);
 const skillPath = path.resolve(__dirname, '..', 'SKILL.md');
 const manifestPath = path.resolve(__dirname, '..', 'references', 'composite-check-manifest.json');
 const skillSetPath = path.join(sourceRoot, 'scripts', 'platform-skill-set.json');
+const validationSpecPath = path.join(sourceRoot, '.trellis', 'spec', 'skills', 'validation.md');
 
 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
 const skill = fs.readFileSync(skillPath, 'utf8');
@@ -70,6 +71,7 @@ test('generic novel check requires all eight stages and the manifest contract', 
   ];
 
   assert.equal(manifest.stages.length, 8);
+  assert.equal(manifest.completion.stageCount, 8);
   assert.deepEqual(manifest.skipPolicy, {allowedOnlyWhen: 'not-applicable', requiresReason: true});
   assert.deepEqual(
     manifest.stages.map((stage) => [stage.id, stage.route]),
@@ -77,7 +79,7 @@ test('generic novel check requires all eight stages and the manifest contract', 
   );
   assert.deepEqual(manifest.stages.map((stage) => stage.order), [1, 2, 3, 4, 5, 6, 7, 8]);
   assert.equal(new Set(allItems().map((item) => item.id)).size, allItems().length);
-  assert.ok(allItems().length >= 90, 'manifest must enumerate internal checks, not only seven routes');
+  assert.equal(allItems().length, 103, 'manifest and validation spec must update together');
 
   for (const item of allItems()) {
     assert.equal(typeof item.id, 'string');
@@ -94,6 +96,14 @@ test('generic novel check requires all eight stages and the manifest contract', 
   assert.match(skill, /每个必检项都有状态/);
   assert.match(skill, /复合检查完成：8\/8，过滤项 M\/M/);
   assert.match(skill, /不得静默跳过/);
+});
+
+test('validation spec stays synchronized with the composite manifest', () => {
+  const validationSpec = fs.readFileSync(validationSpecPath, 'utf8');
+  assert.match(validationSpec, /八个有序阶段/);
+  assert.match(validationSpec, /103 个必检项/);
+  assert.match(validationSpec, /复合检查完成：8\/8，过滤项 103\/103/);
+  assert.doesNotMatch(validationSpec, /七阶段|95 个必检项|复合检查 7\/7/);
 });
 
 test('AI flavor manifest preserves all ten layers and five semantic mismatch checks', () => {

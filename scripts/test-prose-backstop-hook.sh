@@ -13,7 +13,8 @@ HOOK="$REPO_ROOT/skills/story-setup/references/templates/hooks/check-prose-after
 bash -n "$HOOK" || { echo "FAIL: hook has syntax errors" >&2; exit 1; }
 
 TMP="$(mktemp -d)"
-trap 'rm -rf "$TMP"' EXIT
+TMP_ALIAS_ROOT="$(mktemp -d)"
+trap 'rm -rf "$TMP" "$TMP_ALIAS_ROOT"' EXIT
 # 真书结构：设定.md + 大纲/ + 正文/
 mkdir -p "$TMP/某书/正文" "$TMP/某书/大纲" "$TMP/docs/正文" "$TMP/游离/正文"
 printf '# 设定\n主角江晨。\n' > "$TMP/某书/设定.md"
@@ -47,6 +48,20 @@ expect_silent "$TMP/docs/正文.md"
 expect_silent "$TMP/游离/正文/第005章.md"
 # ② 真正文（极短→落盘信号）必须触发
 expect_fire "$TMP/某书/正文/第001章_截断.md"
+
+# ②b 路径边界按物理路径判断：同一项目的别名路径可扫，根内链接逃到根外不能扫。
+# macOS /var -> /private/var 会自然覆盖第一种情况；显式 symlink 让 Linux 也能稳定回归。
+if ln -s "$TMP" "$TMP_ALIAS_ROOT/project-alias" 2>/dev/null && [ -L "$TMP_ALIAS_ROOT/project-alias" ]; then
+  expect_fire "$TMP_ALIAS_ROOT/project-alias/某书/正文/第001章_截断.md"
+
+  mkdir -p "$TMP_ALIAS_ROOT/outside-book/正文"
+  printf '# 设定\n外部书。\n' > "$TMP_ALIAS_ROOT/outside-book/设定.md"
+  printf '他' > "$TMP_ALIAS_ROOT/outside-book/正文/第001章_外部.md"
+  ln -s "$TMP_ALIAS_ROOT/outside-book" "$TMP/外链书"
+  expect_silent "$TMP/外链书/正文/第001章_外部.md"
+else
+  echo "SKIP: symlink alias regression unavailable on this platform"
+fi
 
 # ③ 内容网：真正文里的硬信号必须被抓，且抓对类型；干净正文（排比+AI角色对话+悬念收尾）静默。
 expect_fire_kw() {

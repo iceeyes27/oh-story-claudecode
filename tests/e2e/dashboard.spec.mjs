@@ -594,3 +594,72 @@ test("@mobile 手机视口仍可从真实长篇项目打开大纲", async ({ pag
     await expect(page.locator(".editor-panel")).toBeHidden();
   }
 });
+
+test("候选审批：并排审阅、确认后采用，取消时不发请求", async ({ page }) => {
+  const book = "长篇/让你管账号，你高燃混剪炸全网";
+  const candidate = {
+    chapter: 3,
+    name: "第003章_这个拍 MV 的人，简直太懂！.md",
+    path: `${book}/正文/第003章_这个拍 MV 的人，简直太懂！.md`,
+    hasTransaction: true,
+    transactionPath: `${book}/候选/第003章_追踪事务.json`,
+    finalExists: false,
+    outlinePath: `${book}/大纲/细纲_第003章.md`,
+    skeletonPath: null,
+    previousFinalPath: `${book}/正文/第002章_《诸君，且听龙吟》.md`,
+  };
+  let listRequests = 0;
+  await page.route("**/api/candidates", async (route) => {
+    listRequests += 1;
+    await route.fulfill({
+      json:
+        listRequests === 1
+          ? {
+              projects: [
+                { name: "让你管账号，你高燃混剪炸全网", path: book, candidates: [candidate] },
+              ],
+              total: 1,
+              scanErrors: [],
+            }
+          : { projects: [], total: 0, scanErrors: [] },
+    });
+  });
+  const actionBodies = [];
+  await page.route("**/api/candidates/action", async (route) => {
+    actionBodies.push(route.request().postDataJSON());
+    await route.fulfill({ json: { ok: true, action: "promote", chapter: 3, result: {} } });
+  });
+
+  await page.goto("/");
+  await expect(page.locator("#candidatesBadge")).toHaveText("1");
+  await page.getByRole("tab", { name: /候选审批/ }).click();
+  await expect(page.locator("#treeSearch")).toBeDisabled();
+  await expect(page.locator("#fileTree")).toContainText("让你管账号");
+
+  await page.locator(".candidate-row").click();
+  await expect(page.locator("#reviewWorkspace")).toBeVisible();
+  await expect(page.locator("#reviewTitle")).toContainText("第003章");
+  // 左右两栏都要装载真实文件内容；参照默认取上一章正稿
+  await expect(page.locator("#reviewCandidatePane")).not.toHaveText("");
+  await expect(page.locator("#reviewReferencePane")).not.toHaveText("");
+  await expect(page.locator("#referenceSelect")).toHaveValue(candidate.previousFinalPath);
+
+  await page.locator("#referenceSelect").selectOption(candidate.outlinePath);
+  await expect(page.locator("#reviewReferencePane")).toContainText("细纲");
+
+  // 取消确认时绝不能发出采用请求
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page.locator("#promoteButton").click();
+  await expect(page.locator("#reviewWorkspace")).toBeVisible();
+  expect(actionBodies).toHaveLength(0);
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.locator("#promoteButton").click();
+  await expect(page.locator("#toastRegion")).toContainText("已采用");
+  await expect(page.locator("#reviewWorkspace")).toBeHidden();
+  expect(actionBodies).toEqual([
+    { action: "promote", project: book, chapter: 3, rewrite: false },
+  ]);
+  await expect(page.locator("#candidatesBadge")).toHaveText("0");
+  await expect(page.locator("#fileTree")).toContainText("没有待审批的候选章节");
+});

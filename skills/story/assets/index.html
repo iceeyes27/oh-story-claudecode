@@ -70,6 +70,14 @@
               <span>写作项目</span>
               <b id="projectsBadge">0</b>
             </button>
+            <button id="candidatesTab" type="button" role="tab" aria-selected="false" aria-controls="treePanel" data-view="candidates">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 4.5h14v15H5z"></path>
+                <path d="m8.5 12 2.5 2.5 4.5-5"></path>
+              </svg>
+              <span>候选审批</span>
+              <b id="candidatesBadge">0</b>
+            </button>
           </div>
 
           <label class="search-field" for="treeSearch">
@@ -173,6 +181,42 @@
                 </button>
               </div>
             </footer>
+          </div>
+
+          <div id="reviewWorkspace" class="review-workspace" hidden>
+            <header class="review-toolbar">
+              <div class="document-identity">
+                <nav id="reviewBreadcrumbs" class="breadcrumbs" aria-label="候选路径"></nav>
+                <div class="document-title-row">
+                  <h2 id="reviewTitle">候选审阅</h2>
+                </div>
+              </div>
+              <div class="review-actions">
+                <label class="review-reference-picker">
+                  <span>参照</span>
+                  <select id="referenceSelect"></select>
+                </label>
+                <button id="promoteButton" class="save-button" type="button">采用</button>
+                <button id="rewriteButton" class="secondary-button" type="button">弃用并重写</button>
+                <button id="rejectButton" class="danger-button" type="button">弃用</button>
+                <button id="closeReviewButton" class="icon-button" type="button" title="关闭审阅" aria-label="关闭审阅">
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m6 6 12 12M18 6 6 18"></path>
+                  </svg>
+                </button>
+              </div>
+            </header>
+            <p id="reviewStatus" class="review-status" role="status" hidden></p>
+            <div class="review-body">
+              <section class="review-pane" aria-labelledby="reviewCandidateLabel">
+                <h3 id="reviewCandidateLabel">候选正文</h3>
+                <pre id="reviewCandidatePane" tabindex="0"></pre>
+              </section>
+              <section class="review-pane" aria-labelledby="reviewReferenceLabel">
+                <h3 id="reviewReferenceLabel">参照</h3>
+                <pre id="reviewReferencePane" tabindex="0"></pre>
+              </section>
+            </div>
           </div>
         </section>
       </main>

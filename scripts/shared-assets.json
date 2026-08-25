@@ -15,7 +15,15 @@
       "source": "skills/story-write/scripts/tracking_commit.py",
       "targets": [
         "skills/story-import/scripts/tracking_commit.py",
-        "skills/story-review/scripts/tracking_commit.py"
+        "skills/story-review/scripts/tracking_commit.py",
+        "skills/story/scripts/tracking_commit.py"
+      ]
+    },
+    {
+      "name": "story-candidate-commit",
+      "source": "skills/story-write/scripts/candidate-commit.py",
+      "targets": [
+        "skills/story/scripts/candidate-commit.py"
       ]
     },
     {

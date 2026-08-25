@@ -3,14 +3,17 @@ import { chmod, mkdtemp, mkdir, readFile, rm, stat, symlink, writeFile } from "n
 import { tmpdir } from "node:os";
 import { resolve } from "node:path";
 import { afterEach, describe, test } from "node:test";
+import { spawnSync } from "node:child_process";
 import {
   DashboardError,
   browserLaunchCommand,
   createDashboardServer,
+  listWorkspaceCandidates,
   listWorkspaceDirectory,
   pathsReferToSameFile,
   resolveWorkspaceDirectory,
   resolveWorkspacePath,
+  runCandidateAction,
   scanWorkspace,
   searchWorkspace,
 } from "../skills/story/scripts/dashboard-server.mjs";
@@ -775,5 +778,124 @@ describe("HTTP API", () => {
     } finally {
       await chmod(root, 0o755);
     }
+  });
+});
+
+async function createCandidateWorkspace() {
+  const root = await mkdtemp(resolve(tmpdir(), "oh-story-dashboard-candidates-"));
+  temporaryDirectories.push(root);
+  const book = resolve(root, "长篇", "候选书");
+  await mkdir(resolve(book, "正文"), { recursive: true });
+  await mkdir(resolve(book, "大纲"), { recursive: true });
+  await mkdir(resolve(book, "骨架"), { recursive: true });
+  await mkdir(resolve(book, "候选", "_历史"), { recursive: true });
+  await writeFile(resolve(book, "正文", "第001章_旧稿.md"), "# 第001章 旧稿\n正文。\n", "utf8");
+  await writeFile(resolve(book, "大纲", "细纲_第002章.md"), "# 细纲\n", "utf8");
+  await writeFile(resolve(book, "骨架", "第002章_骨架.md"), "# 骨架\n", "utf8");
+  await writeFile(resolve(book, "候选", "第002章_新章.md"), "# 第002章 新章\n候选正文。\n", "utf8");
+  await writeFile(resolve(book, "候选", "第002章_追踪事务.json"), "{}", "utf8");
+  await writeFile(resolve(book, "候选", "第003章_无事务.md"), "# 第003章\n候选正文。\n", "utf8");
+  await writeFile(resolve(book, "候选", "_历史", "第001章_废稿.md"), "已归档", "utf8");
+  await writeFile(resolve(book, "候选", "说明.txt"), "非候选", "utf8");
+  return { root, book };
+}
+
+const pythonAvailable = ["python3", "python", "py"].some(
+  (command) => spawnSync(command, ["--version"], { stdio: "ignore" }).status === 0,
+);
+
+describe("candidate review", () => {
+  test("lists prose candidates with context paths and skips history, transactions, and non-markdown", async () => {
+    const { root } = await createCandidateWorkspace();
+    const listing = await listWorkspaceCandidates(root);
+
+    assert.equal(listing.total, 2);
+    assert.equal(listing.projects.length, 1);
+    const [project] = listing.projects;
+    assert.equal(project.name, "候选书");
+    assert.deepEqual(
+      project.candidates.map((candidate) => candidate.chapter),
+      [2, 3],
+    );
+
+    const [second, third] = project.candidates;
+    assert.equal(second.hasTransaction, true);
+    assert.equal(second.finalExists, false);
+    assert.equal(second.path, "长篇/候选书/候选/第002章_新章.md");
+    assert.equal(second.outlinePath, "长篇/候选书/大纲/细纲_第002章.md");
+    assert.equal(second.skeletonPath, "长篇/候选书/骨架/第002章_骨架.md");
+    assert.equal(second.previousFinalPath, "长篇/候选书/正文/第001章_旧稿.md");
+    assert.equal(third.hasTransaction, false);
+    assert.equal(third.outlinePath, null);
+    // 归档区与事务/txt 文件绝不能混进待审列表，否则一键采用会打到错误对象上
+    assert.ok(!project.candidates.some((candidate) => candidate.name.includes("废稿")));
+    assert.ok(!project.candidates.some((candidate) => candidate.name.endsWith(".txt")));
+  });
+
+  test("serves candidates over HTTP and rejects invalid action payloads", async () => {
+    const { root } = await createCandidateWorkspace();
+    const baseUrl = await startServer(root);
+
+    const listing = await fetch(`${baseUrl}/api/candidates`).then((response) => response.json());
+    assert.equal(listing.total, 2);
+
+    const invalidAction = await fetch(`${baseUrl}/api/candidates/action`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "publish", project: "长篇/候选书", chapter: 2 }),
+    });
+    assert.equal(invalidAction.status, 400);
+
+    const invalidChapter = await fetch(`${baseUrl}/api/candidates/action`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "reject", project: "长篇/候选书", chapter: 0 }),
+    });
+    assert.equal(invalidChapter.status, 400);
+
+    const outsideWorkspace = await fetch(`${baseUrl}/api/candidates/action`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "reject", project: "../外部", chapter: 2 }),
+    });
+    assert.equal(outsideWorkspace.status, 403);
+
+    const crossOrigin = await fetch(`${baseUrl}/api/candidates/action`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Origin: "http://evil.example" },
+      body: JSON.stringify({ action: "reject", project: "长篇/候选书", chapter: 2 }),
+    });
+    assert.equal(crossOrigin.status, 403);
+  });
+
+  test("reject archives the candidate through candidate-commit.py", { skip: !pythonAvailable }, async () => {
+    const { root, book } = await createCandidateWorkspace();
+    const result = await runCandidateAction(root, {
+      action: "reject",
+      project: "长篇/候选书",
+      chapter: 3,
+      rewrite: true,
+    });
+
+    assert.equal(result.ok, true);
+    assert.equal(result.result.action, "rewrite");
+    await assert.rejects(stat(resolve(book, "候选", "第003章_无事务.md")));
+    const listing = await listWorkspaceCandidates(root);
+    assert.deepEqual(listing.projects[0].candidates.map((candidate) => candidate.chapter), [2]);
+  });
+
+  test("promote without a replayable transaction is refused fail-closed", { skip: !pythonAvailable }, async () => {
+    const { root, book } = await createCandidateWorkspace();
+    await assert.rejects(
+      runCandidateAction(root, { action: "promote", project: "长篇/候选书", chapter: 3 }),
+      (error) => {
+        assert.ok(error instanceof DashboardError);
+        assert.equal(error.status, 422);
+        assert.equal(error.code, "candidate_action_rejected");
+        return true;
+      },
+    );
+    // 采用被拒后候选必须原地保留，作者可以修事务后重试
+    await stat(resolve(book, "候选", "第003章_无事务.md"));
   });
 });

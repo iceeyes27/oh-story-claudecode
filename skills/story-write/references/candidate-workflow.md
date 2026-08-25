@@ -59,9 +59,13 @@
 - **可逆安全网**：拒绝/替换的候选进 `候选/_历史/` 而非硬删，符合仓库既有「中途快照」安全网理念。
 - **骨架与事实分离**：骨架和候选都不能提前改变追踪；采用后的实际正文才是事实来源。
 
+## Dashboard 候选审批（已实现）
+
+`/story dashboard` 的「候选审批」标签页列出各书 `候选/` 待审项（标注 缺追踪事务 / 正稿冲突），审阅视图把候选正文与 上一章正稿 / 本章细纲 / 本章骨架 并排对照，「采用 / 弃用 / 弃用并重写」按钮通过 `POST /api/candidates/action` 调用本目录的 `candidate-commit.py`。Dashboard 不暴露 `--no-scan`：采用一律过 promote 前确定性质量门（fail-closed），被拒时错误信息原样回显给作者。
+
 ## 非目标（扩展项，当前未实现）
 
 - 日更批量候选 + provisional tracking（多章暂存、全部采用时统一 finalize）。
 - 写后 Hook 直接处理书根候选（当前由本流程和 promote 前检查处理）。
-- `/story dashboard` 候选审阅视图 + 候选/正稿 diff。
+- Dashboard 内逐行 diff 高亮（当前为并排对照视图）。
 - 短篇 mode=short 的候选态。

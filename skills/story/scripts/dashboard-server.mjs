@@ -41,6 +41,17 @@ const IGNORED_DIRECTORIES = new Set([
 ]);
 const MAX_FILE_BYTES = 2 * 1024 * 1024;
 const MAX_REQUEST_BYTES = MAX_FILE_BYTES + 64 * 1024;
+const CANDIDATE_DIR = "候选";
+const CANDIDATE_HISTORY_DIR = "_历史";
+const CANDIDATE_TRANSACTION_SUFFIX = "_追踪事务.json";
+const CANDIDATE_CHAPTER_PREFIX = /^第0*(\d+)章/;
+const CANDIDATE_ACTIONS = new Set(["promote", "reject"]);
+const CANDIDATE_ACTION_TIMEOUT_MS = 120_000;
+const CANDIDATE_ACTION_OUTPUT_LIMIT = 256 * 1024;
+// candidate-commit.py 是 story-write 的权威副本经 scripts/shared-assets.json 同步到本 skill 的拷贝
+// （运行时 skill 不得跨 skill 读文件，见 static-check cross-skill-reference 规则）。
+const CANDIDATE_TOOL_PATH = fileURLToPath(new URL("./candidate-commit.py", import.meta.url));
+const PYTHON_COMMANDS = ["python3", "python", "py"];
 const DIRECTORY_PAGE_SIZE = 200;
 const MAX_SEARCH_RESULTS = 100;
 const MAX_SEARCH_NODES = 5000;
@@ -551,6 +562,192 @@ export async function searchWorkspace(root, queryValue, scopeValue) {
   };
 }
 
+function candidateChapterNumber(name) {
+  const match = CANDIDATE_CHAPTER_PREFIX.exec(name);
+  return match ? Number(match[1]) : null;
+}
+
+async function readVisibleFiles(directory) {
+  const entries = await readdir(directory, { withFileTypes: true }).catch(() => []);
+  return entries.filter((entry) => entry.isFile() && !entry.isSymbolicLink()).map((entry) => entry.name);
+}
+
+async function listProjectCandidates(realRoot, projectAbsolute) {
+  const candidateDir = resolve(projectAbsolute, CANDIDATE_DIR);
+  const candidateInfo = await lstat(candidateDir).catch(() => null);
+  if (!candidateInfo?.isDirectory() || candidateInfo.isSymbolicLink()) return [];
+
+  const [candidateNames, finalNames, outlineNames, skeletonNames] = await Promise.all([
+    readVisibleFiles(candidateDir),
+    readVisibleFiles(resolve(projectAbsolute, "正文")),
+    readVisibleFiles(resolve(projectAbsolute, "大纲")),
+    readVisibleFiles(resolve(projectAbsolute, "骨架")),
+  ]);
+
+  const finalChapters = new Map();
+  for (const name of finalNames) {
+    const chapter = candidateChapterNumber(name);
+    if (chapter !== null && name.endsWith(".md")) finalChapters.set(chapter, name);
+  }
+
+  const relativeTo = (directory, name) =>
+    toPosixPath(relative(realRoot, resolve(projectAbsolute, directory, name)));
+
+  const candidates = [];
+  for (const name of candidateNames.sort()) {
+    if (name === CANDIDATE_HISTORY_DIR) continue;
+    if (!name.endsWith(".md") || name.endsWith(CANDIDATE_TRANSACTION_SUFFIX)) continue;
+    const chapter = candidateChapterNumber(name);
+    const transactionName =
+      chapter === null
+        ? null
+        : candidateNames.find(
+            (entry) =>
+              entry.endsWith(CANDIDATE_TRANSACTION_SUFFIX) && candidateChapterNumber(entry) === chapter,
+          ) || null;
+    const outlineName =
+      chapter === null
+        ? null
+        : outlineNames.find(
+            (entry) => new RegExp(`^细纲_第0*${chapter}章.*\\.md$`).test(entry),
+          ) || null;
+    const skeletonName =
+      chapter === null
+        ? null
+        : skeletonNames.find(
+            (entry) => entry.endsWith(".md") && candidateChapterNumber(entry) === chapter,
+          ) || null;
+    let previousFinalName = null;
+    if (chapter !== null) {
+      let best = -1;
+      for (const [finalChapter, finalName] of finalChapters) {
+        if (finalChapter < chapter && finalChapter > best) {
+          best = finalChapter;
+          previousFinalName = finalName;
+        }
+      }
+    }
+    candidates.push({
+      chapter,
+      name,
+      path: relativeTo(CANDIDATE_DIR, name),
+      hasTransaction: transactionName !== null,
+      transactionPath: transactionName ? relativeTo(CANDIDATE_DIR, transactionName) : null,
+      finalExists: chapter !== null && finalChapters.has(chapter),
+      outlinePath: outlineName ? relativeTo("大纲", outlineName) : null,
+      skeletonPath: skeletonName ? relativeTo("骨架", skeletonName) : null,
+      previousFinalPath: previousFinalName ? relativeTo("正文", previousFinalName) : null,
+    });
+  }
+  candidates.sort((left, right) => (left.chapter ?? Infinity) - (right.chapter ?? Infinity));
+  return candidates;
+}
+
+export async function listWorkspaceCandidates(root) {
+  const realRoot = await existingRealRoot(root);
+  const { projectRoots, scanErrors } = await discoverWorkspaceRoots(realRoot);
+  const projects = [];
+  let total = 0;
+  for (const entry of projectRoots) {
+    const candidates = await listProjectCandidates(realRoot, entry.absolutePath);
+    if (candidates.length === 0) continue;
+    total += candidates.length;
+    projects.push({
+      name: basename(entry.absolutePath),
+      path: toPosixPath(entry.relativePath) || ".",
+      candidates,
+    });
+  }
+  projects.sort((left, right) => left.path.localeCompare(right.path, "zh-CN", { numeric: true }));
+  return { projects, total, scanErrors };
+}
+
+function spawnCommandOnce(command, args, options) {
+  return new Promise((accept, reject) => {
+    const child = spawn(command, args, { ...options, stdio: ["ignore", "pipe", "pipe"] });
+    let stdout = "";
+    let stderr = "";
+    let settled = false;
+    const timer = setTimeout(() => {
+      settled = true;
+      child.kill("SIGKILL");
+      reject(new DashboardError(504, "candidate_action_timeout", "候选操作超时，已中止；请在终端手动检查候选状态"));
+    }, CANDIDATE_ACTION_TIMEOUT_MS);
+    child.stdout.on("data", (chunk) => {
+      if (stdout.length < CANDIDATE_ACTION_OUTPUT_LIMIT) stdout += chunk.toString("utf8");
+    });
+    child.stderr.on("data", (chunk) => {
+      if (stderr.length < CANDIDATE_ACTION_OUTPUT_LIMIT) stderr += chunk.toString("utf8");
+    });
+    child.on("error", (error) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      reject(error);
+    });
+    child.on("close", (code) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      accept({ code, stdout, stderr });
+    });
+  });
+}
+
+async function runCandidateTool(args) {
+  const toolInfo = await stat(CANDIDATE_TOOL_PATH).catch(() => null);
+  if (!toolInfo?.isFile()) {
+    throw new DashboardError(
+      501,
+      "candidate_tool_missing",
+      "找不到 story-write 的 candidate-commit.py，无法执行候选操作",
+    );
+  }
+  for (const command of PYTHON_COMMANDS) {
+    try {
+      return await spawnCommandOnce(command, [CANDIDATE_TOOL_PATH, ...args]);
+    } catch (error) {
+      if (error?.code === "ENOENT") continue;
+      throw error;
+    }
+  }
+  throw new DashboardError(501, "python_unavailable", "本机未找到可用的 Python（python3/python/py）");
+}
+
+export async function runCandidateAction(root, payload) {
+  if (!payload || typeof payload !== "object") {
+    throw new DashboardError(400, "invalid_payload", "缺少候选操作参数");
+  }
+  const { action, project, chapter, rewrite } = payload;
+  if (!CANDIDATE_ACTIONS.has(action)) {
+    throw new DashboardError(400, "invalid_action", "候选操作只支持 promote / reject");
+  }
+  if (!Number.isSafeInteger(chapter) || chapter <= 0) {
+    throw new DashboardError(400, "invalid_chapter", "章号必须是正整数");
+  }
+  const { absolutePath } = await resolveWorkspaceDirectory(root, project);
+
+  // 刻意不暴露 --no-scan：Dashboard 审批必须走 candidate-commit.py 的 fail-closed 质量门。
+  const args = [action, "--project", absolutePath, "--chapter", String(chapter)];
+  if (action === "reject" && rewrite === true) args.push("--rewrite");
+
+  const { code, stdout, stderr } = await runCandidateTool(args);
+  if (code === 0) {
+    let result = null;
+    try {
+      result = JSON.parse(stdout);
+    } catch {
+      result = null;
+    }
+    return { ok: true, action, chapter, result };
+  }
+  const message = stderr.trim().replace(/^ERROR:\s*/, "") || "候选操作失败";
+  if (code === 2) {
+    throw new DashboardError(422, "candidate_action_rejected", message);
+  }
+  throw new DashboardError(500, "candidate_action_failed", message);
+}
+
 async function readJsonBody(request) {
   const chunks = [];
   let size = 0;
@@ -761,7 +958,7 @@ function assertLocalRequest(request, allowNetwork) {
   if (!LOOPBACK_HOSTS.has(hostname)) {
     throw new DashboardError(403, "invalid_host", "Dashboard 只接受本机回环地址请求");
   }
-  if (["PUT", "DELETE"].includes(request.method) && request.headers.origin) {
+  if (["PUT", "DELETE", "POST"].includes(request.method) && request.headers.origin) {
     const originHostname = normalizedOriginHostname(request.headers.origin);
     if (!LOOPBACK_HOSTS.has(originHostname)) {
       throw new DashboardError(403, "invalid_origin", "拒绝来自非本机页面的写入请求");
@@ -805,6 +1002,14 @@ export function createDashboardServer({ root, allowNetwork = false }) {
             url.searchParams.get("scope") || "",
           ),
         );
+        return;
+      }
+      if (request.method === "GET" && url.pathname === "/api/candidates") {
+        sendJson(response, 200, await listWorkspaceCandidates(workspaceRoot));
+        return;
+      }
+      if (request.method === "POST" && url.pathname === "/api/candidates/action") {
+        sendJson(response, 200, await runCandidateAction(workspaceRoot, await readJsonBody(request)));
         return;
       }
       if (request.method === "GET" && url.pathname === "/api/file") {

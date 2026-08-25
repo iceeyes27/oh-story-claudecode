@@ -17,6 +17,10 @@ const state = {
   // 记住作者手动展开/收起过的目录，重绘文件树时不要把人正在翻的章节文件夹关掉
   expandedDirs: new Set(),
   collapsedDirs: new Set(),
+  candidates: null,
+  candidatesLoading: false,
+  activeCandidate: null,
+  candidateBusy: false,
 };
 
 const elements = {
@@ -52,6 +56,18 @@ const elements = {
   conflictDialog: document.querySelector("#conflictDialog"),
   reloadConflictButton: document.querySelector("#reloadConflictButton"),
   truncationNotice: null,
+  candidatesBadge: document.querySelector("#candidatesBadge"),
+  reviewWorkspace: document.querySelector("#reviewWorkspace"),
+  reviewTitle: document.querySelector("#reviewTitle"),
+  reviewBreadcrumbs: document.querySelector("#reviewBreadcrumbs"),
+  reviewStatus: document.querySelector("#reviewStatus"),
+  referenceSelect: document.querySelector("#referenceSelect"),
+  promoteButton: document.querySelector("#promoteButton"),
+  rejectButton: document.querySelector("#rejectButton"),
+  rewriteButton: document.querySelector("#rewriteButton"),
+  closeReviewButton: document.querySelector("#closeReviewButton"),
+  reviewCandidatePane: document.querySelector("#reviewCandidatePane"),
+  reviewReferencePane: document.querySelector("#reviewReferencePane"),
 };
 
 class ApiError extends Error {
@@ -366,7 +382,221 @@ function searchTruncationMessage() {
   return messages.join("；");
 }
 
+function candidateFlags(candidate) {
+  const flags = [];
+  if (!candidate.hasTransaction) flags.push("缺追踪事务");
+  if (candidate.finalExists) flags.push("正稿冲突");
+  return flags;
+}
+
+function renderCandidateList() {
+  elements.fileTree.replaceChildren();
+  elements.treeLoading.hidden = true;
+  if (state.candidatesLoading) {
+    const message = document.createElement("div");
+    message.className = "tree-message";
+    const text = document.createElement("p");
+    text.textContent = "正在清点候选章节…";
+    message.append(text);
+    elements.fileTree.append(message);
+    return;
+  }
+  const projects = state.candidates?.projects || [];
+  if (!projects.length) {
+    const message = document.createElement("div");
+    message.className = "tree-message";
+    const text = document.createElement("p");
+    text.textContent = "没有待审批的候选章节。生成成稿后，候选会出现在这里等你拍板。";
+    message.append(text);
+    elements.fileTree.append(message);
+    return;
+  }
+  const list = document.createElement("ul");
+  for (const project of projects) {
+    const groupItem = document.createElement("li");
+    const heading = document.createElement("p");
+    heading.className = "candidate-project";
+    heading.textContent = project.name;
+    heading.title = project.path;
+    groupItem.append(heading);
+    const groupList = document.createElement("ul");
+    for (const candidate of project.candidates) {
+      const item = document.createElement("li");
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "file-row candidate-row";
+      button.dataset.path = candidate.path;
+      button.dataset.active = String(state.activeCandidate?.candidate.path === candidate.path);
+      button.innerHTML = iconSvg("file");
+      const label = document.createElement("span");
+      label.className = "tree-label";
+      label.textContent = candidate.name;
+      button.append(label);
+      for (const flag of candidateFlags(candidate)) {
+        const badge = document.createElement("span");
+        badge.className = "candidate-flag";
+        badge.textContent = flag;
+        button.append(badge);
+      }
+      button.addEventListener("click", () => openCandidate(project, candidate));
+      item.append(button);
+      groupList.append(item);
+    }
+    groupItem.append(groupList);
+    list.append(groupItem);
+  }
+  elements.fileTree.append(list);
+}
+
+async function loadCandidates({ announce = false } = {}) {
+  state.candidatesLoading = true;
+  if (state.activeView === "candidates") renderTree();
+  try {
+    state.candidates = await requestJson("/api/candidates");
+    elements.candidatesBadge.textContent = formatNumber(state.candidates.total);
+    if (announce) showToast("候选列表已刷新");
+  } catch (error) {
+    state.candidates = null;
+    showToast(error.message, "error");
+  } finally {
+    state.candidatesLoading = false;
+    if (state.activeView === "candidates") renderTree();
+  }
+}
+
+function closeReview() {
+  state.activeCandidate = null;
+  elements.reviewWorkspace.hidden = true;
+  if (!state.activeFile) {
+    elements.editorEmpty.hidden = false;
+    document.body.classList.remove("document-open");
+  } else {
+    elements.editorWorkspace.hidden = false;
+  }
+  if (state.activeView === "candidates") renderTree();
+}
+
+function setReviewStatus(message) {
+  elements.reviewStatus.hidden = !message;
+  elements.reviewStatus.textContent = message || "";
+}
+
+function syncCandidateActionAvailability() {
+  const busy = state.candidateBusy || !state.activeCandidate;
+  elements.promoteButton.disabled = busy;
+  elements.rejectButton.disabled = busy;
+  elements.rewriteButton.disabled = busy;
+}
+
+async function loadReviewPane(pane, path, emptyMessage) {
+  if (!path) {
+    pane.textContent = emptyMessage;
+    return;
+  }
+  pane.textContent = "正在载入…";
+  try {
+    const file = await requestJson(`/api/file?path=${encodeURIComponent(path)}`);
+    pane.textContent = file.content;
+  } catch (error) {
+    pane.textContent = `载入失败：${error.message}`;
+  }
+}
+
+function referenceOptions(candidate) {
+  return [
+    { value: candidate.previousFinalPath, label: "上一章正稿" },
+    { value: candidate.outlinePath, label: "本章细纲" },
+    { value: candidate.skeletonPath, label: "本章骨架" },
+  ].filter((option) => option.value);
+}
+
+async function openCandidate(project, candidate) {
+  if (state.candidateBusy || !confirmDiscard()) return;
+  state.activeCandidate = { project, candidate };
+  elements.editorEmpty.hidden = true;
+  elements.editorWorkspace.hidden = true;
+  elements.reviewWorkspace.hidden = false;
+  document.body.classList.add("document-open");
+  elements.reviewTitle.textContent = candidate.name;
+  elements.reviewBreadcrumbs.replaceChildren();
+  const crumb = document.createElement("span");
+  crumb.textContent = `${project.name} ／ 候选`;
+  elements.reviewBreadcrumbs.append(crumb);
+  setReviewStatus(
+    candidateFlags(candidate).length
+      ? `注意：${candidateFlags(candidate).join("；")}。缺追踪事务时采用会被拒绝；正稿冲突需先处理已有正稿。`
+      : "",
+  );
+  syncCandidateActionAvailability();
+
+  elements.referenceSelect.replaceChildren();
+  const options = referenceOptions(candidate);
+  if (options.length === 0) {
+    const option = document.createElement("option");
+    option.value = "";
+    option.textContent = "无可用参照";
+    elements.referenceSelect.append(option);
+  } else {
+    for (const entry of options) {
+      const option = document.createElement("option");
+      option.value = entry.value;
+      option.textContent = entry.label;
+      elements.referenceSelect.append(option);
+    }
+  }
+  renderTree();
+  await Promise.all([
+    loadReviewPane(elements.reviewCandidatePane, candidate.path, "候选文件不可读"),
+    loadReviewPane(
+      elements.reviewReferencePane,
+      options[0]?.value || null,
+      "本章没有上一章正稿、细纲或骨架可以对照。",
+    ),
+  ]);
+}
+
+async function runCandidateAction(action, { rewrite = false } = {}) {
+  const active = state.activeCandidate;
+  if (!active || state.candidateBusy) return;
+  const { project, candidate } = active;
+  const label = action === "promote" ? "采用" : rewrite ? "弃用并重写" : "弃用";
+  const detail =
+    action === "promote"
+      ? "将并入正稿并回放追踪事务（先过确定性质量门）。"
+      : "候选会归档到 候选/_历史/，正稿与追踪不动。";
+  if (!window.confirm(`确定${label}《${candidate.name}》吗？${detail}`)) return;
+
+  state.candidateBusy = true;
+  syncCandidateActionAvailability();
+  setReviewStatus(`正在${label}…`);
+  try {
+    await requestJson("/api/candidates/action", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action,
+        project: project.path,
+        chapter: candidate.chapter,
+        rewrite,
+      }),
+    });
+    showToast(`已${label}《${candidate.name}》`);
+    closeReview();
+    await loadCandidates();
+  } catch (error) {
+    setReviewStatus(`${label}失败：${error.message}`);
+    showToast(`${label}失败：${error.message}`, "error");
+  } finally {
+    state.candidateBusy = false;
+    syncCandidateActionAvailability();
+  }
+}
+
 function renderTree() {
+  if (state.activeView === "candidates") {
+    renderCandidateList();
+    return;
+  }
   elements.fileTree.replaceChildren();
   elements.treeLoading.hidden = true;
   const query = state.filter.trim();
@@ -570,6 +800,8 @@ async function openFile(path, { force = false } = {}) {
     setMode("edit");
     updateDocumentMeta();
     updateCursorPosition();
+    state.activeCandidate = null;
+    elements.reviewWorkspace.hidden = true;
     elements.editorEmpty.hidden = true;
     elements.editorWorkspace.hidden = false;
     document.body.classList.add("document-open");
@@ -789,6 +1021,10 @@ async function searchWorkspace(query, sequence) {
 }
 
 function scheduleSearch() {
+  if (state.activeView === "candidates") {
+    renderTree();
+    return;
+  }
   window.clearTimeout(state.searchTimer);
   const query = state.filter.trim();
   state.searchSequence += 1;
@@ -814,8 +1050,17 @@ function setActiveView(view) {
   });
   elements.treePanel.setAttribute(
     "aria-labelledby",
-    view === "libraries" ? "librariesTab" : "projectsTab",
+    view === "libraries" ? "librariesTab" : view === "projects" ? "projectsTab" : "candidatesTab",
   );
+  // 候选视图不走文件名搜索：列表本身就是全量待审项
+  elements.treeSearch.disabled = view === "candidates";
+  if (view === "candidates") {
+    if (!state.candidates && !state.candidatesLoading) {
+      loadCandidates();
+    }
+    renderTree();
+    return;
+  }
   if (state.filter.trim()) {
     scheduleSearch();
   } else {
@@ -851,7 +1096,21 @@ elements.treeSearch.addEventListener("keydown", (event) => {
   }
 });
 
-elements.refreshButton.addEventListener("click", () => loadWorkspace({ announce: true }));
+elements.refreshButton.addEventListener("click", () => {
+  loadWorkspace({ announce: true });
+  loadCandidates();
+});
+elements.promoteButton.addEventListener("click", () => runCandidateAction("promote"));
+elements.rejectButton.addEventListener("click", () => runCandidateAction("reject"));
+elements.rewriteButton.addEventListener("click", () => runCandidateAction("reject", { rewrite: true }));
+elements.closeReviewButton.addEventListener("click", closeReview);
+elements.referenceSelect.addEventListener("change", () => {
+  loadReviewPane(
+    elements.reviewReferencePane,
+    elements.referenceSelect.value || null,
+    "本章没有上一章正稿、细纲或骨架可以对照。",
+  );
+});
 elements.mobileBackButton.addEventListener("click", () => {
   document.body.classList.remove("document-open");
   window.requestAnimationFrame(() => elements.treeSearch.focus());
@@ -900,3 +1159,4 @@ window.addEventListener("beforeunload", (event) => {
 });
 
 loadWorkspace();
+loadCandidates();

@@ -141,12 +141,14 @@ npx skills add iceeyes27/oh-story-claudecode -y -g
 
 **多 agent 协作要先部署再新开会话：** 7 个专业 agent（story-architect、narrative-writer、consistency-checker 等）由 `/story-setup` 写入项目 `.claude/agents/`，或由 `$story-setup` 写入 `.codex/agents/*.toml`。Claude Code / Codex 都在会话启动时更稳定地注册 custom agent；ZCode 3.3.4、OpenClaw Phase 1、Reasonix Phase 1 与 generic 路径默认走 skills + solo fallback。判断是否生效：新会话里跑 `/story-review`，报告头是 `Effective Mode: full/lean` 即注册成功，是 `Fallback: ... -> solo` 说明当前运行时未暴露该 agent。
 
+**作者习惯会跨会话延续：** 对 `/story` 说“记住我的写作习惯”，稳定偏好会进入工作区 `.story/作者记忆/`；看到 `Author Memory Receipt` 才算写入成功。普通写作只查询本次相关的已确认条目，输出硬上限 2KB，不把完整画像、候选和历史塞进正文 prompt。它与每本书的剧情追踪分开，当前要求、本书设定和硬性门禁始终优先。
+
 ## Skills
 
 | Skill | 触发 | 说明 |
 |:------|:-----|:-----|
 | `story-setup` | `/story-setup` `$story-setup` `/准备写书` | 环境部署 · Claude/OpenCode/Codex/ZCode/OpenClaw/Reasonix + generic（已有配置安全合并） |
-| `story` | `/story` `$story` `/story dashboard` | 工具箱路由 · 模糊意图分发 + 本地拆文/项目 Dashboard |
+| `story` | `/story` `$story` `/story dashboard` | 工具箱路由 · 模糊意图分发 + 作者习惯管理 + 本地拆文/项目 Dashboard |
 | `story-write` | `/story-write` `/写长篇` | 长篇写作 · 大纲搭建、人物设定、正文输出 |
 | `story-analyze` | `/story-analyze` | 长篇拆文 · 黄金三章、爽点设计、节奏分析 |
 | `story-scan` | `/story-scan` | 长篇扫榜 · 起点/番茄/晋江市场趋势 |
@@ -170,6 +172,7 @@ npx skills add iceeyes27/oh-story-claudecode -y -g
 - 「这篇太 AI 了」→ `story-deslop`
 - 「把我的书导进来」→ `story-import`
 - 「打开工作台」→ `story dashboard`（本机浏览拆文库与写作项目，可轻量编辑）
+- 「记住我的写作习惯」→ `story` 作者记忆（原话证据、待确认、冲突替代）
 - 「沈栀现在什么状态」→ 自动 spawn `story-explorer` agent
 
 ### Story Dashboard
@@ -299,6 +302,16 @@ Agent 按需加载 `references/` 中的写作理论（角色设计、对话技�
 一部长篇动辄几十万字、几百章。设定冲突、伏笔断线、时间线对不上——写到最后全靠记忆硬撑，迟早翻车。
 
 用文件系统把设定、大纲、正文、追踪拆开，每个维度独立维护。对话只负责创作，不负责记忆。
+
+工作区级作者记忆独立于单本小说：
+
+```text
+.story/作者记忆/
+├── _author-memory-state.json  # 唯一结构化权威
+├── 作者画像.md               # 已确认、可用于创作的偏好
+├── 待确认.md                 # 推断、重复修正和冲突候选
+└── 变更记录.md               # 可审计的替代与撤回历史
+```
 
 **长篇：**
 

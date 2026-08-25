@@ -1,6 +1,6 @@
 ---
 name: story
-description: "网络小说工具箱主入口。根据用户需求自动路由到对应 skill；当用户只说检查、检查这本小说、帮我检查或检查当前书时，必须执行完整的小说复合检查。也用于分发扫榜、拆文、写作、去AI味、封面、导入、审查和启动本地 Dashboard。触发方式：/story、$story、/story dashboard、$story dashboard、/网文、/检查、「我想写小说」「打开工作台」「检查这本小说」「检查更新」「有新版本吗」。"
+description: "网络小说工具箱主入口。根据用户需求自动路由到对应 skill；当用户只说检查、检查这本小说、帮我检查或检查当前书时，必须执行完整的小说复合检查。也用于分发扫榜、拆文、写作、去AI味、封面、导入、审查、管理作者习惯和启动本地 Dashboard。触发方式：/story、$story、/story dashboard、$story dashboard、/网文、/检查、「我想写小说」「记住我的写作习惯」「打开工作台」「检查这本小说」「检查更新」「有新版本吗」。"
 metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}
 ---
 # story：网文工具箱路由
@@ -32,12 +32,19 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 | 工作台 | dashboard、工作台、看拆文库、浏览项目文件、打开项目面板 | 见下方「Dashboard 工作台」 |
 | 检查/更新版本 | 检查更新、有新版本吗、升级、更新工具箱 | 见下方「版本更新检查」 |
 | 切换/列出书目 | 切书、换书、列出我的书、我在写哪几本、切换项目 | 见下方「多书切换」 |
+| 管理作者习惯 | 记住我的写作习惯、作者画像、待确认偏好、忘掉这个偏好 | 见下方「作者记忆」 |
 | 查故事资料 | 查角色、查伏笔、查进度、查设定、什么状态、写到哪了 | spawn `story-explorer` agent（结构化 prompt：`项目目录：{dir}\n查询类型：{根据意图选择}\n查询参数：{用户查询}`）；agent 不可用时见下方「查询降级」 |
 | 查资料 | 查资料、帮我查资料、调研、搜索一下、搜一下 | spawn `story-researcher` agent；agent 不可用时见下方「查询降级」 |
 
 ### 导入续写顺序
 
 用户问"导入续写先 setup 还是 import"时，直接回答：**推荐先 `/story-setup`，新开/刷新会话后 `/story-import`，最后 `/story-write 日更` 或 `/story-write 写第N章`**。如果用户已经直接触发 `/story-import`，按 story-import 自带环境检测继续：未 setup 时让用户选择先去 setup 或继续串行导入。
+
+## 作者记忆
+
+用户要求记住、查看、确认、替换或忘掉作者习惯时，加载 [.agents/skills/_shared/references/author-memory.md](../_shared/references/author-memory.md)，并只用共享脚本 `.agents/skills/_shared/scripts/author_memory_commit.py` 管理工作区级 `.story/作者记忆/`。常用变更走单事件 `record`；工具未返回 `ok: true` 和 `Author Memory Receipt` 前，不得声称已记住。显示画像或待确认项是只读操作；不存在时直接说明尚未建立。
+
+新增习惯必须保留用户原话和适用范围。一次性要求只执行不记录；小说事实写入本书设定/追踪；推断和重复修正先进入待确认；与已生效习惯冲突时显式 replace，不原地改写历史。用户没有指定工作区时，按协议定位已有作者记忆的最近祖先或当前创作工作区，禁止默认写到用户主目录。
 
 ## Dashboard 工作台
 

@@ -97,6 +97,10 @@ AI 味不按语法错误处理，也不需要「修正」。它属于风格问�
 - 保留技术性（general 模式）：专业词、系统主语、事故复盘用语、PRD / 发布说明中的术语默认可保留。
 - 不用机械同义词替换表（general 模式）：默认可以删句、并句、降调、换主语、去总结式收尾；如果进入 `in-place` scope，就只做句内改写。
 
+### 作者习惯
+
+若作者记忆 state 已存在，改写前用 `.agents/skills/_shared/scripts/author_memory_commit.py query --kind prose_style` 获取匹配的 active 文风条目（总输出 ≤2KB），并交给 inline/spawn 执行者作为自然倾向，不逐条展示或最大化命中，不牺牲连贯、节奏和字数；当前请求、原文剧情功能和本 skill 保护规则优先。用户明确声明长期文风习惯时，改写后按 [.agents/skills/_shared/references/author-memory.md](../_shared/references/author-memory.md) 用 `record` 写入并回传回执；重复修正/推断先待确认，一次性要求、检测器 findings 和助手自己的结果不记录。
+
 ---
 
 ## 小说去 AI 味模式（mode = novel）
@@ -229,7 +233,7 @@ node .agents/skills/_shared/scripts/check-ai-patterns.js --check --fail-on=block
 Phase 2 诊断完成后，按以下顺序选择执行路径：
 
 1. **已在 narrative-writer 子代理内**：直接 inline 执行 Gate A-G，不再 spawn（嵌套 spawn 会被静默降级）。
-2. **未在子代理内且 agent 目录（优先 `.claude/agents/`，其次 `.opencode/agents/`，再检查 `.codex/agents/`）下的 `narrative-writer.md` 或 `.codex/agents/narrative-writer.toml` 存在**：spawn `Agent(subagent_type: "narrative-writer", prompt: "项目目录：{dir}\n任务描述：去 AI 味\n检查范围：{待处理的正文文件}\nAI 味等级：{Phase 2 诊断结果}\n处理策略：{轻度 / 中度 / 重度对应的 Gate 范围}\n删除优先：每条 AI 味项先判能否删除——删后不丢伏笔 / 钩子 / 角色 / 情节 / 人物记忆 / 情绪承接 / 因果锚点 / 必要信息 / 必要转折的直接删，会丢才进 Gate 润色；看似解释 / 评价但承担小连贯的句子，压成白话承接、动作或物件锚点，不机械删除；已有任务 / 手续 / 物件 / 证据缺口可以压成角色当下要处理的具体卡点，但不新增原文没有的事件链；删除服从比例上限与字数下限，跌破下限改降 AI 重写。\n模式处理：按 .agents/skills/_shared/references/anti-ai-writing.md 的问题模式目录执行；模式 8（解释腔 / 上帝视角 / 安排感）归入 Gate G，其余新增模式归入 Gate A-F 的对应处理。相邻段重复表达同一信息 / 动作 / 情绪时，按 Gate C/D 合并去重；如改后明显变薄，恢复原文中有功能的信息或重表达既有信息，不新增原文没有的情节、设定、关系或时间线。")`。
+2. **未在子代理内且 agent 目录（优先 `.claude/agents/`，其次 `.opencode/agents/`，再检查 `.codex/agents/`）下的 `narrative-writer.md` 或 `.codex/agents/narrative-writer.toml` 存在**：spawn `Agent(subagent_type: "narrative-writer", prompt: "项目目录：{dir}\n任务描述：去 AI 味\n检查范围：{待处理的正文文件}\n作者偏好：{query 命中的 prose_style 项}\nAI 味等级：{Phase 2 诊断结果}\n处理策略：{轻度 / 中度 / 重度对应的 Gate 范围}\n删除优先：每条 AI 味项先判能否删除——删后不丢伏笔 / 钩子 / 角色 / 情节 / 人物记忆 / 情绪承接 / 因果锚点 / 必要信息 / 必要转折的直接删，会丢才进 Gate 润色；看似解释 / 评价但承担小连贯的句子，压成白话承接、动作或物件锚点，不机械删除；已有任务 / 手续 / 物件 / 证据缺口可以压成角色当下要处理的具体卡点，但不新增原文没有的事件链；删除服从比例上限与字数下限，跌破下限改降 AI 重写。\n模式处理：按 .agents/skills/_shared/references/anti-ai-writing.md 的问题模式目录执行；模式 8（解释腔 / 上帝视角 / 安排感）归入 Gate G，其余新增模式归入 Gate A-F 的对应处理。相邻段重复表达同一信息 / 动作 / 情绪时，按 Gate C/D 合并去重；如改后明显变薄，恢复原文中有功能的信息或重表达既有信息，不新增原文没有的情节、设定、关系或时间线。")`。
 3. **agent 不存在或 spawn 失败**：主线程 inline 执行。
 
 ##### 删除优先判断（先于各 Gate）
@@ -484,6 +488,7 @@ node .agents/skills/_shared/scripts/normalize-punctuation.js <正文文件...>
 | [.agents/skills/_shared/scripts/normalize-punctuation.js](../_shared/scripts/normalize-punctuation.js) | 文件模式落盘后做确定性标点收尾；默认保留引号风格 |
 | [.agents/skills/_shared/scripts/check-ai-patterns.js](../_shared/scripts/check-ai-patterns.js) | 文件模式 Phase 1 预检与 Phase 3.5 复扫（只看引号外叙述），只报告不改写 |
 | [.agents/skills/_shared/scripts/check-degeneration.js](../_shared/scripts/check-degeneration.js) | 文件模式 Phase 3.5 复扫，只报告不改写 |
+| [.agents/skills/_shared/references/author-memory.md](../_shared/references/author-memory.md) + [.agents/skills/_shared/scripts/author_memory_commit.py](../_shared/scripts/author_memory_commit.py) | 读取或更新跨会话作者文风习惯时 |
 
 ---
 

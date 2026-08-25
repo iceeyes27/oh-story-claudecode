@@ -168,7 +168,7 @@ function resolvePaths(argv) {
   const forkPath = argv.fork || state.forkPath || DEFAULT_FORK;
   const branch = argv.branch || state.branch || 'main';
   if (!fs.existsSync(path.join(forkPath, '.git'))) {
-    die('fork 克隆不存在：' + forkPath + '\n重建：git clone git@github.com:iceeyes27/oh-story-claudecode.git "' + forkPath + '" && cd "' + forkPath + '" && git remote add upstream https://github.com/worldwonderer/oh-story-claudecode.git');
+    die('fork 克隆不存在：' + forkPath + '\n重建：git clone git@github.com:iceeyes27/oh-story-claudecode.git "' + forkPath + '" && cd "' + forkPath + '" && git remote add upstream git@github.com:zenstory-ai/oh-story-claudecode.git');
   }
   return { projRoot, localSkills, forkSkills: path.join(forkPath, 'skills'), forkPath, branch, state };
 }

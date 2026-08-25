@@ -5,7 +5,7 @@
 - `setup_skill_version: 1.2.7`
 - `agents_version: 25`
 
-> **本 fork 的取值约定**：`setup_skill_version` 跟随上游 worldwonderer/oh-story-claudecode，不另起 fork 自有版本线。本 fork 的架构差异由 `resolver_strategy: agents-canonical-v1` 连同 `canonical_skills_dir` / `adapter_manifest` 两个上游没有的字段标识，那几行远离上游高频改动区，能自动合并。
+> **本 fork 的取值约定**：`setup_skill_version` 跟随上游 zenstory-ai/oh-story-claudecode，不另起 fork 自有版本线。本 fork 的架构差异由 `resolver_strategy: agents-canonical-v1` 连同 `canonical_skills_dir` / `adapter_manifest` 两个上游没有的字段标识，那几行远离上游高频改动区，能自动合并。
 >
 > 原因：`setup_skill_version` 与 `agents_version` 在本文件、`SKILL.md`、`current-contract.json`、`session-start.sh` 里都是相邻行，而上游每次发版都会 bump `agents_version`。两行贴在一起时会落进同一个 diff 块，只要 fork 在其中一行有自己的取值，每次合并上游必然冲突。让 `setup_skill_version` 与上游一致即可消除这类冲突，且不损失任何信息——运行时只用 `agents_version` 判断部署是否过期（见 `check-story-setup-deployment.sh` TS10 的 mixed-version 夹具），`setup_skill_version` 只做仓库内三处一致性校验。
 

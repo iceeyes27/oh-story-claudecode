@@ -25,7 +25,7 @@ def require_all(text: str, needles: tuple[str, ...], label: str) -> None:
 
 def test_transaction_is_the_only_tracking_writer() -> None:
     for path in (
-        "skills/story-write/SKILL.md",
+        "skills/story-write/references/long-mode.md",
         "skills/story-write/references/workflow-daily.md",
         "skills/story-write/references/workflow-revision.md",
         "skills/story-import/SKILL.md",
@@ -175,6 +175,8 @@ def test_retired_tracking_architecture_is_absent() -> None:
         "README.md",
         "README_EN.md",
         "skills/story-write/SKILL.md",
+        "skills/story-write/references/long-mode.md",
+        "skills/story-write/references/short-mode.md",
         "skills/story-write/references/artifact-protocols.md",
         "skills/story-write/references/workflow-daily.md",
         "skills/story-write/references/workflow-revision.md",
@@ -210,7 +212,7 @@ def test_retired_tracking_architecture_is_absent() -> None:
 
 
 def test_no_tracking_fallback_or_context_style_fingerprint_remains() -> None:
-    long_write = read("skills/story-write/SKILL.md")
+    long_write = read("skills/story-write/references/long-mode.md")
     for forbidden in (
         "角色状态文件缺失** → 从角色设定文件和前文推断当前状态",
         "伏笔/时间线文件缺失** → 不检查",

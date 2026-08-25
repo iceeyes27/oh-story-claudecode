@@ -9,7 +9,7 @@ const { spawnSync } = require('child_process');
 
 const ROOT = path.resolve(__dirname, '..');
 const TOOL = path.join(ROOT, 'skills/story-write/scripts/check-chapter-skeleton.js');
-const SKILL = path.join(ROOT, 'skills/story-write/SKILL.md');
+const SKILL = path.join(ROOT, 'skills/story-write/references/long-mode.md');
 const WORKFLOW = path.join(ROOT, 'skills/story-write/references/chapter-skeleton-workflow.md');
 const CANDIDATE_WORKFLOW = path.join(ROOT, 'skills/story-write/references/candidate-workflow.md');
 const TEMP = fs.mkdtempSync(path.join(os.tmpdir(), 'chapter-skeleton-test-'));

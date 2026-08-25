@@ -196,7 +196,11 @@ LEGACY_RULES = (
         "context-missing-skips-all",
         "single-chapter context follows item-specific missing-file decisions",
         r"按需加载，缺失则跳过",
-        ("skills/story-write/SKILL.md",),
+        (
+            "skills/story-write/SKILL.md",
+            "skills/story-write/references/long-mode.md",
+            "skills/story-write/references/short-mode.md",
+        ),
     ),
     AbsentRule(
         "static-long-word-floor",
@@ -206,6 +210,8 @@ LEGACY_RULES = (
         r"(?:高速推进|正常节奏|舒缓铺垫|高潮爆发)\s*\|\s*≥\s*(?:2000|3000)\s*字/章",
         (
             "skills/story-write/SKILL.md",
+            "skills/story-write/references/long-mode.md",
+            "skills/story-write/references/short-mode.md",
             "skills/story-setup/references/templates/agents/narrative-writer.md",
             "skills/story-setup/references/opencode/agents/narrative-writer.md",
             "skills/story-setup/references/codex/agents/narrative-writer.toml",
@@ -1315,7 +1321,7 @@ def validate_repository(repo_root: Path, manifest: ContractManifest) -> List[Fin
     findings.extend(require_pattern(explorer, r"missing_primary_contract", "explorer-primary-failure", "story-explorer must fail closed on missing current benchmark artifacts"))
     findings.extend(require_pattern(explorer, r"repair_action", "explorer-repair-action", "story-explorer must return an explicit repair action"))
 
-    long_write = repo_root / "skills/story-write/SKILL.md"
+    long_write = repo_root / "skills/story-write/references/long-mode.md"
     for artifact in manifest.primary_benchmark_artifacts:
         findings.extend(
             require_pattern(

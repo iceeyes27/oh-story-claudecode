@@ -74,6 +74,8 @@
 
 **执行前先读 [references/workflow-setup.md](workflow-setup.md) 的「Phase 3：大纲搭建」节**。
 
+每批细纲交付前跑 `python skills/story-write/scripts/check-outline-causal.py <书目录>`：前因指向未来章或不存在的章判 blocking（因果逻辑错误，必须改纲再交付）；缺字段或占位只判 advisory，旧项目渐进补。字段写法见 [artifact-protocols.md](artifact-protocols.md)「因果链三字段」。
+
 ---
 
 ### Phase 4：章节生产辅助

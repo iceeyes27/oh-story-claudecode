@@ -10,7 +10,7 @@
   "quality_profile": "release",
   "source_hashes": {
     "skills/story/VERSION": "aaf6721dc37c40b4233accfc081f25776ff3bd1d2a4b9d5cea760d1c2cf86665",
-    "scripts/current-contract.json": "955d0eb1d5acf2385e0d91fcd1994bf3cbaea20cd1e92b074e31dde0ba5d00bd",
+    "scripts/current-contract.json": "6bccf74a5a77cca4f0af921e488507751b8c9551441cf3834c292f98dce7af57",
     "scripts/upstream-integration.json": "b0112eb33b02c9401cd7bfabdc2b71596bb417d1df21843670d6adc4887577fe",
     "scripts/platform-capabilities.json": "2d51b334c4f8b430b267b9f88176622fcbfddfb6ab2245d953be104b18bb7a80",
     "scripts/platform-skill-set.json": "84014f26bf0f265227e5168b3959f1305eb97729430982a35f3cf169397d857f",

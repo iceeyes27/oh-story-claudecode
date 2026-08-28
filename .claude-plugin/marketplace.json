@@ -310,6 +310,44 @@
       ]
     },
     {
+      "name": "reader-comprehension-scan",
+      "description": "读者视角理解力扫描。只读正文判断读者能否看懂：专名首现无交代、前因悬空、理解断点。",
+      "source": "./",
+      "strict": false,
+      "version": "1.0.0",
+      "category": "novel-quality",
+      "keywords": [
+        "comprehension",
+        "reader",
+        "novel",
+        "读者视角",
+        "逻辑",
+        "chinese"
+      ],
+      "skills": [
+        "./skills/reader-comprehension-scan"
+      ]
+    },
+    {
+      "name": "opening-arc-audit",
+      "description": "开篇连读体检。把前 N 章当整体连读，量化悬念收支与主线推进，抓只开不闭的故弄玄虚。",
+      "source": "./",
+      "strict": false,
+      "version": "1.0.0",
+      "category": "novel-quality",
+      "keywords": [
+        "opening",
+        "pacing",
+        "novel",
+        "开篇",
+        "悬念",
+        "chinese"
+      ],
+      "skills": [
+        "./skills/opening-arc-audit"
+      ]
+    },
+    {
       "name": "humanizer",
       "description": "去除文本中的 AI 写作痕迹（中英双语），自动按输入语言选择模式。",
       "source": "./",

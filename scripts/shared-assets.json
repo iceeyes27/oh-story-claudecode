@@ -15,7 +15,24 @@
       "source": "skills/story-write/scripts/tracking_commit.py",
       "targets": [
         "skills/story-import/scripts/tracking_commit.py",
-        "skills/story-review/scripts/tracking_commit.py"
+        "skills/story-review/scripts/tracking_commit.py",
+        "skills/story/scripts/tracking_commit.py"
+      ]
+    },
+    {
+      "name": "story-project-lock",
+      "source": "skills/story-write/scripts/project_lock.py",
+      "targets": [
+        "skills/story-import/scripts/project_lock.py",
+        "skills/story-review/scripts/project_lock.py",
+        "skills/story/scripts/project_lock.py"
+      ]
+    },
+    {
+      "name": "story-candidate-transaction",
+      "source": "skills/story-write/scripts/candidate-commit.py",
+      "targets": [
+        "skills/story/scripts/candidate-commit.py"
       ]
     },
     {
@@ -24,6 +41,13 @@
       "targets": [
         "skills/story-import/references/tracking-transaction.md",
         "skills/story-review/references/tracking-transaction.md"
+      ]
+    },
+    {
+      "name": "story-writing-craft-reference",
+      "source": "skills/story-write/references/writing-craft.md",
+      "targets": [
+        "skills/story-setup/references/agent-references/writing-craft.md"
       ]
     },
     {

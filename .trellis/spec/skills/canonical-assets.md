@@ -9,7 +9,7 @@
 
 ## Upstream mapping
 
-上游仍可能修改旧拆分目录。`scripts/unified-skill-upstream-map.json` 声明旧目录到统一 Skill 的映射；同步时使用 `node scripts/sync-upstream.js`，它会保留 fork 对旧目录的删除、把剩余语义冲突显式列出，并调用 `scripts/check-unified-skill-upstream-drift.py` 阻止未迁移的旧目录改动被提交。上游变更必须人工迁移到对应统一资产，并更新基线。
+`scripts/upstream-integration.json` 是上游同步策略的唯一来源，声明固定基线、保护路径、禁止路径、生成资产与旧拆分目录到统一 Skill 的映射。同步只使用 `node scripts/sync-upstream.js prepare|review|validate|promote|abort`：工具在专用 worktree 中固定双方 SHA，要求 upstream 禁止 push，记录逐路径决定，并在 promote 前执行统一质量门禁。上游语义必须人工迁移到统一资产；旧拆分目录、生成入口和 `.github/workflows/` 不得直接进入 fork。
 
 ## Self-contained runtime rule
 

@@ -27,7 +27,7 @@ Markdown 只负责给作者和 Agent 阅读，工具不再反向解析 Markdown�
 - `commit`：读取唯一权威状态，在内存中完成合并、引用检查、全部视图渲染和容量检查；随后写逐章记录与派生视图，最后原子替换 `_tracking-state.json` 作为唯一提交点。
 - `check`：严格验证 state schema、导入范围外每个非缺口章节的逐章记录、缺口内无伪记录、规范名/体积、固定 7 栏、角色快照硬上限、派生文件集合，以及所有派生视图与 state 的逐字一致性。
 
-同一本书只允许工作流串行提交，不支持多个 Agent 或终端并发写。`expected_state_revision` 用于拒绝基于旧状态构造的顺序 stale transaction，不是并发锁。
+同一本书的追踪提交与候选采用由 `追踪/.story-write.lock` 互斥。`expected_state_revision` 仍用于拒绝基于旧状态构造的事务；项目锁负责阻止多个进程同时进入写入阶段。存在未完成采用日志时，普通追踪提交会拒绝执行，须先运行候选恢复。
 
 事务 JSON 在成功前必须保留。若文件写入失败，`_tracking-state.json` 尚未推进；修正环境后直接重跑**同一份** `commit`。append 重跑只接受内容完全相同的既有逐章记录，不维护 `dirty/pending/repair` 状态机。
 

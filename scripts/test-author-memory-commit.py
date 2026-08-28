@@ -409,10 +409,12 @@ def main() -> None:
         run("check", "--workspace", str(auto_workspace))
 
     injection_contracts = {
-        REPO / "skills/story-write/SKILL.md": (
+        REPO / "skills/story-write/references/long-mode.md": (
             "`author_preferences`",
             "作者偏好：{本章 query 命中的 prose_style/story_design 项}",
             "不逐条展示或最大化命中",
+        ),
+        REPO / "skills/story-write/references/short-mode.md": (
             "作者偏好 query 中的文风/故事设计项",
             "作者偏好：{query 命中的 prose_style/story_design 项}",
         ),

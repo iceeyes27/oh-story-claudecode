@@ -21,6 +21,11 @@ import unicodedata
 from pathlib import Path
 from typing import Any
 
+SCRIPT_DIR = str(Path(__file__).resolve().parent)
+if SCRIPT_DIR not in sys.path:
+    sys.path.insert(0, SCRIPT_DIR)
+from project_lock import ProjectLockError, assert_no_unfinished_adoption, project_lock
+
 
 INPUT_SCHEMA_VERSION = 1
 TRACKING_SCHEMA_VERSION = 4
@@ -1179,16 +1184,25 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def _execute(args: argparse.Namespace) -> dict[str, Any]:
+    if args.command in {"init", "commit"} and os.environ.get("STORY_WRITE_LOCK_HELD") != "1":
+        assert_no_unfinished_adoption(args.project)
+    if args.command == "init":
+        return initialize(args.project, read_json(args.input))
+    if args.command == "commit":
+        return apply_transaction(args.project, read_json(args.input))
+    return check_project(args.project)
+
+
 def main() -> int:
     args = build_parser().parse_args()
     try:
-        if args.command == "init":
-            result = initialize(args.project, read_json(args.input))
-        elif args.command == "commit":
-            result = apply_transaction(args.project, read_json(args.input))
+        if os.environ.get("STORY_WRITE_LOCK_HELD") == "1":
+            result = _execute(args)
         else:
-            result = check_project(args.project)
-    except (TrackingError, OSError, UnicodeError) as exc:
+            with project_lock(args.project):
+                result = _execute(args)
+    except (TrackingError, ProjectLockError, OSError, UnicodeError) as exc:
         emit(f"ERROR: {exc}", error=True)
         return 2
     emit(

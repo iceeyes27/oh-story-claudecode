@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import importlib.util
+import hashlib
 import json
 import os
 import subprocess
@@ -57,6 +58,9 @@ def run(
 
 class CandidateCommitTests(unittest.TestCase):
     def setUp(self) -> None:
+        self._reset_project()
+
+    def _reset_project(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.project = Path(self.temporary.name) / "候选测试书"
         self.project.mkdir()
@@ -107,12 +111,59 @@ class CandidateCommitTests(unittest.TestCase):
         tx_overrides: dict | None = None,
         body: str | None = None,
     ) -> Path:
-        prose = self.candidate_dir / f"第{chapter:03d}章_测试章名.md"
-        prose.write_text(body if body is not None else f"# 第{chapter}章\n候选正文内容。\n", encoding="utf-8")
+        title = "测试章名" if chapter == 1 else f"暗门{chapter}"
+        prose = self.candidate_dir / f"第{chapter:03d}章_{title}.md"
+        prefix = body if body is not None else f"# 第{chapter}章\n"
+        visible = "".join(prefix.split())
+        fill_length = max(0, 2300 - len(visible))
+        fill = "".join(chr(0x6000 + ((chapter * 2500 + index) % 7000)) for index in range(fill_length))
+        content = prefix + fill + "。\n"
+        prose.write_text(content, encoding="utf-8")
+        outline_dir = self.project / "大纲"
+        skeleton_dir = self.project / "骨架"
+        outline_dir.mkdir(exist_ok=True)
+        skeleton_dir.mkdir(exist_ok=True)
+        outline = outline_dir / f"细纲_第{chapter:03d}章.md"
+        outline.write_text(
+            f"# 第{chapter}章细纲\n- 情节点：本章完成一次可验证推进。\n",
+            encoding="utf-8",
+        )
+        skeleton = skeleton_dir / f"第{chapter:03d}章_{title}.md"
+        skeleton.write_text(
+            f"# 第{chapter}章 {title}\n\n"
+            "## 章节契约\n"
+            f"- 来源细纲：大纲/{outline.name}\n"
+            "- 最终正文字数目标：2400\n"
+            "- 目标情绪：紧张\n- 读者获得：关键进展\n- 禁止提前释放：后续真相\n"
+            "- 开场动作：人物进入现场\n- 章尾钩子：发现新物证\n\n"
+            "## 细纲覆盖\n- [x] O1 本章推进 -> 场景 1\n\n"
+            "## 场景 1\n- 时空与人物：现场与主角\n- 场景目标：核验物证\n- 阻力：资料缺失\n"
+            "- 动作链：进入现场并核验\n- 结果变化：获得线索\n- 情绪转折：从怀疑到确认\n"
+            "- 信息/伏笔：物证编号\n- 台词意图与潜台词：试探责任人\n- 正文字数预算：800\n\n"
+            "## 场景 2\n- 时空与人物：办公室与主角\n- 场景目标：追查来源\n- 阻力：权限受限\n"
+            "- 动作链：提交申请并复核\n- 结果变化：锁定范围\n- 情绪转折：从受阻到突破\n"
+            "- 信息/伏笔：访问记录\n- 台词意图与潜台词：逼问时间点\n- 正文字数预算：800\n\n"
+            "## 场景 3\n- 时空与人物：走廊与主角\n- 场景目标：确认结论\n- 阻力：对方回避\n"
+            "- 动作链：展示证据并追问\n- 结果变化：出现新冲突\n- 情绪转折：从确定到警觉\n"
+            "- 信息/伏笔：异常签名\n- 台词意图与潜台词：迫使对方表态\n- 正文字数预算：800\n\n"
+            "## 扩写约束\n- 人物声线：克制直接\n- 事实红线：不新增无来源事实\n- 允许自由发挥：动作细节\n",
+            encoding="utf-8",
+        )
         if with_transaction:
             doc = transaction(chapter)
+            doc["expected_state_revision"] = self.read_state()["state_revision"]
             if tx_overrides:
                 doc.update(tx_overrides)
+            evidence = content.splitlines()[-1][:8]
+            digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
+            doc["candidate_binding"] = {
+                "schema_version": 1,
+                "quality_profile": "fanqie-long-v1",
+                "prose": {"path": f"候选/{prose.name}", "sha256": digest(prose)},
+                "outline": {"path": f"大纲/{outline.name}", "sha256": digest(outline)},
+                "skeleton": {"path": f"骨架/{skeleton.name}", "sha256": digest(skeleton)},
+                "coverage": [{"id": "O1", "evidence": evidence}],
+            }
             (self.candidate_dir / f"第{chapter:03d}章_追踪事务.json").write_text(
                 json.dumps(doc, ensure_ascii=False), encoding="utf-8"
             )
@@ -145,11 +196,12 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertFalse((self.candidate_dir / "第001章_追踪事务.json").exists())
         run(TRACKING_TOOL, ["check", "--project", str(self.project)])
 
-    def test_promote_refreshes_stale_expected_revision(self) -> None:
-        # 候选事务里烤入过期 revision，promote 应刷新为当前值后成功。
+    def test_promote_rejects_stale_expected_revision_before_writes(self) -> None:
         self.make_candidate(1, tx_overrides={"expected_state_revision": 99})
-        self._candidate(["promote", "--chapter", "1"])
-        self.assertEqual(self.read_state()["state_revision"], 1)
+        self._candidate(["promote", "--chapter", "1"], expect=2)
+        self.assertEqual(self.read_state()["state_revision"], 0)
+        self.assertEqual(self.final_files(), [])
+        self.assertTrue((self.candidate_dir / "第001章_测试章名.md").exists())
 
     def test_promote_missing_transaction_aborts(self) -> None:
         self.make_candidate(1, with_transaction=False)
@@ -160,22 +212,22 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertTrue((self.candidate_dir / "第001章_测试章名.md").exists())
 
     def test_promote_rolls_back_on_tracking_failure(self) -> None:
-        # 破坏事务（删掉 delta）触发 tracking_commit 校验失败，验证正文移回、状态不变、可重跑。
+        # 破坏事务（删掉 delta）应在任何移动前被预演拒绝，修复后可重跑。
         prose = self.make_candidate(1)
-        broken = transaction(1)
+        transaction_path = self.candidate_dir / "第001章_追踪事务.json"
+        original = json.loads(transaction_path.read_text(encoding="utf-8"))
+        broken = dict(original)
         del broken["delta"]
-        (self.candidate_dir / "第001章_追踪事务.json").write_text(
+        transaction_path.write_text(
             json.dumps(broken, ensure_ascii=False), encoding="utf-8"
         )
         self._candidate(["promote", "--chapter", "1"], expect=2)
         self.assertEqual(self.final_files(), [])
         self.assertEqual(self.read_state()["state_revision"], 0)
-        self.assertTrue(prose.exists(), "追踪失败后候选正文必须移回原处以支持重跑")
+        self.assertTrue(prose.exists(), "追踪预演失败后候选正文必须保持原处")
 
         # 修好事务后重跑同一 promote 成功。
-        (self.candidate_dir / "第001章_追踪事务.json").write_text(
-            json.dumps(transaction(1), ensure_ascii=False), encoding="utf-8"
-        )
+        transaction_path.write_text(json.dumps(original, ensure_ascii=False), encoding="utf-8")
         self._candidate(["promote", "--chapter", "1"])
         self.assertEqual(self.read_state()["state_revision"], 1)
 
@@ -242,11 +294,28 @@ class CandidateCommitTests(unittest.TestCase):
 
     def test_promote_all_in_order(self) -> None:
         self.make_candidate(1)
-        self.make_candidate(2)
+        self.make_candidate(2, tx_overrides={"expected_state_revision": 1})
         results = json.loads(self._candidate(["promote", "--all"]).stdout)
         self.assertEqual([r["chapter"] for r in results], [1, 2])
         self.assertEqual(self.read_state()["last_committed_chapter"], 2)
-        self.assertEqual(sorted(self.final_files()), ["第001章_测试章名.md", "第002章_测试章名.md"])
+        self.assertEqual(sorted(self.final_files()), ["第001章_测试章名.md", "第002章_暗门2.md"])
+
+    def test_recover_is_idempotent_after_each_persisted_phase(self) -> None:
+        for index, phase in enumerate(("prepared", "prose_moved", "tracking_committed")):
+            with self.subTest(phase=phase):
+                if index:
+                    self.temporary.cleanup()
+                    self._reset_project()
+                self.make_candidate(1)
+                env = os.environ.copy()
+                env["STORY_CANDIDATE_FAIL_AFTER"] = phase
+                self._candidate(["promote", "--chapter", "1"], expect=97, env=env)
+                first = json.loads(self._candidate(["recover", "--chapter", "1"]).stdout)
+                second = json.loads(self._candidate(["recover", "--chapter", "1"]).stdout)
+                self.assertEqual(first[0]["state_revision"], 1)
+                self.assertEqual(second[0]["state_revision"], 1)
+                self.assertEqual(self.read_state()["state_revision"], 1)
+                self.assertEqual(self.final_files(), ["第001章_测试章名.md"])
 
 
 if __name__ == "__main__":

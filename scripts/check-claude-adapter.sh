@@ -5,6 +5,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+. "$REPO_ROOT/scripts/python3-shim.sh"
 MARKETPLACE="$REPO_ROOT/.claude-plugin/marketplace.json"
 SKILL_SET="$REPO_ROOT/scripts/platform-skill-set.json"
 

@@ -4,6 +4,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+. "$REPO_ROOT/scripts/python3-shim.sh"
 ROOT="$REPO_ROOT/skills/story-setup/references/opencode"
 TMP_DIR="$(mktemp -d)"
 SYNC_LOG="$TMP_DIR/sync.log"
@@ -35,7 +36,7 @@ python3 -m json.tool "$ROOT/book-discovery-contract.json" >/dev/null
 python3 - <<'PY'
 import json
 from pathlib import Path
-cfg = json.loads(Path('skills/story-setup/references/opencode/opencode.json.patch').read_text())
+cfg = json.loads(Path('skills/story-setup/references/opencode/opencode.json.patch').read_text(encoding='utf-8'))
 assert cfg.get('$schema') == 'https://opencode.ai/config.json', cfg
 plugins = cfg.get('plugin')
 assert isinstance(plugins, list), plugins
@@ -343,7 +344,7 @@ base = Path('skills/story-setup/references/opencode/agents')
 found = {p.stem for p in base.glob('*.md')}
 assert found == expected, found
 for p in sorted(base.glob('*.md')):
-    text = p.read_text()
+    text = p.read_text(encoding='utf-8')
     assert text.startswith('---\n'), f'{p}: missing frontmatter'
     try:
         fm = text.split('---', 2)[1]
@@ -647,7 +648,7 @@ assert not missing, f'platform skill set references missing skills: {missing}'
 command_names = {p.stem for p in Path('skills/story-setup/references/opencode/commands').glob('*.md')}
 assert skill_names == command_names, f'missing={skill_names-command_names}, extra={command_names-skill_names}'
 for p in sorted(Path('skills/story-setup/references/opencode/commands').glob('*.md')):
-    text = p.read_text()
+    text = p.read_text(encoding='utf-8')
     assert text.startswith('---\n'), f'{p}: missing frontmatter'
     fm = text.split('---', 2)[1]
     assert 'description:' in fm, f'{p}: missing description'

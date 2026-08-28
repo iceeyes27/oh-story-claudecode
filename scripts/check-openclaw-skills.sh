@@ -10,6 +10,8 @@ if [ -z "$REPO_ROOT" ]; then
   exit 1
 fi
 
+. "$REPO_ROOT/scripts/python3-shim.sh"
+
 SKILLS_DIR="$REPO_ROOT/skills"
 SKILL_SET="$REPO_ROOT/scripts/platform-skill-set.json"
 

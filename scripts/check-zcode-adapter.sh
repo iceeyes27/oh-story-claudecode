@@ -4,6 +4,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+. "$REPO_ROOT/scripts/python3-shim.sh"
 cd "$REPO_ROOT"
 
 fail() { echo "FAIL: $*" >&2; exit 1; }
@@ -42,7 +43,7 @@ python3 - <<'PY'
 import json, re
 from pathlib import Path
 
-plugin = json.loads(Path('.zcode-plugin/plugin.json').read_text())
+plugin = json.loads(Path('.zcode-plugin/plugin.json').read_text(encoding='utf-8'))
 assert re.fullmatch(r'[a-z0-9][a-z0-9._-]{0,127}', plugin['name'])
 assert plugin['name'] == 'oh-story'
 assert plugin['skills'] == 'skills'
@@ -51,14 +52,14 @@ assert plugin['hooks'] == 'skills/story-setup/references/zcode/hooks/hooks.json'
 for key in ('agents', 'channels', 'lspServers', 'outputStyles', 'settings'):
     assert key not in plugin, f'non-runnable ZCode component declared: {key}'
 
-market = json.loads(Path('marketplace.json').read_text())
+market = json.loads(Path('marketplace.json').read_text(encoding='utf-8'))
 assert market['name'] == 'oh-story-zcode'
 assert market['version'] == 1
 assert len(market['plugins']) == 1
 entry = market['plugins'][0]
 assert entry['name'] == plugin['name'] and entry['source'] == './'
 assert entry['version'] == plugin['version']
-assert plugin['version'] == Path('skills/story/VERSION').read_text().strip()
+assert plugin['version'] == Path('skills/story/VERSION').read_text(encoding='utf-8').strip()
 PY
 echo "  OK native plugin/marketplace manifest"
 
@@ -111,8 +112,8 @@ EVENT_HANDLERS = {
     'PreToolUse': {'pre-tool-prose-guard', 'pre-tool-commit-advisory'},
     'PostToolUse': {'post-tool-prose-check'},
 }
-plugin = json.loads(Path('skills/story-setup/references/zcode/hooks/hooks.json').read_text())['hooks']
-config = json.loads(Path('skills/story-setup/references/zcode/config.json.patch').read_text())['hooks']
+plugin = json.loads(Path('skills/story-setup/references/zcode/hooks/hooks.json').read_text(encoding='utf-8'))['hooks']
+config = json.loads(Path('skills/story-setup/references/zcode/config.json.patch').read_text(encoding='utf-8'))['hooks']
 assert config['enabled'] is True
 assert set(plugin) == set(EVENT_HANDLERS)
 assert set(config['events']) == set(plugin)

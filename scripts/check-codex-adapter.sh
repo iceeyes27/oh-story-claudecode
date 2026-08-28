@@ -9,6 +9,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+. "$REPO_ROOT/scripts/python3-shim.sh"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
@@ -323,7 +324,7 @@ expected = {
 read_only = {'chapter-extractor', 'consistency-checker', 'story-explorer'}
 found = set()
 for path in sorted(Path('skills/story-setup/references/codex/agents').glob('*.toml')):
-    data = loads(path.read_text())
+    data = loads(path.read_text(encoding='utf-8'))
     for key in ('name', 'description', 'developer_instructions'):
         assert data.get(key), f'{path}: missing {key}'
     name = data['name']

@@ -19,13 +19,24 @@ echo "======================"
 echo "Repo: $REPO_ROOT"
 
 [ -f reasonix-plugin.json ] || fail "reasonix-plugin.json missing"
-python3 -m json.tool reasonix-plugin.json >/dev/null || fail "reasonix-plugin.json is not valid JSON"
 
-python3 - <<'PY'
+# Windows 上裸调 python3 会落到 Microsoft Store 占位程序并静默失败（见 check-python-invocation.sh）。
+PYTHON_BIN=""
+for candidate in python3 python py; do
+  if "$candidate" -c "" >/dev/null 2>&1; then
+    PYTHON_BIN="$candidate"
+    break
+  fi
+done
+[ -n "$PYTHON_BIN" ] || fail "Python 3 is required (tried python3, python, and py)"
+
+"$PYTHON_BIN" -m json.tool reasonix-plugin.json >/dev/null || fail "reasonix-plugin.json is not valid JSON"
+
+"$PYTHON_BIN" - <<'PY'
 import json, re
 from pathlib import Path
 
-manifest = json.loads(Path('reasonix-plugin.json').read_text())
+manifest = json.loads(Path('reasonix-plugin.json').read_text(encoding='utf-8'))
 skill_set = json.loads(Path('scripts/platform-skill-set.json').read_text(encoding='utf-8'))
 published = skill_set.get('skills', [])
 assert published and len(published) == len(set(published)), 'platform skill set must contain unique skill names'
@@ -33,7 +44,7 @@ assert re.fullmatch(r'[a-z0-9][a-z0-9._-]{0,127}', manifest.get('name', '')), f"
 assert manifest['name'] == 'oh-story', manifest['name']
 assert manifest['skills'] == 'skills', manifest.get('skills')
 assert isinstance(manifest.get('description'), str) and manifest['description'], 'description required'
-version = Path('skills/story/VERSION').read_text().strip()
+version = Path('skills/story/VERSION').read_text(encoding='utf-8').strip()
 assert manifest['version'] == version, f"version {manifest['version']!r} must match skills/story/VERSION {version!r}"
 # The manifest promises the complete repository skill directory; keep it honest.
 skills = sorted(Path('skills').glob('*/SKILL.md'))

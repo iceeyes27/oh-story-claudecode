@@ -6,6 +6,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+. "$REPO_ROOT/scripts/python3-shim.sh"
 SKILL_DIR="$REPO_ROOT/skills/story-setup"
 HOOKS_DIR="$SKILL_DIR/references/templates/hooks"
 AGENT_REFS_DIR="$SKILL_DIR/references/agent-references"

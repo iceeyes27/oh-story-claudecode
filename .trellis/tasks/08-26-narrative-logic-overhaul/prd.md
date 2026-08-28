@@ -70,12 +70,16 @@
 
 ## 跨子任务验收标准
 
-- [ ] AC1：对 demo 书 `demo/长篇/让你管账号，你高燃混剪炸全网/` 跑完整改后的复合检查，读者视角阶段能产出可核查的 findings 清单，且不误报到无法使用的程度。
+> 状态核对于 2026-08-28，P0 两项已接入复合检查（清单 8→10 阶段、必检项 103→108）。
+
+- [x] AC1：对 demo 书 `demo/长篇/让你管账号，你高燃混剪炸全网/` 跑读者视角检查，`check-first-mention.js` 产出 8 处候选（4 blocking），每处带章节:行号与首现上下文，可逐条核查，未误报到不可用。注意候选提取仍有精度毛刺（"个系统" 这类中文切分残留、歌曲名被当专名），属 advisory 级需人工复核，已写在 skill 能力边界里。
 - [ ] AC2：复合检查的逻辑层 required 项占比从 7.8% 提升到 ≥25%，且提升来自新增逻辑项与精简冗余风格项两侧，不是单纯加项。
-- [ ] AC3：真实爆款书的说明性章节标题不再被判 blocking（以 demo 书前 20 章为基线，blocking 数从 9 降到 0）。
-- [ ] AC4：`叙事复杂度=平直` 档位可用，且在该档下"每章必须卡关键信息"不再是硬要求。
-- [ ] AC5：`bash scripts/static-check.sh`、`python scripts/check-current-skill-contracts.py`、`bash scripts/check-doc-budget.sh` 全部通过。
+      **当前 13/108 = 12.0%**（原 8 项 + 新增 rc-01/02/03、arc-01/02 共 5 项）。只加项到不了 25%，**必须等 P2 `qa-budget-rebalance` 精简 humanizer / general-deslop 的冗余风格项**才能关闭——这是 AC2 对 P2 的硬依赖。
+- [ ] AC3：真实爆款书的说明性章节标题不再被判 blocking（以 demo 书前 20 章为基线，blocking 数从 9 降到 0）。属 P2 `plain-narrative-mode`，未开工。
+- [ ] AC4：`叙事复杂度=平直` 档位可用，且在该档下"每章必须卡关键信息"不再是硬要求。属 P2 `plain-narrative-mode`，未开工。
+- [x] AC5：`node scripts/quality-gate.mjs --profile release` 22/23 PASS，唯一非 PASS 是 `dashboard-e2e` BLOCKED（本机未安装 Playwright chromium，属清单声明的 blocked 条件，非失败）。含 `static-check.sh`、`check-current-skill-contracts.py`、`check-doc-budget.sh` 全绿。
 - [ ] AC6：六个子任务各自的 AC 全部关闭，或未关闭项在本文件写明例外理由。
+      当前：P0 两项（reader-comprehension-scan、opening-arc-audit）已完成并接线；P1 `outline-causal-fields` 只完成脚本+测试，契约/demo 数据/文档三块未做；P1 `first-mention-protection` 未开工；P2 两项仍在 planning。
 
 ## Out of Scope
 

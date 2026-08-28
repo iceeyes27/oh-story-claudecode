@@ -2,9 +2,9 @@
 
 ## 1. 校验脚本（先行，可独立测）
 
-- [ ] `skills/story-write/scripts/check-outline-causal.py`：三字段存在/非占位、前因章号解析与存在性校验、tracking 交叉验证（有则验无则降级）、blocking/advisory 分级、退出码。
-- [ ] `scripts/test-outline-causal.py`：正常、前因未来章(blocking)、前因不存在(blocking)、缺字段(advisory)、占位(advisory)、参数错误(2)。
-- [ ] `python scripts/test-outline-causal.py` 全绿。
+- [x] `skills/story-write/scripts/check-outline-causal.py`：三字段存在/非占位、前因章号解析与存在性校验、tracking 交叉验证（有则验无则降级）、blocking/advisory 分级、退出码。
+- [x] `scripts/test-outline-causal.py`：正常、前因未来章(blocking)、前因不存在(blocking)、缺字段(advisory)、占位(advisory)、参数错误(2)。
+- [x] `python scripts/test-outline-causal.py` 全绿。
 
 ## 2. 契约与模板
 
@@ -32,6 +32,12 @@
 - [ ] `python scripts/check-current-skill-contracts.py`
 - [ ] `bash scripts/static-check.sh`、`bash scripts/check-doc-budget.sh`
 - [ ] `node .agents/skills/story-setup/scripts/manage-skill-adapters.js check`
+
+## 进度（2026-08-28 核对）
+
+- 第 1 节已完成：`check-outline-causal.py` 与 `scripts/test-outline-causal.py` 在仓库内，`python scripts/test-outline-causal.py` 7 项全绿。
+- 第 2-5 节未开工：`scripts/current-contract.json` 无因果规则、demo 20 章大纲无「因果链」段（对 demo 跑脚本全是 advisory 缺字段）、`artifact-protocols.md` / `workflow-setup.md` / `long-mode.md` 未同步。
+- 结论：本子任务仍为 in_progress，剩余工作是契约 + demo 数据 + 文档三块。
 
 ## 回退点
 

@@ -87,6 +87,18 @@ function canonicalRoot(root) {
 function listSkills(root) {
   const base = canonicalRoot(root);
   if (!fs.existsSync(base)) throw new Error(`canonical skill root is missing: ${base}`);
+  const publicPath = path.join(root, 'scripts', 'platform-skill-set.json');
+  const localPath = path.join(root, 'scripts', 'local-only-skill-set.json');
+  if (fs.existsSync(publicPath) && fs.existsSync(localPath)) {
+    const published = JSON.parse(fs.readFileSync(publicPath, 'utf8')).skills;
+    const local = Object.keys(JSON.parse(fs.readFileSync(localPath, 'utf8')).skills || {});
+    const declared = ['_shared', ...published, ...local].sort();
+    for (const name of declared) {
+      const directory = path.join(base, name);
+      if (!fs.existsSync(directory)) throw new Error(`declared canonical skill is missing: ${directory}`);
+    }
+    return declared;
+  }
   return fs.readdirSync(base, { withFileTypes: true })
     .filter((entry) => entry.isDirectory())
     .map((entry) => entry.name)

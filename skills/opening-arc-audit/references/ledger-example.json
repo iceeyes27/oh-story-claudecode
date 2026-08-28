@@ -1,0 +1,22 @@
+{
+  "_note": "基于 demo 书《让你管账号，你高燃混剪炸全网》前 15 章手工构造的示例 ledger，用于演示 arc-ledger.js 的输入格式与健康爽文的收支形态（快节奏爽文：悬念开得多也闭得勤、主线基本每章推进 → 不触发故弄玄虚阈值）。真实使用时由 references/arc-reading-protocol.md 的连读子代理产出。",
+  "book": "让你管账号，你高燃混剪炸全网",
+  "window": 15,
+  "chapters": [
+    {"num": 1, "opens": [{"id": "Q1", "q": "5天涨粉100万的系统任务能不能完成"}, {"id": "Q2", "q": "文娱国运系统到底是什么、会给什么"}], "closes": [], "mainAdvance": true},
+    {"num": 2, "opens": [{"id": "Q3", "q": "江晨拍的《诸君且听龙吟》MV会不会火"}], "closes": ["Q2"], "mainAdvance": true},
+    {"num": 3, "opens": [], "closes": ["Q3"], "mainAdvance": true},
+    {"num": 4, "opens": [], "closes": ["Q1"], "mainAdvance": true},
+    {"num": 5, "opens": [{"id": "Q4", "q": "系统下一步会奖励什么"}], "closes": [], "mainAdvance": true},
+    {"num": 6, "opens": [{"id": "Q5", "q": "军报记者为什么专程来采访江晨"}], "closes": ["Q4"], "mainAdvance": true},
+    {"num": 7, "opens": [], "closes": ["Q5"], "mainAdvance": true},
+    {"num": 8, "opens": [{"id": "Q6", "q": "钟嘉嘉的请求是什么"}], "closes": [], "mainAdvance": true},
+    {"num": 9, "opens": [], "closes": ["Q6"], "mainAdvance": true},
+    {"num": 10, "opens": [{"id": "Q7", "q": "专业团队和江晨对打谁赢"}], "closes": ["Q7"], "mainAdvance": true},
+    {"num": 11, "opens": [{"id": "Q8", "q": "老兵愿望任务能不能达成"}], "closes": [], "mainAdvance": true},
+    {"num": 12, "opens": [], "closes": [], "mainAdvance": false},
+    {"num": 13, "opens": [{"id": "Q9", "q": "作品引发的争议会怎样收场"}], "closes": [], "mainAdvance": true},
+    {"num": 14, "opens": [], "closes": ["Q9"], "mainAdvance": true},
+    {"num": 15, "opens": [], "closes": ["Q8"], "mainAdvance": true}
+  ]
+}

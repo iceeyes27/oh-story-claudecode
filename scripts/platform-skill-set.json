@@ -8,6 +8,8 @@
     "humanizer",
     "jargon-verb-scan",
     "legal-domain-veracity-scan",
+    "opening-arc-audit",
+    "reader-comprehension-scan",
     "story",
     "story-analyze",
     "story-cover",

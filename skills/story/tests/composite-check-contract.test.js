@@ -58,8 +58,10 @@ function publishedSkills() {
   );
 }
 
-test('generic novel check requires all eight stages and the manifest contract', () => {
+test('generic novel check requires all ten stages and the manifest contract', () => {
   const expectedStages = [
+    ['reader-comprehension', 'reader-comprehension-scan'],
+    ['opening-arc', 'opening-arc-audit'],
     ['review', 'story-review'],
     ['ai-flavor', 'ai-flavor-scan'],
     ['novel-deslop', 'story-deslop'],
@@ -70,16 +72,24 @@ test('generic novel check requires all eight stages and the manifest contract', 
     ['humanizer', 'humanizer'],
   ];
 
-  assert.equal(manifest.stages.length, 8);
-  assert.equal(manifest.completion.stageCount, 8);
+  assert.equal(manifest.stages.length, 10);
+  assert.equal(manifest.completion.stageCount, 10);
   assert.deepEqual(manifest.skipPolicy, {allowedOnlyWhen: 'not-applicable', requiresReason: true});
   assert.deepEqual(
     manifest.stages.map((stage) => [stage.id, stage.route]),
     expectedStages,
   );
-  assert.deepEqual(manifest.stages.map((stage) => stage.order), [1, 2, 3, 4, 5, 6, 7, 8]);
+  assert.deepEqual(manifest.stages.map((stage) => stage.order), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   assert.equal(new Set(allItems().map((item) => item.id)).size, allItems().length);
-  assert.equal(allItems().length, 103, 'manifest and validation spec must update together');
+  assert.equal(allItems().length, 108, 'manifest and validation spec must update together');
+
+  // 读者视角阶段的立身条件：只读正文。清单里丢了这条约束，阶段就退回作者视角。
+  const readerStage = manifest.stages.find((stage) => stage.id === 'reader-comprehension');
+  assert.match(readerStage.readerViewOnly, /只读 正文\//);
+  assert.doesNotMatch(
+    readerStage.filters.map((item) => item.scope).join(' '),
+    /设定|大纲|追踪/,
+  );
 
   for (const item of allItems()) {
     assert.equal(typeof item.id, 'string');
@@ -94,16 +104,16 @@ test('generic novel check requires all eight stages and the manifest contract', 
   assert.match(skill, /composite-check-manifest\.json/);
   assert.match(skill, /ai-flavor-scan.*正文十层/s);
   assert.match(skill, /每个必检项都有状态/);
-  assert.match(skill, /复合检查完成：8\/8，过滤项 M\/M/);
+  assert.match(skill, /复合检查完成：10\/10，过滤项 M\/M/);
   assert.match(skill, /不得静默跳过/);
 });
 
 test('validation spec stays synchronized with the composite manifest', () => {
   const validationSpec = fs.readFileSync(validationSpecPath, 'utf8');
-  assert.match(validationSpec, /八个有序阶段/);
-  assert.match(validationSpec, /103 个必检项/);
-  assert.match(validationSpec, /复合检查完成：8\/8，过滤项 103\/103/);
-  assert.doesNotMatch(validationSpec, /七阶段|95 个必检项|复合检查 7\/7/);
+  assert.match(validationSpec, /十个有序阶段/);
+  assert.match(validationSpec, /108 个必检项/);
+  assert.match(validationSpec, /复合检查完成：10\/10，过滤项 108\/108/);
+  assert.doesNotMatch(validationSpec, /七阶段|八个有序阶段|95 个必检项|103 个必检项|复合检查 7\/7/);
 });
 
 test('AI flavor manifest preserves all ten layers and five semantic mismatch checks', () => {

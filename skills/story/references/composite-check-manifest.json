@@ -7,9 +7,9 @@
     "requiresReason": true
   },
   "completion": {
-    "stageCount": 8,
+    "stageCount": 10,
     "requiredResultForEveryItem": true,
-    "successText": "复合检查完成：8/8，过滤项 {completed}/{required}",
+    "successText": "复合检查完成：10/10，过滤项 {completed}/{required}",
     "blockedText": "复合检查未完成：{completed}/{required}，原因：{reason}"
   },
   "triggers": {
@@ -19,8 +19,33 @@
   },
   "stages": [
     {
-      "id": "review",
+      "id": "reader-comprehension",
       "order": 1,
+      "route": "reader-comprehension-scan",
+      "mode": "full",
+      "dependencies": ["reader-comprehension-scan"],
+      "readerViewOnly": "本阶段只读 正文/，不得读取 设定/、大纲/、追踪/、对标/；注入其中任何一项即退回作者视角，等于没查",
+      "filters": [
+        {"id": "rc-01-first-mention", "label": "专名首现交代（确定性）", "executor": "skills/reader-comprehension-scan/scripts/check-first-mention.js", "scope": "正文全文", "required": true, "report": "blocking findings"},
+        {"id": "rc-02-cause-dangling", "label": "前因悬空", "executor": "skills/reader-comprehension-scan/SKILL.md", "scope": "仅正文，逐章追前因落点", "required": true, "report": "findings"},
+        {"id": "rc-03-comprehension-break", "label": "理解断点", "executor": "skills/reader-comprehension-scan/SKILL.md", "scope": "仅正文，连续章节读者信息量", "required": true, "report": "findings"}
+      ]
+    },
+    {
+      "id": "opening-arc",
+      "order": 2,
+      "route": "opening-arc-audit",
+      "mode": "full",
+      "dependencies": ["opening-arc-audit"],
+      "applicability": "正文章节数达到连读窗口（默认 15 章）时必检；不足窗口时允许整阶段 SKIPPED，须写明实际章节数",
+      "filters": [
+        {"id": "arc-01-suspense-ledger", "label": "悬念开闭连读填表", "executor": "skills/opening-arc-audit/SKILL.md", "scope": "开篇窗口正文，逐章开/闭悬念与主线推进", "required": true, "report": "findings"},
+        {"id": "arc-02-ledger-verdict", "label": "收支累计与阈值裁决（确定性）", "executor": "skills/opening-arc-audit/scripts/arc-ledger.js", "scope": "上一项产出的 ledger JSON", "required": true, "report": "blocking findings"}
+      ]
+    },
+    {
+      "id": "review",
+      "order": 3,
       "route": "story-review",
       "mode": "full",
       "dependencies": ["story-review"],
@@ -42,7 +67,7 @@
     },
     {
       "id": "ai-flavor",
-      "order": 2,
+      "order": 4,
       "route": "ai-flavor-scan",
       "mode": "ten-layer",
       "dependencies": ["ai-flavor-scan"],
@@ -70,7 +95,7 @@
     },
     {
       "id": "novel-deslop",
-      "order": 3,
+      "order": 5,
       "route": "story-deslop",
       "mode": "novel",
       "dependencies": ["story-deslop", "batch-pollution-detector"],
@@ -94,7 +119,7 @@
     },
     {
       "id": "dialogue-naturalness",
-      "order": 4,
+      "order": 6,
       "route": "dialogue-naturalness-scan",
       "mode": "full",
       "dependencies": ["dialogue-naturalness-scan"],
@@ -114,7 +139,7 @@
     },
     {
       "id": "jargon-verb",
-      "order": 5,
+      "order": 7,
       "route": "jargon-verb-scan",
       "mode": "full",
       "dependencies": ["jargon-verb-scan"],
@@ -126,7 +151,7 @@
     },
     {
       "id": "legal-domain-veracity",
-      "order": 6,
+      "order": 8,
       "route": "legal-domain-veracity-scan",
       "mode": "full",
       "dependencies": ["legal-domain-veracity-scan"],
@@ -142,7 +167,7 @@
     },
     {
       "id": "general-deslop",
-      "order": 7,
+      "order": 9,
       "route": "story-deslop",
       "mode": "general",
       "dependencies": ["story-deslop"],
@@ -161,7 +186,7 @@
     },
     {
       "id": "humanizer",
-      "order": 8,
+      "order": 10,
       "route": "humanizer",
       "mode": "bilingual",
       "dependencies": ["humanizer"],

@@ -51,11 +51,11 @@
 
 - Good：公开 Skill 清单、`_shared`、生成 command 和各 marketplace 一致。
 - Base：仓库 Skill 均归入公开或本地专用清单，数量从清单计算。
-- Bad：平台只安装 `story` 与 10 个旧公开 Skill，却宣称复合检查 8/8。
+- Bad：平台只安装 `story` 与 10 个旧公开 Skill，却宣称复合检查 10/10。
 
 ### 6. Tests Required
 
-- `skills/story/tests/composite-check-contract.test.js`：断言八阶段顺序、103 个必检项和公开依赖集合。
+- `skills/story/tests/composite-check-contract.test.js`：断言十阶段顺序、108 个必检项、读者视角阶段的只读正文约束和公开依赖集合。
 - `scripts/skill-publication-coverage.test.js`：断言公开与本地专用集合无遗漏、无重叠且原因非空。
 - 平台检查：断言 marketplace、commands、frontmatter、manifest 与清单一一对应。
 - 平台 AGENTS 路由模板中的 Skill 名称也必须与 `platform-skill-set.json` 一致，禁止保留已删除的 `story-long-*` / `story-short-*` 名称。
@@ -87,7 +87,7 @@ Correct: 读取 platform-skill-set.json，并额外复制 skills/_shared/。
 
 ### 3. Contracts
 
-- 清单必须声明八个有序阶段；当前清单登记 103 个必检项。
+- 清单必须声明十个有序阶段；当前清单登记 108 个必检项。前两个阶段是读者视角（`reader-comprehension` / `opening-arc`），只读 `正文/`。
 - 每个必检项必须有唯一 `id`、`executor`、`scope`、`required` 和 `report`。
 - Hook 输入使用 `hook_event_name`、`tool_name`、`tool_input`；Write/Edit/MultiEdit 读取 `file_path`、`path`、`filePath`，Bash 读取 `command`、`cmd` 或 `script`。
 - Hook 的项目根、工作目录和目标文件必须先按物理路径归一化再做范围判断：允许 `/var` 与 `/private/var`、项目根别名等同对象路径，拒绝词法位于根内但经符号链接逃到根外的目标。
@@ -106,9 +106,9 @@ Correct: 读取 platform-skill-set.json，并额外复制 skills/_shared/。
 
 ### 5. Good / Base / Bad Cases
 
-- Good：八阶段全部有结论，103 个必检项均有状态，输出 `复合检查完成：8/8，过滤项 103/103`。
+- Good：十阶段全部有结论，108 个必检项均有状态，输出 `复合检查完成：10/10，过滤项 108/108`。
 - Base：某项发现问题但仍执行后续项目，输出 `FAIL` 而不是中断。
-- Bad：只报告八个阶段名称，或把无法读取的文件静默排除后输出完成。
+- Bad：只报告十个阶段名称，或把无法读取的文件静默排除后输出完成。
 
 ### 6. Tests Required
 

@@ -1,0 +1,7 @@
+{"file":".trellis/spec/skills/index.md","reason":"Skill 仓库入口与修改边界"}
+{"file":".trellis/spec/skills/canonical-assets.md","reason":"共享资产和统一 story-write 单一来源"}
+{"file":".trellis/spec/skills/validation.md","reason":"本地验证与跨平台适配要求"}
+{"file":".trellis/spec/skills/longform-artifacts.md","reason":"骨架、候选、正稿与采用事务边界"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"tracking、API 与 UI 数据流契约"}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"集中 schema 解析与派生投影"}
+{"file":".trellis/tasks/08-24-author-voice-reference/research/architecture-review.md","reason":"两轮子 Agent 架构审查共识"}

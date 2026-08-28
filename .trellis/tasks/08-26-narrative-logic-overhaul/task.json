@@ -1,0 +1,33 @@
+{
+  "id": "narrative-logic-overhaul",
+  "name": "narrative-logic-overhaul",
+  "title": "叙事逻辑与读者可读性整改",
+  "description": "针对读者反馈（逻辑不通/叙事混乱/故弄玄虚）重排质检预算与写作门禁",
+  "status": "planning",
+  "dev_type": null,
+  "scope": null,
+  "package": null,
+  "priority": "P1",
+  "creator": "nat.yu",
+  "assignee": "nat.yu",
+  "createdAt": "2026-08-26",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [
+    "08-26-reader-comprehension-scan",
+    "08-26-opening-arc-audit",
+    "08-26-outline-causal-fields",
+    "08-26-first-mention-protection",
+    "08-26-plain-narrative-mode",
+    "08-26-qa-budget-rebalance"
+  ],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "",
+  "meta": {}
+}

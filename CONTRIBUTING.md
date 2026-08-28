@@ -169,11 +169,11 @@ bash scripts/test-opencode-cli-e2e.sh  # 可选：需要本机已安装 opencode
 1. 将 `templates/agents/` 下的 Claude Code agent 转换为 opencode 格式，写入 `opencode/agents/`
 2. 将 `CLAUDE.md.tmpl` 复制到 `opencode/AGENTS.md.tmpl`，替换 `.claude/` 路径引用
 3. 输出同步结果摘要
-4. 可选真实 CLI smoke 会在临时项目里验证 15 个 slash commands、7 个 agents 与 `story-hooks.ts` 插件能被 OpenCode 解析加载
+4. 可选真实 CLI smoke 会在临时项目里验证公开清单生成的 slash commands、agents 与 `story-hooks.ts` 插件能被 OpenCode 解析加载
 
 ### 本地检测
 
-修改 Claude Code 模板文件后，必须在本地运行同步脚本和 `bash scripts/check-opencode-adapter.sh`，检查 opencode 模板、`opencode.json.patch`、`plugin.ts`、16 个公开 command 与 7 个 agent 的结构锚点，再提交结果。
+修改 Claude Code 模板文件后，必须在本地运行同步脚本和 `bash scripts/check-opencode-adapter.sh`，检查 opencode 模板、`opencode.json.patch`、`plugin.ts`、公开清单生成的 command 与 agent 结构锚点，再提交结果。
 
 ### 手动维护的部分
 
@@ -228,7 +228,7 @@ bash scripts/check-openclaw-skills.sh
 OPENCLAW_REAL_CHECK=1 bash scripts/check-openclaw-skills.sh  # 本机安装 openclaw 时可选
 ```
 
-`OPENCLAW_REAL_CHECK=1` 会用临时 profile + 临时 workspace 创建隔离 agent，确认 OpenClaw CLI 能从 workspace `skills/` 发现 16 个公开 Skill；脚本结束后清理临时 profile。
+`OPENCLAW_REAL_CHECK=1` 会用临时 profile + 临时 workspace 创建隔离 agent，确认 OpenClaw CLI 能从 workspace `skills/` 发现公开清单中的 Skill；脚本结束后清理临时 profile。
 
 ### OpenClaw 已知边界
 
@@ -261,8 +261,8 @@ bash scripts/test-prose-net-parity.sh
 Reasonix（DeepSeek-Reasonix CLI）当前支持 skills + 原生 plugin manifest + skills-only 的项目级 `story-setup` 部署；hooks 与 custom agents 留待后续阶段（涉及专业 Agent 的 Skill 走 solo/direct fallback）：
 
 - 根 `reasonix-plugin.json` 是 plugin manifest；`version` 必须与 `skills/story/VERSION` 同步（`check-reasonix-adapter.sh` 守卫）。
-- Reasonix 原生扫描项目 skill root（`.agents/skills` 等，指向 `skills/` 的 symlink，与 Codex 共用）发现仓库内全部 31 个 Skill。
-- `story-setup` 的 `target_cli=reasonix` 走 skills-only 部署：复制 `scripts/platform-skill-set.json` 声明的 16 个公开 Skill 到项目 `skills/`、写入 `references/reasonix/AGENTS.md.tmpl`，不部署 hooks/agents（与 OpenClaw / generic 同构，由 `check-story-setup-deployment.sh` 守卫）。改动 Reasonix 部署路径或模板时同步该守卫。
+- Reasonix 原生扫描项目 skill root（`.agents/skills` 等，指向 `skills/` 的 symlink，与 Codex 共用）发现仓库 Skill。
+- `story-setup` 的 `target_cli=reasonix` 走 skills-only 部署：复制 `scripts/platform-skill-set.json` 声明的公开 Skill 到项目 `skills/`、写入 `references/reasonix/AGENTS.md.tmpl`，不部署 hooks/agents（与 OpenClaw / generic 同构，由 `check-story-setup-deployment.sh` 守卫）。改动 Reasonix 部署路径或模板时同步该守卫。
 - 真实 CLI 校验 `reasonix doctor capabilities` 不在默认本地检查内，发版前手动运行。
 
 ### Reasonix 检查步骤

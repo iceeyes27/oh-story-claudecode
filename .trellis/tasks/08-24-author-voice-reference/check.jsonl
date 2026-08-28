@@ -1,0 +1,6 @@
+{"file":".trellis/spec/skills/index.md","reason":"检查任务是否符合仓库 Skill 约定"}
+{"file":".trellis/spec/skills/canonical-assets.md","reason":"检查共享资产和统一入口没有漂移"}
+{"file":".trellis/spec/skills/validation.md","reason":"执行完整质量门与适配验证"}
+{"file":".trellis/spec/skills/longform-artifacts.md","reason":"检查候选采用和追踪零副作用"}
+{"file":".trellis/spec/guides/cross-layer-thinking-guide.md","reason":"复核 tracking 到 Dashboard 的跨层数据流"}
+{"file":".trellis/tasks/08-24-author-voice-reference/research/architecture-review.md","reason":"核对实现未偏离三方共识"}

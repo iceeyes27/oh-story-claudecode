@@ -586,6 +586,55 @@ def test_launcher_reports_missing_git_repository() -> None:
         assert "not in a git repository" in proc.stderr, proc.stdout + proc.stderr
 
 
+def test_launcher_accepts_windows_worktree_marker_under_wsl() -> None:
+    bash = shutil.which("bash")
+    if os.name != "nt" or bash is None:
+        print("SKIP: Windows WSL worktree marker regression not applicable")
+        return
+    probe = subprocess.run(
+        [bash, "-lc", "uname -s"],
+        check=False,
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+    )
+    if probe.stdout.strip() != "Linux":
+        print("SKIP: bash is not WSL; Windows worktree marker regression not applicable")
+        return
+
+    def as_wsl_path(path: Path) -> str:
+        resolved = path.resolve().as_posix()
+        return f"/mnt/{resolved[0].lower()}/{resolved[3:]}"
+
+    with tempfile.TemporaryDirectory(prefix="story-static-worktree-") as tmp:
+        base = Path(tmp)
+        root = base / "linked"
+        scripts = root / "scripts"
+        git_dir = base / "common" / "worktrees" / "linked"
+        scripts.mkdir(parents=True)
+        git_dir.mkdir(parents=True)
+        (git_dir / "HEAD").write_text("ref: refs/heads/probe\n", encoding="utf-8")
+        (git_dir / "commondir").write_text("../..\n", encoding="utf-8")
+        (root / ".git").write_text(f"gitdir: {git_dir.resolve()}\n", encoding="utf-8")
+        (scripts / "static-check.sh").write_text(
+            LAUNCHER.read_text(encoding="utf-8"), encoding="utf-8", newline="\n"
+        )
+        (scripts / "static-check.py").write_text(
+            "import sys\nassert sys.argv[1:] == ['--root', sys.argv[-1]]\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        root_arg = as_wsl_path(root)
+        proc = subprocess.run(
+            [bash, "-lc", f"cd {shlex.quote(root_arg)} && bash scripts/static-check.sh"],
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+        )
+        assert proc.returncode == 0, proc.stdout + proc.stderr
+
+
 def main() -> None:
     test_valid_contract()
     test_structural_failures_are_not_hidden_by_prose()
@@ -608,6 +657,7 @@ def main() -> None:
     test_brace_enumerations_name_each_file()
     test_trellis_project_artifacts_do_not_disable_link_validation()
     test_launcher_reports_missing_git_repository()
+    test_launcher_accepts_windows_worktree_marker_under_wsl()
     print("PASS: structured static-check regression")
 
 

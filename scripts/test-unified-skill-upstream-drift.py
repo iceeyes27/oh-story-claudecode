@@ -60,11 +60,12 @@ def main() -> int:
         git(root, "commit", "-qm", "upstream change")
         git(root, "branch", "upstream/main")
         git(root, "checkout", "-q", "main")
-        (root / "scripts/unified-skill-upstream-map.json").write_text(
+        policy_path = root / "scripts/upstream-integration.json"
+        policy_path.write_text(
             json.dumps(
                 {
-                    "upstream_baseline": baseline,
-                    "mappings": [
+                    "upstream": {"baseline": baseline},
+                    "unified_mappings": [
                         {"source": "skills/story-long-write", "target": "skills/story-write"},
                     ],
                 }
@@ -79,6 +80,13 @@ def main() -> int:
         report = run_checker(root, "--upstream-ref=upstream/main", "--report")
         assert report.returncode == 0, report.stdout + report.stderr
         assert "Unified upstream migration report" in report.stdout, report.stdout
+
+        policy = json.loads(policy_path.read_text(encoding="utf-8"))
+        policy["upstream"]["baseline"] = git(root, "rev-parse", "upstream/main")
+        policy_path.write_text(json.dumps(policy), encoding="utf-8")
+        reverse = run_checker(root, "--upstream-ref=main")
+        assert reverse.returncode == 2, reverse.stdout + reverse.stderr
+        assert "is not an ancestor" in reverse.stderr, reverse.stderr
 
     print("PASS: unified upstream checker reports source-to-target migration paths")
     return 0

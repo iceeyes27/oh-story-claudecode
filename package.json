@@ -3,10 +3,13 @@
   "private": true,
   "scripts": {
     "dashboard": "node skills/story/scripts/dashboard-server.mjs",
+    "quality:fast": "node scripts/quality-gate.mjs --profile fast",
+    "quality:affected": "node scripts/quality-gate.mjs --profile affected",
+    "quality:release": "node scripts/quality-gate.mjs --profile release",
     "test:contracts": "node --test skills/story/tests/composite-check-contract.test.js skills/story-deslop/tests/general-mode-contract.test.js",
     "test:dashboard": "node --test tests/dashboard-server.test.mjs tests/dashboard-bundle-contract.test.mjs",
     "test:dashboard:e2e": "playwright test",
-    "test": "npm run test:contracts && npm run test:dashboard && npm run test:dashboard:e2e"
+    "test": "npm run quality:release"
   },
   "devDependencies": {
     "@playwright/test": "^1.62.0"

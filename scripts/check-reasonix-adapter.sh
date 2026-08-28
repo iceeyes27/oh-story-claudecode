@@ -47,7 +47,9 @@ assert 'scripts/platform-skill-set.json' in reasonix_section, 'Reasonix deployme
 assert 'skills/_shared/' in reasonix_section, 'Reasonix deployment must include the shared runtime assets'
 
 agents = Path('skills/story-setup/references/reasonix/AGENTS.md.tmpl').read_text(encoding='utf-8')
-assert f'{len(published)} 个公开 Skill' in agents, 'Reasonix template public Skill count drifted'
+assert '公开清单中的 oh-story Skill' in agents, (
+    'Reasonix template must describe the catalog-driven public Skill set'
+)
 route_section = agents.split('## Skill 路由表', 1)[1].split('## Reasonix 兼容说明', 1)[0]
 route_names = set()
 for line in route_section.splitlines():

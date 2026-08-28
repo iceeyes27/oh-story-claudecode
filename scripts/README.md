@@ -12,16 +12,20 @@
 | `static-check.sh` + `static-check.py` | 结构化验证 frontmatter、Markdown 路径/锚点、Agent 引用、references 可达性；除基础组件 `browser-cdp` 外禁止跨 Skill 文件引用 | 提交前本地 |
 | `skill-numbering.py check` | 工作流 Step/Phase/Stage 编号策略、引用绑定、SKILL.md 裸编号/子步骤小数守卫 | 提交前本地；改工作流结构后 |
 | `check-current-skill-contracts.sh` + `.py` + `current-contract.json` | 从结构化 manifest 校验当前版本、Phase、schema、主产物、细纲契约与 GitHub Actions 禁用策略；保留 legacy/path 守卫并拦截缺主产物后的静默替代 | 提交前本地 |
-| `check-unified-skill-upstream-drift.py` + `unified-skill-upstream-map.json` | 上游 split skill 改动后强制人工映射到 unified skill；`--report` 只读输出 source -> target 迁移清单 | 合并上游后；提交前本地 |
+| `check-unified-skill-upstream-drift.py` + `upstream-integration.json` | 固定上游基线并检查 split skill 到 unified skill 的人工迁移义务；`--report` 只读输出 source -> target 清单 | 上游同步后；提交前本地 |
 | `check-shared-files.sh` | 调 `sync-shared-assets.py check` 验 runtime 副本，再验共享 reference 字节一致 | 提交前本地 |
 | `check-scan-runtime-policy.sh` | scraper 输出文件名依赖本地日期 helper；CDP 探测/Windows 监听解析的源码策略 | 提交前本地；这些依赖方向无法由隔离 helper 测试证明 |
 | `check-story-setup-deployment.sh` | story-setup 部署/运行时回归（慢，>2min） | story-setup 改动后本地 |
 | `check-hook-regex-sync.sh` | `detect-story-gaps.sh` 伏笔状态检测行为 | 相关改动后本地 |
 | `check-hook-locale-safety.sh` | 部署 hook 在 Windows 中文 GBK 区域的字节安全 | hook 改动后本地 |
 | `check-python-invocation.sh` | 技能文档禁止裸调 `python3`（须 python3→python→py 探测） | 提交前本地 |
-| `platform-skill-set.json` | 跨平台公开发布的 15 个 Skill 唯一清单；Claude、OpenCode、ZCode 与 OpenClaw 校验共用 | 增减公开 Skill 时先修改 |
+| `check-doc-budget.sh` + `doc-budget.json` | 校验每次会话或每章加载的热路径文档没有超过显式预算 | 修改 Skill 入口与写作热路径后 |
+| `platform-skill-set.json` | 跨平台公开发布 Skill 的唯一清单；Claude、OpenCode、ZCode 与 OpenClaw 校验共用 | 增减公开 Skill 时先修改 |
 | `local-only-skill-set.json` | 不进入跨平台公开部署的 Skill 及原因；与公开清单的并集必须覆盖仓库全部 Skill | 新增或改变 Skill 发布范围时修改 |
-| `sync-upstream.js` | 安全拉取并合并 `upstream/main`；按统一 Skill 映射自动处理旧 split 目录冲突，漂移未迁移时拒绝提交 | 同步上游时运行 |
+| `sync-upstream.js` | 在专用 worktree 中固定双方 SHA，按策略分类、记录审阅决定、验证并生成双亲 merge commit；不改调用者工作区 | 同步上游时运行 |
+| `platform-capabilities.json` + `check-platform-capabilities.mjs` | 平台能力、降级行为、Windows 启动方式与公开 Skill 完整性 | 平台适配改动后 |
+| `quality-gate.json` + `quality-gate.mjs` | `fast` / `affected` / `release` 本地质量配置与 JSON 报告 | 改动后或发布前 |
+| `release-manifest.json` + `check-release-manifest.mjs` | 发布身份、上游基线与权威资产摘要 | 发布前 |
 | `check-claude-adapter.sh` | Claude marketplace 与公开 Skill 清单的一一映射；可选真实 CLI strict validate | 本地静态；`CLAUDE_REAL_CHECK=1`（真实 CLI） |
 | `check-opencode-adapter.sh` | OpenCode 适配层同步 + commands/agents/config 结构 + plugin 行为回归 | 本地（调 sync-opencode.py） |
 | `check-openclaw-skills.sh` | OpenClaw AgentSkills/frontmatter 兼容性 | 本地 |
@@ -74,13 +78,16 @@
 
 ## 上游同步
 
-从干净工作区运行：
+先确认 `upstream` 的 push URL 已禁用，再从任意工作区运行：
 
 ```bash
-node scripts/sync-upstream.js
+node scripts/sync-upstream.js prepare
+node scripts/sync-upstream.js review --decisions path/to/decisions.json
+node scripts/sync-upstream.js validate
+node scripts/sync-upstream.js promote
 ```
 
-脚本会 fetch `upstream/main`、开始一个不自动提交的 merge，并按 `unified-skill-upstream-map.json` 自动保留已统一 Skill 对旧 split 目录的删除。若上游修改了旧目录，漂移检查会暂停合并，列出必须迁入 `story-write`、`story-analyze` 或 `story-scan` 的目标；其它语义冲突也会原样列出。处理完并通过检查后手动 `git commit`，或一开始传 `--commit` 让全套检查通过后自动创建 merge commit。放弃本次同步用 `git merge --abort`。
+`prepare` 记录 origin/upstream 的固定 SHA 并创建专用 worktree；`review` 导入逐路径决定；`validate` 要求冲突、未知路径、禁止路径和未处理项均为零，并执行 `release` 质量配置；`promote` 只在 origin SHA 未变化、验证树未变化时创建以 upstream 为第二父节点的 merge commit。中止使用 `node scripts/sync-upstream.js abort`。
 
 ## 工作流编号维护
 

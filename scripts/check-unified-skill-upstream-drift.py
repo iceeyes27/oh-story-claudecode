@@ -20,7 +20,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_MAP = REPO_ROOT / "scripts" / "unified-skill-upstream-map.json"
+DEFAULT_MAP = REPO_ROOT / "scripts" / "upstream-integration.json"
 
 
 def git(*args: str) -> str:
@@ -53,10 +53,11 @@ def main() -> int:
         print(f"FAIL: cannot read unified-skill map: {error}", file=sys.stderr)
         return 2
 
-    baseline = config.get("upstream_baseline")
-    mappings = config.get("mappings")
+    upstream = config.get("upstream")
+    baseline = upstream.get("baseline") if isinstance(upstream, dict) else None
+    mappings = config.get("unified_mappings")
     if not isinstance(baseline, str) or not baseline or not isinstance(mappings, list):
-        print("FAIL: map needs upstream_baseline and mappings", file=sys.stderr)
+        print("FAIL: policy needs upstream.baseline and unified_mappings", file=sys.stderr)
         return 2
 
     try:
@@ -65,6 +66,16 @@ def main() -> int:
     except subprocess.CalledProcessError:
         print(
             f"FAIL: cannot resolve {args.upstream_ref} or baseline {baseline}; fetch upstream before this check.",
+            file=sys.stderr,
+        )
+        return 2
+
+    try:
+        git("merge-base", "--is-ancestor", baseline, args.upstream_ref)
+    except subprocess.CalledProcessError:
+        print(
+            f"FAIL: configured upstream baseline {baseline} is not an ancestor of {args.upstream_ref}; "
+            "refuse a reverse or unrelated migration report.",
             file=sys.stderr,
         )
         return 2
@@ -118,7 +129,7 @@ def main() -> int:
         print(f"  {status:4} {path} -> {target}")
     print(
         "Review each source change, apply its semantics to the mapped unified target, "
-        "then advance upstream_baseline in scripts/unified-skill-upstream-map.json."
+        "then advance upstream.baseline in scripts/upstream-integration.json."
     )
     return 0 if args.report else 1
 

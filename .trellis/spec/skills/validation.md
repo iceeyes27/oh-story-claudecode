@@ -11,6 +11,9 @@
 - `python scripts/check-unified-skill-upstream-drift.py`：校验统一目录对上游拆分目录的人工迁移义务。
 - 需要查看迁移范围时使用 `python scripts/check-unified-skill-upstream-drift.py --report`；该报告只读，不自动覆盖统一 Skill。
 - `python scripts/check-current-skill-contracts.py`：除版本与产物契约外，拒绝 `.github/workflows/` 中的任何文件，保持本 fork 仅使用本地验证。
+- `node scripts/check-platform-capabilities.mjs`：校验各平台能力、降级行为与 Windows 启动方式。
+- `node scripts/quality-gate.mjs --profile affected|release`：统一执行本地质量检查并生成机器可读报告。
+- `node scripts/check-release-manifest.mjs`：校验发布身份、上游基线与权威资产摘要。
 - 跨平台校验必须读取 `scripts/platform-skill-set.json`，不得另建公开 Skill 名单；不公开的 Skill 必须在 `scripts/local-only-skill-set.json` 中写明原因，两个集合必须无交集且完整覆盖仓库 Skill。复合检查及其嵌套路由的契约测试还要证明全部必需 Skill 依赖属于公开集合且资产存在。
 
 ## Public Skill / Deployment Contract
@@ -46,8 +49,8 @@
 
 ### 5. Good / Base / Bad Cases
 
-- Good：16 个公开 Skill、`_shared`、16 个 command 和各 marketplace 一致。
-- Base：仓库内 `.agents/skills` 发现全部 31 个 Skill，公开集合为 16 个。
+- Good：公开 Skill 清单、`_shared`、生成 command 和各 marketplace 一致。
+- Base：仓库 Skill 均归入公开或本地专用清单，数量从清单计算。
 - Bad：平台只安装 `story` 与 10 个旧公开 Skill，却宣称复合检查 8/8。
 
 ### 6. Tests Required

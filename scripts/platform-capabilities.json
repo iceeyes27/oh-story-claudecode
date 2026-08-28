@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "skill_catalog": "scripts/platform-skill-set.json",
+  "platforms": {
+    "claude": {
+      "skill_root": ".claude/skills",
+      "commands": true,
+      "hooks": ["SessionStart", "PostToolUse", "PreCompact", "SessionEnd"],
+      "custom_agents": "supported",
+      "windows_runner": "bash",
+      "activation": ["restart_session"],
+      "fallback": "solo"
+    },
+    "opencode": {
+      "skill_root": ".opencode/skills",
+      "commands": true,
+      "hooks": ["session.created", "tool.execute.after", "session.compacted"],
+      "custom_agents": "supported",
+      "windows_runner": "node",
+      "activation": ["restart_session"],
+      "fallback": "solo"
+    },
+    "codex": {
+      "skill_root": ".codex/skills",
+      "commands": false,
+      "hooks": ["SessionStart", "PostToolUse"],
+      "custom_agents": "runtime_probe_required",
+      "windows_runner": "python_or_py",
+      "activation": ["trust_project", "restart_session"],
+      "fallback": "inline"
+    },
+    "zcode": {
+      "skill_root": ".zcode/skills",
+      "commands": true,
+      "hooks": ["SessionStart", "PostToolUse"],
+      "custom_agents": "unsupported",
+      "windows_runner": "node",
+      "activation": ["restart_session"],
+      "fallback": "direct"
+    },
+    "openclaw": {
+      "skill_root": "skills",
+      "commands": false,
+      "hooks": [],
+      "custom_agents": "unsupported",
+      "windows_runner": "none",
+      "activation": ["restart_session_or_watcher"],
+      "fallback": "skills_only"
+    },
+    "reasonix": {
+      "skill_root": ".agents/skills",
+      "commands": false,
+      "hooks": [],
+      "custom_agents": "unsupported",
+      "windows_runner": "native_plugin",
+      "activation": ["plugin_install_or_restart"],
+      "fallback": "skills_only"
+    },
+    "generic": {
+      "skill_root": "skills",
+      "commands": false,
+      "hooks": [],
+      "custom_agents": "unsupported",
+      "windows_runner": "none",
+      "activation": ["host_dependent"],
+      "fallback": "skills_only"
+    }
+  }
+}

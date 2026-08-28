@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "origin": {
+    "remote": "origin",
+    "branch": "main"
+  },
+  "upstream": {
+    "remote": "upstream",
+    "branch": "main",
+    "baseline": "d1f88587c0b88abdb0a62b101b850300e0617d7b"
+  },
+  "quality_profile": "release",
+  "policy_priority": [
+    "forbidden",
+    "protected",
+    "generated",
+    "shared",
+    "unified",
+    "canonical",
+    "unknown"
+  ],
+  "policies": {
+    "forbidden": [
+      {
+        "prefix": ".github/workflows/",
+        "reason": "This fork uses local verification and does not ship GitHub Actions."
+      }
+    ],
+    "protected": [
+      {
+        "prefix": ".trellis/",
+        "reason": "Trellis tasks and project specifications are fork-owned."
+      },
+      {
+        "path": "scripts/upstream-integration.json",
+        "reason": "The integration policy is fork-owned."
+      },
+      {
+        "path": "scripts/sync-upstream.js",
+        "reason": "The integration orchestrator is fork-owned."
+      },
+      {
+        "path": "scripts/quality-gate.mjs",
+        "reason": "The local quality runner is fork-owned."
+      },
+      {
+        "path": "scripts/platform-capabilities.json",
+        "reason": "Platform capability declarations are fork-owned."
+      },
+      {
+        "path": "scripts/release-manifest.json",
+        "reason": "The fork release identity is fork-owned."
+      },
+      {
+        "path": "skills/story-write/scripts/candidate-commit.py",
+        "reason": "Candidate adoption is a fork-owned author approval boundary."
+      }
+    ],
+    "generated": [
+      {
+        "prefix": ".claude/skills/",
+        "reason": "Platform Skill entries are generated from the canonical skills tree."
+      },
+      {
+        "prefix": ".codex/skills/",
+        "reason": "Platform Skill entries are generated from the canonical skills tree."
+      },
+      {
+        "prefix": ".opencode/skills/",
+        "reason": "Platform Skill entries are generated from the canonical skills tree."
+      },
+      {
+        "prefix": ".zcode/skills/",
+        "reason": "Platform Skill entries are generated from the canonical skills tree."
+      },
+      {
+        "prefix": "skills/story-setup/references/codex/",
+        "reason": "Codex adapters are generated from canonical templates."
+      },
+      {
+        "prefix": "skills/story-setup/references/opencode/",
+        "reason": "OpenCode adapters are generated from canonical templates."
+      },
+      {
+        "prefix": "skills/story-setup/references/zcode/",
+        "reason": "ZCode adapters are generated from canonical templates."
+      }
+    ],
+    "shared": [
+      {
+        "prefix": "skills/_shared/",
+        "reason": "Shared rules and scanners have one canonical source."
+      },
+      {
+        "prefix": "skills/story-setup/references/agent-references/",
+        "reason": "Agent references are rebuilt from shared sources."
+      },
+      {
+        "prefix": "skills/story-setup/references/templates/hooks/",
+        "reason": "Hook targets are rebuilt from shared sources."
+      }
+    ],
+    "canonical": [
+      { "prefix": ".claude-plugin/" },
+      { "prefix": ".github/ISSUE_TEMPLATE/" },
+      { "prefix": ".zcode-plugin/" },
+      { "prefix": "demo/" },
+      { "prefix": "scripts/" },
+      { "prefix": "skills/" },
+      { "path": ".gitignore" },
+      { "path": "AGENTS.md" },
+      { "path": "CHANGELOG.md" },
+      { "path": "CLAUDE.md" },
+      { "path": "CONTRIBUTING.md" },
+      { "path": "LICENSE" },
+      { "path": "README.md" },
+      { "path": "README_EN.md" },
+      { "path": "marketplace.json" },
+      { "path": "package-lock.json" },
+      { "path": "package.json" },
+      { "path": "reasonix-plugin.json" }
+    ]
+  },
+  "unified_mappings": [
+    { "source": "skills/story-long-write", "target": "skills/story-write" },
+    { "source": "skills/story-short-write", "target": "skills/story-write" },
+    { "source": "skills/story-long-analyze", "target": "skills/story-analyze" },
+    { "source": "skills/story-short-analyze", "target": "skills/story-analyze" },
+    { "source": "skills/story-long-scan", "target": "skills/story-scan" },
+    { "source": "skills/story-short-scan", "target": "skills/story-scan" }
+  ]
+}

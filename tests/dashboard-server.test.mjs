@@ -7,10 +7,12 @@ import {
   DashboardError,
   browserLaunchCommand,
   createDashboardServer,
+  listWorkspaceCandidates,
   listWorkspaceDirectory,
   pathsReferToSameFile,
   resolveWorkspaceDirectory,
   resolveWorkspacePath,
+  runCandidateAction,
   scanWorkspace,
   searchWorkspace,
 } from "../skills/story/scripts/dashboard-server.mjs";
@@ -29,6 +31,88 @@ afterEach(async () => {
       rm(directory, { recursive: true, force: true }),
     ),
   );
+});
+
+async function createCandidateWorkspace() {
+  const root = await mkdtemp(resolve(tmpdir(), "oh-story-dashboard-candidates-"));
+  temporaryDirectories.push(root);
+  const book = resolve(root, "长篇", "候选书");
+  await mkdir(resolve(book, "正文"), { recursive: true });
+  await mkdir(resolve(book, "大纲"), { recursive: true });
+  await mkdir(resolve(book, "骨架"), { recursive: true });
+  await mkdir(resolve(book, "追踪"), { recursive: true });
+  await mkdir(resolve(book, "候选", "_历史"), { recursive: true });
+  await writeFile(resolve(book, "正文", "第001章_旧稿.md"), "# 第001章 旧稿\n正文。\n", "utf8");
+  await writeFile(resolve(book, "大纲", "细纲_第002章.md"), "# 细纲\n", "utf8");
+  await writeFile(resolve(book, "骨架", "第002章_骨架.md"), "# 骨架\n", "utf8");
+  await writeFile(resolve(book, "候选", "第002章_新章.md"), "# 第002章 新章\n候选正文。\n", "utf8");
+  await writeFile(
+    resolve(book, "候选", "第002章_追踪事务.json"),
+    JSON.stringify({ expected_state_revision: 7, candidate_binding: { schema_version: 1 } }),
+    "utf8",
+  );
+  await writeFile(resolve(book, "候选", "第003章_无事务.md"), "# 第003章\n候选正文。\n", "utf8");
+  await writeFile(resolve(book, "追踪", "上下文.md"), "受管理状态", "utf8");
+  return { root, book };
+}
+
+describe("candidate review", () => {
+  test("lists candidates through the transaction authority with version and state binding", async () => {
+    const { root } = await createCandidateWorkspace();
+    const listing = await listWorkspaceCandidates(root);
+    assert.equal(listing.total, 2);
+    const [second, third] = listing.projects[0].candidates;
+    assert.equal(second.chapter, 2);
+    assert.match(second.candidateVersion, /^[a-f0-9]{64}$/);
+    assert.equal(second.hasTransaction, true);
+    assert.equal(second.hasBinding, true);
+    assert.equal(second.expectedStateRevision, 7);
+    assert.equal(second.outlinePath, "长篇/候选书/大纲/细纲_第002章.md");
+    assert.equal(second.skeletonPath, "长篇/候选书/骨架/第002章_骨架.md");
+    assert.equal(second.previousFinalPath, "长篇/候选书/正文/第001章_旧稿.md");
+    assert.equal(third.hasTransaction, false);
+  });
+
+  test("rejects stale actions and archives an unchanged candidate", async () => {
+    const { root, book } = await createCandidateWorkspace();
+    const listing = await listWorkspaceCandidates(root);
+    const third = listing.projects[0].candidates.find((entry) => entry.chapter === 3);
+    await writeFile(resolve(book, "候选", third.name), "已被外部改写", "utf8");
+    await assert.rejects(
+      runCandidateAction(root, {
+        action: "reject",
+        project: "长篇/候选书",
+        chapter: 3,
+        candidateVersion: third.candidateVersion,
+      }),
+      (error) => error instanceof DashboardError && error.code === "candidate_changed",
+    );
+    const refreshed = await listWorkspaceCandidates(root);
+    const current = refreshed.projects[0].candidates.find((entry) => entry.chapter === 3);
+    const result = await runCandidateAction(root, {
+      action: "reject",
+      project: "长篇/候选书",
+      chapter: 3,
+      candidateVersion: current.candidateVersion,
+    });
+    assert.equal(result.ok, true);
+    await assert.rejects(stat(resolve(book, "候选", third.name)));
+  });
+
+  test("blocks generic edits to tracking state and candidate transaction files", async () => {
+    const { root } = await createCandidateWorkspace();
+    const baseUrl = await startServer(root);
+    for (const path of ["长篇/候选书/追踪/上下文.md", "长篇/候选书/候选/第002章_追踪事务.json"]) {
+      const loaded = await fetch(`${baseUrl}/api/file?path=${encodeURIComponent(path)}`).then((response) => response.json());
+      const response = await fetch(`${baseUrl}/api/file`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path, content: "旁路修改", expectedVersion: loaded.version }),
+      });
+      assert.equal(response.status, 403);
+      assert.equal((await response.json()).error.code, "managed_state_read_only");
+    }
+  });
 });
 
 async function createWorkspace() {

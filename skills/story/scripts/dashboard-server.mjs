@@ -41,12 +41,26 @@ const IGNORED_DIRECTORIES = new Set([
 ]);
 const MAX_FILE_BYTES = 2 * 1024 * 1024;
 const MAX_REQUEST_BYTES = MAX_FILE_BYTES + 64 * 1024;
+const CANDIDATE_DIR = "候选";
+const CANDIDATE_TRANSACTION_SUFFIX = "_追踪事务.json";
+const CANDIDATE_CHAPTER_PREFIX = /^第0*(\d+)章/;
+const CANDIDATE_ACTIONS = new Set(["promote", "reject"]);
+const CANDIDATE_ACTION_TIMEOUT_MS = 120_000;
+const CANDIDATE_ACTION_OUTPUT_LIMIT = 256 * 1024;
+// candidate-commit.py 由共享资产清单从 story-write 的权威副本生成。
+const CANDIDATE_TOOL_PATH = fileURLToPath(new URL("./candidate-commit.py", import.meta.url));
+const PYTHON_COMMANDS = [
+  { command: "python3", prefix: [] },
+  { command: "python", prefix: [] },
+  { command: "py", prefix: ["-3"] },
+];
 const DIRECTORY_PAGE_SIZE = 200;
 const MAX_SEARCH_RESULTS = 100;
 const MAX_SEARCH_NODES = 5000;
 const MAX_SEARCH_DEPTH = 20;
 const LOOPBACK_HOSTS = new Set(["127.0.0.1", "::1", "localhost"]);
 const FILE_MUTATION_TAILS = new Map();
+let detectedPython = null;
 
 const CONTENT_TYPES = {
   ".css": "text/css; charset=utf-8",
@@ -551,6 +565,199 @@ export async function searchWorkspace(root, queryValue, scopeValue) {
   };
 }
 
+function candidateChapterNumber(name) {
+  const match = CANDIDATE_CHAPTER_PREFIX.exec(name);
+  return match ? Number(match[1]) : null;
+}
+
+async function readVisibleFiles(directory) {
+  const entries = await readdir(directory, { withFileTypes: true }).catch(() => []);
+  return entries.filter((entry) => entry.isFile() && !entry.isSymbolicLink()).map((entry) => entry.name);
+}
+
+function spawnCommandOnce(command, args, options = {}) {
+  return new Promise((accept, reject) => {
+    const child = spawn(command, args, { ...options, stdio: ["ignore", "pipe", "pipe"] });
+    let stdout = "";
+    let stderr = "";
+    let settled = false;
+    const timer = setTimeout(() => {
+      settled = true;
+      child.kill("SIGKILL");
+      reject(new DashboardError(504, "candidate_action_timeout", "候选操作超时，已中止；请在终端检查候选状态"));
+    }, options.timeoutMs || CANDIDATE_ACTION_TIMEOUT_MS);
+    child.stdout.on("data", (chunk) => {
+      if (stdout.length < CANDIDATE_ACTION_OUTPUT_LIMIT) stdout += chunk.toString("utf8");
+    });
+    child.stderr.on("data", (chunk) => {
+      if (stderr.length < CANDIDATE_ACTION_OUTPUT_LIMIT) stderr += chunk.toString("utf8");
+    });
+    child.on("error", (error) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      reject(error);
+    });
+    child.on("close", (code) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      accept({ code, stdout, stderr });
+    });
+  });
+}
+
+async function detectPython() {
+  if (detectedPython) return detectedPython;
+  for (const candidate of PYTHON_COMMANDS) {
+    try {
+      const probe = await spawnCommandOnce(candidate.command, [...candidate.prefix, "--version"], {
+        timeoutMs: 10_000,
+      });
+      if (probe.code === 0) {
+        detectedPython = candidate;
+        return candidate;
+      }
+    } catch (error) {
+      if (error?.code !== "ENOENT") continue;
+    }
+  }
+  throw new DashboardError(501, "python_unavailable", "本机未找到可用的 Python（python3/python/py -3）");
+}
+
+async function runCandidateTool(args) {
+  const toolInfo = await stat(CANDIDATE_TOOL_PATH).catch(() => null);
+  if (!toolInfo?.isFile()) {
+    throw new DashboardError(501, "candidate_tool_missing", "找不到候选事务工具，无法执行候选操作");
+  }
+  const python = await detectPython();
+  return spawnCommandOnce(python.command, [...python.prefix, CANDIDATE_TOOL_PATH, ...args]);
+}
+
+async function candidateContext(realRoot, projectAbsolute, entry) {
+  const chapter = entry.chapter;
+  const [finalNames, outlineNames, skeletonNames] = await Promise.all([
+    readVisibleFiles(resolve(projectAbsolute, "正文")),
+    readVisibleFiles(resolve(projectAbsolute, "大纲")),
+    readVisibleFiles(resolve(projectAbsolute, "骨架")),
+  ]);
+  const chapterByName = (name) => candidateChapterNumber(name);
+  const previousFinal = finalNames
+    .filter((name) => name.endsWith(".md") && chapterByName(name) < chapter)
+    .sort((left, right) => chapterByName(right) - chapterByName(left))[0] || null;
+  const outline = outlineNames.find((name) => new RegExp(`^细纲_第0*${chapter}章.*\\.md$`).test(name)) || null;
+  const skeleton = skeletonNames.find((name) => name.endsWith(".md") && chapterByName(name) === chapter) || null;
+  const relativeTo = (directory, name) =>
+    name ? toPosixPath(relative(realRoot, resolve(projectAbsolute, directory, name))) : null;
+  return {
+    chapter,
+    name: entry.prose,
+    path: relativeTo(CANDIDATE_DIR, entry.prose),
+    candidateVersion: entry.candidate_sha256,
+    hasTransaction: entry.has_transaction,
+    hasBinding: entry.has_binding,
+    expectedStateRevision: entry.expected_state_revision,
+    finalExists: entry.final_exists,
+    adoptionPhase: entry.adoption_phase,
+    transactionPath: entry.has_transaction
+      ? relativeTo(CANDIDATE_DIR, `第${String(chapter).padStart(3, "0")}章_追踪事务.json`)
+      : null,
+    outlinePath: relativeTo("大纲", outline),
+    skeletonPath: relativeTo("骨架", skeleton),
+    previousFinalPath: relativeTo("正文", previousFinal),
+  };
+}
+
+async function listProjectCandidates(realRoot, projectAbsolute) {
+  const result = await runCandidateTool(["list", "--project", projectAbsolute]);
+  if (result.code !== 0) {
+    throw new DashboardError(
+      422,
+      "candidate_list_rejected",
+      result.stderr.trim().replace(/^ERROR:\s*/, "") || "候选列表读取失败",
+    );
+  }
+  let entries;
+  try {
+    entries = JSON.parse(result.stdout);
+  } catch {
+    throw new DashboardError(500, "candidate_list_invalid", "候选事务工具返回了无效数据");
+  }
+  if (!Array.isArray(entries)) {
+    throw new DashboardError(500, "candidate_list_invalid", "候选事务工具返回的数据结构无效");
+  }
+  return Promise.all(entries.map((entry) => candidateContext(realRoot, projectAbsolute, entry)));
+}
+
+export async function listWorkspaceCandidates(root) {
+  const realRoot = await existingRealRoot(root);
+  const { projectRoots, scanErrors } = await discoverWorkspaceRoots(realRoot);
+  const projects = [];
+  let total = 0;
+  for (const entry of projectRoots) {
+    const candidates = await listProjectCandidates(realRoot, entry.absolutePath);
+    if (candidates.length === 0) continue;
+    total += candidates.length;
+    projects.push({
+      name: basename(entry.absolutePath),
+      path: toPosixPath(entry.relativePath) || ".",
+      candidates,
+    });
+  }
+  projects.sort((left, right) => left.path.localeCompare(right.path, "zh-CN", { numeric: true }));
+  return { projects, total, scanErrors };
+}
+
+export async function runCandidateAction(root, payload) {
+  if (!payload || typeof payload !== "object") {
+    throw new DashboardError(400, "invalid_payload", "缺少候选操作参数");
+  }
+  const { action, project, chapter, rewrite, candidateVersion, expectedStateRevision } = payload;
+  if (!CANDIDATE_ACTIONS.has(action)) {
+    throw new DashboardError(400, "invalid_action", "候选操作只支持 promote / reject");
+  }
+  if (!Number.isSafeInteger(chapter) || chapter <= 0) {
+    throw new DashboardError(400, "invalid_chapter", "章号必须是正整数");
+  }
+  if (!/^[a-f0-9]{64}$/.test(candidateVersion || "")) {
+    throw new DashboardError(400, "missing_candidate_version", "候选请求缺少内容版本，请刷新后重试");
+  }
+  if (action === "promote" && !Number.isSafeInteger(expectedStateRevision)) {
+    throw new DashboardError(400, "missing_state_revision", "采用请求缺少追踪状态版本，请刷新后重试");
+  }
+  const { absolutePath } = await resolveWorkspaceDirectory(root, project);
+  const current = (await listProjectCandidates(await existingRealRoot(root), absolutePath)).find(
+    (entry) => entry.chapter === chapter,
+  );
+  if (!current) {
+    throw new DashboardError(409, "candidate_changed", "候选已不存在，请刷新列表");
+  }
+  if (current.candidateVersion !== candidateVersion) {
+    throw new DashboardError(409, "candidate_changed", "候选正文已变化，请重新审阅后操作");
+  }
+  if (action === "promote" && current.expectedStateRevision !== expectedStateRevision) {
+    throw new DashboardError(409, "candidate_state_changed", "候选绑定的追踪状态已变化，请刷新后重新审阅");
+  }
+
+  const args = [action, "--project", absolutePath, "--chapter", String(chapter)];
+  if (action === "reject" && rewrite === true) args.push("--rewrite");
+  const { code, stdout, stderr } = await runCandidateTool(args);
+  if (code === 0) {
+    let result = null;
+    try {
+      result = JSON.parse(stdout);
+    } catch {
+      result = null;
+    }
+    return { ok: true, action, chapter, result };
+  }
+  const message = stderr.trim().replace(/^ERROR:\s*/, "") || "候选操作失败";
+  if (code === 2) {
+    throw new DashboardError(422, "candidate_action_rejected", message);
+  }
+  throw new DashboardError(500, "candidate_action_failed", message);
+}
+
 async function readJsonBody(request) {
   const chunks = [];
   let size = 0;
@@ -640,6 +847,22 @@ async function replaceFileAtomically(target, content, mode) {
   }
 }
 
+function assertDashboardMutationAllowed(realRoot, absolutePath) {
+  const workspacePath = toPosixPath(relative(realRoot, absolutePath));
+  const parts = workspacePath.split("/");
+  if (
+    parts.includes("追踪") ||
+    (parts.includes(CANDIDATE_DIR) && parts.includes("_历史")) ||
+    basename(absolutePath).endsWith(CANDIDATE_TRANSACTION_SUFFIX)
+  ) {
+    throw new DashboardError(
+      403,
+      "managed_state_read_only",
+      "该文件属于受管理的追踪或候选事务状态，只能通过专用事务工具修改",
+    );
+  }
+}
+
 async function saveWorkspaceFile(root, payload) {
   if (!payload || typeof payload !== "object") {
     throw new DashboardError(400, "invalid_payload", "缺少保存参数");
@@ -657,6 +880,7 @@ async function saveWorkspaceFile(root, payload) {
   const initial = await resolveWorkspacePath(root, payload.path, {
     editableOnly: true,
   });
+  assertDashboardMutationAllowed(initial.realRoot, initial.absolutePath);
   return withSerializedFileMutation(initial.absolutePath, async () => {
     let current;
     try {
@@ -667,6 +891,7 @@ async function saveWorkspaceFile(root, payload) {
       }
       throw error;
     }
+    assertDashboardMutationAllowed(current.realRoot, current.absolutePath);
     const currentContent = await readFile(current.absolutePath, "utf8");
     if (fileVersion(currentContent) !== payload.expectedVersion) {
       throw new DashboardError(
@@ -699,6 +924,7 @@ async function deleteWorkspaceFile(root, payload) {
   const initial = await resolveWorkspacePath(root, payload.path, {
     editableOnly: true,
   });
+  assertDashboardMutationAllowed(initial.realRoot, initial.absolutePath);
   return withSerializedFileMutation(initial.absolutePath, async () => {
     let current;
     try {
@@ -709,6 +935,7 @@ async function deleteWorkspaceFile(root, payload) {
       }
       throw error;
     }
+    assertDashboardMutationAllowed(current.realRoot, current.absolutePath);
     const currentContent = await readFile(current.absolutePath, "utf8");
     if (fileVersion(currentContent) !== payload.expectedVersion) {
       throw new DashboardError(
@@ -761,7 +988,7 @@ function assertLocalRequest(request, allowNetwork) {
   if (!LOOPBACK_HOSTS.has(hostname)) {
     throw new DashboardError(403, "invalid_host", "Dashboard 只接受本机回环地址请求");
   }
-  if (["PUT", "DELETE"].includes(request.method) && request.headers.origin) {
+  if (["PUT", "DELETE", "POST"].includes(request.method) && request.headers.origin) {
     const originHostname = normalizedOriginHostname(request.headers.origin);
     if (!LOOPBACK_HOSTS.has(originHostname)) {
       throw new DashboardError(403, "invalid_origin", "拒绝来自非本机页面的写入请求");
@@ -805,6 +1032,14 @@ export function createDashboardServer({ root, allowNetwork = false }) {
             url.searchParams.get("scope") || "",
           ),
         );
+        return;
+      }
+      if (request.method === "GET" && url.pathname === "/api/candidates") {
+        sendJson(response, 200, await listWorkspaceCandidates(workspaceRoot));
+        return;
+      }
+      if (request.method === "POST" && url.pathname === "/api/candidates/action") {
+        sendJson(response, 200, await runCandidateAction(workspaceRoot, await readJsonBody(request)));
         return;
       }
       if (request.method === "GET" && url.pathname === "/api/file") {

@@ -22,6 +22,9 @@ test("Claude Code marketplace exposes the canonical story skill bundle", async (
   for (const relativePath of [
     "SKILL.md",
     "scripts/dashboard-server.mjs",
+    "scripts/candidate-commit.py",
+    "scripts/project_lock.py",
+    "scripts/tracking_commit.py",
     "assets/index.html",
     "assets/styles.css",
     "assets/app.js",
@@ -29,4 +32,15 @@ test("Claude Code marketplace exposes the canonical story skill bundle", async (
     const bundled = await stat(join(storySkillRoot, relativePath));
     assert.ok(bundled.isFile(), `${relativePath} must ship inside the canonical story skill`);
   }
+
+  const [html, client, server] = await Promise.all([
+    read("skills/story/assets/index.html"),
+    read("skills/story/assets/app.js"),
+    read("skills/story/scripts/dashboard-server.mjs"),
+  ]);
+  assert.match(html, /id="candidatesTab"/);
+  assert.match(client, /candidateVersion/);
+  assert.match(client, /expectedStateRevision/);
+  assert.match(server, /managed_state_read_only/);
+  assert.doesNotMatch(server, /--no-scan/);
 });

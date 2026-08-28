@@ -594,3 +594,62 @@ test("@mobile 手机视口仍可从真实长篇项目打开大纲", async ({ pag
     await expect(page.locator(".editor-panel")).toBeHidden();
   }
 });
+
+test("候选审批使用版本绑定，并在作者确认后提交", async ({ page }) => {
+  const book = "长篇/让你管账号，你高燃混剪炸全网";
+  const candidate = {
+    chapter: 3,
+    name: "第003章_这个拍 MV 的人，简直太懂！.md",
+    path: `${book}/正文/第003章_这个拍 MV 的人，简直太懂！.md`,
+    candidateVersion: "a".repeat(64),
+    hasTransaction: true,
+    hasBinding: true,
+    expectedStateRevision: 7,
+    finalExists: false,
+    adoptionPhase: null,
+    transactionPath: `${book}/候选/第003章_追踪事务.json`,
+    outlinePath: `${book}/大纲/细纲_第003章.md`,
+    skeletonPath: null,
+    previousFinalPath: `${book}/正文/第002章_《诸君，且听龙吟》.md`,
+  };
+  let listCount = 0;
+  await page.route("**/api/candidates", async (route) => {
+    listCount += 1;
+    await route.fulfill({
+      json: listCount === 1
+        ? { projects: [{ name: "高燃混剪", path: book, candidates: [candidate] }], total: 1, scanErrors: [] }
+        : { projects: [], total: 0, scanErrors: [] },
+    });
+  });
+  const actionBodies = [];
+  await page.route("**/api/candidates/action", async (route) => {
+    actionBodies.push(route.request().postDataJSON());
+    await route.fulfill({ json: { ok: true, action: "promote", chapter: 3, result: {} } });
+  });
+
+  await page.goto("/");
+  await expect(page.locator("#candidatesBadge")).toHaveText("1");
+  await page.getByRole("tab", { name: /候选审批/ }).click();
+  await expect(page.locator("#treeSearch")).toBeDisabled();
+  await page.locator(".candidate-row").click();
+  await expect(page.locator("#reviewWorkspace")).toBeVisible();
+  await expect(page.locator("#reviewCandidatePane")).not.toHaveText("");
+  await expect(page.locator("#referenceSelect")).toHaveValue(candidate.previousFinalPath);
+
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page.locator("#promoteButton").click();
+  expect(actionBodies).toHaveLength(0);
+
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.locator("#promoteButton").click();
+  await expect(page.locator("#toastRegion")).toContainText("已采用");
+  expect(actionBodies).toEqual([{
+    action: "promote",
+    project: book,
+    chapter: 3,
+    rewrite: false,
+    candidateVersion: candidate.candidateVersion,
+    expectedStateRevision: 7,
+  }]);
+  await expect(page.locator("#candidatesBadge")).toHaveText("0");
+});

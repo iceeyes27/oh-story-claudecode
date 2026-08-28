@@ -171,7 +171,7 @@
    再运行 `node ../_shared/scripts/normalize-punctuation.js 正文/第XXX章_*.md`（默认 `--quote-mode keep`）清理无功能省略号、破折号、双连字符和独立分隔线。`normalize-punctuation` 与下方退化检查仍由主会话运行。
    - **退化防护**：再跑 `node ../_shared/scripts/check-degeneration.js --check 正文/第XXX章_*.md`。blocking 只重写受影响章节，最多 2 次；仍失败就报告证据让用户定夺。advisory 先看例外，确属工程词泄漏或退化再改。
 
-> 完整检查清单见 [Phase 5：质量检查](../SKILL.md#phase-5质量检查)。
+> 完整检查清单见 [Phase 5：质量检查](long-mode.md#phase-5质量检查)。
 > 若本步修文改变了会影响后续的事实、角色状态、伏笔、时间线或下一章承诺，必须在进入 Step 4 前为受影响章节提交 `mode=revision` 事务并通过 `check`；其中 `delta` 要重算修订后该章仍成立的完整当前记录，不能只传本次改动；纯措辞调整不重复提交。
 
 ---

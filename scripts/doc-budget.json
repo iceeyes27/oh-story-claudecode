@@ -7,81 +7,87 @@
     "预算超了怎么办：先删等量的旧文本，删不动再在本文件里调高 budget 并在 PR 里说明为什么",
     "这段新规则值得每个用户每次会话都付。调 budget 是允许的，但必须是一次显式决定。",
     "",
+    "本 fork 已把 story-long-write/story-short-write 合并为统一入口 story-write，",
+    "路径按合并后的 mode 参考文件登记（见 2026-08 的 story-write SKILL.md 瘦身：",
+    "长篇/短篇流程从 SKILL.md 拆到 references/long-mode.md、references/short-mode.md，",
+    "SKILL.md 只保留路由与共享方法）。",
+    "",
     "新增热路径文件时把它加进来，否则它不受任何约束。"
   ],
   "files": [
     {
-      "path": "skills/story-long-write/SKILL.md",
-      "budget": 13420,
-      "why": "长篇任一场景都无条件加载。+90：作者记忆若只在某条 workflow 按需出现，开书/日更/单章会有路径漏查；入口只保留按 kind 的 ≤2KB 查询、优先级、单事件回执和 reference 路由，完整协议仍是冷路径"
+      "path": "skills/story-write/SKILL.md",
+      "budget": 3800,
+      "why": "长篇/短篇任一场景都无条件加载的路由入口。2026-08 瘦身后只保留模式判定、共享核心方法/执行规则和按 mode 加载指引，正文流程全部移到 long-mode.md / short-mode.md 按需加载"
     },
     {
-      "path": "skills/story-long-write/references/workflow-daily.md",
-      "budget": 11300,
-      "why": "日更每次会话加载，且与 SKILL.md 叠加"
+      "path": "skills/story-write/references/long-mode.md",
+      "budget": 27500,
+      "why": "mode=long 的完整流程（场景路由、Phase 1-5、候选/骨架规则、质量检查、参考索引），任一长篇请求都加载"
     },
     {
-      "path": "skills/story-long-write/references/workflow-chapter.md",
-      "budget": 12030,
-      "why": "单章正文与质量检查，日更/单章路径都加载。含 spawn prompt 的正文形状层约束——细纲边界只传「不许自造」半边时，子代理会一条情节点一段平推（#255 的复发路径），形状半边必须随 prompt 传达。+180：把筛选后的偏好传给初稿/去味 agent，并明确禁止为最大化命中牺牲连贯、节奏和字数"
+      "path": "skills/story-write/references/short-mode.md",
+      "budget": 22200,
+      "why": "mode=short 的完整流程（格式规范、Phase 1-4、核心框架、参考索引），任一短篇请求都加载"
     },
     {
-      "path": "skills/story-long-write/references/workflow-setup.md",
-      "budget": 12300,
-      "why": "开书/补纲路径加载"
+      "path": "skills/story-write/references/workflow-daily.md",
+      "budget": 17500,
+      "why": "日更/单章正文与质量检查，日更/单章路径与 long-mode.md 叠加"
     },
     {
-      "path": "skills/story-short-write/SKILL.md",
-      "budget": 16800,
-      "why": "短篇任一场景都无条件加载"
+      "path": "skills/story-write/references/workflow-setup.md",
+      "budget": 13000,
+      "why": "开书 Phase 1-3，与 long-mode.md 叠加"
+    },
+    {
+      "path": "skills/story-write/references/writing-craft.md",
+      "budget": 9100,
+      "why": "正文写作全程参考，长篇/短篇写作 agent 都会读；增加反套式身体反应规则后显式调整预算"
+    },
+    {
+      "path": "skills/_shared/references/banned-words.md",
+      "budget": 14800,
+      "why": "跨 skill 共享禁用词表，写作/审查/去AI味都读，持续「发现即注册」增长，需要显式预算刹车"
+    },
+    {
+      "path": "skills/_shared/references/anti-ai-writing.md",
+      "budget": 14800,
+      "why": "去 AI 味完整指南，narrative-writer 与 story-deslop 共读"
     },
     {
       "path": "skills/story-setup/references/templates/agents/narrative-writer.md",
-      "budget": 13320,
-      "why": "正文 agent 的系统提示，每章每次 spawn 都付。正文规则中的 reference 引用必须保留 canonical agent-references 前缀，否则运行时无法可靠定位部署文件；本次同时加入正文形状、机器统计与细纲重合复核规则。+150：参考文件表的「何时读取」改为可判定的必读条件——旧措辞「按需读取…时」是场景描述，被当成自由裁量，实测同一章 6 轮全部漏读 writing-craft.md（9 个参考文件里只读到 banned-words.md，而它是靠 spawn prompt 点名才被读的）；条件化后同条件 1 轮命中 5 读 4 不读，判定全对且未出现全量预加载"
-    },
-    {
-      "path": "skills/story-long-write/references/writing-craft.md",
-      "budget": 8300,
-      "why": "narrative-writer 每章写作时读"
-    },
-    {
-      "path": "skills/story-long-write/references/anti-ai-writing.md",
-      "budget": 13900,
-      "why": "去AI味每章读"
-    },
-    {
-      "path": "skills/story-long-write/references/banned-words.md",
-      "budget": 3800,
-      "why": "禁用词扫描每章读"
+      "budget": 16500,
+      "why": "部署到项目的正文 agent 模板，每次 spawn narrative-writer 都全量加载"
     }
   ],
   "paths": [
     {
       "label": "长篇日更主会话",
-      "budget": 36730,
+      "budget": 48500,
       "files": [
-        "skills/story-long-write/SKILL.md",
-        "skills/story-long-write/references/workflow-daily.md",
-        "skills/story-long-write/references/workflow-chapter.md"
+        "skills/story-write/SKILL.md",
+        "skills/story-write/references/long-mode.md",
+        "skills/story-write/references/workflow-daily.md"
       ]
     },
     {
       "label": "长篇开书",
-      "budget": 25720,
+      "budget": 44000,
       "files": [
-        "skills/story-long-write/SKILL.md",
-        "skills/story-long-write/references/workflow-setup.md"
+        "skills/story-write/SKILL.md",
+        "skills/story-write/references/long-mode.md",
+        "skills/story-write/references/workflow-setup.md"
       ]
     },
     {
       "label": "正文 agent 上下文",
-      "budget": 39120,
+      "budget": 54000,
       "files": [
         "skills/story-setup/references/templates/agents/narrative-writer.md",
-        "skills/story-long-write/references/writing-craft.md",
-        "skills/story-long-write/references/anti-ai-writing.md",
-        "skills/story-long-write/references/banned-words.md"
+        "skills/story-write/references/writing-craft.md",
+        "skills/_shared/references/anti-ai-writing.md",
+        "skills/_shared/references/banned-words.md"
       ]
     }
   ]

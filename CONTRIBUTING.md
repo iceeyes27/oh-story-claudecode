@@ -57,6 +57,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 本 fork 不使用 GitHub Actions。提交或发起 PR 前，贡献者必须在本地运行与改动范围对应的检查：
 
 - `scripts/static-check.sh` — frontmatter、引用路径、死文件、references 交叉引用
+- `scripts/check-doc-budget.sh` — 热路径文档字符预算（防 skill/agent 模板无声膨胀，改动 story-write/_shared/narrative-writer 相关文档后必跑）
 - `scripts/check-hook-regex-sync.sh` — hook 伏笔状态检测行为
 - `scripts/check-shared-files.sh` — 共享 runtime 资产清单 + 跨 skill reference 副本一致性
 - `scripts/check-scan-runtime-policy.sh` — scraper 本地日期依赖与 CDP 源码策略守卫
@@ -80,6 +81,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 
 ```bash
 bash scripts/static-check.sh
+bash scripts/check-doc-budget.sh
 bash scripts/check-hook-regex-sync.sh
 bash scripts/check-shared-files.sh
 python3 scripts/test-shared-assets.py

@@ -48,7 +48,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 
 ## Dashboard 工作台
 
-用户执行 `/story dashboard`（Codex 为 `$story dashboard`），或明确说“打开工作台 / 看项目文件”时，直接启动随本 skill 分发的本地 Dashboard，不再转发到其他 skill：
+用户执行 `/story dashboard`（Codex 为 `$story dashboard`），或明确说“打开工作台 / 看项目文件 / 审批候选”时，直接启动随本 skill 分发的本地 Dashboard，不再转发到其他 skill。Dashboard 除浏览/编辑文稿外，还提供「候选审批」标签页：并排对照候选正文与上一章正稿/细纲/骨架，一键采用（走 `candidate-commit.py` 的 fail-closed 质量门）或弃用归档：
 
 1. 把当前工作目录作为默认工作区；用户明确给出目录时改用该目录。目录必须存在。
 2. 从当前已加载的 `story` skill 目录定位 `scripts/dashboard-server.mjs`，不要硬编码仓库路径、全局 skill 路径或用户主目录。

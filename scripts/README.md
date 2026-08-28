@@ -10,6 +10,7 @@
 | 脚本 | 检查什么 | 何时跑 |
 |---|---|---|
 | `static-check.sh` + `static-check.py` | 结构化验证 frontmatter、Markdown 路径/锚点、Agent 引用、references 可达性；除基础组件 `browser-cdp` 外禁止跨 Skill 文件引用 | 提交前本地 |
+| `check-doc-budget.sh` + `doc-budget.json` | 热路径文档字符预算（去空白字符数），防 skill/agent 模板无声膨胀；超预算需显式调高并说明理由 | 改动登记文件后本地；提交前本地 |
 | `skill-numbering.py check` | 工作流 Step/Phase/Stage 编号策略、引用绑定、SKILL.md 裸编号/子步骤小数守卫 | 提交前本地；改工作流结构后 |
 | `check-current-skill-contracts.sh` + `.py` + `current-contract.json` | 从结构化 manifest 校验当前版本、Phase、schema、主产物、细纲契约与 GitHub Actions 禁用策略；保留 legacy/path 守卫并拦截缺主产物后的静默替代 | 提交前本地 |
 | `check-unified-skill-upstream-drift.py` + `upstream-integration.json` | 固定上游基线并检查 split skill 到 unified skill 的人工迁移义务；`--report` 只读输出 source -> target 清单 | 上游同步后；提交前本地 |

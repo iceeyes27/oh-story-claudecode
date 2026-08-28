@@ -863,7 +863,7 @@ describe("HTTP API", () => {
   });
 });
 
-async function createCandidateWorkspace() {
+async function createCandidateListingWorkspace() {
   const root = await mkdtemp(resolve(tmpdir(), "oh-story-dashboard-candidates-"));
   temporaryDirectories.push(root);
   const book = resolve(root, "长篇", "候选书");
@@ -886,9 +886,9 @@ const pythonAvailable = ["python3", "python", "py"].some(
   (command) => spawnSync(command, ["--version"], { stdio: "ignore" }).status === 0,
 );
 
-describe("candidate review", () => {
+describe("candidate review listing filters and HTTP contract", () => {
   test("lists prose candidates with context paths and skips history, transactions, and non-markdown", async () => {
-    const { root } = await createCandidateWorkspace();
+    const { root } = await createCandidateListingWorkspace();
     const listing = await listWorkspaceCandidates(root);
 
     assert.equal(listing.total, 2);
@@ -915,7 +915,7 @@ describe("candidate review", () => {
   });
 
   test("serves candidates over HTTP and rejects invalid action payloads", async () => {
-    const { root } = await createCandidateWorkspace();
+    const { root } = await createCandidateListingWorkspace();
     const baseUrl = await startServer(root);
 
     const listing = await fetch(`${baseUrl}/api/candidates`).then((response) => response.json());
@@ -935,10 +935,16 @@ describe("candidate review", () => {
     });
     assert.equal(invalidChapter.status, 400);
 
+    // 版本校验在解析工程目录之前，所以要给一个格式合法的版本才能测到越界防护本身
     const outsideWorkspace = await fetch(`${baseUrl}/api/candidates/action`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "reject", project: "../外部", chapter: 2 }),
+      body: JSON.stringify({
+        action: "reject",
+        project: "../外部",
+        chapter: 2,
+        candidateVersion: "a".repeat(64),
+      }),
     });
     assert.equal(outsideWorkspace.status, 403);
 
@@ -951,12 +957,15 @@ describe("candidate review", () => {
   });
 
   test("reject archives the candidate through candidate-commit.py", { skip: !pythonAvailable }, async () => {
-    const { root, book } = await createCandidateWorkspace();
+    const { root, book } = await createCandidateListingWorkspace();
+    const before = await listWorkspaceCandidates(root);
+    const third = before.projects[0].candidates.find((candidate) => candidate.chapter === 3);
     const result = await runCandidateAction(root, {
       action: "reject",
       project: "长篇/候选书",
       chapter: 3,
       rewrite: true,
+      candidateVersion: third.candidateVersion,
     });
 
     assert.equal(result.ok, true);
@@ -967,13 +976,23 @@ describe("candidate review", () => {
   });
 
   test("promote without a replayable transaction is refused fail-closed", { skip: !pythonAvailable }, async () => {
-    const { root, book } = await createCandidateWorkspace();
+    const { root, book } = await createCandidateListingWorkspace();
+    const before = await listWorkspaceCandidates(root);
+    const third = before.projects[0].candidates.find((candidate) => candidate.chapter === 3);
+    // 没有追踪事务就拿不到状态版本，采用在调用工具之前就被拒——比落到工具再退出更早的 fail-closed
+    assert.equal(third.expectedStateRevision, null);
     await assert.rejects(
-      runCandidateAction(root, { action: "promote", project: "长篇/候选书", chapter: 3 }),
+      runCandidateAction(root, {
+        action: "promote",
+        project: "长篇/候选书",
+        chapter: 3,
+        candidateVersion: third.candidateVersion,
+        expectedStateRevision: third.expectedStateRevision,
+      }),
       (error) => {
         assert.ok(error instanceof DashboardError);
-        assert.equal(error.status, 422);
-        assert.equal(error.code, "candidate_action_rejected");
+        assert.equal(error.status, 400);
+        assert.equal(error.code, "missing_state_revision");
         return true;
       },
     );

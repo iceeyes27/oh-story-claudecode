@@ -14,8 +14,12 @@
  * 脚本不猜。默认报 advisory；「首现零交代 + 之后 ≥2 章再当已知前提出现」升 blocking。
  * 通过不代表读者一定看得懂。
  *
+ * 现实世界实体：脚本无法判断《如愿》是真实歌曲还是虚构曲目——真实歌曲对读者本就
+ * 是已知的，不需要正文交代。这类实体由作者用 `--known=<文件>` 声明一次（每行一个，
+ * `#` 开头为注释），或在书根放 `正文/_已知实体.txt` 自动读取。
+ *
  * 用法:
- *   node check-first-mention.js <书目录> [--json] [--min-freq=3] [--reintro-gap=2]
+ *   node check-first-mention.js <书目录> [--json] [--min-freq=3] [--reintro-gap=2] [--known=<文件>]
  *   <书目录>：书根（含 正文/），或直接指向 正文/ 目录
  *
  * 退出码：0 无 blocking / 1 有 blocking / 2 参数或读取错误
@@ -73,6 +77,12 @@ const BOUNDARY = new Set('的了是在也都就而和与又还这那有着过把
 // 人名不含这类尾字 → 脚本不报，交给语义三问层。
 // 注：不含「经/团/场/室/区」等泛词尾（会误伤 饱经/文工团/训练场）。可按题材在此增删。
 const NAME_SUFFIX = /(系统|阁|宗|殿|盟|诀|术|阵法|阵眼|令牌|令|塔|鼎|珏|幡|真君|上仙|尊者|剑诀)$/;
+// 量词前缀：n-gram 会把量词粘进候选（「获得了一个系统」→「个系统」）。裸串候选以
+// 这些字开头一律丢弃——正确切分的那一份（「系统」）本来就是独立候选，不会因此漏报，
+// 只是不再输出「个系统」这种切分残留误导作者。
+// 只收**不会做专名首字**的纯量词：数词（三清殿/九幽阁/万剑宗）和兼作名词的量词
+// （道诀、口诀、本命、层塔）一律不收，否则会误杀真专名。
+const MEASURE_PREFIX = /^[个只件张份位名枚颗粒匹头群批朵棵株尾]/;
 
 // 首现交代锚点：判断句 / 职务身份词 / 来历动词
 const APPOSITION = /是|为|叫|名为|称为|名叫|所谓|乃是/;
@@ -97,6 +107,8 @@ function extractCandidates(chapters, opts) {
     if (STOPWORDS.has(token) || ENGINEERING.test(token)) return;
     // 书名号实体不受边界虚字约束；普通 gram 首尾为虚字则跳过（词截断噪音）
     if (!bracketed && (BOUNDARY.has(token[0]) || BOUNDARY.has(token[token.length - 1]))) return;
+    // 裸串以量词开头同样是切分残留
+    if (!bracketed && MEASURE_PREFIX.test(token)) return;
     let e = map.get(token);
     if (!e) { e = { token, freq: 0, chapters: new Set(), first: null, bracketed }; map.set(token, e); }
     e.freq++;
@@ -152,13 +164,32 @@ function firstMentionContext(chapters, token, first) {
   return [lines[idx - 1] || '', lines[idx] || '', lines[idx + 1] || ''].join('');
 }
 
+// 读取「现实世界已知实体」清单：每行一个，# 开头为注释，空行忽略。
+// 真实歌曲/影视/历史人物对读者本就是已知的，正文不交代不构成理解断点。
+function loadKnownEntities(file) {
+  if (!file || !fs.existsSync(file)) return new Set();
+  return new Set(
+    fs.readFileSync(file, 'utf8')
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith('#')),
+  );
+}
+
+function defaultKnownFile(textDir) {
+  const p = path.join(textDir, '_已知实体.txt');
+  return fs.existsSync(p) ? p : null;
+}
+
 function analyze(chapters, opts = {}) {
   const MIN_FREQ = opts.MIN_FREQ ?? DEFAULTS.MIN_FREQ;
   const REINTRO_GAP = opts.REINTRO_GAP ?? DEFAULTS.REINTRO_GAP;
+  const known = opts.known instanceof Set ? opts.known : loadKnownEntities(opts.knownFile);
   const map = extractCandidates(chapters, opts);
   // 高精度候选：书名号实体，或命中专名尾字白名单且 ≥2 次。裸高频词一律不作候选。
   const qualified = [...map.values()].filter(
-    (e) => e.first && (e.bracketed || (NAME_SUFFIX.test(e.token) && e.freq >= 2)),
+    (e) => e.first && !known.has(e.token) &&
+      (e.bracketed || (NAME_SUFFIX.test(e.token) && e.freq >= 2)),
   );
   const candidates = dedupeContained(qualified);
   const findings = [];
@@ -197,10 +228,11 @@ function main() {
     if (a === '--json') jsonMode = true;
     else if (a.startsWith('--min-freq=')) opts.MIN_FREQ = parseInt(a.slice(11), 10);
     else if (a.startsWith('--reintro-gap=')) opts.REINTRO_GAP = parseInt(a.slice(14), 10);
+    else if (a.startsWith('--known=')) opts.knownFile = a.slice(8);
     else if (!a.startsWith('--')) bookDir = a;
   }
   if (!bookDir) {
-    console.error('用法: node check-first-mention.js <书目录> [--json] [--min-freq=3] [--reintro-gap=2]');
+    console.error('用法: node check-first-mention.js <书目录> [--json] [--min-freq=3] [--reintro-gap=2] [--known=<文件>]');
     process.exit(2);
   }
   const textDir = resolveTextDir(bookDir);
@@ -213,12 +245,21 @@ function main() {
     console.error(`读取错误：${textDir} 下没有「第N章_*.md」章节`);
     process.exit(2);
   }
+  if (!opts.knownFile) opts.knownFile = defaultKnownFile(textDir);
+  const known = loadKnownEntities(opts.knownFile);
+  opts.known = known;
   const findings = analyze(chapters, opts);
   const blocking = findings.filter((f) => f.severity === 'blocking');
   if (jsonMode) {
-    console.log(JSON.stringify({ chapters: chapters.length, blocking: blocking.length, findings }, null, 2));
+    console.log(JSON.stringify({
+      chapters: chapters.length,
+      knownEntities: known.size,
+      blocking: blocking.length,
+      findings,
+    }, null, 2));
   } else {
-    console.log(`专名首现交代检查 · 共 ${chapters.length} 章，候选 ${findings.length} 处（blocking ${blocking.length}）`);
+    const knownNote = known.size ? `，已排除 ${known.size} 个声明的现实世界实体` : '';
+    console.log(`专名首现交代检查 · 共 ${chapters.length} 章，候选 ${findings.length} 处（blocking ${blocking.length}）${knownNote}`);
     console.log('—'.repeat(70));
     for (const f of findings) {
       const tag = f.severity === 'blocking' ? '[blocking]' : '[advisory]';
@@ -229,11 +270,17 @@ function main() {
     console.log('—'.repeat(70));
     console.log('判定口诀：这个专名第一次出现时，读者知道它是谁/是什么吗？blocking = 首现没交代又在后文当已知前提用。');
     console.log('能力边界：仅覆盖可机械判定子集，advisory 需人工复核；通过不代表读者一定看得懂。');
+    if (!known.size) {
+      console.log('提示：真实歌曲/影视/历史人物对读者本就已知，可在 正文/_已知实体.txt 每行声明一个，或用 --known=<文件>。');
+    }
   }
   process.exit(blocking.length > 0 ? 1 : 0);
 }
 
 // 供测试调用
-module.exports = { analyze, hasAnchor, extractCandidates, collectChapters, resolveTextDir };
+module.exports = {
+  analyze, hasAnchor, extractCandidates, collectChapters, resolveTextDir,
+  loadKnownEntities, defaultKnownFile,
+};
 
 if (require.main === module) main();

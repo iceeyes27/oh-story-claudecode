@@ -120,6 +120,55 @@ ok('不存在目录退出码 2', () => {
   assert.equal(code, 2);
 });
 
+// 9) 量词前缀切分残留不进候选（「获得了一个系统」不得报「个系统」）
+ok('量词前缀切分残留不进候选', () => {
+  const dir = makeBook([
+    { num: 1, body: '自己获得了一个系统？\n有了这个系统，一切都好办。\n他打开了那个系统。' },
+    { num: 2, body: '过渡内容。\n随便写点。' },
+    { num: 3, body: '他又想起一个系统。\n还是那个系统。' },
+  ]);
+  const findings = analyze(chapterObjs(dir));
+  assert.equal(findings.find((f) => f.token === '个系统'), undefined, '「个系统」是量词粘连残留，不得作为候选');
+});
+
+// 10) 数词开头的真专名仍要报（不能被量词过滤误杀）
+ok('数词开头的专名不被量词过滤误杀', () => {
+  const dir = makeBook([
+    { num: 1, body: '三清殿的钟响了。\n三清殿很安静。\n三清殿的门开着。' },
+    { num: 2, body: '过渡。\n过渡。' },
+    { num: 3, body: '他回到三清殿。\n三清殿依旧。' },
+  ]);
+  const findings = analyze(chapterObjs(dir));
+  assert.ok(findings.find((f) => f.token === '三清殿'), '「三清殿」是真专名，不能被量词/数词过滤误杀');
+});
+
+// 11) 声明为现实世界已知实体后不再报
+ok('已知实体清单可排除真实歌曲', () => {
+  const dir = makeBook([
+    { num: 1, body: '他放起了《如愿》。\n很好听。' },
+    { num: 2, body: '过渡。\n过渡。' },
+    { num: 3, body: '《如愿》又响起。\n还是《如愿》。' },
+  ]);
+  const before = analyze(chapterObjs(dir));
+  assert.ok(before.find((f) => f.token === '如愿'), '未声明时应进候选');
+  const after = analyze(chapterObjs(dir), { known: new Set(['如愿']) });
+  assert.equal(after.find((f) => f.token === '如愿'), undefined, '声明为已知实体后不得再报');
+});
+
+// 12) 正文/_已知实体.txt 自动生效，注释与空行忽略
+ok('正文/_已知实体.txt 自动生效', () => {
+  const dir = makeBook([
+    { num: 1, body: '他放起了《如愿》。\n很好听。' },
+    { num: 2, body: '过渡。\n过渡。' },
+    { num: 3, body: '《如愿》又响起。\n还是《如愿》。' },
+  ]);
+  fs.writeFileSync(path.join(dir, '正文', '_已知实体.txt'), '# 真实歌曲\n\n如愿\n', 'utf8');
+  const out = execFileSync('node', [SCRIPT, dir, '--json'], { encoding: 'utf8' });
+  const res = JSON.parse(out);
+  assert.equal(res.knownEntities, 1, '注释与空行不计入实体数');
+  assert.equal(res.findings.find((f) => f.token === '如愿'), undefined, '自动读取的清单应生效');
+});
+
 // hasAnchor 单元
 ok('hasAnchor 识别判断句/职务/来历', () => {
   assert.ok(hasAnchor('他是团长'));

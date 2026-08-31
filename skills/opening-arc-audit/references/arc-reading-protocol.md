@@ -1,6 +1,6 @@
 # 开篇连读 · 产 ledger 的子代理协议
 
-> 本文件由 [../SKILL.md](../SKILL.md) 引用。目标：连读前 N 章，逐章判「开了哪些悬念 / 闭了哪些 / 是否推进主线」，产出 [ledger-example.json](ledger-example.json) 同构的 ledger JSON，交 `../scripts/arc-ledger.js` 做确定性裁决。
+> 本文件由 [../SKILL.md](../SKILL.md) 引用。目标：连读前 N 章，逐章判「开了哪些悬念 / 闭了哪些 / 是否推进主线」，产出 [ledger-example.json](ledger-example.json) 同构的 ledger JSON，交共享 `arc-ledger.js` 做确定性裁决。
 
 ## 概念
 
@@ -43,7 +43,7 @@
 把 JSON 存成文件，跑：
 
 ```bash
-node ../scripts/arc-ledger.js <你的ledger.json>
+node ../../_shared/scripts/arc-ledger.js <你的ledger.json>
 ```
 
 脚本会给出收支表和裁决。若脚本报 ledger 错误（close 引用不存在/未来章 id），说明连读记错了，回去修 ledger 再跑。

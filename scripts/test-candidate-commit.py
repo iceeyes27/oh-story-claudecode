@@ -17,6 +17,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import shutil
 from pathlib import Path
 
 
@@ -60,7 +61,7 @@ class CandidateCommitTests(unittest.TestCase):
     def setUp(self) -> None:
         self._reset_project()
 
-    def _reset_project(self) -> None:
+    def _reset_project(self, *, last_chapter: int = 0) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.project = Path(self.temporary.name) / "候选测试书"
         self.project.mkdir()
@@ -69,7 +70,12 @@ class CandidateCommitTests(unittest.TestCase):
         self.candidate_dir.mkdir(parents=True)
         (self.project / "正文").mkdir()
         # 初始化追踪状态（last_committed_chapter=0, state_revision=0）。
-        self._tracking("init", initial_document(last_chapter=0))
+        self._tracking("init", initial_document(last_chapter=last_chapter))
+        for chapter in range(1, last_chapter + 1):
+            first = chr(0x4E00 + chapter * 2)
+            second = chr(0x4E00 + chapter * 2 + 1)
+            path = self.project / "正文" / f"第{chapter:03d}章_{first}{second}.md"
+            path.write_text(f"# 第{chapter}章 {first}{second}\n本章事实{first}{second}。\n", encoding="utf-8")
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
@@ -103,6 +109,112 @@ class CandidateCommitTests(unittest.TestCase):
     # 触发 check-ai-patterns finding 的短句（reverse-not-is + negation-parade）。
     TOXIC = "他想要的是尊严，而不是金钱。他知道，这世上没有光，没有声音，没有温度。"
 
+    @staticmethod
+    def _canonical_sha(value: object) -> str:
+        payload = json.dumps(
+            value, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")
+        return hashlib.sha256(payload).hexdigest()
+
+    def _reader_paths(self, prose: Path) -> list[Path]:
+        accepted = sorted(
+            (path for path in (self.project / "正文").glob("第*章*.md") if path.is_file()),
+            key=lambda path: path.name,
+        )
+        paths = [*accepted, prose]
+        known = self.project / "正文/_已知实体.txt"
+        if known.is_file():
+            paths.append(known)
+        return paths
+
+    def _prose_files(self, prose: Path) -> tuple[list[dict[str, str]], str]:
+        entries = []
+        rows = []
+        for path in self._reader_paths(prose):
+            relative = path.relative_to(self.project).as_posix()
+            digest = hashlib.sha256(path.read_bytes()).hexdigest()
+            entries.append({"path": relative, "sha256": digest})
+            rows.append(f"{relative}\0{digest}")
+        set_digest = hashlib.sha256("\n".join(sorted(rows)).encode("utf-8")).hexdigest()
+        return entries, set_digest
+
+    def _rc_report(self, prose: Path) -> dict:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for path in self._reader_paths(prose):
+                shutil.copy2(path, root / path.name)
+            completed = subprocess.run(
+                ["node", str(ROOT / "skills/_shared/scripts/check-first-mention.js"), str(root), "--json"],
+                text=True, capture_output=True, check=False, encoding="utf-8",
+            )
+        self.assertIn(completed.returncode, (0, 1), completed.stderr)
+        return json.loads(completed.stdout)
+
+    def _arc_report(self, ledger: dict) -> dict:
+        path = Path(self.temporary.name) / f"ledger-{os.urandom(4).hex()}.json"
+        path.write_text(json.dumps(ledger, ensure_ascii=False), encoding="utf-8")
+        completed = subprocess.run(
+            ["node", str(ROOT / "skills/_shared/scripts/arc-ledger.js"), str(path), "--json", "--window=15"],
+            text=True, capture_output=True, check=False, encoding="utf-8",
+        )
+        self.assertIn(completed.returncode, (0, 1), completed.stderr)
+        return json.loads(completed.stdout)
+
+    def _logic_checks(self, chapter: int, prose: Path, *, ledger: dict | None = None) -> dict:
+        candidate_sha = hashlib.sha256(prose.read_bytes()).hexdigest()
+        prose_files, set_sha = self._prose_files(prose)
+        anchor = prose.read_text(encoding="utf-8-sig").splitlines()[0]
+        base = {
+            "status": "pass",
+            "findings": [],
+            "evidence": [{"path": prose.relative_to(self.project).as_posix(), "anchor": anchor}],
+            "candidate_sha256": candidate_sha,
+            "prose_files": prose_files,
+            "prose_set_sha256": set_sha,
+        }
+        report = self._rc_report(prose)
+        checks = {
+            receipt_id: {**base, "run_id": f"test-{receipt_id}-{chapter}"}
+            for receipt_id in ("rc-01", "rc-02", "rc-03")
+        }
+        checks["rc-01"]["result_sha256"] = self._canonical_sha(report)
+        if chapter == 15:
+            ledger = ledger or {
+                "book": "候选测试书",
+                "window": 15,
+                "chapters": [
+                    {"num": number, "opens": [], "closes": [], "mainAdvance": True}
+                    for number in range(1, 16)
+                ],
+            }
+            ledger_sha = self._canonical_sha(ledger)
+            arc_report = self._arc_report(ledger)
+            checks["arc-01"] = {
+                **base,
+                "run_id": "test-arc-01-15",
+                "ledger": ledger,
+                "ledger_sha256": ledger_sha,
+            }
+            checks["arc-02"] = {
+                "run_id": "test-arc-02-15",
+                "status": "pass" if not arc_report["blocking"] else "blocking",
+                "findings": [],
+                "evidence": [{"anchor": "ledger threshold"}],
+                "candidate_sha256": candidate_sha,
+                "ledger_sha256": ledger_sha,
+                "result_sha256": self._canonical_sha(arc_report),
+            }
+        return checks
+
+    def _transaction_path(self, chapter: int) -> Path:
+        return self.candidate_dir / f"第{chapter:03d}章_追踪事务.json"
+
+    def _mutate_binding(self, chapter: int, mutate) -> None:
+        path = self._transaction_path(chapter)
+        document = json.loads(path.read_text(encoding="utf-8"))
+        mutate(document["candidate_binding"])
+        path.write_text(json.dumps(document, ensure_ascii=False), encoding="utf-8")
+
     def make_candidate(
         self,
         chapter: int,
@@ -110,8 +222,10 @@ class CandidateCommitTests(unittest.TestCase):
         with_transaction: bool = True,
         tx_overrides: dict | None = None,
         body: str | None = None,
+        ledger: dict | None = None,
+        title: str | None = None,
     ) -> Path:
-        title = "测试章名" if chapter == 1 else f"暗门{chapter}"
+        title = title or ("测试章名" if chapter == 1 else f"暗门{chapter}")
         prose = self.candidate_dir / f"第{chapter:03d}章_{title}.md"
         prefix = body if body is not None else f"# 第{chapter}章\n"
         visible = "".join(prefix.split())
@@ -157,12 +271,13 @@ class CandidateCommitTests(unittest.TestCase):
             evidence = content.splitlines()[-1][:8]
             digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
             doc["candidate_binding"] = {
-                "schema_version": 1,
-                "quality_profile": "fanqie-long-v1",
+                "schema_version": 2,
+                "quality_profile": "fanqie-long-v2",
                 "prose": {"path": f"候选/{prose.name}", "sha256": digest(prose)},
                 "outline": {"path": f"大纲/{outline.name}", "sha256": digest(outline)},
                 "skeleton": {"path": f"骨架/{skeleton.name}", "sha256": digest(skeleton)},
                 "coverage": [{"id": "O1", "evidence": evidence}],
+                "logic_checks": self._logic_checks(chapter, prose, ledger=ledger),
             }
             (self.candidate_dir / f"第{chapter:03d}章_追踪事务.json").write_text(
                 json.dumps(doc, ensure_ascii=False), encoding="utf-8"
@@ -183,6 +298,16 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertEqual(self.final_files(), [])
         self.assertEqual(self.read_state()["state_revision"], 0)
         self.assertEqual(self.read_state()["last_committed_chapter"], 0)
+
+    def test_candidate_workflow_documents_v2_logic_contract(self) -> None:
+        workflow = (ROOT / "skills/story-write/references/candidate-workflow.md").read_text(encoding="utf-8")
+        binding = (ROOT / "skills/story-write/references/candidate-logic-binding.md").read_text(encoding="utf-8")
+        self.assertIn("candidate_binding` v2", workflow)
+        self.assertIn("fanqie-long-v2", workflow)
+        for receipt_id in ("rc-01", "rc-02", "rc-03", "arc-01", "arc-02"):
+            self.assertIn(receipt_id, binding)
+        self.assertIn("第 3、5、10、14、16 章", binding)
+        self.assertIn("blocking-approved", binding)
 
     def test_promote_moves_prose_and_advances_tracking(self) -> None:
         self.make_candidate(1)
@@ -293,7 +418,7 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertEqual(self.final_files(), [])
         self.assertEqual(self.read_state()["state_revision"], 0)
 
-    def test_promote_no_scan_bypasses_gate(self) -> None:
+    def test_promote_no_scan_bypasses_ai_gate_only(self) -> None:
         self.make_candidate(1, body=f"# 第1章\n{self.TOXIC}\n")
         self._candidate(["promote", "--chapter", "1", "--no-scan"])
         self.assertEqual(self.final_files(), ["第001章_测试章名.md"])
@@ -305,13 +430,214 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertEqual(self.final_files(), ["第001章_测试章名.md"])
         self.assertEqual(self.read_state()["state_revision"], 1)
 
-    def test_promote_all_in_order(self) -> None:
+    def test_promote_honors_explicit_terse_title_profile(self) -> None:
+        settings = self.project / "设定"
+        settings.mkdir()
+        (settings / "题材定位.md").write_text("# 题材定位\n- 标题档位：terse\n", encoding="utf-8")
+        self.make_candidate(1, title="这是一个很长的测试标题")
+        result = self._candidate(["promote", "--chapter", "1"], expect=2)
+        self.assertIn("章节标题未通过", result.stderr)
+
+    def test_promote_rejects_v1_binding_with_regeneration_message(self) -> None:
         self.make_candidate(1)
-        self.make_candidate(2, tx_overrides={"expected_state_revision": 1})
+        self._mutate_binding(1, lambda binding: binding.update({
+            "schema_version": 1, "quality_profile": "fanqie-long-v1",
+        }))
+        result = self._candidate(["promote", "--chapter", "1"], expect=2)
+        self.assertIn("v1", result.stderr)
+        self.assertIn("重新生成", result.stderr)
+
+    def test_promote_rejects_missing_or_unknown_logic_id(self) -> None:
+        for case in ("missing", "unknown"):
+            with self.subTest(case=case):
+                if case == "unknown":
+                    self.temporary.cleanup()
+                    self._reset_project()
+                self.make_candidate(1)
+                if case == "missing":
+                    self._mutate_binding(1, lambda binding: binding["logic_checks"].pop("rc-03"))
+                else:
+                    self._mutate_binding(1, lambda binding: binding["logic_checks"].update({
+                        "rc-99": dict(binding["logic_checks"]["rc-03"])
+                    }))
+                result = self._candidate(["promote", "--chapter", "1"], expect=2)
+                self.assertIn("logic_checks 必须精确包含", result.stderr)
+                self.assertEqual(self.final_files(), [])
+
+    def test_promote_rejects_duplicate_logic_id_in_json(self) -> None:
+        self.make_candidate(1)
+        path = self._transaction_path(1)
+        text = path.read_text(encoding="utf-8")
+        text = text.replace('"logic_checks": {', '"logic_checks": {"rc-01": {},', 1)
+        path.write_text(text, encoding="utf-8")
+        result = self._candidate(["promote", "--chapter", "1"], expect=2)
+        self.assertIn("JSON 含重复键：rc-01", result.stderr)
+
+    def test_promote_rejects_stale_reader_file_hash(self) -> None:
+        self.temporary.cleanup()
+        self._reset_project(last_chapter=1)
+        self.make_candidate(2)
+        accepted = next((self.project / "正文").glob("第001章_*.md"))
+        accepted.write_text(accepted.read_text(encoding="utf-8") + "正文后来改变。\n", encoding="utf-8")
+        result = self._candidate(["promote", "--chapter", "2"], expect=2)
+        self.assertIn("prose_files", result.stderr)
+        self.assertIn("sha256 已过期", result.stderr)
+
+    def test_promote_rejects_empty_or_unbound_semantic_evidence(self) -> None:
+        for case in ("empty", "outside-prose", "missing-anchor"):
+            with self.subTest(case=case):
+                if case != "empty":
+                    self.temporary.cleanup()
+                    self._reset_project()
+                self.make_candidate(1)
+
+                def invalidate(binding):
+                    receipt = binding["logic_checks"]["rc-02"]
+                    if case == "empty":
+                        receipt["evidence"] = []
+                    elif case == "outside-prose":
+                        receipt["evidence"] = [{
+                            "path": "大纲/细纲_第001章.md",
+                            "anchor": "第1章细纲",
+                        }]
+                    else:
+                        receipt["evidence"][0]["anchor"] = "正文中不存在的证据锚点"
+
+                self._mutate_binding(1, invalidate)
+                result = self._candidate(["promote", "--chapter", "1"], expect=2)
+                self.assertIn("rc-02.evidence", result.stderr)
+                self.assertEqual(self.final_files(), [])
+
+    def test_promote_reruns_rc01_even_with_no_scan(self) -> None:
+        self.temporary.cleanup()
+        self._reset_project(last_chapter=2)
+        first = next((self.project / "正文").glob("第001章_*.md"))
+        first.write_text(first.read_text(encoding="utf-8") + "九幽阁忽然亮了。\n", encoding="utf-8")
+        self.make_candidate(3, body="# 第3章\n九幽阁再次亮起。\n")
+        result = self._candidate(["promote", "--chapter", "3", "--no-scan"], expect=2)
+        self.assertIn("rc-01 复验发现 blocking", result.stderr)
+        self.assertEqual(self.final_files(), sorted(path.name for path in (self.project / "正文").glob("*.md")))
+
+    def test_chapter_14_and_16_do_not_require_arc_receipts(self) -> None:
+        for chapter in (14, 16):
+            with self.subTest(chapter=chapter):
+                self.temporary.cleanup()
+                self._reset_project(last_chapter=chapter - 1)
+                self.make_candidate(chapter)
+                document = json.loads(self._transaction_path(chapter).read_text(encoding="utf-8"))
+                self.assertEqual(set(document["candidate_binding"]["logic_checks"]), {"rc-01", "rc-02", "rc-03"})
+                self._candidate(["promote", "--chapter", str(chapter)])
+                self.assertEqual(self.read_state()["last_committed_chapter"], chapter)
+
+    @staticmethod
+    def _blocking_ledger() -> dict:
+        return {
+            "book": "候选测试书",
+            "window": 15,
+            "chapters": [
+                {
+                    "num": number,
+                    "opens": [{"id": f"Q{number}", "q": f"问题{number}"}],
+                    "closes": [],
+                    "mainAdvance": False,
+                }
+                for number in range(1, 16)
+            ],
+        }
+
+    def test_chapter_15_requires_ledger_and_valid_arc02(self) -> None:
+        for case in ("missing", "invalid"):
+            with self.subTest(case=case):
+                self.temporary.cleanup()
+                self._reset_project(last_chapter=14)
+                self.make_candidate(15)
+                if case == "missing":
+                    self._mutate_binding(15, lambda binding: binding["logic_checks"]["arc-01"].pop("ledger"))
+                else:
+                    def invalidate(binding):
+                        ledger = binding["logic_checks"]["arc-01"]["ledger"]
+                        ledger["chapters"][0]["closes"] = ["NOT-OPEN"]
+                        digest = self._canonical_sha(ledger)
+                        binding["logic_checks"]["arc-01"]["ledger_sha256"] = digest
+                        binding["logic_checks"]["arc-02"]["ledger_sha256"] = digest
+                    self._mutate_binding(15, invalidate)
+                result = self._candidate(["promote", "--chapter", "15"], expect=2)
+                self.assertIn("arc-01.ledger" if case == "missing" else "arc-02 开篇阈值检查", result.stderr)
+                self.assertEqual(self.read_state()["last_committed_chapter"], 14)
+
+    def test_arc02_blocking_requires_exact_author_approval(self) -> None:
+        self.temporary.cleanup()
+        self._reset_project(last_chapter=14)
+        self.make_candidate(15, ledger=self._blocking_ledger())
+        result = self._candidate(["promote", "--chapter", "15"], expect=2)
+        self.assertIn("缺少作者批准", result.stderr)
+
+        def approve(binding):
+            arc02 = binding["logic_checks"]["arc-02"]
+            arc02["status"] = "blocking-approved"
+            arc02["override"] = {
+                "approved_by_author": True,
+                "result_sha256": arc02["result_sha256"],
+                "reason": "作者确认本书为高悬念开篇并接受当前收支。",
+            }
+        self._mutate_binding(15, approve)
+        self._candidate(["promote", "--chapter", "15"])
+        self.assertEqual(self.read_state()["last_committed_chapter"], 15)
+
+    def test_no_scan_cannot_bypass_logic_receipts(self) -> None:
+        self.make_candidate(1, body=f"# 第1章\n{self.TOXIC}\n")
+        self._mutate_binding(1, lambda binding: binding["logic_checks"].pop("rc-02"))
+        result = self._candidate(["promote", "--chapter", "1", "--no-scan"], expect=2)
+        self.assertIn("logic_checks 必须精确包含", result.stderr)
+        self.assertEqual(self.final_files(), [])
+
+    def test_promote_all_with_current_serial_candidate(self) -> None:
+        self.make_candidate(1)
         results = json.loads(self._candidate(["promote", "--all"]).stdout)
-        self.assertEqual([r["chapter"] for r in results], [1, 2])
-        self.assertEqual(self.read_state()["last_committed_chapter"], 2)
-        self.assertEqual(sorted(self.final_files()), ["第001章_测试章名.md", "第002章_暗门2.md"])
+        self.assertEqual([r["chapter"] for r in results], [1])
+        self.assertEqual(self.read_state()["last_committed_chapter"], 1)
+        self.assertEqual(self.final_files(), ["第001章_测试章名.md"])
+
+    def test_promote_all_rejects_multiple_candidates_before_writes(self) -> None:
+        self.make_candidate(1)
+        self.make_candidate(2)
+        result = self._candidate(["promote", "--all"], expect=2)
+        self.assertIn("不支持多个候选", result.stderr)
+        self.assertEqual(self.read_state()["state_revision"], 0)
+        self.assertEqual(self.final_files(), [])
+        self.assertTrue((self.candidate_dir / "第001章_测试章名.md").is_file())
+        self.assertTrue((self.candidate_dir / "第002章_暗门2.md").is_file())
+
+    def test_recover_rejects_changed_reader_view_before_move_or_tracking(self) -> None:
+        for phase in ("prepared", "prose_moved"):
+            with self.subTest(phase=phase):
+                self.temporary.cleanup()
+                self._reset_project(last_chapter=1)
+                self.make_candidate(2)
+                env = os.environ.copy()
+                env["STORY_CANDIDATE_FAIL_AFTER"] = phase
+                self._candidate(["promote", "--chapter", "2"], expect=97, env=env)
+                accepted = next((self.project / "正文").glob("第001章_*.md"))
+                accepted.write_text(accepted.read_text(encoding="utf-8") + "恢复前被修改。\n", encoding="utf-8")
+                result = self._candidate(["recover", "--chapter", "2"], expect=2)
+                self.assertIn("读者正文摘要已变化", result.stderr)
+                self.assertEqual(self.read_state()["state_revision"], 0)
+                if phase == "prepared":
+                    self.assertTrue((self.candidate_dir / "第002章_暗门2.md").is_file())
+                else:
+                    self.assertTrue((self.project / "正文/第002章_暗门2.md").is_file())
+
+    def test_recover_validates_transaction_digest_before_moving_prose(self) -> None:
+        self.make_candidate(1)
+        env = os.environ.copy()
+        env["STORY_CANDIDATE_FAIL_AFTER"] = "prepared"
+        self._candidate(["promote", "--chapter", "1"], expect=97, env=env)
+        transaction_path = self._transaction_path(1)
+        transaction_path.write_text(transaction_path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+        result = self._candidate(["recover", "--chapter", "1"], expect=2)
+        self.assertIn("追踪事务摘要不一致", result.stderr)
+        self.assertEqual(self.final_files(), [])
+        self.assertTrue((self.candidate_dir / "第001章_测试章名.md").is_file())
 
     def test_recover_is_idempotent_after_each_persisted_phase(self) -> None:
         for index, phase in enumerate(("prepared", "prose_moved", "tracking_committed")):

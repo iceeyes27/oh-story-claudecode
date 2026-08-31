@@ -280,7 +280,7 @@ function main() {
 // 供测试调用
 module.exports = {
   analyze, hasAnchor, extractCandidates, collectChapters, resolveTextDir,
-  loadKnownEntities, defaultKnownFile,
+  loadKnownEntities, defaultKnownFile, main,
 };
 
 if (require.main === module) main();

@@ -5,7 +5,7 @@
  *
  * 用法:
  *   node check-chapter-titles.js --dir "正文目录路径"
- *   node check-chapter-titles.js --dir "法援律师：我专打赢不了的官司/正文" [--json]
+ *   node check-chapter-titles.js --dir "法援律师：我专打赢不了的官司/正文" [--profile fanqie|terse] [--json]
  *
  * 输出: 按严重度分类的问题列表（blocking / advisory）
  */
@@ -17,12 +17,19 @@ const path = require('path');
 const args = process.argv.slice(2);
 let dir = '';
 let jsonMode = false;
+let profile = 'fanqie';
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--dir' && args[i + 1]) dir = args[++i];
+  if (args[i] === '--profile' && args[i + 1]) profile = args[++i];
+  if (args[i].startsWith('--profile=')) profile = args[i].slice('--profile='.length);
   if (args[i] === '--json') jsonMode = true;
 }
 if (!dir) {
-  console.error('用法: node check-chapter-titles.js --dir "正文目录路径" [--json]');
+  console.error('用法: node check-chapter-titles.js --dir "正文目录路径" [--profile fanqie|terse] [--json]');
+  process.exit(1);
+}
+if (!['fanqie', 'terse'].includes(profile)) {
+  console.error(`未知标题档位：${profile}（仅支持 fanqie / terse）`);
   process.exit(1);
 }
 
@@ -72,7 +79,8 @@ const PATTERN_RELATIVE_CLAUSE = [
   { re: /^(刚|一|在|从|被|把|死后|事后|出事|之前|之后).+?的.+$/, desc: '偏正修饰从句（"刚/从/被/把/死后...的..."剧情摘要腔，请改为具体名词或动作）' },
   { re: /^.+[，,].*?(与|和).+$/, desc: '散文式"X，与/和Y"并列句' },
   { re: /^.+二字[，,].+$/, desc: '"XX二字，"抽象口号句' },
-  { re: /^谁.+谁.+谁.+$/, desc: '三段式排比设问句' },
+  { re: /^谁设(?:考核|规则|标准|权限)谁(?:可|有权|必须|能|敢)(?:停|查|签|批|定|改|撤|封|判|领|拿|得|进|出|做|管|算|说|用|开|关|删|写).*[?？]?$/, desc: '“谁设考核/规则，谁可执行动作”权力判断式口号设问句' },
+  { re: /^谁抓(?:现行|证据|把柄)谁有奖[?？]?$/, desc: '“谁抓现行/证据，谁有奖”奖惩口号设问句' },
   { re: /^.+不能再.+$/, desc: '大纲式叙事说明句' },
   { re: /^.+是谁[划抹删写弄].+$/, desc: '设问句式' },
   { re: /^(我也想|今晚看|单子不是|空海也|抢海的人|懂行的人).+$/, desc: '口语化/否定式大纲从句，请改为干脆硬质物证或动作' },
@@ -82,14 +90,16 @@ const PATTERN_RELATIVE_CLAUSE = [
  * 规则1c: 设问/疑问标题（blocking / advisory）
  * 标题以疑问或设问形式出现，读者无法落地为具体物证/动作/冲突，
  * 违反「章节命名硬门禁」rule 3（严禁完整叙事句或设问口号）。
- * - 问号结尾 / 句末疑问词「吗」「么」 /「有多X」设问式：blocking（明确的疑问形态）
+ * - 挑衅、宣战、身份贬损等口号式设问：两档都 blocking
+ * - 普通问号结尾 / 句末疑问词「吗」「么」：fanqie advisory，terse blocking
  * - 以疑问词（怎么/为何/什么/谁/哪/几/多少…）开头的悬念式标题：advisory
  *   此类常作对抗冲突/悬念，本身可能合规，仅标记供人工复核，不直接判 blocking
  */
 const PATTERN_QUESTION = [
-  { re: /[?？]$/, desc: '标题以问号结尾（疑问/设问形态，无法落地为物证）', sev: 'blocking' },
-  { re: /吗[?？]?$/, desc: '标题以「吗」结尾（句末疑问词，设问口号腔）', sev: 'blocking' },
-  { re: /么[?？]?$/, desc: '标题以「么」结尾（句末疑问词，设问口号腔）', sev: 'blocking' },
+  { re: /^(你也配|谁敢|还有谁|谁来战|谁能拦|谁配|你敢|敢不敢|服不服|信不信|配不配|凭什么|算什么).*[?？]$/, desc: '挑衅/宣战/身份贬损式口号设问，请改为具体冲突或物证', sev: 'blocking' },
+  { re: /[?？]$/, desc: '标题以问号结尾（fanqie 档提示复核，terse 档阻断）', profileSensitive: true },
+  { re: /吗[?？]?$/, desc: '标题以「吗」结尾（fanqie 档提示复核，terse 档阻断）', profileSensitive: true },
+  { re: /么[?？]?$/, desc: '标题以「么」结尾（fanqie 档提示复核，terse 档阻断）', profileSensitive: true },
   { re: /有多/, desc: '「有多X」设问式（如《这水有多白》），请改为具体物证/动作', sev: 'blocking' },
   { re: /^(怎么|怎样|如何|为何|为什么|为啥|干什么|什么|谁|哪|几|多少)/, desc: '以疑问词开头的设问/疑问标题，请确认能否落地为具体物证/冲突（悬念式可保留）', sev: 'advisory' },
 ];
@@ -116,7 +126,7 @@ const PATTERN_SHUANGQING = [
 ];
 
 /**
- * 规则4: 过长标题（blocking，标准 2~6 字，严禁超过 7 字）
+ * 规则4: 过长标题（fanqie advisory；terse blocking）
  */
 const MAX_TITLE_LEN = 7;
 
@@ -169,7 +179,8 @@ for (const ch of chapters) {
   }
   for (const p of PATTERN_QUESTION) {
     if (p.re.test(ch.title)) {
-      findings.push({ num: ch.num, title: ch.title, rule: '设问/疑问标题', severity: p.sev || 'blocking', desc: p.desc });
+      const severity = p.profileSensitive ? (profile === 'terse' ? 'blocking' : 'advisory') : (p.sev || 'blocking');
+      findings.push({ num: ch.num, title: ch.title, rule: '设问/疑问标题', severity, desc: p.desc });
     }
   }
   for (const re of ABSTRACT_METAPHORS) {
@@ -183,7 +194,13 @@ for (const ch of chapters) {
     }
   }
   if (ch.title.length > MAX_TITLE_LEN) {
-    findings.push({ num: ch.num, title: ch.title, rule: '标题过长', severity: 'blocking', desc: `${ch.title.length}字，超过${MAX_TITLE_LEN}字上限（标准为2~6字，最长7字）` });
+    findings.push({
+      num: ch.num,
+      title: ch.title,
+      rule: '标题过长',
+      severity: profile === 'terse' ? 'blocking' : 'advisory',
+      desc: `${ch.title.length}字，超过${MAX_TITLE_LEN}字（fanqie 档提示复核，terse 档阻断）`,
+    });
   }
   // 规则4b: 叠床架屋重字检测（如《海上海警》《断水断电》等4字内同字出现2次）
   if (ch.title.length <= 4 && !/^[0-9一二三四五六七八九十百千]+$/.test(ch.title)) {
@@ -218,6 +235,7 @@ for (const [key, nums] of Object.entries(templateCounts)) {
 // 规则6: 重复/撞车与相邻同质化检测
 const MONEY_PATTERN = /[一二两三四五六七八九十百千万\d]+(万|千|百|块|元)/;
 const STOP_CHARS = '的了一是个不没在有和与从到被把';
+const COMMON_ROLE_GRAMS = new Set(['记者', '医生', '律师', '警察', '老板', '主任', '队长', '老师', '同学', '领导', '员工', '军人']);
 
 for (let i = 0; i < chapters.length; i++) {
   const chA = chapters[i];
@@ -270,8 +288,9 @@ for (let i = 0; i < chapters.length; i++) {
         if (cleanB.includes(gram)) {
           findings.push({
             num: chA.num, title: chA.title,
-            rule: '相邻章节核心词撞车', severity: 'blocking',
-            desc: `与第${chB.num}章「${chB.title}」共享词汇「${gram}」，请拉开命名差异`,
+            rule: '相邻章节核心词撞车',
+            severity: profile === 'fanqie' && COMMON_ROLE_GRAMS.has(gram) ? 'advisory' : 'blocking',
+            desc: `与第${chB.num}章「${chB.title}」共享词汇「${gram}」${COMMON_ROLE_GRAMS.has(gram) ? '（通用角色词）' : ''}，请复核命名差异`,
           });
           break;
         }
@@ -282,12 +301,12 @@ for (let i = 0; i < chapters.length; i++) {
 
 // ─── 输出 ────────────────────────────────────────────────
 if (jsonMode) {
-  console.log(JSON.stringify({ total: chapters.length, findings }, null, 2));
+  console.log(JSON.stringify({ profile, total: chapters.length, findings }, null, 2));
 } else {
   const blocking = findings.filter(f => f.severity === 'blocking');
   const advisory = findings.filter(f => f.severity === 'advisory');
 
-  console.log(`\n📖 章节标题扫描：共 ${chapters.length} 章\n`);
+  console.log(`\n📖 章节标题扫描：共 ${chapters.length} 章（${profile}）\n`);
 
   if (blocking.length > 0) {
     console.log(`🔴 Blocking（建议改）：${blocking.length} 条`);

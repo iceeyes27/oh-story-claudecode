@@ -42,8 +42,8 @@ def causal(cause, effect="下一章用到", known="读者已知任务"):
     return (f"#### 因果链\n- 前因：{cause}\n- 后果指向：{effect}\n- 读者已知：{known}\n")
 
 
-def run(book: Path):
-    r = subprocess.run([sys.executable, str(SCRIPT), str(book), "--json"],
+def run(book: Path, *extra: str):
+    r = subprocess.run([sys.executable, str(SCRIPT), str(book), "--json", *extra],
                        capture_output=True, text=True, encoding="utf-8")
     import json
     data = json.loads(r.stdout) if r.stdout.strip() else {}
@@ -103,11 +103,32 @@ code, data = run(b)
 ok("占位因果字段仅 advisory",
    code == 0 and any(f["code"] == "placeholder-field" for f in data["findings"]), f"code={code}")
 
-# 6) 缺参数 → exit 2
+# 6) strict：缺字段/占位变 blocking
+code, data = run(b, "--strict")
+ok("strict 模式占位字段 blocking",
+   code == 1 and any(f["code"] == "placeholder-field" and f["severity"] == "blocking" for f in data["findings"]),
+   f"code={code} data={data}")
+
+# 7) strict：具体事件必须能在来源章找到锚点
+b = make_book({
+    1: "# 细纲\n- 核心事件：主角接下涨粉任务\n" + causal("开篇无前因"),
+    2: "# 细纲\n" + causal("第1章：主角接下涨粉任务"),
+})
+code, data = run(b, "--strict", "--from=2", "--to=2")
+ok("strict 模式具体事件锚点通过", code == 0 and data.get("blocking") == 0, f"code={code} data={data}")
+b = make_book({
+    1: "# 细纲\n- 核心事件：主角接下涨粉任务\n" + causal("开篇无前因"),
+    2: "# 细纲\n" + causal("第1章：从未发生的秘密交易"),
+})
+code, data = run(b, "--strict", "--from=2", "--to=2")
+ok("strict 模式悬空事件 blocking",
+   code == 1 and any(f["code"] == "cause-event-missing" for f in data["findings"]), f"code={code} data={data}")
+
+# 8) 缺参数 → exit 2
 r = subprocess.run([sys.executable, str(SCRIPT)], capture_output=True, text=True, encoding="utf-8")
 ok("缺参数退出码 2", r.returncode == 2)
 
-# 7) 不存在目录 → exit 2
+# 9) 不存在目录 → exit 2
 r = subprocess.run([sys.executable, str(SCRIPT), str(Path(tempfile.gettempdir()) / "nope-xyz-123")],
                    capture_output=True, text=True, encoding="utf-8")
 ok("不存在目录退出码 2", r.returncode == 2)

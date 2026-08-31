@@ -18,7 +18,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 ## 用法
 
 ```bash
-node scripts/arc-ledger.js <ledger.json> [--json] [--window=15] [--net-ratio=1] [--advance-floor=0.333]
+node ../_shared/scripts/arc-ledger.js <ledger.json> [--json] [--window=15] [--net-ratio=1] [--advance-floor=0.333]
 ```
 
 ledger 格式与一份可运行示例见 [references/ledger-example.json](references/ledger-example.json)（基于 demo 爽文前 15 章：开 9 闭 9、平均 1.44 章闭环、主线推进 14/15 → 健康、不 blocking，正好和「故弄玄虚」对照）。

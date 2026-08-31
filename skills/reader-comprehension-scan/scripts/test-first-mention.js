@@ -10,8 +10,8 @@ const os = require('os');
 const path = require('path');
 const { execFileSync } = require('node:child_process');
 
-const SCRIPT = path.join(__dirname, 'check-first-mention.js');
-const { analyze, hasAnchor } = require('./check-first-mention.js');
+const SCRIPT = path.resolve(__dirname, '..', '..', '_shared', 'scripts', 'check-first-mention.js');
+const { analyze, hasAnchor } = require(SCRIPT);
 
 function makeBook(chapters) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'fm-'));
@@ -25,7 +25,7 @@ function makeBook(chapters) {
 }
 
 function chapterObjs(dir) {
-  const { collectChapters, resolveTextDir } = require('./check-first-mention.js');
+  const { collectChapters, resolveTextDir } = require(SCRIPT);
   return collectChapters(resolveTextDir(dir));
 }
 

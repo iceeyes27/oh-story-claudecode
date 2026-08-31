@@ -31,7 +31,11 @@ HISTORY_DIR = "_历史"
 TRACKING_STATE = "追踪/_tracking-state.json"
 TRANSACTION_SUFFIX = "_追踪事务.json"
 JOURNAL_PREFIX = "采用事务-"
-QUALITY_PROFILE = "fanqie-long-v1"
+QUALITY_PROFILE = "fanqie-long-v2"
+BINDING_SCHEMA = 2
+RC_IDS = ("rc-01", "rc-02", "rc-03")
+ARC_IDS = ("arc-01", "arc-02")
+SEMANTIC_RECEIPT_IDS = ("rc-01", "rc-02", "rc-03", "arc-01")
 PHASES = ("prepared", "prose_moved", "tracking_committed", "done")
 CHAPTER_PREFIX = re.compile(r"^第0*(\d+)章")
 EXEMPTION = re.compile(r"去味(：|:)跳过")
@@ -40,6 +44,8 @@ SKELETON_TOOL = Path(__file__).resolve().parent / "check-chapter-skeleton.js"
 OUTLINE_COPY_TOOL = Path(__file__).resolve().parent / "check-outline-copy.js"
 SHARED_SCRIPTS = Path(__file__).resolve().parent.parent.parent / "_shared" / "scripts"
 TITLE_TOOL = SHARED_SCRIPTS / "check-chapter-titles.js"
+FIRST_MENTION_TOOL = SHARED_SCRIPTS / "check-first-mention.js"
+ARC_LEDGER_TOOL = SHARED_SCRIPTS / "arc-ledger.js"
 SCAN_SCRIPTS = ("check-ai-patterns.js", "check-degeneration.js")
 
 
@@ -140,9 +146,19 @@ def canonical_json(value: object) -> bytes:
     return json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
 
+def reject_duplicate_keys(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
+    value: dict[str, Any] = {}
+    for key, item in pairs:
+        require(key not in value, f"JSON 含重复键：{key}")
+        value[key] = item
+    return value
+
+
 def read_json(path: Path, label: str) -> dict[str, Any]:
     try:
-        value = json.loads(path.read_text(encoding="utf-8-sig"))
+        value = json.loads(
+            path.read_text(encoding="utf-8-sig"), object_pairs_hook=reject_duplicate_keys,
+        )
     except (OSError, UnicodeError, json.JSONDecodeError) as exc:
         raise CandidateError(f"{label}不可读：{path}: {exc}") from exc
     require(isinstance(value, dict), f"{label}必须是 JSON 对象：{path}")
@@ -219,13 +235,195 @@ def skeleton_coverage_ids(skeleton: Path) -> list[str]:
 
 
 def validate_titles(project: Path, prose: Path) -> None:
+    profile = "fanqie"
+    topic = project.resolve() / "设定" / "题材定位.md"
+    if topic.is_file():
+        try:
+            match = re.search(r"^\s*-\s*标题档位\s*[：:]\s*(\S+)\s*$", topic.read_text(encoding="utf-8-sig"), re.MULTILINE)
+        except (OSError, UnicodeError) as exc:
+            raise CandidateError(f"无法读取标题档位：{topic}: {exc}") from exc
+        if match:
+            profile = match.group(1)
+    require(profile in {"fanqie", "terse"}, f"标题档位非法：{profile}")
     with tempfile.TemporaryDirectory(prefix="candidate-title-") as temporary:
         root = Path(temporary)
         for final in body_root(project).glob("第*章*.md") if body_root(project).is_dir() else []:
             shutil.copy2(final, root / final.name)
         shutil.copy2(prose, root / prose.name)
-        result = run_node([str(TITLE_TOOL), "--dir", str(root)], "章节标题检查")
+        result = run_node([str(TITLE_TOOL), "--dir", str(root), "--profile", profile], "章节标题检查")
     require(result.returncode == 0, f"章节标题未通过：\n{(result.stdout or result.stderr).strip()}")
+
+
+def reader_view_paths(project: Path, prose: Path) -> list[Path]:
+    accepted = sorted(
+        (
+            path for path in body_root(project).glob("第*章*.md")
+            if path.is_file() and chapter_of(path.name) is not None
+        ),
+        key=lambda path: (chapter_of(path.name) or 0, path.name),
+    ) if body_root(project).is_dir() else []
+    paths = [*accepted, prose.resolve()]
+    known = body_root(project) / "_已知实体.txt"
+    if known.is_file():
+        paths.append(known.resolve())
+    return paths
+
+
+def prose_set_sha256(project: Path, paths: list[Path]) -> str:
+    rows = sorted(
+        f"{project_relative(project, path)}\0{sha256_file(path)}" for path in paths
+    )
+    return sha256_bytes("\n".join(rows).encode("utf-8"))
+
+
+def validate_semantic_receipt(
+    project: Path,
+    receipt_id: str,
+    receipt: object,
+    prose: Path,
+    candidate_sha256: str,
+    expected_paths: list[Path],
+) -> dict[str, Any]:
+    require(isinstance(receipt, dict), f"candidate_binding.logic_checks.{receipt_id} 必须是对象")
+    require(isinstance(receipt.get("run_id"), str) and receipt["run_id"].strip(), f"{receipt_id}.run_id 缺失")
+    require(receipt.get("status") == "pass", f"{receipt_id}.status 必须是 pass")
+    require(isinstance(receipt.get("findings"), list), f"{receipt_id}.findings 必须是数组")
+    require(isinstance(receipt.get("evidence"), list) and receipt["evidence"], f"{receipt_id}.evidence 必须是非空数组")
+    require(receipt.get("candidate_sha256") == candidate_sha256, f"{receipt_id}.candidate_sha256 已过期")
+    for finding in receipt["findings"]:
+        require(isinstance(finding, dict), f"{receipt_id}.findings 每项必须是对象")
+        require(finding.get("severity") != "blocking", f"{receipt_id} 含 blocking finding")
+
+    raw_files = receipt.get("prose_files")
+    require(isinstance(raw_files, list), f"{receipt_id}.prose_files 必须是数组")
+    actual_paths: list[Path] = []
+    seen: set[str] = set()
+    for index, item in enumerate(raw_files):
+        require(isinstance(item, dict), f"{receipt_id}.prose_files[{index}] 必须是对象")
+        label = f"logic_checks.{receipt_id}.prose_files[{index}]"
+        path = bound_path(project, item.get("path"), label)
+        relative = project_relative(project, path)
+        require(item.get("path") == relative, f"{receipt_id}.prose_files[{index}].path 必须是规范项目相对路径")
+        require(relative not in seen, f"{receipt_id}.prose_files 含重复路径：{relative}")
+        seen.add(relative)
+        require(item.get("sha256") == sha256_file(path), f"{receipt_id}.prose_files[{index}].sha256 已过期")
+        actual_paths.append(path)
+
+    expected = {path.resolve() for path in expected_paths}
+    require({path.resolve() for path in actual_paths} == expected, f"{receipt_id}.prose_files 未完整绑定实际读过的正文视图")
+    require(receipt.get("prose_set_sha256") == prose_set_sha256(project, actual_paths), f"{receipt_id}.prose_set_sha256 已过期")
+    files_by_relative = {project_relative(project, path): path for path in actual_paths}
+    for index, item in enumerate(receipt["evidence"]):
+        require(isinstance(item, dict), f"{receipt_id}.evidence[{index}] 必须是对象")
+        label = f"logic_checks.{receipt_id}.evidence[{index}]"
+        path = bound_path(project, item.get("path"), label)
+        relative = project_relative(project, path)
+        require(item.get("path") == relative, f"{receipt_id}.evidence[{index}].path 必须是规范项目相对路径")
+        require(relative in files_by_relative, f"{receipt_id}.evidence[{index}].path 不属于 prose_files")
+        anchor = item.get("anchor")
+        require(isinstance(anchor, str) and anchor.strip(), f"{receipt_id}.evidence[{index}].anchor 缺失")
+        try:
+            source = files_by_relative[relative].read_text(encoding="utf-8-sig")
+        except (OSError, UnicodeError) as exc:
+            raise CandidateError(f"无法读取 {receipt_id} 证据正文：{relative}: {exc}") from exc
+        require(anchor in source, f"{receipt_id}.evidence[{index}].anchor 无法在对应正文定位")
+    return receipt
+
+
+def parse_node_json(result: subprocess.CompletedProcess[str], label: str, allowed: set[int]) -> dict[str, Any]:
+    require(result.returncode in allowed, f"{label}执行失败：\n{(result.stdout or result.stderr).strip()}")
+    try:
+        value = json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise CandidateError(f"{label}未返回合法 JSON：{(result.stdout or result.stderr).strip()}") from exc
+    require(isinstance(value, dict), f"{label}结果必须是 JSON 对象")
+    return value
+
+
+def rerun_rc01(project: Path, prose: Path) -> dict[str, Any]:
+    with tempfile.TemporaryDirectory(prefix="candidate-reader-view-") as temporary:
+        root = Path(temporary)
+        for path in reader_view_paths(project, prose):
+            shutil.copy2(path, root / path.name)
+        result = run_node([str(FIRST_MENTION_TOOL), str(root), "--json"], "rc-01 专名首现检查")
+    report = parse_node_json(result, "rc-01 专名首现检查", {0, 1})
+    require(result.returncode == 0 and report.get("blocking") == 0, "rc-01 复验发现 blocking finding")
+    return report
+
+
+def rerun_arc02(ledger: dict[str, Any]) -> dict[str, Any]:
+    with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".json", delete=False) as handle:
+        json.dump(ledger, handle, ensure_ascii=False)
+        ledger_path = Path(handle.name)
+    try:
+        result = run_node([str(ARC_LEDGER_TOOL), str(ledger_path), "--json", "--window=15"], "arc-02 开篇阈值检查")
+    finally:
+        ledger_path.unlink(missing_ok=True)
+    return parse_node_json(result, "arc-02 开篇阈值检查", {0, 1})
+
+
+def validate_logic_checks(
+    project: Path, chapter: int, prose: Path, binding: dict[str, Any], candidate_sha256: str,
+) -> dict[str, str]:
+    logic = binding.get("logic_checks")
+    require(isinstance(logic, dict), "candidate_binding.logic_checks 必须是对象")
+    required_ids = set(RC_IDS + (ARC_IDS if chapter == 15 else ()))
+    require(set(logic) == required_ids, f"candidate_binding.logic_checks 必须精确包含：{', '.join(sorted(required_ids))}")
+    expected_paths = reader_view_paths(project, prose)
+
+    for receipt_id in RC_IDS:
+        validate_semantic_receipt(
+            project, receipt_id, logic[receipt_id], prose, candidate_sha256, expected_paths,
+        )
+
+    rc_report = rerun_rc01(project, prose)
+    rc_digest = sha256_bytes(canonical_json(rc_report))
+    require(logic["rc-01"].get("result_sha256") == rc_digest, "rc-01.result_sha256 与复验结果不一致")
+    result = {"rc-01": rc_digest}
+
+    if chapter != 15:
+        return result
+
+    accepted_numbers = sorted(
+        chapter_of(path.name) for path in body_root(project).glob("第*章*.md")
+        if path.is_file() and chapter_of(path.name) is not None
+    )
+    require(accepted_numbers == list(range(1, 15)), "第15章 arc 检查要求正文完整包含第1～14章")
+    arc01 = validate_semantic_receipt(
+        project, "arc-01", logic["arc-01"], prose, candidate_sha256, expected_paths,
+    )
+    ledger = arc01.get("ledger")
+    require(isinstance(ledger, dict), "arc-01.ledger 必须是对象")
+    ledger_chapters = ledger.get("chapters")
+    require(
+        isinstance(ledger_chapters, list)
+        and [item.get("num") for item in ledger_chapters if isinstance(item, dict)] == list(range(1, 16)),
+        "arc-01.ledger 必须按顺序完整覆盖第1～15章",
+    )
+    ledger_digest = sha256_bytes(canonical_json(ledger))
+    require(arc01.get("ledger_sha256") == ledger_digest, "arc-01.ledger_sha256 已过期")
+
+    arc02 = logic["arc-02"]
+    require(isinstance(arc02, dict), "candidate_binding.logic_checks.arc-02 必须是对象")
+    require(isinstance(arc02.get("run_id"), str) and arc02["run_id"].strip(), "arc-02.run_id 缺失")
+    require(isinstance(arc02.get("findings"), list), "arc-02.findings 必须是数组")
+    require(isinstance(arc02.get("evidence"), list), "arc-02.evidence 必须是数组")
+    require(arc02.get("candidate_sha256") == candidate_sha256, "arc-02.candidate_sha256 已过期")
+    require(arc02.get("ledger_sha256") == ledger_digest, "arc-02.ledger_sha256 已过期")
+    arc_report = rerun_arc02(ledger)
+    arc_digest = sha256_bytes(canonical_json(arc_report))
+    require(arc02.get("result_sha256") == arc_digest, "arc-02.result_sha256 与复验结果不一致")
+    if arc_report.get("blocking"):
+        override = arc02.get("override")
+        require(isinstance(override, dict), "arc-02 复验为 blocking，缺少作者批准")
+        require(override.get("approved_by_author") is True, "arc-02 作者批准标记无效")
+        require(override.get("result_sha256") == arc_digest, "arc-02 作者批准未绑定当前结果")
+        require(isinstance(override.get("reason"), str) and override["reason"].strip(), "arc-02 作者批准缺少理由")
+        require(arc02.get("status") == "blocking-approved", "arc-02 blocking 批准状态非法")
+    else:
+        require(arc02.get("status") == "pass", "arc-02.status 必须是 pass")
+    result["arc-02"] = arc_digest
+    return result
 
 
 def validate_binding(
@@ -238,7 +436,8 @@ def validate_binding(
     require(document.get("chapter") == chapter, "追踪事务章号与候选章号不一致")
 
     binding = document.get("candidate_binding")
-    require(isinstance(binding, dict) and binding.get("schema_version") == 1, "追踪事务缺少 candidate_binding v1")
+    require(isinstance(binding, dict), "追踪事务缺少 candidate_binding")
+    require(binding.get("schema_version") == BINDING_SCHEMA, "candidate_binding v1 已停止采用；请重新生成带逻辑证据的 v2 绑定")
     require(binding.get("quality_profile") == QUALITY_PROFILE, f"candidate_binding.quality_profile 必须是 {QUALITY_PROFILE}")
     prose_binding = binding.get("prose")
     outline_binding = binding.get("outline")
@@ -258,6 +457,13 @@ def validate_binding(
     }
     for key, value in (("prose", hashes["candidate"]), ("outline", hashes["outline"]), ("skeleton", hashes["skeleton"])):
         require(binding[key].get("sha256") == value, f"candidate_binding.{key}.sha256 已过期")
+
+    logic_results = validate_logic_checks(project, chapter, prose, binding, hashes["candidate"])
+    rc01 = binding["logic_checks"]["rc-01"]
+    reader_view_binding = {
+        "prose_files": [dict(item) for item in rc01["prose_files"]],
+        "prose_set_sha256": rc01["prose_set_sha256"],
+    }
 
     skeleton_result = run_node([str(SKELETON_TOOL), str(skeleton)], "骨架检查")
     require(skeleton_result.returncode == 0, f"骨架未通过：\n{(skeleton_result.stdout or skeleton_result.stderr).strip()}")
@@ -314,6 +520,8 @@ def validate_binding(
         "length": length,
         "outline": project_relative(project, outline),
         "skeleton": project_relative(project, skeleton),
+        "logic_results": logic_results,
+        "reader_view_binding": reader_view_binding,
     }
 
 
@@ -333,14 +541,23 @@ def update_phase(path: Path, journal: dict[str, Any], phase: str) -> None:
         os._exit(97)
 
 
-def create_journal(project: Path, chapter: int, prose: Path, transaction: Path, preflight: dict[str, Any]) -> tuple[Path, dict[str, Any]]:
+def operation_id_for(chapter: int, candidate_sha256: str, transaction_sha256: str, expected_revision: int) -> str:
     digest = sha256_bytes(canonical_json({
         "chapter": chapter,
-        "candidate": preflight["hashes"]["candidate"],
-        "transaction": preflight["hashes"]["transaction"],
-        "expected_revision": preflight["expected_revision"],
+        "candidate": candidate_sha256,
+        "transaction": transaction_sha256,
+        "expected_revision": expected_revision,
     }))[:20]
-    operation_id = f"c{chapter}-{digest}"
+    return f"c{chapter}-{digest}"
+
+
+def create_journal(project: Path, chapter: int, prose: Path, transaction: Path, preflight: dict[str, Any]) -> tuple[Path, dict[str, Any]]:
+    operation_id = operation_id_for(
+        chapter,
+        preflight["hashes"]["candidate"],
+        preflight["hashes"]["transaction"],
+        preflight["expected_revision"],
+    )
     path = journal_path(project, operation_id)
     archive = history_root(project) / f"{operation_id}-{transaction.name}"
     journal = {
@@ -361,6 +578,8 @@ def create_journal(project: Path, chapter: int, prose: Path, transaction: Path, 
         "digests": preflight["hashes"],
         "tracking_payload": preflight["tracking_payload"],
         "length": preflight["length"],
+        "logic_results": preflight["logic_results"],
+        "reader_view_binding": preflight["reader_view_binding"],
         "created_at": datetime.now().astimezone().isoformat(),
         "updated_at": datetime.now().astimezone().isoformat(),
     }
@@ -372,6 +591,70 @@ def create_journal(project: Path, chapter: int, prose: Path, transaction: Path, 
     if os.environ.get("STORY_CANDIDATE_FAIL_AFTER") == "prepared":
         os._exit(97)
     return path, journal
+
+
+def verify_recovery_reader_view(
+    project: Path,
+    journal_path_: Path,
+    journal: dict[str, Any],
+    paths: dict[str, Path],
+    digests: dict[str, str],
+) -> None:
+    expected_operation = operation_id_for(
+        journal["chapter"],
+        digests["candidate"],
+        digests["transaction"],
+        journal["expected_state_revision"],
+    )
+    require(journal.get("operation_id") == expected_operation, "采用日志 operation_id 与输入摘要不一致")
+    require(journal_path_.name == f"{JOURNAL_PREFIX}{expected_operation}.json", "采用日志文件名与 operation_id 不一致")
+
+    transaction = paths["transaction"]
+    require(transaction.is_file(), "恢复采用前缺少原始追踪事务")
+    require(sha256_file(transaction) == digests["transaction"], "恢复采用前追踪事务摘要不一致")
+    document = read_json(transaction, "追踪事务")
+    binding = document.get("candidate_binding")
+    logic = binding.get("logic_checks") if isinstance(binding, dict) else None
+    rc01 = logic.get("rc-01") if isinstance(logic, dict) else None
+    require(isinstance(rc01, dict), "恢复采用缺少 rc-01 读者视图绑定")
+    source_binding = {
+        "prose_files": rc01.get("prose_files"),
+        "prose_set_sha256": rc01.get("prose_set_sha256"),
+    }
+    snapshot = journal.get("reader_view_binding")
+    require(snapshot == source_binding, "采用日志的读者视图绑定与原始事务不一致")
+    require(isinstance(snapshot, dict) and isinstance(snapshot.get("prose_files"), list), "采用日志缺少读者视图绑定")
+
+    candidate_relative = journal["paths"]["candidate"]
+    final = paths["final"]
+    candidate = paths["candidate"]
+    seen: set[str] = set()
+    rows: list[str] = []
+    for index, item in enumerate(snapshot["prose_files"]):
+        require(isinstance(item, dict), f"采用日志 prose_files[{index}] 必须是对象")
+        relative = item.get("path")
+        require(isinstance(relative, str) and relative not in seen, f"采用日志 prose_files[{index}].path 非法或重复")
+        seen.add(relative)
+        unresolved = (project.resolve() / relative).resolve()
+        require(project_relative(project, unresolved) == relative, f"采用日志 prose_files[{index}].path 不是规范项目相对路径")
+        actual = final if relative == candidate_relative and not candidate.exists() else unresolved
+        require(actual.is_file(), f"恢复采用的读者正文缺失：{relative}")
+        digest = sha256_file(actual)
+        require(item.get("sha256") == digest, f"恢复采用的读者正文摘要已变化：{relative}")
+        rows.append(f"{relative}\0{digest}")
+
+    current_relatives = {
+        candidate_relative if path.resolve() == final else project_relative(project, path)
+        for path in body_root(project).glob("第*章*.md")
+        if path.is_file() and chapter_of(path.name) is not None
+    }
+    current_relatives.add(candidate_relative)
+    known = body_root(project) / "_已知实体.txt"
+    if known.is_file():
+        current_relatives.add(project_relative(project, known))
+    require(seen == current_relatives, "恢复采用时读者正文文件集合已变化")
+    current_set_sha = sha256_bytes("\n".join(sorted(rows)).encode("utf-8"))
+    require(snapshot.get("prose_set_sha256") == current_set_sha, "恢复采用时 prose_set_sha256 已变化")
 
 
 def replay_tracking(project: Path, payload: dict[str, Any]) -> None:
@@ -402,6 +685,9 @@ def recover_journal(project: Path, path: Path) -> dict[str, Any]:
     transaction = paths["transaction"]
     archive = paths["archive_transaction"]
     digests = journal["digests"]
+
+    if journal["phase"] in {"prepared", "prose_moved"}:
+        verify_recovery_reader_view(project, path, journal, paths, digests)
 
     if journal["phase"] == "prepared":
         if candidate.exists():
@@ -569,7 +855,8 @@ def list_candidates(project: Path) -> list[dict[str, Any]]:
 def promote_all(project: Path, *, skip_scan: bool = False) -> list[dict[str, Any]]:
     chapters = sorted({entry["chapter"] for entry in list_candidates(project) if entry["chapter"] is not None})
     require(chapters, "候选目录没有可采用的正文")
-    return [promote_chapter(project, chapter, skip_scan=skip_scan) for chapter in chapters]
+    require(len(chapters) == 1, "promote --all 不支持多个候选；请逐章采用，尚未修改任何正文或追踪")
+    return [promote_chapter(project, chapters[0], skip_scan=skip_scan)]
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -579,7 +866,7 @@ def build_parser() -> argparse.ArgumentParser:
     promote.add_argument("--project", type=Path, required=True)
     group = promote.add_mutually_exclusive_group(required=True)
     group.add_argument("--chapter", type=int)
-    group.add_argument("--all", action="store_true")
+    group.add_argument("--all", action="store_true", help="兼容单个待审候选；多个候选会在写入前拒绝")
     promote.add_argument("--no-scan", action="store_true", help="只跳过 AI 模式扫描，不跳过结构与状态门禁")
     recover_parser = sub.add_parser("recover")
     recover_parser.add_argument("--project", type=Path, required=True)

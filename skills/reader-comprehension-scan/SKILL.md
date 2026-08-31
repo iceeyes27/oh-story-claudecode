@@ -17,7 +17,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 ### 第 1 层：专名首现交代（确定性脚本）
 
 ```bash
-node scripts/check-first-mention.js <书目录> [--json] [--min-freq=3] [--reintro-gap=2] [--known=<文件>]
+node ../_shared/scripts/check-first-mention.js <书目录> [--json] [--min-freq=3] [--reintro-gap=2] [--known=<文件>]
 ```
 
 - 只报**高精度信号**：① 书名号/引号具名实体（作品名/道具名/绰号）；② 命中虚构专名尾字白名单的 token（系统/阁/宗/令/诀…，白名单在脚本顶部 `NAME_SUFFIX`，按题材增删）。

@@ -92,6 +92,13 @@
       ]
     },
     {
+      "name": "story-narrative-complexity-reference",
+      "source": "skills/story-write/references/narrative-complexity.md",
+      "targets": [
+        "skills/story-setup/references/agent-references/narrative-complexity.md"
+      ]
+    },
+    {
       "name": "story-hook-core",
       "source": "skills/story-setup/references/templates/hooks/story_hook_core.js",
       "targets": [

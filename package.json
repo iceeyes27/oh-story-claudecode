@@ -6,7 +6,7 @@
     "quality:fast": "node scripts/quality-gate.mjs --profile fast",
     "quality:affected": "node scripts/quality-gate.mjs --profile affected",
     "quality:release": "node scripts/quality-gate.mjs --profile release",
-    "test:contracts": "node --test skills/story/tests/composite-check-contract.test.js skills/story-deslop/tests/general-mode-contract.test.js",
+    "test:contracts": "node --test skills/story/tests/composite-check-contract.test.js skills/story-deslop/tests/general-mode-contract.test.js skills/story-deslop/tests/first-mention-protection.test.js scripts/test-narrative-complexity.js scripts/test-chapter-titles.js",
     "test:dashboard": "node --test tests/dashboard-server.test.mjs tests/dashboard-bundle-contract.test.mjs",
     "test:dashboard:e2e": "playwright test",
     "test": "npm run quality:release"

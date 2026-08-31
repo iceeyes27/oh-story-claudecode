@@ -102,7 +102,7 @@ story-architect 属于高层级结构设计 agent。轻量题材定位优先由�
 
 完成核心设定后，创建以下 artifact（加载 [references/artifact-protocols.md](artifact-protocols.md) 中对应模板）：
 - **设定/关系.md**：角色关系映射（参考 character-relations.md「四种关系类型」）
-- **设定/题材定位.md**：题材核心梗三分法+对标分析（参考 genre-core-mechanics.md「核心梗解析」）。对标分析表保留 2-3 行摘要，详细数据见 `对标/` 目录
+- **设定/题材定位.md**：题材核心梗三分法+对标分析；新建长篇按 `narrative-complexity.md` 写入 `叙事复杂度：平直`、`标题档位：fanqie`。对标分析表保留 2-3 行摘要，详细数据见 `对标/` 目录
 - **设定/题材正文提示卡.md**：从 `设定/题材定位.md` + `references/genre-prose-cards.md`（索引）+ `references/genre-prose-cards/`（单题材正文卡目录，按题材分类优先）+ `references/style-genre-modules.md`（通用流派补充）抽取本书正文层题材卡，只写题材边界、核心逻辑、读者期待、核心爽点/情绪、正文落点、前中后期打法、节奏密度、场景颗粒、禁止漂移；不写通用格式规则，不覆盖 `设定/文风.md`
 
 > **多对标书时**：参 `references/cross-book-recall.md`，副对标 anchor 入「对标分析」表附录

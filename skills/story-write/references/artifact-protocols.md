@@ -114,6 +114,8 @@
 ## 基本信息
 - 题材类型：{玄幻/都市/系统/...}
 - 目标平台：{起点/番茄/晋江/其他；story-review 据此选平台 rubric}
+- 叙事复杂度：平直
+- 标题档位：fanqie
 - 核心梗：{一句话卖点}
 - 微创新点：{与同类题材的差异}
 
@@ -283,7 +285,7 @@
 
 三字段的关系：`前因` 往回指，`后果指向` 往前指，两者串起来就是可核查的跨章因果链；`读者已知` 是同一条链上的读者视角切片——它记录的是**读者**手上的信息，不是作者手上的，写正文时据此判断哪些前提必须在正文里交代过。
 
-校验：`python skills/story-write/scripts/check-outline-causal.py <书目录>`。前因指向未来章或不存在的章判 **blocking**（因果逻辑错误，必须修）；字段缺失或占位只判 **advisory**——存量旧细纲没有这三个字段，硬 blocking 会把所有旧项目卡死，按模板渐进补即可。
+校验：存量项目可运行 `python skills/story-write/scripts/check-outline-causal.py <书目录>`，缺字段或占位仍为 advisory；写第 N 章前必须运行 `python skills/story-write/scripts/check-outline-causal.py <书目录> --strict --from=N --to=N`，缺字段、占位、未来/不存在章、未采用前因或找不到具体事件锚点均 blocking。
 
 ---
 

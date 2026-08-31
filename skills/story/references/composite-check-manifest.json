@@ -1,10 +1,68 @@
 {
   "version": 1,
   "countUnit": "required-check-items",
-  "status": ["PASS", "FAIL", "BLOCKED", "SKIPPED"],
+  "status": ["PASS", "FAIL", "BLOCKED", "SKIPPED", "NOT_APPLICABLE"],
   "skipPolicy": {
     "allowedOnlyWhen": "not-applicable",
     "requiresReason": true
+  },
+  "notApplicablePolicy": {
+    "status": "NOT_APPLICABLE",
+    "requiresReason": true,
+    "excludedFromScenarioDenominator": true
+  },
+  "applicabilityProfiles": {
+    "pure-chinese-prose": {
+      "description": "纯中文小说正文；英文、Markdown、对外文案、法律专项及被前序阶段完整覆盖的重复项不进入场景分母",
+      "requiredFilterIds": [
+        "rc-01-first-mention",
+        "rc-02-cause-dangling",
+        "rc-03-comprehension-break",
+        "arc-01-suspense-ledger",
+        "arc-02-ledger-verdict",
+        "review-subject-switch",
+        "review-chapter-boundary",
+        "review-structure-logic",
+        "review-setting-consistency",
+        "review-timeline-space",
+        "review-evidence-program-boundary",
+        "review-plot-progression",
+        "review-foreshadow-tracking",
+        "review-character-voice",
+        "review-platform-fit",
+        "ai-01-banned-words",
+        "ai-02-rhetoric-library",
+        "ai-03-fused-metaphor",
+        "ai-03b-abstract-erasure",
+        "ai-04-empty-summary",
+        "ai-04b-instruction-book",
+        "ai-04c-subject-continuity",
+        "ai-04d-chapter-continuity",
+        "ai-04e-narration-slogan",
+        "ai-05-jargon-single-character",
+        "ai-06-coined-collocation",
+        "ai-07-telegraphic-writing",
+        "ai-08a-physical-attribute",
+        "ai-08b-force-result",
+        "ai-08c-object-feeling",
+        "ai-08d-abstract-object",
+        "ai-08e-state-ownership",
+        "ai-09-persona-cliche",
+        "ai-10-chapter-title",
+        "deslop-pollution-duplicates",
+        "deslop-pollution-balance",
+        "deslop-whitelist-protection",
+        "deslop-deletion-ratio",
+        "deslop-reread",
+        "dialogue-semantic-read",
+        "dialogue-vague-reference",
+        "dialogue-awkward-collocation",
+        "dialogue-voice-mismatch",
+        "jargon-known-regressions",
+        "jargon-root-grep",
+        "jargon-semantic-read"
+      ]
+    }
   },
   "completion": {
     "stageCount": 10,
@@ -26,7 +84,7 @@
       "dependencies": ["reader-comprehension-scan"],
       "readerViewOnly": "本阶段只读 正文/，不得读取 设定/、大纲/、追踪/、对标/；注入其中任何一项即退回作者视角，等于没查",
       "filters": [
-        {"id": "rc-01-first-mention", "label": "专名首现交代（确定性）", "executor": "skills/reader-comprehension-scan/scripts/check-first-mention.js", "scope": "正文全文", "required": true, "report": "blocking findings"},
+        {"id": "rc-01-first-mention", "label": "专名首现交代（确定性）", "executor": "skills/_shared/scripts/check-first-mention.js", "scope": "正文全文", "required": true, "report": "blocking findings"},
         {"id": "rc-02-cause-dangling", "label": "前因悬空", "executor": "skills/reader-comprehension-scan/SKILL.md", "scope": "仅正文，逐章追前因落点", "required": true, "report": "findings"},
         {"id": "rc-03-comprehension-break", "label": "理解断点", "executor": "skills/reader-comprehension-scan/SKILL.md", "scope": "仅正文，连续章节读者信息量", "required": true, "report": "findings"}
       ]
@@ -40,7 +98,7 @@
       "applicability": "正文章节数达到连读窗口（默认 15 章）时必检；不足窗口时允许整阶段 SKIPPED，须写明实际章节数",
       "filters": [
         {"id": "arc-01-suspense-ledger", "label": "悬念开闭连读填表", "executor": "skills/opening-arc-audit/SKILL.md", "scope": "开篇窗口正文，逐章开/闭悬念与主线推进", "required": true, "report": "findings"},
-        {"id": "arc-02-ledger-verdict", "label": "收支累计与阈值裁决（确定性）", "executor": "skills/opening-arc-audit/scripts/arc-ledger.js", "scope": "上一项产出的 ledger JSON", "required": true, "report": "blocking findings"}
+        {"id": "arc-02-ledger-verdict", "label": "收支累计与阈值裁决（确定性）", "executor": "skills/_shared/scripts/arc-ledger.js", "scope": "上一项产出的 ledger JSON", "required": true, "report": "blocking findings"}
       ]
     },
     {

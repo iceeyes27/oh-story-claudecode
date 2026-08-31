@@ -87,7 +87,8 @@ Correct: 读取 platform-skill-set.json，并额外复制 skills/_shared/。
 
 ### 3. Contracts
 
-- 清单必须声明十个有序阶段；当前清单登记 108 个必检项。前两个阶段是读者视角（`reader-comprehension` / `opening-arc`），只读 `正文/`。
+- 清单必须声明十个有序阶段与完整目录 108 项。前两个阶段是读者视角（`reader-comprehension` / `opening-arc`），只读 `正文/`。
+- 场景适用项由 manifest 的 profile 明确列出；纯中文正文为 46 项，其中逻辑项 13 项，`13/46 = 28.26%`。profile 外项目用 `NOT_APPLICABLE` 及原因登记，不进入适用分母。
 - 每个必检项必须有唯一 `id`、`executor`、`scope`、`required` 和 `report`。
 - Hook 输入使用 `hook_event_name`、`tool_name`、`tool_input`；Write/Edit/MultiEdit 读取 `file_path`、`path`、`filePath`，Bash 读取 `command`、`cmd` 或 `script`。
 - Hook 的项目根、工作目录和目标文件必须先按物理路径归一化再做范围判断：允许 `/var` 与 `/private/var`、项目根别名等同对象路径，拒绝词法位于根内但经符号链接逃到根外的目标。
@@ -101,18 +102,19 @@ Correct: 读取 platform-skill-set.json，并额外复制 skills/_shared/。
 | 过滤器发现问题 | 记录 `FAIL`，继续执行后续项目 |
 | 输入不可读或执行器缺失 | 记录 `BLOCKED`，不能报告完成 |
 | `SKIPPED` 无原因 | 契约测试失败 |
+| profile 外项目未记 `NOT_APPLICABLE` 或缺原因 | 契约测试失败 |
 | Hook 无目标、非正文或无发现 | 静默退出 |
 | Hook 输入无法解析 | 静默退出，不改变工具结果 |
 
 ### 5. Good / Base / Bad Cases
 
-- Good：十阶段全部有结论，108 个必检项均有状态，输出 `复合检查完成：10/10，过滤项 108/108`。
+- Good：十阶段全部有结论，完整目录 108 项均有状态；纯中文正文 46 个适用项全部返回，输出 `复合检查完成：10/10，过滤项 46/46（完整目录 108 项）`。
 - Base：某项发现问题但仍执行后续项目，输出 `FAIL` 而不是中断。
 - Bad：只报告十个阶段名称，或把无法读取的文件静默排除后输出完成。
 
 ### 6. Tests Required
 
-- `node --test skills/story/tests/composite-check-contract.test.js`：阶段顺序、103 项覆盖、规范同步、依赖来源、漏项、阻断、触发词和旧入口提示。
+- `node --test skills/story/tests/composite-check-contract.test.js`：阶段顺序、108 项目录、纯中文 13/46 预算、规范同步、依赖来源、漏项、阻断和触发词。
 - `bash scripts/test-prose-backstop-hook.sh`：Bash 成功/失败、Write、Edit、MultiEdit 的合法 Hook JSON 与正文发现，并覆盖物理同路径别名及符号链接逃逸。
 - `bash scripts/test-story-continuity.sh`：章节号与 tracking state 判定，不依赖固定 mtime 延迟。
 - `bash scripts/check-story-setup-deployment.sh`：部署模板必须包含 `prose-after-event` 路由。

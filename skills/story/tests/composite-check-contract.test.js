@@ -20,21 +20,29 @@ function allItems() {
   return manifest.stages.flatMap((stage) => stage.filters);
 }
 
-function requiredIds() {
+function requiredIds(profile = null) {
+  if (profile) return manifest.applicabilityProfiles[profile].requiredFilterIds;
   return allItems().filter((item) => item.required).map((item) => item.id);
 }
 
-function coverageComplete(records) {
-  const required = new Set(requiredIds());
+function coverageComplete(records, profile = null) {
+  const catalog = new Set(requiredIds());
+  const required = new Set(requiredIds(profile));
   const seen = new Set();
   for (const record of records) {
-    if (!required.has(record.id) || seen.has(record.id)) return false;
+    if (!catalog.has(record.id) || seen.has(record.id)) return false;
     if (!manifest.status.includes(record.status)) return false;
+    if (!required.has(record.id)) {
+      if (record.status !== 'NOT_APPLICABLE' || !String(record.reason || '').trim()) return false;
+      seen.add(record.id);
+      continue;
+    }
+    if (record.status === 'NOT_APPLICABLE') return false;
     if (record.status === 'SKIPPED' && !/^not applicable:/i.test(String(record.reason || '').trim())) return false;
     if (record.status === 'BLOCKED') return false;
     seen.add(record.id);
   }
-  return seen.size === required.size;
+  return seen.size === catalog.size && [...required].every((id) => seen.has(id));
 }
 
 function sourcePath(executor) {
@@ -75,6 +83,9 @@ test('generic novel check requires all ten stages and the manifest contract', ()
   assert.equal(manifest.stages.length, 10);
   assert.equal(manifest.completion.stageCount, 10);
   assert.deepEqual(manifest.skipPolicy, {allowedOnlyWhen: 'not-applicable', requiresReason: true});
+  assert.deepEqual(manifest.notApplicablePolicy, {
+    status: 'NOT_APPLICABLE', requiresReason: true, excludedFromScenarioDenominator: true,
+  });
   assert.deepEqual(
     manifest.stages.map((stage) => [stage.id, stage.route]),
     expectedStages,
@@ -103,16 +114,52 @@ test('generic novel check requires all ten stages and the manifest contract', ()
 
   assert.match(skill, /composite-check-manifest\.json/);
   assert.match(skill, /ai-flavor-scan.*正文十层/s);
-  assert.match(skill, /每个必检项都有状态/);
+  assert.match(skill, /108 个目录项都有合法状态/);
   assert.match(skill, /复合检查完成：10\/10，过滤项 M\/M/);
   assert.match(skill, /不得静默跳过/);
+});
+
+test('pure Chinese prose profile gives logic checks at least one quarter of applicable budget', () => {
+  const profile = manifest.applicabilityProfiles['pure-chinese-prose'];
+  const applicable = profile.requiredFilterIds;
+  const catalog = new Set(requiredIds());
+  const logicIds = [
+    'rc-01-first-mention',
+    'rc-02-cause-dangling',
+    'rc-03-comprehension-break',
+    'arc-01-suspense-ledger',
+    'arc-02-ledger-verdict',
+    'review-subject-switch',
+    'review-chapter-boundary',
+    'review-structure-logic',
+    'review-setting-consistency',
+    'review-timeline-space',
+    'review-evidence-program-boundary',
+    'review-plot-progression',
+    'review-foreshadow-tracking',
+  ];
+
+  assert.equal(applicable.length, 46);
+  assert.equal(new Set(applicable).size, applicable.length);
+  for (const id of applicable) assert.ok(catalog.has(id), `unknown profile filter: ${id}`);
+  assert.equal(logicIds.filter((id) => applicable.includes(id)).length, 13);
+  assert.ok(13 / applicable.length >= 0.25, `logic budget is ${13}/${applicable.length}`);
+
+  const applicableSet = new Set(applicable);
+  const records = requiredIds().map((id) => applicableSet.has(id)
+    ? {id, status: 'PASS', scope: 'pure Chinese prose', findings: 0}
+    : {id, status: 'NOT_APPLICABLE', reason: 'pure Chinese prose profile excludes this filter'});
+  assert.equal(coverageComplete(records, 'pure-chinese-prose'), true);
+  records.find((record) => record.status === 'NOT_APPLICABLE').reason = '';
+  assert.equal(coverageComplete(records, 'pure-chinese-prose'), false);
 });
 
 test('validation spec stays synchronized with the composite manifest', () => {
   const validationSpec = fs.readFileSync(validationSpecPath, 'utf8');
   assert.match(validationSpec, /十个有序阶段/);
   assert.match(validationSpec, /108 个必检项/);
-  assert.match(validationSpec, /复合检查完成：10\/10，过滤项 108\/108/);
+  assert.match(validationSpec, /完整目录 108 项/);
+  assert.match(validationSpec, /纯中文正文.*13\/46 = 28\.26%/s);
   assert.doesNotMatch(validationSpec, /七阶段|八个有序阶段|95 个必检项|103 个必检项|复合检查 7\/7/);
 });
 

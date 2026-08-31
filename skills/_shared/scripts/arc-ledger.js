@@ -140,6 +140,6 @@ function main() {
   process.exit(report.blocking ? 1 : 0);
 }
 
-module.exports = { computeLedger, renderText };
+module.exports = { computeLedger, renderText, main };
 
 if (require.main === module) main();

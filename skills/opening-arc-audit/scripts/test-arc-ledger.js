@@ -6,9 +6,9 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { execFileSync } = require('node:child_process');
-const { computeLedger } = require('./arc-ledger.js');
+const SCRIPT = path.resolve(__dirname, '..', '..', '_shared', 'scripts', 'arc-ledger.js');
+const { computeLedger } = require(SCRIPT);
 
-const SCRIPT = path.join(__dirname, 'arc-ledger.js');
 let pass = 0;
 function ok(name, fn) {
   try { fn(); console.log(`  [PASS] ${name}`); pass++; }

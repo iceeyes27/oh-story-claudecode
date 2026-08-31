@@ -214,6 +214,24 @@ if (command === "extract-target") {
   } catch {
     process.exit(0)
   }
+} else if (command === "foreshadow-debt") {
+  // 伏笔欠账门（BLOCKING 面）：guard-outline-before-prose.sh 调本子命令复用共享核
+  // foreshadowDebtIssue，与 codex py / opencode / zcode 同一份判定和同一份文案。
+  // 用法：foreshadow-debt <bookDir> <本章号>
+  // 只在首建新章时由 bash 侧调用；本章细纲头 6 行有 <!-- 伏笔:跳过 --> 即豁免。
+  // 契约：stdout 空 = 放行；非空 = 完整拦截文案，与 core.proseBlockReason 逐字一致。
+  // 只拦「越过自己排定的回收章」的逾期伏笔；悬空/冷藏是 advisory，不在日更路径上拦。
+  // node 缺席时 bash 侧根本不调本子命令（等同放行），故内部异常也一律 exit 0 静默放行。
+  const [book, chapterRaw] = args
+  try {
+    const chapter = Number(chapterRaw)
+    if (!Number.isInteger(chapter) || chapter < 1) process.exit(0)
+    const outlineFile = core.outlineFileForChapter(book, chapter)
+    const issue = core.foreshadowDebtIssue(book, outlineFile, String(chapter))
+    if (issue) process.stdout.write(issue)
+  } catch {
+    process.exit(0)
+  }
 } else if (command === "is-git-commit") {
   // git commit 侦测。命令优先取 STORY_COMMIT_COMMAND，缺省再从 HOOK_INPUT 挖 command/cmd/script。
   // 用共享核 isGitCommitCommand（js 分词语义，与 OpenCode/ZCode 一致；对「引号内分隔符」这类

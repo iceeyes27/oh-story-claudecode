@@ -723,6 +723,65 @@ function extractPatchTargets(patchText) {
   return targets
 }
 
+// 伏笔逾期判定（无状态）：只认「作者自己写了 planned_resolution_chapter，正文已经越过那一章，
+// 状态仍是『已埋』」这一类明确违约。悬空（从没排回收章）和冷藏（掉出续写热卡前 8 条）是
+// advisory，由 _shared/scripts/check-foreshadow-overdue.js 在建细纲批时报，不在日更路径上拦——
+// 与 detect-story-gaps.sh 的既定设计一致：不把日更变成全量伏笔审计。
+// 读取失败、schema 不符、字段异常一律返回空放行（宁可漏拦不可误伤）。
+// js↔py 文案由 test-foreshadow-gate.js 锁 parity。
+function overdueForeshadowLines(book) {
+  let document
+  try {
+    document = JSON.parse(fs.readFileSync(path.join(book, "追踪", "_tracking-state.json"), "utf8"))
+  } catch { return [] }
+  if (!document || typeof document !== "object" || Array.isArray(document)) return []
+  if (document.schema_version !== 4) return []
+  const last = document.last_committed_chapter
+  if (!Number.isInteger(last)) return []
+  const rows = document.foreshadow
+  if (!rows || typeof rows !== "object" || Array.isArray(rows)) return []
+  const lines = []
+  for (const id of Object.keys(rows).sort()) {
+    const row = rows[id]
+    if (!row || typeof row !== "object") continue
+    if (row.status !== "已埋") continue
+    const planned = row.planned_resolution_chapter
+    if (!Number.isInteger(planned)) continue
+    if (last <= planned) continue
+    lines.push(`${id}｜${String(row.summary ?? "")}｜计划第${planned}章回收，正文已到第${last}章`)
+  }
+  return lines
+}
+
+// 伏笔欠账门的完整判定：豁免标记 + 逾期列表 + 拦截文案。proseBlockReason 与 CLI 子命令
+// （Claude Code 的 bash 守卫走这条）共用本函数，保证四端逐字一致。
+// outlineFile 为 null（正文已存在 / 细纲未定位）时不拦。
+function foreshadowDebtIssue(book, outlineFile, chapter) {
+  if (!outlineFile) return null
+  let outlineText = null
+  try { outlineText = fs.readFileSync(outlineFile, "utf8") } catch {}
+  if (outlineText !== null && /伏笔(：|:)跳过/.test(outlineText.split(/\r?\n/).slice(0, 6).join("\n"))) return null
+  const overdue = overdueForeshadowLines(book)
+  if (!overdue.length) return null
+  const shown = overdue.slice(0, 6)
+  const more = overdue.length - shown.length
+  let reason = `⛔ 写正文被拦截：有 ${overdue.length} 条伏笔已越过自己排定的回收章仍未回收，先处理再写第 ${chapter} 章；用户显式豁免时在本章细纲标题行下加 <!-- 伏笔:跳过 --> 后重试。\n${shown.join("\n")}`
+  if (more > 0) reason += `\n（另有 ${more} 条，完整体检：node <skill>/scripts/check-foreshadow-overdue.js --project 书目录）`
+  return reason
+}
+
+// 按整数章号定位本章细纲，与 proseBlockReason 的匹配规则一致（容忍补零与标题后缀）。
+function outlineFileForChapter(book, chapter) {
+  const outlineDir = path.join(book, "大纲")
+  try {
+    const match = fs.readdirSync(outlineDir).find((file) => {
+      const candidate = file.match(/^细纲_第0*(\d+)章.*\.md$/)
+      return candidate && candidate[1] === String(chapter)
+    })
+    return match ? path.join(outlineDir, match) : null
+  } catch { return null }
+}
+
 function proseBlockReason(root, absolute) {
   const base = path.basename(absolute)
   if (base === "正文.md") {
@@ -748,15 +807,18 @@ function proseBlockReason(root, absolute) {
   if (fs.existsSync(path.join(root, "拆文库", path.basename(book))) && !fs.existsSync(state)) return null
   const exists = fs.existsSync(absolute)
   const outlineDir = path.join(book, "大纲")
-  let found = false
+  // 细纲路径要留下来：伏笔欠账门的豁免标记 <!-- 伏笔:跳过 --> 写在本章细纲头部。
+  // 判定语义与旧 some() 逐字等价（找到 ⟺ outlineFile 非 null）。
+  let outlineFile = null
   if (!exists) {
     try {
-      found = fs.readdirSync(outlineDir).some((file) => {
+      const match = fs.readdirSync(outlineDir).find((file) => {
         const candidate = file.match(/^细纲_第0*(\d+)章.*\.md$/)
         return candidate && candidate[1] === chapter
       })
+      if (match) outlineFile = path.join(outlineDir, match)
     } catch {}
-    if (!found) {
+    if (!outlineFile) {
       return `⛔ 写正文被拦截：第 ${chapter} 章缺少细纲（${safeRelative(root, outlineDir)}/细纲_第${chapter}章.md）。先按 story-write mode=long 单章流程补建细纲再写正文。`
     }
   }
@@ -765,6 +827,10 @@ function proseBlockReason(root, absolute) {
     return `⛔ 写正文被拦截：${safeRelative(root, book)} 的${checkpointIssue}。`
   }
   if (exists) return null
+  // 伏笔欠账门（无状态）：写第 N 章（首建）前，若有伏笔越过了自己排定的回收章仍未回收，先处理再写。
+  // 判据现算自 _tracking-state.json，不落任何状态文件；豁免标记写在本章细纲头 6 行。
+  const debtIssue = foreshadowDebtIssue(book, outlineFile, chapter)
+  if (debtIssue) return debtIssue
   // 欠账门（无状态）：写第 N 章（首建）前，上一章有未清毒句式且未标「去味:跳过」豁免时先清再写。
   // 判据现算自上一章文件本身，不落任何状态文件；找不到上一章/读取失败一律放行（宁可漏拦不可误伤）。
   // js↔py 文案由 check-hook-regex-sync.sh 锁同步，判定由 test-prose-net-parity.sh Part E 锁 parity。
@@ -1276,6 +1342,9 @@ module.exports = {
   longChapterInfo,
   listChapterFiles,
   trackingCheckpointIssue,
+  overdueForeshadowLines,
+  foreshadowDebtIssue,
+  outlineFileForChapter,
   continuityFindings,
   extractProseTargets,
   extractPatchTargets,

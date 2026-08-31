@@ -182,6 +182,19 @@ case "$BASE" in
     fi
     # 正文已存在的到此为止：欠账门只针对首建新章。
     [ -n "$EXISTS" ] && exit 0
+    # 伏笔欠账门（无状态）：写第 N 章（首建）前，若有伏笔越过了自己排定的回收章仍未回收，先处理再写。
+    # 判定走共享核 foreshadow-debt 子命令（与 opencode/zcode/codex 同一份实现和同一份文案），
+    # 顺序与 JS 核 proseBlockReason 一致：伏笔欠账门在毒句式欠账门之前。
+    # 只拦「作者自己排了回收章又错过」这一类明确违约；悬空/冷藏是 advisory，不在日更路径上拦
+    # （与 detect-story-gaps.sh 的既定设计一致：不把日更变成全量伏笔审计）。
+    # 需要解析 JSON，只能靠 node；node 缺席/核缺失/子命令不识别一律放行（宁可漏拦不可误伤）。
+    if node -e "" >/dev/null 2>&1 && [ -f "$CLI" ]; then
+      DEBT="$(node "$CLI" foreshadow-debt "$BOOK_DIR" "$NUM" 2>/dev/null || true)"
+      if [ -n "$DEBT" ]; then
+        printf '%s\n' "$DEBT" >&2
+        exit 2
+      fi
+    fi
     # 欠账门（无状态）：写第 N 章（首建）前，上一章有未清毒句式且未标「去味:跳过」豁免时先清再写。
     # 毒句式扫描走共享核 prose-toxic 子命令（与写后网同一份规则）；node/核缺失或扫描失败一律
     # 放行（宁可漏拦不可误伤）——写后网与 SKILL 同轮铁律仍兜底。判据现算自上一章文件，无状态。

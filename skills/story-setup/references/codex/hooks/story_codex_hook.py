@@ -1297,6 +1297,39 @@ def target_paths_from_hook(obj: dict[str, Any]) -> list[Path]:
     return [resolve_target(root, t, base) for t in raw_targets if t]
 
 
+# 伏笔逾期判定（无状态）：只认「作者自己写了 planned_resolution_chapter，正文已经越过那一章，
+# 状态仍是『已埋』」这一类明确违约。悬空（从没排回收章）和冷藏（掉出续写热卡前 8 条）是
+# advisory，由 _shared/scripts/check-foreshadow-overdue.js 在建细纲批时报，不在日更路径上拦——
+# 与 detect-story-gaps.sh 的既定设计一致：不把日更变成全量伏笔审计。
+# 读取失败、schema 不符、字段异常一律返回空放行（宁可漏拦不可误伤）。
+# py↔js 文案由 test-foreshadow-gate.js 锁 parity。
+def _overdue_foreshadow_lines(book_dir: Path) -> list[str]:
+    try:
+        document = json.loads((book_dir / "追踪" / "_tracking-state.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    if not isinstance(document, dict) or document.get("schema_version") != 4:
+        return []
+    last = document.get("last_committed_chapter")
+    if not isinstance(last, int) or isinstance(last, bool):
+        return []
+    rows = document.get("foreshadow")
+    if not isinstance(rows, dict):
+        return []
+    lines: list[str] = []
+    for key in sorted(rows):
+        row = rows[key]
+        if not isinstance(row, dict) or row.get("status") != "已埋":
+            continue
+        planned = row.get("planned_resolution_chapter")
+        if not isinstance(planned, int) or isinstance(planned, bool):
+            continue
+        if last <= planned:
+            continue
+        lines.append(f"{key}｜{row.get('summary') or ''}｜计划第{planned}章回收，正文已到第{last}章")
+    return lines
+
+
 def prose_block_reason(root: Path, abs_path: Path) -> str | None:
     base = abs_path.name
     if base == "正文.md":
@@ -1325,15 +1358,17 @@ def prose_block_reason(root: Path, abs_path: Path) -> str | None:
         return None
     exists = abs_path.exists()
     outline_dir = book_dir / "大纲"
-    found = False
+    # 细纲路径要留下来：伏笔欠账门的豁免标记 <!-- 伏笔:跳过 --> 写在本章细纲头部。
+    # 判定语义与旧 found 布尔逐字等价（找到 ⟺ outline_file 非 None）。
+    outline_file = None
     if not exists:
         if outline_dir.is_dir():
-            for candidate in outline_dir.iterdir():
+            for candidate in sorted(outline_dir.iterdir()):
                 fm = re.match(r"^细纲_第0*(\d+)章.*\.md$", candidate.name)
                 if fm and fm.group(1) == num:
-                    found = True
+                    outline_file = candidate
                     break
-        if not found:
+        if outline_file is None:
             return f"⛔ 写正文被拦截：第 {num} 章缺少细纲（{safe_rel(root, outline_dir)}/细纲_第{num}章.md）。先按 story-write mode=long 单章流程补建细纲再写正文。"
     checkpoint_issue = tracking_checkpoint_issue(
         book_dir,
@@ -1344,6 +1379,27 @@ def prose_block_reason(root: Path, abs_path: Path) -> str | None:
         return f"⛔ 写正文被拦截：{safe_rel(root, book_dir)} 的{checkpoint_issue}。"
     if exists:
         return None
+    # 伏笔欠账门（无状态）：写第 N 章（首建）前，若有伏笔越过了自己排定的回收章仍未回收，先处理再写。
+    # 判据现算自 _tracking-state.json，不落任何状态文件；豁免标记写在本章细纲头 6 行。
+    if outline_file is not None:
+        try:
+            outline_text = outline_file.read_text(encoding="utf-8")
+        except OSError:
+            outline_text = None
+        head = "\n".join((outline_text or "").splitlines()[:6])
+        if outline_text is None or not re.search(r"伏笔(：|:)跳过", head):
+            overdue = _overdue_foreshadow_lines(book_dir)
+            if overdue:
+                shown = overdue[:6]
+                more = len(overdue) - len(shown)
+                reason = (
+                    f"⛔ 写正文被拦截：有 {len(overdue)} 条伏笔已越过自己排定的回收章仍未回收，"
+                    f"先处理再写第 {num} 章；用户显式豁免时在本章细纲标题行下加 <!-- 伏笔:跳过 --> 后重试。\n"
+                    + "\n".join(shown)
+                )
+                if more > 0:
+                    reason += f"\n（另有 {more} 条，完整体检：node <skill>/scripts/check-foreshadow-overdue.js --project 书目录）"
+                return reason
     # 欠账门（无状态）：写第 N 章（首建）前，上一章有未清毒句式且未标「去味:跳过」豁免时先清再写。
     # 判据现算自上一章文件本身，不落任何状态文件；找不到上一章/读取失败一律放行（宁可漏拦不可误伤）。
     # js↔py 文案由 check-hook-regex-sync.sh 锁同步，判定由 test-prose-net-parity.sh Part E 锁 parity。

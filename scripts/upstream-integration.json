@@ -7,7 +7,7 @@
   "upstream": {
     "remote": "upstream",
     "branch": "main",
-    "baseline": "d1f88587c0b88abdb0a62b101b850300e0617d7b"
+    "baseline": "5de060f9a47e7c4781c81edb320436b772e2955e"
   },
   "quality_profile": "release",
   "policy_priority": [
@@ -101,32 +101,86 @@
       }
     ],
     "canonical": [
-      { "prefix": ".claude-plugin/" },
-      { "prefix": ".github/ISSUE_TEMPLATE/" },
-      { "prefix": ".zcode-plugin/" },
-      { "prefix": "demo/" },
-      { "prefix": "scripts/" },
-      { "prefix": "skills/" },
-      { "path": ".gitignore" },
-      { "path": "AGENTS.md" },
-      { "path": "CHANGELOG.md" },
-      { "path": "CLAUDE.md" },
-      { "path": "CONTRIBUTING.md" },
-      { "path": "LICENSE" },
-      { "path": "README.md" },
-      { "path": "README_EN.md" },
-      { "path": "marketplace.json" },
-      { "path": "package-lock.json" },
-      { "path": "package.json" },
-      { "path": "reasonix-plugin.json" }
+      {
+        "prefix": ".claude-plugin/"
+      },
+      {
+        "prefix": ".github/ISSUE_TEMPLATE/"
+      },
+      {
+        "prefix": ".zcode-plugin/"
+      },
+      {
+        "prefix": "demo/"
+      },
+      {
+        "prefix": "scripts/"
+      },
+      {
+        "prefix": "skills/"
+      },
+      {
+        "path": ".gitignore"
+      },
+      {
+        "path": "AGENTS.md"
+      },
+      {
+        "path": "CHANGELOG.md"
+      },
+      {
+        "path": "CLAUDE.md"
+      },
+      {
+        "path": "CONTRIBUTING.md"
+      },
+      {
+        "path": "LICENSE"
+      },
+      {
+        "path": "README.md"
+      },
+      {
+        "path": "README_EN.md"
+      },
+      {
+        "path": "marketplace.json"
+      },
+      {
+        "path": "package-lock.json"
+      },
+      {
+        "path": "package.json"
+      },
+      {
+        "path": "reasonix-plugin.json"
+      }
     ]
   },
   "unified_mappings": [
-    { "source": "skills/story-long-write", "target": "skills/story-write" },
-    { "source": "skills/story-short-write", "target": "skills/story-write" },
-    { "source": "skills/story-long-analyze", "target": "skills/story-analyze" },
-    { "source": "skills/story-short-analyze", "target": "skills/story-analyze" },
-    { "source": "skills/story-long-scan", "target": "skills/story-scan" },
-    { "source": "skills/story-short-scan", "target": "skills/story-scan" }
+    {
+      "source": "skills/story-long-write",
+      "target": "skills/story-write"
+    },
+    {
+      "source": "skills/story-short-write",
+      "target": "skills/story-write"
+    },
+    {
+      "source": "skills/story-long-analyze",
+      "target": "skills/story-analyze"
+    },
+    {
+      "source": "skills/story-short-analyze",
+      "target": "skills/story-analyze"
+    },
+    {
+      "source": "skills/story-long-scan",
+      "target": "skills/story-scan"
+    },
+    {
+      "source": "skills/story-short-scan",
+      "target": "skills/story-scan"
+    }
   ]
 }

@@ -12,7 +12,7 @@ disable: true
 
 ## 阶段 Reference Gate
 
-先确定 mode，再完整读取对应 `references/long-mode.md` 或 `references/short-mode.md` 直到 EOF；只读本 SKILL.md 不算完成门禁，`rg` 检索或局部摘读也不算，必需路径缺失或不可读即停止。
+确定 mode，完整读取 `references/long-mode.md` 或 `references/short-mode.md` 直到 EOF；只读本文件（SKILL.md）不算完成门禁，`rg` 检索或局部摘读都不算完成门禁，必需路径缺失或不可读即停止。
 
 短篇运行 `node .agents/skills/_shared/scripts/check-phase2-contract.js --json {短篇目录}`；最多做 2 轮定向 repair。交付时用户明确的字数范围优先；运行 `node .agents/skills/_shared/scripts/check-delivery-contract.js --json --min-chars {MIN} --max-chars {MAX} --sections {N} {短篇目录}`。
 

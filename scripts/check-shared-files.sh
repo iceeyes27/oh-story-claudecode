@@ -4,16 +4,20 @@
 # 兼容 bash 3+（macOS）
 set -euo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
-if [ -z "$REPO_ROOT" ]; then
-  echo "Error: not in a git repository"
-  exit 1
-fi
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 SKILLS_DIR="$REPO_ROOT/skills"
 if [ ! -d "$SKILLS_DIR" ]; then
   echo "Error: skills/ not found at $SKILLS_DIR"
   exit 1
+fi
+
+GIT_BIN="git"
+GIT_REPO_ROOT="$REPO_ROOT"
+if command -v wslpath >/dev/null 2>&1 && command -v git.exe >/dev/null 2>&1; then
+  GIT_BIN="git.exe"
+  GIT_REPO_ROOT="$(wslpath -w "$REPO_ROOT")"
 fi
 
 # Known intentional differences (basename): these files are expected to differ
@@ -66,7 +70,7 @@ echo "=============================="
 # skill asset and must not make this guard disagree with a clean CI checkout.
 list_asset_files() {
   local asset_dir="$1"
-  git -C "$REPO_ROOT" ls-files -z --cached --others --exclude-standard -- skills |
+  "$GIT_BIN" -C "$GIT_REPO_ROOT" ls-files -z --cached --others --exclude-standard -- skills |
     while IFS= read -r -d '' rel_path; do
       [ -f "$REPO_ROOT/$rel_path" ] || continue
       case "$rel_path" in

@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## 未发布
+
+### 变更
+
+- 短篇改按场景功能分配篇幅与节奏：移除逐节最低字数、固定子事件数量、对白占比与话轮数、固定冲突间隔、钩子节距和高潮位置等机械配额，改为检查场景是否改变风险、信息、关系、资源、决定、行动或读者理解。Phase 2 新表头使用“情节推进 / 场景形态 / 对白作用”，并继续兼容旧项目表头。
+- 导语作为正文第一场：宅斗宫斗、民俗怪谈、沙雕脑洞的第 1 章从导语末尾的后果、选择或新行动继续，避免重复搭景或重演同一事件。
+- 短篇拆文的节奏与对白指标改为描述性观察，不设跨题材固定阈值。
+
+### 修复
+
+- Codex CLI E2E 支持展开 Skill roots 别名，兼容新版 CLI 的短路径输出。
+
 ## v0.8.1
 
 > 借鉴 [narralume](https://github.com/abligail/narralume) 的「AI 出候选，作者拍板」，为 `story-write` 长篇引入**候选系统**（opt-in）。纯 SKILL 层编排，不改 narrative-writer、不动跨端 hook，`agents_version` 维持 25，未开启候选时行为与 v0.8.0 逐字节一致。

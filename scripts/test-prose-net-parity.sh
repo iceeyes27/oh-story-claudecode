@@ -465,8 +465,8 @@ PY
 # 由 check-story-setup-deployment.sh / test-hook-encoding-portable.sh 的运行回归覆盖。
 # fixture 至少覆盖：① name 字段大小写变体（NAME/全角空格补白）命中一致——有字段不告警；
 # ② 缺字段/硬编码属性的中文警告文案（含头尾框线）逐字一致；③ 长篇缺细纲/有细纲、
-# 短篇缺小节大纲/无设定信号 4 组阻断判定与阻断文案逐字一致；④ 毒句式欠账门 4 组：
-# 有欠账拦、标「去味:跳过」/全角冒号「去味：跳过」豁免放、上一章含坏字节替换解码继续扫。
+# 短篇缺小节大纲/无设定信号 4 组阻断判定与阻断文案逐字一致；④ 上一章风格 finding
+# 不得变成下一章硬门：普通文本、旧豁免标记和坏字节替换解码都应放行。
 run_uncored_parity() {
   command -v node >/dev/null 2>&1 || return 1
   command -v python3 >/dev/null 2>&1 || return 1
@@ -519,8 +519,7 @@ JS
   grep -q '地理.md' "$tmp/spy.txt" && { echo "FAIL: 设定/ 下非角色子目录应整目录跳过" >&2; return 3; }
 
   # E2: 大纲/追踪阻断判定 —— 长篇缺细纲(拦)/有细纲(放)、短篇缺小节大纲(拦)/无设定信号(放)、
-  #     毒句式欠账门（上一章有欠账拦 / 标「去味:跳过」豁免放 / 全角冒号「去味：跳过」豁免放 /
-  #     上一章含坏字节替换解码继续扫仍拦）、新书无脚手架时仍须先建细纲（拦）
+  #     上一章风格 finding 不阻断新章（含旧豁免标记与坏字节）、新书无脚手架仍先建细纲（拦）
   local blk="$tmp/blk"
   mkdir -p "$blk/long/正文" "$blk/long/大纲" "$blk/short" "$blk/short2" \
     "$blk/long2/正文" "$blk/long2/大纲" "$blk/long3/正文" "$blk/long3/大纲"
@@ -550,13 +549,19 @@ JS
   # canonical case：agent 直接首建 {书}/正文/第N章.md，即使书目录还没有大纲/追踪/设定脚手架，
   # 也必须 fail closed；相对目标的 cwd 语义由各宿主 adapter 单独负责，不能靠削弱核心守卫来掩盖。
   mkdir -p "$blk/bare/正文"
+  mkdir -p "$blk/long7/正文" "$blk/long7/大纲" "$blk/long7/追踪" "$blk/long7/.story-quality"
+  : > "$blk/long7/大纲/细纲_第1章.md"
+  printf '%s\n' '# 第1章 只读投影' '正文。' > "$blk/long7/正文/第1章_只读投影.md"
+  printf '%s\n' '{"schema_version":4,"state_revision":0,"last_committed_chapter":1}' > "$blk/long7/追踪/_tracking-state.json"
+  printf '%s\n' '> 状态修订：0' > "$blk/long7/追踪/上下文.md"
+  printf '%s\n' '{}' > "$blk/long7/.story-quality/HEAD.json"
 
   python3 - "$CODEX" "$blk" > "$tmp/bpy.txt" <<'PY'
 import importlib.util, sys
 from pathlib import Path
 spec = importlib.util.spec_from_file_location("ch", sys.argv[1]); m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
 root = Path(sys.argv[2])
-for rel in ["long/正文/第1章_起.md", "long/正文/第2章_承.md", "short/正文.md", "short2/正文.md", "long2/正文/第2章_新.md", "long3/正文/第2章_新.md", "long4/正文/第2章_新.md", "long5/正文/第2章_新.md", "long6/正文/第2章_新.md", "bare/正文/第1章_起.md"]:
+for rel in ["long/正文/第1章_起.md", "long/正文/第2章_承.md", "short/正文.md", "short2/正文.md", "long2/正文/第2章_新.md", "long3/正文/第2章_新.md", "long4/正文/第2章_新.md", "long5/正文/第2章_新.md", "long6/正文/第2章_新.md", "long7/正文/第1章_只读投影.md", "bare/正文/第1章_起.md"]:
     reason = m.prose_block_reason(root, root / rel)
     sys.stdout.buffer.write((f"{rel} :: {reason if reason else '-'}\n").encode("utf-8"))
 PY
@@ -564,7 +569,7 @@ PY
 const path = require("node:path")
 const core = require(process.argv[2])
 const root = process.argv[3]
-for (const rel of ["long/正文/第1章_起.md", "long/正文/第2章_承.md", "short/正文.md", "short2/正文.md", "long2/正文/第2章_新.md", "long3/正文/第2章_新.md", "long4/正文/第2章_新.md", "long5/正文/第2章_新.md", "long6/正文/第2章_新.md", "bare/正文/第1章_起.md"]) {
+for (const rel of ["long/正文/第1章_起.md", "long/正文/第2章_承.md", "short/正文.md", "short2/正文.md", "long2/正文/第2章_新.md", "long3/正文/第2章_新.md", "long4/正文/第2章_新.md", "long5/正文/第2章_新.md", "long6/正文/第2章_新.md", "long7/正文/第1章_只读投影.md", "bare/正文/第1章_起.md"]) {
   const reason = core.proseBlockReason(root, path.join(root, rel))
   console.log(`${rel} :: ${reason || "-"}`)
 }
@@ -578,11 +583,12 @@ JS
   grep -q '第2章_承.md :: -' "$tmp/bpy.txt" || { echo "FAIL: 长篇有细纲被误拦" >&2; return 3; }
   grep -q 'short/正文.md :: ⛔' "$tmp/bpy.txt" || { echo "FAIL: 短篇缺小节大纲未被拦截" >&2; return 3; }
   grep -q 'short2/正文.md :: -' "$tmp/bpy.txt" || { echo "FAIL: 无设定信号的正文.md 被误拦" >&2; return 3; }
-  grep -q '毒句式欠账' "$tmp/bpy.txt" || { echo "FAIL: 上一章毒句式欠账未被欠账门拦截" >&2; return 3; }
-  grep -q 'long3/正文/第2章_新.md :: -' "$tmp/bpy.txt" || { echo "FAIL: 标「去味:跳过」豁免的上一章仍被欠账门误拦" >&2; return 3; }
-  grep -q 'long4/正文/第2章_新.md :: -' "$tmp/bpy.txt" || { echo "FAIL: 全角冒号豁免标记「去味：跳过」未被欠账门认可" >&2; return 3; }
-  grep -q 'long5/正文/第2章_新.md :: ⛔' "$tmp/bpy.txt" || { echo "FAIL: 上一章含坏字节时两端应替换解码继续扫（不得整体放行）" >&2; return 3; }
+  grep -q 'long2/正文/第2章_新.md :: -' "$tmp/bpy.txt" || { echo "FAIL: 上一章风格 finding 被误作下一章硬门" >&2; return 3; }
+  grep -q 'long3/正文/第2章_新.md :: -' "$tmp/bpy.txt" || { echo "FAIL: 旧半角豁免标记场景被误拦" >&2; return 3; }
+  grep -q 'long4/正文/第2章_新.md :: -' "$tmp/bpy.txt" || { echo "FAIL: 旧全角豁免标记场景被误拦" >&2; return 3; }
+  grep -q 'long5/正文/第2章_新.md :: -' "$tmp/bpy.txt" || { echo "FAIL: 上一章坏字节不应触发风格硬门" >&2; return 3; }
   grep -q 'long6/正文/第2章_新.md :: ⛔.*必须先提交第1章追踪事务' "$tmp/bpy.txt" || { echo "FAIL: state 的 last_committed_chapter 落后正文时未拦住下一章" >&2; return 3; }
+  grep -q 'long7/正文/第1章_只读投影.md :: ⛔.*质量 HEAD 的只读投影' "$tmp/bpy.txt" || { echo "FAIL: quality HEAD 初始化后仍可直接改正文投影" >&2; return 3; }
   grep -q 'bare/正文/第1章_起.md :: ⛔' "$tmp/bpy.txt" || { echo "FAIL: 新书无 大纲/追踪/设定 脚手架时首章守卫 fail open" >&2; return 3; }
 
   # E3: 追踪状态判定 parity。覆盖缺失、坏 JSON、旧 schema、派生 revision 不一致、
@@ -710,6 +716,7 @@ valid|0|0|4|1|1|0|0|yes
 skipahead|0|0|4|3|3|0|0|yes
 existing|1|0|4|1|1|1|0|yes
 existing_mismatch|1|9|4|1|1|1|0|yes
+quality|1|0|4|1|1|1|0|yes
 badschema|0|0|3|1|1|0|0|yes
 revisionbackup|5|0|4|3|3|0|0|yes
 "
@@ -727,6 +734,10 @@ revisionbackup|5|0|4|3|3|0|0|yes
       printf '{"schema_version":%s,"state_revision":0,"last_committed_chapter":%s}\n' "$schema" "$last" \
         > "$book/追踪/_tracking-state.json"
       printf '> 状态修订：%s。\n' "$ctx" > "$book/追踪/上下文.md"
+    fi
+    if [ "$name" = "quality" ]; then
+      mkdir -p "$book/.story-quality"
+      printf '{}\n' > "$book/.story-quality/HEAD.json"
     fi
     local abs="$book/正文/第00${target}章_测试.md"
     [ "$exists" = "1" ] && printf '# 第%s章 测试\n正文。\n' "$target" > "$abs"
@@ -761,6 +772,7 @@ valid pass
 skipahead block
 existing pass
 existing_mismatch block
+quality block
 badschema block
 revisionbackup pass"
   while read -r want_name want_verdict; do
@@ -786,7 +798,7 @@ run_uncored_parity
 rc_uncored=$?
 set -e
 case "$rc_uncored" in
-  0) echo "未归核面 parity：codex python == JS core（staged warnings 大小写变体/文案 + 大纲阻断 9 组判定含毒句式欠账门/无脚手架 fail-closed/文案逐字相等）。" ;;
+  0) echo "未归核面 parity：codex python == JS core（staged warnings + 正文守卫含 quality HEAD 只读投影/风格 finding 不阻断/无脚手架 fail-closed）。" ;;
   1) echo "未归核面 parity：跳过（无 node/python3/git 运行时）。" ;;
   *) fails=$((fails + 1)) ;;
 esac
@@ -796,7 +808,7 @@ run_bash_guard_parity
 rc_guard=$?
 set -e
 case "$rc_guard" in
-  0) echo "写正文守卫 parity：Claude bash guard == JS core（10 组工程场景：无 state/缺细纲/导入窗口/跳章/续写/派生修订不一致/坏 schema/回炉备份，含 node 缺席 fail-open）。" ;;
+  0) echo "写正文守卫 parity：Claude bash guard == JS core（11 组工程场景，含 quality HEAD 只读投影与 node 缺席策略）。" ;;
   1) echo "写正文守卫 parity：跳过（无 node/python3 运行时）。" ;;
   *) fails=$((fails + 1)) ;;
 esac

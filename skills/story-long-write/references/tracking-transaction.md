@@ -102,6 +102,8 @@ Markdown 只负责给作者和 Agent 阅读，工具不再反向解析 Markdown�
       {
         "action": "upsert",
         "id": "E010",
+        "kind": "event",
+        "occurrence_order": 1,
         "story_time": "实弹训练两天后",
         "objective_fact": "文工团高层否决专业重拍版，决定沿用江晨手机拍摄的原版视频",
         "reader_knowledge": "读者已看到周薄森指出专业版缺了灵魂，张耀祖当场拍板用回原版",
@@ -150,7 +152,8 @@ Markdown 只负责给作者和 Agent 阅读，工具不再反向解析 Markdown�
 - 不再复用的核心角色写进 `delta.retired_characters`：工具删除其当前快照与 `角色状态/{角色名}.md`，并在逐章记录留档。同一事务里不能既退役又提交快照，也不能退役仍列在 `context.active_character_names` 的角色。角色阵亡/退场这一章，把变化照写进 `character_changes` 即可，本章退役的角色不必再交一份马上要删的快照，逐章记录仍按核心角色标注。退役只表示不再进入热上下文，正文与逐章记录不受影响。
 - 两类退役都只能在 `mode=append` 提交。退役表示「从此刻起离开当前状态」，而修订事务的逐章记录属于被改写的旧章，落在那里会谎报退役发生的章节；`mode=revision` 必须原样重交当前全部上下文条目，需要退役就放到下一次 append。
 - `伏笔.md` 只呈现已经埋设过的当前状态。未来规划仍留在大纲。
-- `timeline_events.action` 可为 `upsert/delete`。`未揭示` 的 `reveal_chapter` 必须为 `null`；部分/完全揭示只能填写已经发生的实际章节。
+- `timeline_events.action` 可为 `upsert/delete`。`kind` 缺省为 `event`；P1 可用 `kind: knowledge` 登记角色知情状态，并用正整数 `occurrence_order` 表示同章内先后。`未揭示` 的 `reveal_chapter` 必须为 `null`；部分/完全揭示只能填写已经发生的实际章节。
+- `kind: knowledge` 时必须额外提交 `knowledge: {character, fact_id, state, source, source_chapter}`；`state` 只允许 `knows / believes / suspects / misbelieves / denies`。正文把某事实用作角色行动前提时，必须能追溯到更早章节，或同章更小 `occurrence_order` 的 knowledge 事件；不要求登记角色接触过的全部事实。
 - `mode=revision` 时，逐章记录必须重算为修订后该章仍然成立的完整连续性记录；当前角色、伏笔、时间线和上下文则提交受影响对象截至最新已写章的当前值。
 - 修订导入截止章内的正文时，会新增或覆盖该章的逐章记录；`imported_through_chapter` 不变。
 

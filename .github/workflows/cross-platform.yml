@@ -71,6 +71,12 @@ jobs:
         run: python3 scripts/test-storyctl.py
       - name: Chapter completion lifecycle regression
         run: python3 scripts/test-chapter-completion-lifecycle.py
+      - name: Deep-review quality lifecycle regression
+        run: python3 scripts/test-quality-lifecycle.py
+      - name: Prose policy regression
+        run: |
+          python3 scripts/check-prose-policy.py
+          python3 scripts/test-prose-policy.py
       - name: Author memory transaction behavior regression
         run: python3 scripts/test-author-memory-commit.py
       - name: Check story-setup deployment
@@ -156,6 +162,12 @@ jobs:
         run: python scripts/test-storyctl.py
       - name: Chapter completion lifecycle regression
         run: python scripts/test-chapter-completion-lifecycle.py
+      - name: Deep-review quality lifecycle regression
+        run: python scripts/test-quality-lifecycle.py
+      - name: Prose policy regression
+        run: |
+          python scripts/check-prose-policy.py
+          python scripts/test-prose-policy.py
       - name: Author memory transaction behavior regression
         run: python scripts/test-author-memory-commit.py
       - name: Workflow numbering regression
@@ -234,6 +246,12 @@ jobs:
         run: python3 scripts/test-storyctl.py
       - name: Chapter completion lifecycle regression
         run: python3 scripts/test-chapter-completion-lifecycle.py
+      - name: Deep-review quality lifecycle regression
+        run: python3 scripts/test-quality-lifecycle.py
+      - name: Prose policy regression
+        run: |
+          python3 scripts/check-prose-policy.py
+          python3 scripts/test-prose-policy.py
       - name: Author memory transaction behavior regression
         run: python3 scripts/test-author-memory-commit.py
       - name: Workflow numbering regression

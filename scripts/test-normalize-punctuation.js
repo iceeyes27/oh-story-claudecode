@@ -41,9 +41,7 @@ try {
 
   const check = run(["--check", prose]);
   assert.strictEqual(check.status, 1, check.stderr);
-  assert.match(check.stdout, /ellipsis/);
-  assert.match(check.stdout, /em-dash/);
-  assert.match(check.stdout, /double-hyphen/);
+  assert.doesNotMatch(check.stdout, /ellipsis|em-dash|double-hyphen/);
   assert.match(check.stdout, /markdown-divider/);
   assert.strictEqual(fs.readFileSync(prose, "utf8"), original, "--check must not write");
 
@@ -52,14 +50,11 @@ try {
   const normalized = fs.readFileSync(prose, "utf8");
   assert(normalized.includes("title: fixture\r\n---"), "frontmatter must remain intact");
   assert(normalized.includes("围栏内……与---必须保留"), "fenced text must remain intact");
-  assert(normalized.includes("10到20"), "numeric ranges must use 到");
-  assert(normalized.includes("「引号，保留样式」"), "default mode must keep quote style");
+  assert(normalized.includes("10--20"), "double hyphens may be meaningful and must be preserved");
+  assert(normalized.includes("「引号……保留样式」"), "default mode must keep quote and pause style");
   assert(!normalized.split("\r\n").includes("---", 3), "body divider must be removed");
   assert(normalized.includes("\r\n"), "CRLF input must keep CRLF output");
-  const normalizedProse = normalized
-    .replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/, "")
-    .replace(/```[\s\S]*?```/g, "");
-  assert(!/(?:……|——|--)/m.test(normalizedProse));
+  assert(normalized.includes("他说……答案就是这样——真的。"));
 
   const second = run([prose]);
   assert.strictEqual(second.status, 0, second.stderr);
@@ -82,14 +77,14 @@ try {
     "mixed line endings must survive a clean pass byte-for-byte"
   );
 
-  // 混合行尾 + 真标点问题：只改标点，逐行行尾保持原样。
+  // 停顿符是否有效要由审查结合语境判断，结构归一化不能擅自改写；行尾也保持原样。
   const mixedDirty = path.join(tmpDir, "mixed-eol-dirty.md");
   fs.writeFileSync(mixedDirty, "他说……真的。\r\n风很大——雨停了。\n", "utf8");
   assert.strictEqual(run([mixedDirty]).status, 0);
   assert.strictEqual(
     fs.readFileSync(mixedDirty, "utf8"),
-    "他说，真的。\r\n风很大，雨停了。\n",
-    "per-line endings must be preserved while punctuation is normalized"
+    "他说……真的。\r\n风很大——雨停了。\n",
+    "functional punctuation and per-line endings must be preserved"
   );
 
   // HTML 注释里的 `--` 不是停顿标点：`<!-- 去味:跳过 -->` 豁免标记必须原样留在正文里，
@@ -107,7 +102,7 @@ try {
   ].join("\n");
   fs.writeFileSync(marker, markerOriginal, "utf8");
   const markerCheck = run(["--check", marker]);
-  assert.strictEqual(markerCheck.status, 1, markerCheck.stderr);
+  assert.strictEqual(markerCheck.status, 0, markerCheck.stdout + markerCheck.stderr);
   assert.doesNotMatch(markerCheck.stdout, /double-hyphen/, "HTML 注释不得报 double-hyphen");
   assert.doesNotMatch(markerCheck.stdout, /markdown-divider/, "注释内的 --- 不是正文分隔线");
   assert.strictEqual(run([marker]).status, 0);
@@ -115,10 +110,9 @@ try {
   assert(markerNormalized.includes("<!-- 去味:跳过 -->"), "去味豁免标记必须原样保留");
   assert(markerNormalized.includes("跨行注释里的---与……也照旧"), "跨行注释内容必须原样保留");
   assert(markerNormalized.includes("<!-- 行内备注 -->"), "行内注释必须原样保留");
-  assert(markerNormalized.includes("正文，继续。"), "注释外的正文仍要归一化");
+  assert(markerNormalized.includes("正文……继续。"), "注释外的功能性停顿也须保留");
 
-  // 未闭合注释不是“从这里到 EOF 都合法豁免”：必须具名报错，后续正文仍参与检查/归一化。
-  // 否则一个误写的 `<!--` 会让整篇的 `……` / `---` 在 --check 下静默 exit 0。
+  // 未闭合注释不是“从这里到 EOF 都合法豁免”：必须具名报错，后续正文仍参与结构检查。
   const unclosedComment = path.join(tmpDir, "unclosed-comment.md");
   fs.writeFileSync(
     unclosedComment,
@@ -128,21 +122,20 @@ try {
   const unclosedCheck = run(["--check", unclosedComment]);
   assert.strictEqual(unclosedCheck.status, 1, unclosedCheck.stdout + unclosedCheck.stderr);
   assert.match(unclosedCheck.stdout, /html-comment-unclosed/);
-  assert.match(unclosedCheck.stdout, /ellipsis|markdown-divider/);
+  assert.match(unclosedCheck.stdout, /markdown-divider/);
   assert.strictEqual(run([unclosedComment]).status, 0);
   const unclosedNormalized = fs.readFileSync(unclosedComment, "utf8");
   assert(unclosedNormalized.includes("<!-- 临时备注"), "未闭合注释起始符不应被改坏");
-  assert(unclosedNormalized.includes("正文，继续。"), "未闭合注释后的正文仍须归一化");
+  assert(unclosedNormalized.includes("正文……继续。"), "未闭合注释后的功能性停顿仍须保留");
   assert(!unclosedNormalized.includes("\n---\n"), "未闭合注释后的正文分隔线仍须移除");
 
-  // 删空停顿符会把两侧的半角点/连字符粘成新的 `...`/`--`；一遍必须清干净，
-  // 否则成稿留着本该删掉的 ASCII 省略号，事后重跑同一步又会改动已定稿的正文。
+  // 奇异停顿组合也不能由无语境的格式工具猜写作意图。
   const merge = path.join(tmpDir, "merge.md");
   fs.writeFileSync(merge, "他.……..说\n-…...……-2.（！）\n", "utf8");
   assert.strictEqual(run([merge]).status, 0);
-  assert.strictEqual(fs.readFileSync(merge, "utf8"), "他，说\n2.（！）\n");
+  assert.strictEqual(fs.readFileSync(merge, "utf8"), "他.……..说\n-…...……-2.（！）\n");
   const mergeRecheck = run(["--check", merge]);
-  assert.strictEqual(mergeRecheck.status, 0, "一遍归一化后 --check 必须已清零: " + mergeRecheck.stdout);
+  assert.strictEqual(mergeRecheck.status, 0, "功能性停顿不应被结构检查阻断: " + mergeRecheck.stdout);
   assert.match(run([merge]).stdout, /Changed files: 0/);
 
   const fences = path.join(tmpDir, "fences.md");
@@ -174,8 +167,8 @@ try {
   assert(fencedNormalized.includes("更短的波浪线不能关闭--仍须保留"));
   assert(fencedNormalized.includes("四反引号围栏内……必须保留"));
   assert(fencedNormalized.includes("较短的反引号不能关闭——仍须保留"));
-  assert(fencedNormalized.includes("波浪线围栏外，必须归一化"));
-  assert(fencedNormalized.includes("反引号围栏外，必须归一化"));
+  assert(fencedNormalized.includes("波浪线围栏外……必须归一化"));
+  assert(fencedNormalized.includes("反引号围栏外……必须归一化"));
 
   const ascii = path.join(tmpDir, "ascii.md");
   fs.writeFileSync(ascii, "「甲」与“乙”\n", "utf8");
@@ -191,7 +184,7 @@ try {
   assert.strictEqual(missing.status, 2);
   assert.match(missing.stderr, /unable to read/);
 
-  console.log("OK: punctuation normalizer check/write, robust fences, CRLF, quote modes, and errors");
+  console.log("OK: structural punctuation cleanup preserves voice, fences, CRLF, quote modes, and errors");
 } finally {
   fs.rmSync(tmpDir, { recursive: true, force: true });
 }

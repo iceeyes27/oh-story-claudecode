@@ -19,6 +19,9 @@ const FIELDS = [
   ['单元ID/位置', 'U03；单元内第 1 拍'],
   ['目标情绪', '踏实的期待 → 被托付的沉重'],
   ['主角目标/关键选择', '要真实素材；在报批与先去听故事之间选一个'],
+  ['结尾拍ID/类型', 'EB-01-021；relationship；老人把铁盒交给江晨'],
+  ['期待ID/类型', 'EX-01-021；choice；江晨如何使用这份托付'],
+  ['读者验收预期', 'must_know=[托付成立]；may_believe=[铁盒只关乎旧事]；must_not_know=[终局表彰]；open_ids=[EX-01-021]'],
   ['章节定位', '推进'],
   ['本章结构公式', '接到邀约 + 上门 + 老兵开口 + 立下承诺'],
   ['章首钩子', '悬念前置 — 老人把铁盒推过来'],
@@ -31,6 +34,9 @@ function outline(overrides = {}) {
   const fields = FIELDS
     .filter(([name]) => overrides.dropField !== name)
     .map(([name, value]) => `- ${name}：${overrides.fieldValues?.[name] ?? value}`)
+  if (overrides.p1 !== undefined) {
+    fields.splice(10, 0, `- P1质量契约：${JSON.stringify(overrides.p1)}`)
+  }
   const table = overrides.plotTable ?? [
     '| # | 情节点（谁做了什么） | 功能标签 | 执行边界 |',
     '|---|---|---|---|',
@@ -73,8 +79,11 @@ function writeCase(name, body) {
   return path.join(tmpRoot, name)
 }
 
-function run(project, chapter = '21') {
-  const result = spawnSync(process.execPath, [verifier, '--json', '--project', project, '--chapter', chapter], {
+function run(project, chapter = '21', options = {}) {
+  const args = [verifier, '--json']
+  if (options.requireP1) args.push('--require-p1')
+  args.push('--project', project, '--chapter', chapter)
+  const result = spawnSync(process.execPath, args, {
     cwd: repoRoot,
     encoding: 'utf8',
   })
@@ -91,6 +100,53 @@ try {
   assert.strictEqual(good.status, 0, good.stdout + good.stderr)
   assert.strictEqual(good.report.ok, true)
   assert.deepStrictEqual(good.report.failures, [])
+
+  // legacy 细纲默认兼容；只有显式 P1 模式才要求 P1质量契约。
+  const legacyRequired = run(writeCase('legacy-required', outline()), '21', { requireP1: true })
+  assert.strictEqual(legacyRequired.status, 1)
+  assert(failureIds(legacyRequired).includes('outline.p1-required'))
+
+  const validP1 = {
+    chapter_function: '推进',
+    target_emotion_id: 'EMO-01-021',
+    required_deliveries: ['choice-consequence'],
+    allowed_expectation_ids: ['EX-01-021'],
+    allowed_hypothesis_ids: [],
+    intentional_ambiguity: false,
+    scene_catalog: [
+      { scene_id: 'scene-1', scene_index: 1 },
+      { scene_id: 'scene-2', scene_index: 2 },
+    ],
+  }
+  const p1Good = run(writeCase('p1-valid', outline({ p1: validP1 })), '21', { requireP1: true })
+  assert.strictEqual(p1Good.status, 0, p1Good.stdout + p1Good.stderr)
+
+  const missingCatalog = { ...validP1 }
+  delete missingCatalog.scene_catalog
+  const p1Missing = run(writeCase('p1-missing-catalog', outline({ p1: missingCatalog })), '21', { requireP1: true })
+  assert.strictEqual(p1Missing.status, 1)
+  assert(failureIds(p1Missing).includes('outline.p1-quality-contract'))
+
+  const p1OutOfOrder = run(writeCase('p1-out-of-order', outline({
+    p1: { ...validP1, scene_catalog: [
+      { scene_id: 'scene-1', scene_index: 2 },
+      { scene_id: 'scene-2', scene_index: 1 },
+    ] },
+  })), '21', { requireP1: true })
+  assert.strictEqual(p1OutOfOrder.status, 1)
+
+  const p1Duplicate = run(writeCase('p1-duplicate', outline({
+    p1: { ...validP1, scene_catalog: [
+      { scene_id: 'scene-1', scene_index: 1 },
+      { scene_id: 'scene-1', scene_index: 2 },
+    ] },
+  })), '21', { requireP1: true })
+  assert.strictEqual(p1Duplicate.status, 1)
+
+  const p1TableMismatch = run(writeCase('p1-table-mismatch', outline({
+    p1: { ...validP1, scene_catalog: [{ scene_id: 'scene-1', scene_index: 1 }] },
+  })), '21', { requireP1: true })
+  assert.strictEqual(p1TableMismatch.status, 1)
 
   // 值未定时写 [待补充] 是契约允许的写法，不能因此判失败。
   const pending = run(writeCase('pending-value', outline({
@@ -117,6 +173,12 @@ try {
   })))
   assert.strictEqual(hollowGoal.status, 1)
   assert(failureIds(hollowGoal).includes('outline.intent-fields-substantive'))
+
+  const badReaderContract = run(writeCase('bad-reader-contract', outline({
+    fieldValues: { '期待ID/类型': '强悬念' },
+  })))
+  assert.strictEqual(badReaderContract.status, 1)
+  assert(failureIds(badReaderContract).includes('outline.reader-contract'))
 
   // ……但其余字段仍按契约允许 [待补充]，不能因此判失败。
   const hollowOther = run(writeCase('hollow-other', outline({

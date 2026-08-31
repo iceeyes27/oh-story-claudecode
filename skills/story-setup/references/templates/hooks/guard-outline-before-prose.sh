@@ -138,6 +138,10 @@ case "$BASE" in
     if [ -d "$ROOT/拆文库/$(basename "$BOOK_DIR")" ] && [ ! -f "$BOOK_DIR/追踪/_tracking-state.json" ]; then
       exit 0
     fi
+    if [ -f "$BOOK_DIR/.story-quality/HEAD.json" ]; then
+      printf '%s\n' "⛔ 正文是质量 HEAD 的只读投影：${ABS#$ROOT/}。请写入 草稿/待验收，执行 quality_lifecycle.py stage → certify → accept；损坏投影用 rebuild 恢复。" >&2
+      exit 2
+    fi
     # 正文已存在（续写/改稿/回炉）跳过细纲门，但追踪检查点仍适用——与 JS 核
     # proseBlockReason 同序：细纲门只在首建时判，追踪门两种情况都判。
     EXISTS=""
@@ -174,36 +178,6 @@ case "$BASE" in
       if [ -n "$CHECKPOINT" ]; then
         printf '%s\n' "$CHECKPOINT" >&2
         exit 2
-      fi
-    fi
-    # 正文已存在的到此为止：欠账门只针对首建新章。
-    [ -n "$EXISTS" ] && exit 0
-    # 欠账门（无状态）：写第 N 章（首建）前，上一章有未清毒句式且未标「去味:跳过」豁免时先清再写。
-    # 毒句式扫描走共享核 prose-toxic 子命令（与写后网同一份规则）；node/核缺失或扫描失败一律
-    # 放行（宁可漏拦不可误伤）——写后网与 SKILL 同轮铁律仍兜底。判据现算自上一章文件，无状态。
-    PREV=$((NUM - 1))
-    if [ "$PREV" -ge 1 ] && node -e "" >/dev/null 2>&1 && [ -f "$CLI" ]; then
-      PROSE_DIR="$(dirname "$ABS")"
-      PREV_FILE=""
-      # glob 已按字典序，但同章号的原稿备份（workflow-revision 的「备份原稿」产物）
-      # 也会命中；显式跳过 _原稿_，与 JS 核 / codex py 取同一个「上一章」。
-      for f in "$PROSE_DIR"/第*章*.md; do
-        [ -e "$f" ] || continue
-        case "$(basename "$f")" in *_原稿_*) continue ;; esac
-        pnum="$(basename "$f" | sed -n 's/^第0*\([0-9][0-9]*\)章.*/\1/p')"
-        if [ "$pnum" = "$PREV" ]; then PREV_FILE="$f"; break; fi
-      done
-      if [ -n "$PREV_FILE" ] && ! head -n 6 "$PREV_FILE" | grep -qE '去味(：|:)跳过'; then
-        TOXIC="$(node "$CLI" prose-toxic "$PREV_FILE" 2>/dev/null || true)"
-        if [ -n "$TOXIC" ]; then
-          printf '%s\n' "⛔ 写正文被拦截：上一章（$(basename "$PREV_FILE")）有未清毒句式欠账，先清零再写第 ${NUM} 章；用户显式豁免时在上一章标题行下加 <!-- 去味:跳过 --> 后重试。" >&2
-          # 只列前 8 条。不能写 `printf … | head -n 8`：欠账多时 head 先退出，printf 吃 SIGPIPE，
-          # pipefail 下整条管道返回 141，set -e 立刻终止脚本——下面的 exit 2 永远走不到，拦截
-          # 退成「非阻塞错误」放过这次写入。改用 here-string 直喂 head（无管道即无 SIGPIPE），
-          # 再兜一层 || true，保证无论如何都能走到 exit 2。
-          head -n 8 <<< "$TOXIC" >&2 || true
-          exit 2
-        fi
       fi
     fi
     ;;

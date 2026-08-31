@@ -19,7 +19,7 @@ const path = require('path')
 const OUTLINE_HEADERS = [
   '结构段/五段功能',
   '主事件',
-  '子事件×3-5',
+  '子事件/推进步骤',
   '情绪',
   '人物/关系变化',
   '因果/逻辑链',
@@ -216,7 +216,7 @@ function verify(projectDir) {
   const subeventRows = rows.filter((item) => item.cells.length === OUTLINE_HEADERS.length)
   for (const row of subeventRows) {
     const subevents = row.cells[2].split(/\s*(?:->|→)\s*/).filter(Boolean)
-    if (subevents.length < 3 || subevents.length > 5 || subevents.some((item) => !FUNCTION_TAG.test(item))) {
+    if (subevents.length < 1 || subevents.some((item) => !FUNCTION_TAG.test(item))) {
       subeventFailures.push(row.line)
     }
   }
@@ -227,9 +227,9 @@ function verify(projectDir) {
     subeventFailures.length
       ? `子事件数量或标签错误行：${subeventFailures.join('、')}`
       : (subeventRows.length === rows.length
-          ? `所有 ${rows.length} 节均有 3-5 个带功能标签的子事件`
+          ? `所有 ${rows.length} 节均有至少一个带功能标签的推进步骤`
           : `已检查 ${subeventRows.length}/${rows.length} 行；其余行由 phase2.outline-data-rows 报告列错位`),
-    '每节 3-5 个以 -> 连接的子事件，每个含 {对话/冲突/伏笔/回忆/发现/递进} 标签之一',
+    '每节至少一个推进步骤；多个步骤以 -> 连接，每个含 {对话/冲突/伏笔/回忆/发现/递进} 标签之一',
     ['references/writing-workflow.md', 'references/short-craft.md'],
     '只修报告行的子事件单元格，不重写其他列或其他节。'
   ))

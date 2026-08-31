@@ -58,6 +58,8 @@ CONTEXT_HEADINGS = (
 FORESHADOW_STATUSES = ("已埋", "已回收", "已过期", "放弃")
 FORESHADOW_IMPORTANCE = ("高", "中", "低")
 REVEAL_STATUSES = ("未揭示", "部分揭示", "已揭示")
+TIMELINE_KINDS = ("fact", "knowledge_source", "knowledge", "relation", "arc", "commitment", "open_question", "rule", "exception")
+KNOWLEDGE_STATES = ("knows", "believes", "suspects", "misbelieves", "denies")
 INVALID_FILE_CHARS = re.compile(r"[<>:\"/\\|?*\x00-\x1f]")
 FORESHADOW_ID = re.compile(r"^F\d{3,}$")
 EVENT_ID = re.compile(r"^E\d{3,}$")
@@ -453,7 +455,7 @@ def normalize_timeline_change(
     event = as_mapping(value, label)
     require_known_keys(
         event,
-        {"action", "id", "story_time", "objective_fact", "reader_knowledge", "reveal_status", "reveal_chapter", "characters"},
+        {"action", "id", "story_time", "objective_fact", "reader_knowledge", "reveal_status", "reveal_chapter", "characters", "kind", "occurrence_order", "knowledge"},
         label,
     )
     action = clean_text(event.get("action", "upsert"), f"{label}.action", max_bytes=24)
@@ -471,7 +473,7 @@ def normalize_timeline_change(
     else:
         require(reveal_chapter is not None, f"{label}.reveal_chapter is required once revealed")
         require(reveal_chapter <= through_chapter, f"{label}.reveal_chapter cannot be in the future")
-    return {
+    normalized = {
         "action": action,
         "id": identifier,
         "story_time": clean_text(event.get("story_time"), f"{label}.story_time", max_bytes=240),
@@ -481,6 +483,36 @@ def normalize_timeline_change(
         "reveal_chapter": reveal_chapter,
         "characters": clean_string_list(event.get("characters", []), f"{label}.characters", maximum=12, item_max_bytes=120),
     }
+    kind = event.get("kind")
+    occurrence_order = event.get("occurrence_order")
+    knowledge = event.get("knowledge")
+    if kind is not None or occurrence_order is not None or knowledge is not None:
+        kind = clean_text(kind, f"{label}.kind", max_bytes=32)
+        require(kind in TIMELINE_KINDS, f"{label}.kind is invalid")
+        require(isinstance(occurrence_order, int) and not isinstance(occurrence_order, bool) and occurrence_order >= 1, f"{label}.occurrence_order must be a positive integer")
+        normalized["kind"] = kind
+        normalized["occurrence_order"] = occurrence_order
+        if kind == "knowledge":
+            knowledge = as_mapping(knowledge, f"{label}.knowledge")
+            require_known_keys(knowledge, {"character", "fact_id", "state", "source", "source_chapter", "source_order"}, f"{label}.knowledge")
+            source_chapter = as_int(knowledge.get("source_chapter"), f"{label}.knowledge.source_chapter", minimum=1)
+            require(source_chapter <= through_chapter, f"{label}.knowledge.source_chapter cannot be in the future")
+            source_order = as_int(knowledge.get("source_order"), f"{label}.knowledge.source_order", minimum=1)
+            if source_chapter == through_chapter:
+                require(source_order <= occurrence_order, f"{label}.knowledge source occurs after the knowledge event")
+            state = clean_text(knowledge.get("state"), f"{label}.knowledge.state", max_bytes=24)
+            require(state in KNOWLEDGE_STATES, f"{label}.knowledge.state is invalid")
+            normalized["knowledge"] = {
+                "character": clean_text(knowledge.get("character"), f"{label}.knowledge.character", max_bytes=120),
+                "fact_id": clean_text(knowledge.get("fact_id"), f"{label}.knowledge.fact_id", max_bytes=120),
+                "state": state,
+                "source": clean_text(knowledge.get("source"), f"{label}.knowledge.source", max_bytes=240),
+                "source_chapter": source_chapter,
+                "source_order": source_order,
+            }
+        else:
+            require(knowledge is None, f"{label}.knowledge is only valid for kind=knowledge")
+    return normalized
 
 
 def normalize_timeline_state(value: object, last_chapter: int) -> dict[str, dict[str, Any]]:
@@ -493,7 +525,7 @@ def normalize_timeline_state(value: object, last_chapter: int) -> dict[str, dict
             event,
             {
                 "id", "story_time", "objective_fact", "reader_knowledge", "reveal_status", "reveal_chapter",
-                "characters", "first_recorded_chapter", "updated_chapter",
+                "characters", "kind", "occurrence_order", "knowledge", "first_recorded_chapter", "updated_chapter",
             },
             f"tracking state.timeline.{identifier}",
         )
@@ -1152,6 +1184,10 @@ def _apply_transaction_locked(project: Path, document: object) -> dict[str, Any]
 
 
 def apply_transaction(project: Path, document: object) -> dict[str, Any]:
+    require(
+        not (project.resolve() / ".story-quality" / "HEAD.json").is_file(),
+        "quality lifecycle is initialized; tracking may advance only inside quality_lifecycle.py accept",
+    )
     with project_write_lock(project):
         return _apply_transaction_locked(project, document)
 

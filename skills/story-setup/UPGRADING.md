@@ -2,10 +2,10 @@
 
 ## 当前版本
 
-- `setup_skill_version: 1.2.10`
-- `agents_version: 28`
+- `setup_skill_version: 1.2.11`
+- `agents_version: 29`
 
-`.story-deployed` 缺失任一字段，或 `agents_version` 缺失 / 非整数 / 小于 `28`，都视为待更新部署。直接重新运行 `/story-setup`（Codex 用 `$story-setup`，Antigravity 用 `/skills` 或自然语言点名）；不在运行时逐级兼容历史模板。如项目 `agents_version` 大于 `28`，说明本地 story-setup 比项目旧：先更新 oh-story-claudecode，不得用 v28 降级覆盖。历史版本改动见仓库根目录 `CHANGELOG.md`。
+`.story-deployed` 缺失任一字段，或 `agents_version` 缺失 / 非整数 / 小于 `29`，都视为待更新部署。直接重新运行 `/story-setup`（Codex 用 `$story-setup`，Antigravity 用 `/skills` 或自然语言点名）；不在运行时逐级兼容历史模板。如项目 `agents_version` 大于 `29`，说明本地 story-setup 比项目旧：先更新 oh-story-claudecode，不得用 v29 降级覆盖。历史版本改动见仓库根目录 `CHANGELOG.md`。
 
 ## 升级策略
 
@@ -52,7 +52,15 @@ OpenClaw / Reasonix / generic 三条路径的 skill 副本在项目 `skills/` �
 - `{书名}/设定/`、`大纲/`、`追踪/`
 - `.active-book`
 
-## v28 当前契约
+## v29 当前契约
+
+- 正文只能先写入 `草稿/待验收`，完成六视角独立审查、读者链、盲测选择与终验后，才由不可变质量生命周期切换为正式正文。
+- 修订旧章会使下游审查与读者链失效，必须按章顺序重放；人物关系、人物弧光与事实事件同时绑定追踪事务的内容指纹。
+- 正文表达规则改为按叙事功能审查，清理强制短句、固定节奏、悬念配额和自动改写等会制造逻辑跳跃与 AI 省略感的全局模板。
+
+重新部署后需**新开会话**，custom agent 与 hooks 才会重新注册。
+
+## v28 历史契约
 
 - `agent-reference-profiles.md` 成为 story-architect 唯一资料清单；Agent 模板不再复制第二份 inventory。部署守卫会校验 Common / Long / Short 所有权、文件存在性和表外读取。
 - 悬念、反转和质量标准改为 profile 专属：long 使用 `long-suspense.md`、`long-reversal.md`、`long-quality.md`，short 使用对应 `short-*` 文件；`agent-quality.md` 只保留跨体裁五维核心。
@@ -130,7 +138,7 @@ OpenClaw / Reasonix / generic 三条路径的 skill 副本在项目 `skills/` �
 ## 升级步骤
 
 1. 在项目根目录重新运行 story-setup。
-2. 确认 `.story-deployed` 写入 `agents_version: 28` 与 `setup_skill_version: 1.2.10`。
+2. 确认 `.story-deployed` 写入 `agents_version: 29` 与 `setup_skill_version: 1.2.11`。
 3. 确认目标 CLI 的 agents、hooks/rules 和 reference bundle 都通过安装验证。
 4. 新开会话，使 custom agents 与 hooks 按当前文件重新注册。
 5. **长篇在写项目必做**：检查每本书的 `追踪/_tracking-state.json` 是否存在。不存在就是旧追踪结构，按下方「追踪模型迁移」重建，否则写下一章会被拦。

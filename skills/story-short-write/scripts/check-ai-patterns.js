@@ -30,8 +30,10 @@ Detect high-risk AI-flavor prose patterns that need human rewrite:
   - 章尾状态总结体 (文末窗口 这一夜注定/这一切都结束了/新的人生才刚刚开始/命运的齿轮)
   - 引号强调滥用 (叙述里 1-4 字短词加引号强调，密度型)
 
-Each finding carries severity: blocking by default for generation/deslop cleanup (not-is-comparison / em-dash / voice-contrast / negation-parade / reverse-not-is / trailer-ending / trailer-summary). This is a local style/readability gate, not an AIGC detector score; functional human text can be marked for review instead of hard-edited for a detector.
-或 advisory (period-stutter / long-paragraph / micro-action-tic / stock-reaction-tic / action-list-tic / abstract-summary-tic / cliche-density-tic / metaphor-density-tic / reasoning-chain-tic / system-notice-formality-tic / overcompressed-prose-tic / low-connective-density-tic / quote-emphasis-tic / formulaic-parallelism，是提示，justified 的长推理/氛围段可保留)。
+All findings are advisory style/readability evidence, not AIGC verdicts or
+automatic rejection rules. A functional human sentence may be recorded as
+PRESERVED_WITH_FUNCTION after contextual review; only semantic review can decide
+whether it harms clarity, continuity, voice, or pacing.
 --fail-on=blocking 只在出现 blocking finding 时退出 1；默认 --fail-on=all 有任何 finding 即退出 1。
 
 The script reports findings only. It never rewrites text, because the safe fix is
@@ -192,7 +194,7 @@ const QUOTE_SOURCES = QUOTE_PAIRS.map(([open, close]) => `${escapeRegExp(open)}[
 
 // 音量反差腔（实战漏网 A）：「声音不高，第一句却稳稳压住了整个大厅。」
 // 旧网只有套词密度桶里的「声音不大，却带着」，音量词/转折词一换就漏。
-// 引号外叙述逐处 blocking；修法是删掉音量铺垫，直接写声音落进场子的具体效果。
+// 引号外叙述逐处提示；是否修改取决于语境中的信息、声线与节奏功能。
 // 校准：《万疆》20 章 0 命中，demo 前 20 章 0 命中。
 const VOICE_CONTRAST_PATTERN = /声音(?:并)?不[大高响亮][^。！？!?\n]{0,16}[却但偏]/g;
 
@@ -401,7 +403,7 @@ function scanProsePatterns(proseLines) {
         line: lineNo,
         column: dash.index + 1,
         type: 'em-dash',
-        severity: 'blocking',
+        severity: 'advisory',
         message: '破折号按功能改写：打断→动作 beat/短句，拖长音→省略或动作，插入说明→逗号/冒号；勿一律改句号。',
         excerpt: compact(text.slice(Math.max(0, dash.index - 8), dash.index + dash[0].length + 8)),
       });
@@ -439,7 +441,7 @@ function scanProsePatterns(proseLines) {
   return findings;
 }
 
-// 音量反差腔（实战漏网 A）：引号外叙述逐处 blocking，位置与摘录取自原文
+// 音量反差腔（实战漏网 A）：引号外叙述逐处提示，位置与摘录取自原文
 // （maskQuoted 等长占位保偏移；命中片段不含问号占位符，故不会落进占位区）。
 function findVoiceContrast(proseLines) {
   const findings = [];
@@ -455,7 +457,7 @@ function findVoiceContrast(proseLines) {
         line: lineNo,
         column: match.index + 1,
         type: 'voice-contrast',
-        severity: 'blocking',
+        severity: 'advisory',
         message: '音量反差腔：「声音不大/不高…却/但…」是 AI 高频反差模板；删掉音量铺垫，直接写声音落进场子的具体效果（谁停了手、哪排安静了）。',
         excerpt: compact(text.slice(match.index, match.index + match[0].length)),
       });
@@ -496,7 +498,7 @@ function findNegationParade(proseLines) {
         line: lineNo,
         column: start + 1,
         type: 'negation-parade',
-        severity: 'blocking',
+        severity: 'advisory',
         message: '否定排比：「没有X，没有Y…」/「没X，没有Y，只是Z」是 AI 高频排比模板；删掉否定清单，直接写现场实际有什么，最多留一个最有信息量的否定。',
         excerpt: compact(text.slice(start, end)),
       });
@@ -586,7 +588,7 @@ function findReverseNotIs(proseLines) {
         line: lineNo,
         column: start + 1,
         type: 'reverse-not-is',
-        severity: 'blocking',
+        severity: 'advisory',
         message: '反序对比腔：「是A，不是B」与「不是A，是B」同族；删掉后置否定，直接写 A 的具体表现，或用细节让读者自己对比。',
         excerpt: compact(text.slice(start, start + match[0].length)),
       });
@@ -620,7 +622,7 @@ function findTrailerEnding(proseLines) {
         line: lineNo,
         column: match.index + 1,
         type: 'trailer-ending',
-        severity: 'blocking',
+        severity: 'advisory',
         message: '预告式总结收尾：「没人知道/才刚刚开始/正朝着…压了过去」是 AI 章尾预告腔；结尾停在具体动作、画面或一句台词上，悬念让事件自己挂住，别替读者预告下一章。',
         excerpt: compact(text.slice(match.index, match.index + match[0].length)),
       });
@@ -632,7 +634,7 @@ function findTrailerEnding(proseLines) {
         line: lineNo,
         column: summaryMatch.index + 1,
         type: 'trailer-summary',
-        severity: 'blocking',
+        severity: 'advisory',
         message: '章尾状态总结体：「这一夜注定…/这一切都结束了/新的人生才刚刚开始/命运的齿轮」是把细纲的收束状态原样写成了总结句；收束状态是规划口径，正文落到最后一个具体动作、画面或台词上，别替读者盖章。',
         excerpt: compact(text.slice(summaryMatch.index, summaryMatch.index + summaryMatch[0].length)),
       });
@@ -1177,7 +1179,7 @@ function stripQuoted(text) {
 }
 
 // 把成对引号片段（含引号）替换为等长问号占位：既豁免引号内台词/播报，又保住原文
-// 偏移量，供逐处 blocking 规则定位与截取原文摘录（stripQuoted 会移位，不适合定位）。
+// 偏移量，供逐处 finding 定位与截取原文摘录（stripQuoted 会移位，不适合定位）。
 // 占位字符用「？」而不是「。」：占位既要截断各规则的 [^。！？!?…] 否定类（？与句号在每条
 // 规则的否定类里等效），又不能落在任何规则的接受位。句号占位会替 trailer-summary 的句末
 // [。！] 伪造出终止符，让「这一战注定是「血屠」的开端，…」这类引号里放代号/绰号的叙述行
@@ -1328,7 +1330,7 @@ function findNotIsComparisons(text, getPosition) {
         line: position.line,
         column: position.column,
         type: 'not-is-comparison',
-        severity: 'blocking',
+        severity: 'advisory',
         message: '高频 AI 对比句式；删掉否定铺垫，直接写后项，或改成动作/细节呈现。',
         excerpt: compact(raw),
       });

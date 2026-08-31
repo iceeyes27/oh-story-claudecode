@@ -117,7 +117,10 @@ class FinalChapterFlowTests(unittest.TestCase):
             "| 1 | 江晨完成一次审核 | 推进 | 不新增支线 |\n",
             encoding="utf-8",
         )
-        prefix = "这不是夸奖，而是命令。" if blocking else ""
+        # Style-pattern hits are advisory after contextual review.  Exercise a
+        # genuinely invalid body marker here so this regression still proves
+        # that deterministic blocking findings stop the legacy commit path.
+        prefix = "TODO。" if blocking else ""
         fill = max(0, actual - len(prefix) - 1)
         (self.project / "正文" / f"第{chapter:03d}章_测试.md").write_text(
             f"# 第{chapter}章\n{prefix}" + "字" * fill + "。",

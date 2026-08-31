@@ -219,10 +219,10 @@ _TOXIC_TAG_PARTICLES = ("吗", "吧", "嘛")
 _TOXIC_AFFIRM_PARTICLES = ("的", "啊", "呀", "呢")
 _TOXIC_TRAILER_WINDOW = 600
 _TOXIC_SENTENCE_PATTERNS = [
-    (re.compile(r"声音(?:并)?不[大高响亮][^。！？!?\n]{0,16}[却但偏]"), "voice-contrast", "删「不X…却Y」反差腔，直接写具体效果或动作。"),
-    (re.compile(r"(?:没有[^。！？!?\n，,]{1,12}[，,]){2}"), "negation-parade", "「没有…，没有…」排比删到只剩一个或全删，改写正面在场的细节。"),
-    (re.compile(r"是[^。！？!?\n，,]{1,12}[，,]\s*(?:而)?不是[^。！？!?\n]{1,20}"), "reverse-not-is", "删否定铺垫，直接写肯定项，或改成动作细节。"),
-    (re.compile(r"不是[^。！？!?\n]{1,16}[，,]\s*(?:而)?是"), "not-is-comparison", "删否定铺垫，直接写肯定项，或改成动作细节。"),
+    (re.compile(r"声音(?:并)?不[大高响亮][^。！？!?\n]{0,16}[却但偏]"), "voice-contrast", "若只是模板反差就直写效果；承担人物声线或真实对照时可保留。"),
+    (re.compile(r"(?:没有[^。！？!?\n，,]{1,12}[，,]){2}"), "negation-parade", "复核否定排比是否递进新信息；重复铺陈才压缩，角色化节奏可保留。"),
+    (re.compile(r"是[^。！？!?\n，,]{1,12}[，,]\s*(?:而)?不是[^。！？!?\n]{1,20}"), "reverse-not-is", "复核否定对照的语义功能；模板铺垫才改，辩解、排除或反讽可保留。"),
+    (re.compile(r"不是[^。！？!?\n]{1,16}[，,]\s*(?:而)?是"), "not-is-comparison", "复核否定对照的语义功能；模板铺垫才改，辩解、排除或反讽可保留。"),
 ]
 # 「正式拉开序幕/帷幕」是场内事件的报幕式陈述，不是叙述者预告，lookbehind 排除（同 check-ai-patterns.js）。
 _TOXIC_TRAILER = re.compile(r"没人知道|谁也不知道|谁也没想到|殊不知|(?:这)?才刚刚开(?:始|头)|正(?:朝着|向着)[^。！？!?\n]{0,24}(?:压|涌|袭|逼)(?:了?过去|了?过来|来)|(?<!正式)拉开(?:序幕|帷幕)|即将(?:开始|来临|降临)")
@@ -282,7 +282,7 @@ def _toxic_reverse_not_is_excluded(line: str, matched: str, start: int) -> bool:
 
 
 def _toxic_match_sentence(line: str) -> tuple[str, str, str] | None:
-    """每行只报第一条命中的句式规则（复扫到净哲学：改完一处再扫下一处）。"""
+    """每行只报第一条命中的句式规则；结果是深审 finding，不是机械清零命令。"""
     for rx, label, fix in _TOXIC_SENTENCE_PATTERNS:
         for m in rx.finditer(line):
             if label == "not-is-comparison" and _toxic_not_is_excluded(line, m.group(0), m.start()):
@@ -317,12 +317,12 @@ def toxic_phrase_findings(text: str) -> list[str]:
     for line_no, masked in content[cut:]:
         m = _TOXIC_TRAILER.search(masked)
         if m:
-            findings.append(f"第{line_no}行 毒句式[trailer-ending]：『{m.group(0)[:20]}』——删章尾预告腔，用正在发生的动作或画面收章。")
+            findings.append(f"第{line_no}行 毒句式[trailer-ending]：『{m.group(0)[:20]}』——复核是否为空泛预告；有具体信息边界或人物声线时可保留。")
         ms = _TOXIC_TRAILER_SUMMARY.search(masked)
         if ms:
-            findings.append(f"第{line_no}行 毒句式[trailer-summary]：『{ms.group(0)[:20]}』——删章尾状态总结句，收束状态是细纲的规划口径，正文落到具体动作、画面或台词上。")
+            findings.append(f"第{line_no}行 毒句式[trailer-summary]：『{ms.group(0)[:20]}』——复核是否替读者空泛总结；承担人物判断或必要结算时可保留。")
     if findings:
-        findings.append("毒句式是确定性 AI 指纹：本章须清零后再继续。完整扫描：node <skill>/scripts/check-ai-patterns.js --check <正文文件>")
+        findings.append("句式命中只生成 finding：逐条复核清晰度、自然度与语义功能；无功能才改，有功能可在深审中保留。完整扫描：node <skill>/scripts/check-ai-patterns.js --check <正文文件>")
     return findings
 
 
@@ -1219,6 +1219,8 @@ def prose_block_reason(root: Path, abs_path: Path) -> str | None:
     # 即进入当前追踪协议，不再因为保留了 拆文库/ 分析资产而永久绕过守卫。
     if (root / "拆文库" / book_dir.name).exists() and not state.exists():
         return None
+    if (book_dir / ".story-quality" / "HEAD.json").exists():
+        return f"⛔ 正文是质量 HEAD 的只读投影：{safe_rel(root, abs_path)}。请写入 草稿/待验收，执行 quality_lifecycle.py stage → certify → accept；损坏投影用 rebuild 恢复。"
     exists = abs_path.exists()
     outline_dir = book_dir / "大纲"
     found = False
@@ -1238,46 +1240,6 @@ def prose_block_reason(root: Path, abs_path: Path) -> str | None:
     )
     if checkpoint_issue:
         return f"⛔ 写正文被拦截：{safe_rel(root, book_dir)} 的{checkpoint_issue}。"
-    if exists:
-        return None
-    # 欠账门（无状态）：写第 N 章（首建）前，上一章有未清毒句式且未标「去味:跳过」豁免时先清再写。
-    # 判据现算自上一章文件本身，不落任何状态文件；找不到上一章/读取失败一律放行（宁可漏拦不可误伤）。
-    # js↔py 文案由 check-hook-regex-sync.sh 锁同步，判定由 test-prose-net-parity.sh Part E 锁 parity。
-    prev_num = int(num) - 1
-    if prev_num >= 1:
-        prev_file = None
-        try:
-            # iterdir 顺序在 ext4/overlayfs 上是哈希序：不排序就可能挑中同章号的原稿备份
-            # （workflow-revision 的「备份原稿」产物），拿早已被改写掉的旧文本报欠账。
-            # 显式排除 _原稿_ 备份并排序，保证四端与各文件系统上取到同一个「上一章」。
-            candidates = sorted(
-                c for c in abs_path.parent.iterdir()
-                if re.match(r"^第0*(\d+)章.*\.md$", c.name)
-                and int(re.match(r"^第0*(\d+)章", c.name).group(1)) == prev_num
-                and "_原稿_" not in c.name
-            )
-            prev_file = candidates[0] if candidates else None
-        except OSError:
-            prev_file = None
-        if prev_file is not None:
-            prev_text = None
-            try:
-                prev_text = prev_file.read_text(encoding="utf-8", errors="replace")
-            except OSError:
-                prev_text = None
-            if prev_text is not None and not re.search(r"去味(：|:)跳过", "\n".join(re.split(r"\r?\n", prev_text)[:6])):
-                hits = [ln for ln in toxic_phrase_findings(prev_text) if ln.startswith("第")]
-                if hits:
-                    shown = hits[:6]
-                    more = len(hits) - len(shown)
-                    reason = (
-                        f"⛔ 写正文被拦截：上一章（{prev_file.name}）有 {len(hits)} 处未清毒句式欠账，"
-                        f"先清零再写第 {num} 章；用户显式豁免时在上一章标题行下加 <!-- 去味:跳过 --> 后重试。\n"
-                        + "\n".join(shown)
-                    )
-                    if more > 0:
-                        reason += f"\n（另有 {more} 处，完整扫描：node <skill>/scripts/check-ai-patterns.js --check 上一章文件）"
-                    return reason
     return None
 
 
@@ -1517,7 +1479,7 @@ def stop_event() -> None:
         if blocks:
             emit({
                 "continue": True,
-                "systemMessage": "=== 正文兜底检测（回合结束复扫，模型无关）===\n硬信号命中即回正文改掉、复扫到净：\n"
+                "systemMessage": "=== 正文兜底检测（回合结束复扫，模型无关）===\n命中项进入深审；只修损害清晰度、自然度或声线的用法，功能性表达可保留：\n"
                 + "\n".join(blocks),
             })
             return

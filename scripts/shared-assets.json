@@ -44,11 +44,35 @@
       ]
     },
     {
+      "name": "story-quality-lifecycle",
+      "source": "skills/story-long-write/scripts/quality_lifecycle.py",
+      "targets": [
+        "skills/story-import/scripts/quality_lifecycle.py",
+        "skills/story-review/scripts/quality_lifecycle.py"
+      ]
+    },
+    {
+      "name": "story-positive-benchmark-fixtures",
+      "source": "skills/story-long-write/scripts/positive-benchmark-fixtures.json",
+      "targets": [
+        "skills/story-import/scripts/positive-benchmark-fixtures.json",
+        "skills/story-review/scripts/positive-benchmark-fixtures.json"
+      ]
+    },
+    {
       "name": "story-wordcount-core",
       "source": "skills/story-long-write/scripts/wordcount_core.py",
       "targets": [
         "skills/story-import/scripts/wordcount_core.py",
         "skills/story-review/scripts/wordcount_core.py"
+      ]
+    },
+    {
+      "name": "story-chapter-control",
+      "source": "skills/story-long-write/scripts/storyctl.py",
+      "targets": [
+        "skills/story-import/scripts/storyctl.py",
+        "skills/story-review/scripts/storyctl.py"
       ]
     },
     {

@@ -1,6 +1,6 @@
 ---
 name: story-long-write
-version: 1.0.0
+version: 1.1.0
 description: "长篇网文写作。从大纲到正文，辅助长篇网络小说的创作，包括世界观、人物、情节线管理。触发方式：/story-long-write、/写长篇、「帮我开书」「写大纲」「日更」「续写」「继续写」「修改第X章」「回炉」「重写第X章」。"
 metadata: {"openclaw":{"source":"https://github.com/zenstory-ai/oh-story-claudecode"}}
 ---
@@ -25,7 +25,7 @@ metadata: {"openclaw":{"source":"https://github.com/zenstory-ai/oh-story-claudec
 
 > 内置适配 Claude Code / OpenCode / Codex / Antigravity / ZCode / OpenClaw。专业 agent 只查当前端 canonical 目录（`.claude/agents`、`.opencode/agents`、`.codex/agents` TOML、`.agents/agents`）；Antigravity 用 `invoke_subagent` + 同名 `TypeName`。文件或运行时能力缺失、返回 unknown agent，或当前为不执行 custom agents 的 ZCode 3.3.4 时，报告 fallback 并 solo/direct 执行。
 >
-> Spawn 版本提示（不阻断 spawn）：先读取项目根 `.story-deployed` 的 `agents_version`。与本版 `agents_version: 28` 不一致时（标记缺失、字段缺失/非整数、小于或大于 28）**照常按文件存在性检查并 spawn**，但只检查当前运行时的 canonical 目录；同时报告 `Notice: agents bundle 版本不匹配（项目 {N}，本版 28）` 并提示重新运行 `/story-setup` 后新开会话；大于 28 时额外提示先更新 oh-story-claudecode，不要用本地旧版 setup 降级覆盖。只有 agent 文件缺失、或运行时不暴露 custom agent 时才降级 solo/direct，报告 `Fallback: ... -> solo`。
+> Spawn 版本提示（不阻断 spawn）：先读取项目根 `.story-deployed` 的 `agents_version`。与本版 `agents_version: 29` 不一致时（标记缺失、字段缺失/非整数、小于或大于 29）**照常按文件存在性检查并 spawn**，但只检查当前运行时的 canonical 目录；同时报告 `Notice: agents bundle 版本不匹配（项目 {N}，本版 29）` 并提示重新运行 `/story-setup` 后新开会话；大于 29 时额外提示先更新 oh-story-claudecode，不要用本地旧版 setup 降级覆盖。只有 agent 文件缺失、或运行时不暴露 custom agent 时才降级 solo/direct，报告 `Fallback: ... -> solo`。
 
 ## 核心方法
 
@@ -143,6 +143,8 @@ metadata: {"openclaw":{"source":"https://github.com/zenstory-ai/oh-story-claudec
 ├── 正文/
 │   ├── 第001章_章名.md
 │   └── ...
+├── 草稿/待验收/                 ← 深审前候选稿
+├── .story-quality/              ← 修订、代际、读者/事件与 HEAD
 ├── 对标/                          ← 拆文产出的结构化资产
 │   └── {对标书名}/
 │       ├── 原文/
@@ -211,7 +213,7 @@ metadata: {"openclaw":{"source":"https://github.com/zenstory-ai/oh-story-claudec
 **对标分析权威优先级（权威读取顺序）**：
 1. `剧情/情绪模块.md` 是读者需求 / 情绪引擎、爽文套路框架、可复现模块和重组指南的权威来源。
 2. `剧情/节奏.md` 是关键信息推进、章节扩写技法聚合、情绪触动点和爆发节奏的权威来源。
-3. `文风.md` 只管句长、标点、对话潜台词、原文锚点等风格；它不能覆盖情绪模块或节奏意图。**自定义文风 `设定/文风.md`（用户自写、不被导入/拆解覆盖）优先级高于对标 `文风.md`**：含实质内容时作权威风格基，对标文风降为参考与句长数值兜底；命中硬安全线的写法（`……` / 破折号 / 段间空行 / 碎句）仍按 narrative-writer 归一，自定义只接管句长 / 软标点 / 潜台词 / 情绪交替。
+3. `文风.md` 只管句法、标点、潜台词和原文锚点，不能覆盖情绪/节奏。**用户自写的 `设定/文风.md` 优先于对标 `文风.md`**；标点、句长、省略与留白仍先服从清晰度和叙事功能。
 4. `章节/第K章_摘要.md` 是具体章节证据，用来校验和补足权威索引，不反向覆盖 `情绪模块.md` / `节奏.md`。
 5. `拆文报告.md`、`剧情/故事线.md` 是投影/摘要；若与 `剧情/情绪模块.md` 或 `剧情/节奏.md` 冲突，写作以两个权威文件为准，并在写前准备 `gaps.conflict` 记录冲突来源。
 
@@ -220,8 +222,8 @@ metadata: {"openclaw":{"source":"https://github.com/zenstory-ai/oh-story-claudec
 - **势力一个一个文件**：`势力/势力名.md`，组织/门派/家族/国家等
 - **世界观按主题拆分**：背景、力量体系、社会结构等各自独立
 - **细纲一章一个文件**：`细纲_第XXX章.md`，含钩子设计，与正文一一对应
-- **正文按章拆分**：每章一个文件，`第XXX章_章名.md`
-- 每章写完直接写入 `正文/` 目录，不要先输出到对话
+- **正文按章拆分**：每章一个接受文件，`第XXX章_章名.md`
+- 候选只写 `草稿/待验收/`；六视角 accept 后才投影 `正文/`
 
 #### 单章写作流程
 
@@ -305,6 +307,7 @@ metadata: {"openclaw":{"source":"https://github.com/zenstory-ai/oh-story-claudec
 | 写作技法全程参考 | `references/writing-craft.md` |
 | 格式 | `references/long-format.md`（章节、段落、对话、标点与工程元信息） |
 | 状态追踪协议 | `references/state-tracking.md` |
+| 深审、修订、盲评与 P1 | `references/quality-lifecycle.md`（按其路由加载 `quality-p1.md` 等冷参考） |
 | 当前剧情单元与契约校准 | `references/reader-contract-and-progression.md` |
 
 ### Phase 5：质量检查

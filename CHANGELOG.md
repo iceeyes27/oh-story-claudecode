@@ -12,6 +12,30 @@ compare 链接；小节名使用 Keep a Changelog 的六个英文类别（`Added
 
 ## [Unreleased]
 
+### Added
+
+- 新增不可变章节质量生命周期、连续读者状态链、人物关系与人物弧光事件图，以及 15 章累计盲读实验契约。
+- 新增 P1 正向强度系统：Reader Evidence v3/persona（v2 仅保留历史 SHADOW 输入）、版本化 `SHADOW/ENFORCE` 策略与校准、`PASS/FLAT/INSUFFICIENT_EVIDENCE` 判定、L1–L3 不可变重开、累计 checkpoint、知识五态、悬念债、instrument-only 细纲搜索、结构对标诊断和 development 驱动的黄金三章计划。
+- 新增 P0 `single_draft` 与 P1 双稿的同级不可变运行边界；每步单次尝试、字数预算、P0 修复版本、P1 独立 writer/A 来源以及最终 workflow 的 common-control、预算、细纲、accepted generation/manifest 均可重算。
+- 15 章实验升级为中性 v2：P1 胜、P0 胜与平局均可合法保存；正式/系统放行在跨阶段去重与功效审计接入前保持关闭。
+
+### Changed
+
+- 正文必须先进入候选区，经过六视角深审、读者留存证据、盲测选择和终验才可发布；旧章修订会使下游审查失效并要求顺序重放。
+- 清理强制短句、固定节奏、悬念配额和自动改写等全局模板，改为优先保证因果、指代、信息链和阅读清晰度。
+- 风格检测只登记可定位 finding；功能性否定对照、省略号、破折号、直写情绪和题材声线可经深审保留，不再形成“上一章句式未清零就禁止写下一章”的机械门。
+- 发布 `agents_version: 29` 与 `setup_skill_version: 1.2.11`。
+
+### Fixed
+
+- 六视角、benchmark、reader、judge 与终验的运行证据全局隔离；benchmark 改读冻结外部夹具且 evaluator 输入不含 oracle，台词样本必须等于实际声线行，结构修订不能自报非关键章逃掉多版本。修订目标 finding 必须独立终验为 `FIXED_VERIFIED`，任一改进维度变差都不能晋级；失败证书明确登记 `FIX_FAILED`。15 章结论要求每名真人盲读两臂并由偏好严格多数派生。单名 reader 不再实际拥有 veto。
+- 事件抽取与 tracking 同章事实改为双向一一覆盖；旧章修订后图谱停止返回陈旧关系/人物弧，tracking replay 按章推进，后章不得回写旧全局事件 ID。
+- certificate 绑定完整 pending，accept 重新加载 treatment run；拒绝 certify 后篡改 provenance、P0 中间稿错链、双臂字数预算不等和实验 arm 自报共同基线。held-out 校准同时拒绝复用 development 故事包、内容与参与者证据。v1 固定历史 SHADOW；正式/系统产品放行在跨阶段去重和功效审计接入前保持 fail-closed；黄金三章明确为 plan-only。
+
+### Security
+
+- 质量代际写操作改用操作系统文件锁；初始化在开锁前就拒绝 `.story-quality` 符号链接，正文、追踪与质量投影在重建和验收前逐层拒绝项目外目标。certify/accept 均核对 staging transaction digest，accept 重算并完整重验 certificate packet，阻断并发双写、TOCTOU 和证书篡改。
+
 ## [0.7.8] - 2026-08-28
 
 > 升级后必须在写作项目根重新运行 `/story-setup` 并新开会话，否则拿到的仍是旧 agent 与旧参考文件名。本版把长短篇的参考资料按消费者拆分改名，并给长篇写正文、短篇构思与交付加了会阻断的门禁（见 Changed），补丁号不代表可以无脑升级。

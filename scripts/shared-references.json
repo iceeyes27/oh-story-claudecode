@@ -11,6 +11,31 @@
       ]
     },
     {
+      "name": "story-quality-lifecycle-reference",
+      "source": "skills/story-long-write/references/quality-lifecycle.md",
+      "targets": ["skills/story-review/references/quality-lifecycle.md"]
+    },
+    {
+      "name": "story-quality-p1-reference",
+      "source": "skills/story-long-write/references/quality-p1.md",
+      "targets": ["skills/story-review/references/quality-p1.md"]
+    },
+    {
+      "name": "story-reader-chain-reference",
+      "source": "skills/story-long-write/references/reader-chain-and-graph.md",
+      "targets": ["skills/story-review/references/reader-chain-and-graph.md"]
+    },
+    {
+      "name": "story-prose-policy-reference",
+      "source": "skills/story-long-write/references/prose-policy.md",
+      "targets": ["skills/story-review/references/prose-policy.md"]
+    },
+    {
+      "name": "story-evaluation-protocol-reference",
+      "source": "skills/story-long-write/references/evaluation-protocol.md",
+      "targets": ["skills/story-review/references/evaluation-protocol.md"]
+    },
+    {
       "name": "author-memory-reference",
       "source": "skills/story/references/author-memory.md",
       "targets": [

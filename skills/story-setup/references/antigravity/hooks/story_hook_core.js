@@ -599,7 +599,7 @@ function extractProseTargets(command, depth = 0) {
 // `*** Update File: draft.md` + `*** Move to: 书/正文/第9章.md` 只抽到 draft.md：细纲门放行
 // （draft.md 不是正文），写后兜底网也扫的是已经不存在的源 —— 一份没细纲的草稿能直接搬进 正文/。
 // 故 Move 用目的地**顶替**同段的源目标（不是追加：源已不在，拿它去查会误伤/空扫）。
-// Delete File 一律不入表（两端一致）：删除不是写入，proseBlockReason 对已存在的正文本就放行、
+// Delete File 一律不入表（两端一致）：删除不是写入；quality HEAD 项目的正文仍由后续只读投影门保护，
 // 删完文件也不在了没东西可扫，认它只会给「删稿」误报；但 Delete 段也能带 Move to（搬走后删源），
 // 那条 Move 的目的地照样要进表，故 Delete 只清掉待顶替的源槽位。
 function extractPatchTargets(patchText) {
@@ -649,12 +649,16 @@ function proseBlockReason(root, absolute) {
   const chapter = match[1]
   const book = path.dirname(path.dirname(absolute))
   const state = path.join(book, "追踪", "_tracking-state.json")
+  const qualityHead = path.join(book, ".story-quality", "HEAD.json")
   // 这是守卫的 canonical case：agent 可能在任何脚手架存在前就首建 {书}/正文/第N章.md。
   // 是否“像一本书”不能作为放行条件；相对路径误判应在宿主 adapter 按 cwd 正确解析，而不是
   // 让核心守卫 fail open。
   // story-import 在复制既有正文、尚未执行 tracking init 的窗口可以写；一旦 state 存在，
   // 即进入当前追踪协议，不再因为保留了 拆文库/ 分析资产而永久绕过守卫。
   if (fs.existsSync(path.join(root, "拆文库", path.basename(book))) && !fs.existsSync(state)) return null
+  if (fs.existsSync(qualityHead)) {
+    return `⛔ 正文是质量 HEAD 的只读投影：${safeRelative(root, absolute)}。请写入 草稿/待验收，执行 quality_lifecycle.py stage → certify → accept；损坏投影用 rebuild 恢复。`
+  }
   const exists = fs.existsSync(absolute)
   const outlineDir = path.join(book, "大纲")
   let found = false
@@ -672,40 +676,6 @@ function proseBlockReason(root, absolute) {
   const checkpointIssue = trackingCheckpointIssue(book, true, exists ? null : Number(chapter) - 1)
   if (checkpointIssue) {
     return `⛔ 写正文被拦截：${safeRelative(root, book)} 的${checkpointIssue}。`
-  }
-  if (exists) return null
-  // 欠账门（无状态）：写第 N 章（首建）前，上一章有未清毒句式且未标「去味:跳过」豁免时先清再写。
-  // 判据现算自上一章文件本身，不落任何状态文件；找不到上一章/读取失败一律放行（宁可漏拦不可误伤）。
-  // js↔py 文案由 check-hook-regex-sync.sh 锁同步，判定由 test-prose-net-parity.sh Part E 锁 parity。
-  const prevNum = Number(chapter) - 1
-  if (prevNum >= 1) {
-    let prevFile = null
-    try {
-      // readdir 顺序在 ext4/overlayfs 上是哈希序：不排序就可能挑中同章号的原稿备份
-      // （workflow-revision 的「备份原稿」产物），拿早已被改写掉的旧文本报欠账。
-      // 显式排除 _原稿_ 备份并排序，保证四端与各文件系统上取到同一个「上一章」。
-      const candidates = fs.readdirSync(path.dirname(absolute))
-        .filter((file) => {
-          const pm = file.match(/^第0*(\d+)章.*\.md$/)
-          return pm && Number(pm[1]) === prevNum && !file.includes("_原稿_")
-        })
-        .sort()
-      if (candidates.length) prevFile = path.join(path.dirname(absolute), candidates[0])
-    } catch {}
-    if (prevFile) {
-      let prevText = null
-      try { prevText = fs.readFileSync(prevFile, "utf8") } catch {}
-      if (prevText !== null && !/去味(：|:)跳过/.test(prevText.split(/\r?\n/).slice(0, 6).join("\n"))) {
-        const hits = toxicPhraseFindings(prevText).filter((line) => line.startsWith("第"))
-        if (hits.length) {
-          const shown = hits.slice(0, 6)
-          const more = hits.length - shown.length
-          let reason = `⛔ 写正文被拦截：上一章（${path.basename(prevFile)}）有 ${hits.length} 处未清毒句式欠账，先清零再写第 ${chapter} 章；用户显式豁免时在上一章标题行下加 <!-- 去味:跳过 --> 后重试。\n${shown.join("\n")}`
-          if (more > 0) reason += `\n（另有 ${more} 处，完整扫描：node <skill>/scripts/check-ai-patterns.js --check 上一章文件）`
-          return reason
-        }
-      }
-    }
   }
   return null
 }
@@ -752,10 +722,10 @@ const TOXIC_TAG_PARTICLES = new Set(["吗", "吧", "嘛"])
 const TOXIC_AFFIRM_PARTICLES = new Set(["的", "啊", "呀", "呢"])
 const TOXIC_TRAILER_WINDOW = 600
 const TOXIC_SENTENCE_PATTERNS = [
-  [/声音(?:并)?不[大高响亮][^。！？!?\n]{0,16}[却但偏]/g, "voice-contrast", "删「不X…却Y」反差腔，直接写具体效果或动作。"],
-  [/(?:没有[^。！？!?\n，,]{1,12}[，,]){2}/g, "negation-parade", "「没有…，没有…」排比删到只剩一个或全删，改写正面在场的细节。"],
-  [/是[^。！？!?\n，,]{1,12}[，,]\s*(?:而)?不是[^。！？!?\n]{1,20}/g, "reverse-not-is", "删否定铺垫，直接写肯定项，或改成动作细节。"],
-  [/不是[^。！？!?\n]{1,16}[，,]\s*(?:而)?是/g, "not-is-comparison", "删否定铺垫，直接写肯定项，或改成动作细节。"],
+  [/声音(?:并)?不[大高响亮][^。！？!?\n]{0,16}[却但偏]/g, "voice-contrast", "若只是模板反差就直写效果；承担人物声线或真实对照时可保留。"],
+  [/(?:没有[^。！？!?\n，,]{1,12}[，,]){2}/g, "negation-parade", "复核否定排比是否递进新信息；重复铺陈才压缩，角色化节奏可保留。"],
+  [/是[^。！？!?\n，,]{1,12}[，,]\s*(?:而)?不是[^。！？!?\n]{1,20}/g, "reverse-not-is", "复核否定对照的语义功能；模板铺垫才改，辩解、排除或反讽可保留。"],
+  [/不是[^。！？!?\n]{1,16}[，,]\s*(?:而)?是/g, "not-is-comparison", "复核否定对照的语义功能；模板铺垫才改，辩解、排除或反讽可保留。"],
 ]
 // 「正式拉开序幕/帷幕」是场内事件的报幕式陈述，不是叙述者预告，lookbehind 排除（同 check-ai-patterns.js）。
 const TOXIC_TRAILER_PATTERN = /没人知道|谁也不知道|谁也没想到|殊不知|(?:这)?才刚刚开(?:始|头)|正(?:朝着|向着)[^。！？!?\n]{0,24}(?:压|涌|袭|逼)(?:了?过去|了?过来|来)|(?<!正式)拉开(?:序幕|帷幕)|即将(?:开始|来临|降临)/
@@ -803,7 +773,7 @@ function toxicReverseNotIsExcluded(line, matched, start) {
   return false
 }
 
-// 每行只报第一条命中的句式规则（复扫到净哲学：改完一处再扫下一处）。
+// 每行只报第一条命中的句式规则；结果是深审 finding，不是机械清零命令。
 function matchToxicSentence(line) {
   for (const [regex, label, fix] of TOXIC_SENTENCE_PATTERNS) {
     regex.lastIndex = 0
@@ -847,11 +817,11 @@ function toxicPhraseFindings(text) {
   for (let i = cut; i < content.length; i++) {
     const [lineNo, masked] = content[i]
     const match = masked.match(TOXIC_TRAILER_PATTERN)
-    if (match) findings.push(`第${lineNo}行 毒句式[trailer-ending]：『${codePointSlice(match[0], 0, 20)}』——删章尾预告腔，用正在发生的动作或画面收章。`)
+    if (match) findings.push(`第${lineNo}行 毒句式[trailer-ending]：『${codePointSlice(match[0], 0, 20)}』——复核是否为空泛预告；有具体信息边界或人物声线时可保留。`)
     const summary = masked.match(TOXIC_TRAILER_SUMMARY_PATTERN)
-    if (summary) findings.push(`第${lineNo}行 毒句式[trailer-summary]：『${codePointSlice(summary[0], 0, 20)}』——删章尾状态总结句，收束状态是细纲的规划口径，正文落到具体动作、画面或台词上。`)
+    if (summary) findings.push(`第${lineNo}行 毒句式[trailer-summary]：『${codePointSlice(summary[0], 0, 20)}』——复核是否替读者空泛总结；承担人物判断或必要结算时可保留。`)
   }
-  if (findings.length) findings.push("毒句式是确定性 AI 指纹：本章须清零后再继续。完整扫描：node <skill>/scripts/check-ai-patterns.js --check <正文文件>")
+  if (findings.length) findings.push("句式命中只生成 finding：逐条复核清晰度、自然度与语义功能；无功能才改，有功能可在深审中保留。完整扫描：node <skill>/scripts/check-ai-patterns.js --check <正文文件>")
   return findings
 }
 
@@ -945,7 +915,7 @@ function proseAfterWrite(root, absolute) {
   }
   findings.push(...duplicateTitleFindings(absolute))
   if (!findings.length) return ""
-  return `=== 正文兜底检测（${safeRelative(root, absolute)}）===\n轻量确定性网自动复扫（模型无关，防主会话漏跑收尾）。按类型处理后复扫到净：\n${findings.join("\n")}`
+  return `=== 正文兜底检测（${safeRelative(root, absolute)}）===\n轻量规则网只登记待审证据；逐条判断是否损害清晰度、自然度或声线，功能性用法可保留：\n${findings.join("\n")}`
 }
 
 // 线性手写分词，不用带歧义交替的正则：旧式 /"(?:\\.|[^"])*"|'[^']*'|[^\s]+/ 里 \\. 与 [^"] 都能吃

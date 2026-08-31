@@ -6,8 +6,8 @@ const path = require('path');
 
 const USAGE = `Usage: node normalize-punctuation.js [--check] [--quote-mode keep|ascii|yan] <file...>
 
-Normalize正文 punctuation deterministically:
-  - replace ellipses, em dashes, and double hyphens with Chinese punctuation
+Normalize正文 structure deterministically:
+  - preserve ellipses, dashes, and double hyphens when they carry voice or meaning
   - remove markdown divider lines (---) from正文
   - keep quote style by default; convert quotes only when explicitly requested
 `;
@@ -159,10 +159,8 @@ function normalizeDocument(input, quoteMode) {
     }
 
     const commentOpenBefore = commentOpen;
-    const punctuationResult = normalizePausePunctuation(line, lineNo, commentOpen);
-    findings.push(...punctuationResult.findings);
-    line = punctuationResult.line;
-    commentOpen = punctuationResult.commentOpen;
+    const commentResult = htmlCommentSpans(line, commentOpen);
+    commentOpen = commentResult.open;
     if (!commentOpenBefore && commentOpen) {
       commentStart = { line: lineNo, column: Math.max(1, line.lastIndexOf('<!--') + 1) };
     } else if (!commentOpen) {

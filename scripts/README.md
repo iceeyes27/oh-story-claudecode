@@ -19,6 +19,7 @@
 | `check-scan-runtime-policy.sh` | scraper 输出文件名依赖本地日期 helper；CDP 探测/Windows 监听解析的源码策略 | CI；这些依赖方向无法由隔离 helper 测试证明 |
 | `check-story-setup-deployment.sh` | story-setup 部署/运行时回归（慢，>2min） | CI |
 | `check-doc-budget.sh` + `doc-budget.json` | 热路径 SKILL/references/agent 模板的去空白字数预算与路径合计上限；超了要么删等量旧文本，要么显式调高 budget | CI；增删热路径正文后 |
+| `check-prose-policy.py` | 全 skills 规则库存：拦截全局强悬念、固定句长/标点、过火与直接写正文等冲突规则 | Linux / Windows / macOS CI |
 | `check-hook-regex-sync.sh` | `detect-story-gaps.sh` 伏笔状态检测行为 | CI |
 | `check-hook-locale-safety.sh` | 部署 hook 在 Windows 中文 GBK 区域的字节安全 | CI |
 | `check-python-invocation.sh` | 技能文档禁止裸调 `python3`（须 python3→python→py 探测） | CI |
@@ -46,6 +47,8 @@
 | `test-tracking-commit.py` | 单权威追踪行为：原子 state、字数事件链、hash 失效、激活边界、幂等与并发提交 | CI |
 | `test-storyctl.py` | `visible_chars_v1`、双层区间、提交记录与 demo 同口径证据 | Linux / Windows / macOS CI |
 | `test-chapter-completion-lifecycle.py` | 公开 CLI 的 checkpoint、正常提交、欠长接受、超长单次压缩区间、blocking quality 阻断与下一章继续 | Linux / Windows / macOS CI |
+| `test-quality-lifecycle.py` | P0 不可变 revision/generation、全局隔离审查、盲评、读者链、stale replay、图谱，以及 P1 版本化强度门、persona、重开、checkpoint、知识事件、细纲搜索、对标诊断和多故事实验 | Linux / Windows / macOS CI |
+| `test-prose-policy.py` | 清晰度/文风优先级与被否决全局规则的变异回归 | Linux / Windows / macOS CI |
 | `test-author-memory-commit.py` | 工作区作者记忆行为：单事件回执、≤2KB 相关查询、证据候选、冲突替代、撤回、失败零写入、旧修订、幂等重放与派生修复 | CI |
 | `test-codex-hooks.sh` | Codex hook 合成 stdin/stdout 契约 | CI |
 | `test-static-check.py` | 真 frontmatter block、精确路径/锚点、跨 Skill 引用、fence、死 reference、Agent 与章节链接 fixture | CI |

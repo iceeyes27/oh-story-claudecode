@@ -13,7 +13,7 @@ const skillFile = path.join(repoRoot, 'skills/story-short-write/SKILL.md')
 const tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'phase2-contract-'))
 
 const headers = [
-  '结构段/五段功能', '主事件', '子事件×3-5', '情绪', '人物/关系变化', '因果/逻辑链',
+  '结构段/五段功能', '主事件', '子事件/推进步骤', '情绪', '人物/关系变化', '因果/逻辑链',
   '读者新获知什么', '结尾承接/钩子', '伏笔/物件', '动静', '对话密度', '目标字数',
 ]
 
@@ -82,6 +82,13 @@ function validOutline({ includePaywall = true } = {}) {
   ].join('\n')
 }
 
+function outlineWithSingleFunctionalStep() {
+  return validOutline().replace(
+    '主角发现线索1{发现}->对手阻拦行动1{冲突}->主角留下证据1{伏笔}',
+    '主角发现线索1{发现}'
+  )
+}
+
 function writeCase(name, settings, outline) {
   const dir = path.join(tmpRoot, name)
   fs.mkdirSync(dir, { recursive: true })
@@ -117,6 +124,10 @@ try {
   assert.strictEqual(good.status, 0, good.stdout + good.stderr)
   assert.strictEqual(good.report.ok, true)
   assert.deepStrictEqual(good.report.failures, [])
+
+  const noPadding = run(writeCase('single-functional-step', validSettings(), outlineWithSingleFunctionalStep()))
+  assert.strictEqual(noPadding.status, 0, noPadding.stdout + noPadding.stderr)
+  assert.strictEqual(noPadding.report.ok, true)
 
   const explicitShortTarget = run(writeCase(
     'explicit-short-target',

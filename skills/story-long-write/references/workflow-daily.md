@@ -73,7 +73,7 @@
    - **批次定位与阶段约束**：写本批前先从 `大纲/大纲.md`、对应 `大纲/卷纲_第X卷.md` 和本批细纲提取：当前章节区间属于哪个阶段、本批推进目标、本批可释放的信息、本批严禁提前释放的信息、章尾钩子不能越过的边界。必须按终局储备确认本批主推线与战果，别动用本阶段还不该解锁的终局底牌（多线齐涨的战果允许）；行动成本可无，不硬造代价。未来揭示计划留在大纲，不写入时间线事实；只有下一章必须消费的边界才进 `## 下一章承诺`。
    - **阶段进度自检**：每批写完或补完细纲后检查是否超前、拖慢或偏离阶段节奏；若偏离，把下一章必须执行的补偿动作放入事务 `next_chapter_commitments`，跨多章风险放入 `continuity_risks`；不得通过提前泄露后期信息强行提速。
 2. **逐章执行**：每章按 [workflow-chapter.md](workflow-chapter.md) 的「单章写作流程」步骤 1-13 完整走一遍（写前准备、正文执行、字数验证、钩子/爽点检查、元信息与禁用词扫描、追踪事务）。批量模式下再叠加下列日更专属动作：
-   - **上一章欠账检查**：写本章正文前，确认上一章正文无未清 blocking 毒句式欠账（写前 hook 会自动拦；hook 不可用时对上一章跑 `node scripts/check-ai-patterns.js --check --fail-on=blocking`）；有欠账先清完再写本章，除非上一章标了 `<!-- 去味:跳过 -->`（用户显式豁免）
+   - **上一章验收检查**：写本章前先跑 `quality_lifecycle.py check`，上一章必须已有六视角证书且 HEAD/正文/追踪/读者链一致；有 blocking 或 stale replay 先处理。`<!-- 去味:跳过 -->` 只豁免对应 detector，不能豁免深审或原子验收。
    - **状态来源纪律**：不要为取状态/章号把完整 `_tracking-state.json` 加载进 prompt；缺失内容按下方「旧信息查找步骤」定点查询，不得用未标明来源的聊天记忆替代，也不得为了方便通读所有逐章记录。
    - **久别角色交叉检查**：本章细纲列出的核心复用角色若不在 `## 核心角色状态`，直接读取小文件 `追踪/角色状态/{名}.md`；不存在即视为当前检查点损坏，运行 `tracking_commit.py check` 并通过完整事务修复，不能临时扫描增量后手写替代。`设定/角色/{名}.md` 只有静态原始人设，不能替代动态快照。角色重新活跃后，把名字放进本章事务 `context.active_character_names`，由工具更新续写状态卡。
    - **story-explorer 召回的 gaps 分支**（用 `benchmark_style_load` query_type 一次拿到 `{style_profile_path, style_profile_summary, selected_emotion_module, rhythm_reference, module_source_path, rhythm_source_path, matched_chapter_K, matched_chapter_techniques, anchor_excerpts, gaps}` 后按此分流）：
@@ -86,18 +86,18 @@
      - 若 `gaps.tone_match_failed: true` → 仅用整书文风写作，不喂 matched_chapter
      - 否则原样传给 `style_profile_path`、`style_profile_summary`、`selected_emotion_module`、`rhythm_reference`、`module_source_path`、`rhythm_source_path`、`matched_chapter_K`、`matched_chapter_techniques`、`anchor_excerpts` 和 `genre_prose_card` 给 Step 2 末尾的 narrative-writer spawn prompt；其中 `selected_emotion_module` 必须进入情绪目标，`rhythm_reference` 必须进入节奏/爆发安排，`genre_prose_card` 必须进入题材取舍，`matched_chapter_techniques` 必须进入「文风召回指令」。写前准备记录必须保留 `gaps` 原值，尤其 `gaps.module_missing`、`gaps.rhythm_missing`、`gaps.conflict`、`gaps.matched_deep_dive_missing`；若 `matched_deep_dive_missing` 为 true，文风召回指令中明确写“同章深度拆解缺失，已回退黄金三章/文风技巧”，不得在后续报告中反转为 false
      - **无 story-explorer 时直接执行**：主会话按 workflow-chapter.md 写前准备 (a)-(f) 手动依次召回情绪模块、节奏、题材卡、文风与匹配章 K；模块或节奏文件缺失时设置 `missing_primary_contract` 并停止修复
-   - **写后清零不拖到批末**：写后 hook 推回的毒句式命中当轮清零，不得攒到 Step 3。
+   - **写后处置不拖到批末**：写后 hook 推回的句式 finding 当轮逐条读语境；无功能才修，有明确功能则记录 `PRESERVED_WITH_FUNCTION`，不得攒到 Step 3，也不得为命中数清零改文。
    - 每章写完后**立即提交一次追踪事务**：
      1. 从刚落盘的正文、细纲和上一版续写状态卡提取 `result / character_changes / foreshadow_changes / timeline_events / constraints / next_chapter_commitments`。只记录会影响未来章节的变化；过程日志、质检计数、参照章和去 AI 味统计全部排除。
      2. 需要长期复用的核心角色，把完整动态快照放进 `character_snapshots`，并在 `character_changes` 写对应变化；一次性路人只写变化、不交快照。已有动态快照的核心角色再次变化时必须提交新快照。静态人设继续以 `设定/角色/{名}.md` 为准。
      3. `context.long_term_constraints`、当前卷/故事时间/场景、活跃核心角色名、连贯性风险提交当前完整值；活跃伏笔、近三章速记和下一章承诺由工具从当前视图/本章增量派生，不重复手填。
-     4. 运行 `storyctl.py chapter check`，取 `state_revision` 写入无 `wordcount` 的事务。带内 + quality pass → `chapter commit`；`under` 不补，`over` 按 workflow-chapter 步骤 8 净删一次并复检；仍带外走该步骤三动作。提交会重读、重数、重跑 quality；成功后删临时 JSON，tracking 提交后才继续。
+     4. 对待验收候选运行 wordcount 与确定性检查，取 `state_revision` 写入无 `wordcount` 的事务。带内 + quality pass → 六视角证书、读者 cohort、完整抽取和 `quality_lifecycle.py stage/certify/accept/check`；`under` 不补，`over` 按 workflow-chapter 步骤 8 净删一次并复检。HEAD 成功切换并 check 后才继续下一章。
      5. 失败时 `_tracking-state.json` 尚未推进；保留临时 JSON，修正写入环境后重跑同一 `commit`。不得另写下一章、不得手工补派生视图、不得忽略返回码。
 
      `追踪/逐章记录/第NNN章.md` 由工具按 5 类变化生成，目标 ≤1536 字节、硬上限 3072 字节。它不是正文摘要大全，更不保存写作过程。`伏笔.md` 每个 ID 只有一行当前状态；角色状态按核心角色拆文件；时间线的客观事实和读者认知只在同一事件登记中维护，再派生作者/读者两个视图。
 
      状态更新仍由主会话负责。narrative-writer 只写正文并回报必要的写作结果，不直接写 `追踪/`；主会话也不绕过事务工具直接修改最终追踪文件。
-   - **质检提示**（可选）：本章写作完成。如需一致性检查，运行 `/story-review lean`。批量写作模式跳过此步骤，全部写完后再统一审查。
+   - **逐章深审（不可后移）**：本章六视角、盲评、读者链、事件抽取和 final validation 全部通过才算完成。批量模式不得把逐章深审挪到批末；批末只补跨章累积核对。
 3. **不中断但不并发**：tracking 已提交即进下一章（除非用户要求确认）；`under` 或一次压缩后仍带外则展示证据/动作，不静默推进。下一章先读上一章正文与追踪更新。
 
 **资料研究（按需）**：如果写作中遇到需要查证的外部事实（历史年代、地理方位、职业细节等），暂停写作，spawn `story-researcher` agent 搜索并输出到 `参考资料/` 目录。研究完成后再继续写作。
@@ -129,15 +129,15 @@
 2. **契约与细纲双向核对**：先按 `reader-contract-and-progression.md` 检查读者契约、因果权 + 结算权、关键节点四问、期待所有权、期待债偿还、终局储备（透支两问）；章级推进按权威文件七类状态分档（快节奏保留可见事件/爽点下限），相对本书题材与对标判断；高潮后允许短暂低压和小而可见的收益/奖励。新地图/机构/能力/敌人/谜团须检查换书债；履约爽文/能力幻想另查主角是否反复以可避免的无能制造灾难再由他人收拾。再核对正文是否消费了细纲的内容概括五段式、情节安排多线、人物关系变化/出场顺序、行动成本（可无）/收益归属；并加三条写作要求兑现核对（不达标→修复）：① 爽点出手前是否有可指认的危机/期待铺垫段落？指不出=空洞 → 回 Step 2 补铺垫情节点（plot-emotion-system 倒推法）；② 装逼/打脸/揭露章是否写出在场配角差异化反应（集体震惊/各异），还是只写主角动作？没有 → 补在场配角反应（plot-core-methods）；③ 详略是否按目的词（爽点/卖点点展开、过渡点带过、信息密度交替），还是均匀注水？均匀 → 删过渡、扩爽点点。
 3. **伏笔盘点（仅本轮增量）**：确认本批新增/推进/回收的每个 ID 在 `追踪/伏笔.md` 恰好有一行当前状态，并能在对应 `逐章记录/第NNN章.md` 找到本次变化；不得追加第二行历史，也不得在日更流程扫描全部正文做全量伏笔审计
 
-批末再对本批全部落盘正文整体跑一遍 workflow-chapter.md「质量检查」的确定性收尾三脚本（`check-ai-patterns.js` → `normalize-punctuation.js` → `check-degeneration.js`），确认逐章清零后没有回潮。
+批末复扫接受正文并核对跨章疲劳，不替代逐章证书。P1 checkpoint 按 [quality-p1.md](quality-p1.md) 执行且仅作建议。
 
-> 若本步修文改变了会影响后续的事实、角色状态、伏笔、时间线或下一章承诺，必须在进入 Step 4 前为受影响章节提交 `mode=revision` 事务并通过 `check`；其中 `delta` 要重算修订后该章仍成立的完整当前记录，不能只传本次改动；纯措辞调整不重复提交。
+> 批末不得直接改 `正文/`。任何修文都回到该章 revision 流程并重跑六视角、盲选、终验和 accept；语义变化附完整 tracking 事务，纯措辞只换证书。
 
 ---
 
 ## Step 4：批末收尾
 
-**本步不再写任何追踪内容**——每章 Step 2 已完成事务。只做两项验证：
+**本步不再写任何追踪内容**——每章 Step 2 已通过 quality HEAD 完成事务。先跑 `quality_lifecycle.py check`，再做以下验证：
 
 1. 对项目运行 `tracking_commit.py check`；验证 state schema、逐章记录连续/规范/未超限、续写状态卡固定 7 栏且不超过 12288 字节，以及全部派生视图与 state 一致。
 2. 确认本批每章都有对应 `追踪/逐章记录/第NNN章.md`，每个文件 ≤3072 字节。缺失或超限时不手工补文件，回到该章事务修正并重跑 `commit`。

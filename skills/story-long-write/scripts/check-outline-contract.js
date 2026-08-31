@@ -5,6 +5,7 @@
  * Usage:
  *   node scripts/check-outline-contract.js --json <细纲路径...>
  *   node scripts/check-outline-contract.js --json --project <书目录> --chapter N
+ *   add --require-p1 to require and validate the P1 quality contract
  * Exit: 0 = pass, 1 = blocking contract failures, 2 = invalid invocation.
  *
  * Scope is structural only: it decides whether the blueprint carries the fields,
@@ -21,14 +22,16 @@ const path = require('path')
 // 权威模板：references/workflow-setup.md「细纲（全书每章）」
 const FIELDS = [
   '核心事件', '字数目标', '字数口径', '阶段位置', '单元ID/位置', '目标情绪',
-  '主角目标/关键选择', '章节定位', '本章结构公式', '章首钩子', '爽点',
+  '主角目标/关键选择', '结尾拍ID/类型', '期待ID/类型', '读者验收预期',
+  '章节定位', '本章结构公式', '章首钩子', '爽点',
   '本章禁止提前释放', '契约风险',
 ]
+const P1_FIELD = 'P1质量契约'
 const SUBSECTIONS = ['内容概括', '情节安排', '人物关系和出场顺序', '情节细化']
 const FIVE_ACT = ['起因', '发展', '转折', '高潮', '结尾']
 const PLOT_HEADER_FIRST = /^(?:#|序号)$/
 // 这两个字段实测直接影响正文质量，必须有实际内容
-const INTENT_FIELDS = ['目标情绪', '主角目标/关键选择']
+const INTENT_FIELDS = ['目标情绪', '主角目标/关键选择', '结尾拍ID/类型', '期待ID/类型', '读者验收预期']
 const CALIBER = 'visible_chars_v1'
 
 function fieldPattern(name) {
@@ -65,7 +68,83 @@ function parseTableRow(line) {
   return trimmed.slice(1, -1).split('|').map((cell) => cell.replace(/\*\*/g, '').replace(/`/g, '').trim())
 }
 
-function verify(file) {
+function fieldValue(text, name) {
+  const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const match = text.match(new RegExp(`^\\s*[-*+]\\s*\\*{0,2}${escaped}\\*{0,2}\\s*[：:]\\s*(.*)$`, 'm'))
+  return match ? match[1].trim() : null
+}
+
+function parsePlotPoints(lines) {
+  const headerIndex = lines.findIndex((line) => {
+    const cells = parseTableRow(line)
+    return cells && cells.length === 4 && PLOT_HEADER_FIRST.test(cells[0])
+  })
+  if (headerIndex < 0) return { header: null, points: [] }
+  const header = parseTableRow(lines[headerIndex])
+  const points = []
+  for (let index = headerIndex + 1; index < lines.length; index++) {
+    const cells = parseTableRow(lines[index])
+    if (!cells) {
+      if (points.length) break
+      continue
+    }
+    if (/^:?-{3,}:?$/.test(cells[0])) continue
+    if (!/^\d+$/.test(cells[0])) break
+    points.push({ number: Number(cells[0]), cells })
+  }
+  return { header, points }
+}
+
+function validateP1Contract(text, plotPoints, requireP1) {
+  const raw = fieldValue(text, P1_FIELD)
+  if (raw === null) {
+    return {
+      present: false,
+      ok: !requireP1,
+      evidence: requireP1 ? '缺字段：P1质量契约' : 'legacy 细纲未启用 P1；按兼容模式跳过',
+    }
+  }
+  let value
+  try {
+    value = JSON.parse(raw)
+  } catch (error) {
+    return { present: true, ok: false, evidence: `P1质量契约不是合法 JSON：${error.message}` }
+  }
+  if (!value || Array.isArray(value) || typeof value !== 'object') {
+    return { present: true, ok: false, evidence: 'P1质量契约必须是 JSON 对象' }
+  }
+  const required = [
+    'chapter_function', 'target_emotion_id', 'required_deliveries',
+    'allowed_expectation_ids', 'allowed_hypothesis_ids', 'scene_catalog',
+  ]
+  const missing = required.filter((key) => !(key in value))
+  if (missing.length) {
+    return { present: true, ok: false, evidence: `P1质量契约缺字段：${missing.join('、')}` }
+  }
+  const catalog = value.scene_catalog
+  if (!Array.isArray(catalog) || !catalog.length) {
+    return { present: true, ok: false, evidence: 'scene_catalog 必须是非空数组' }
+  }
+  const expectedNumbers = plotPoints.map((row) => row.number)
+  const expectedIndexes = expectedNumbers.map((_, index) => index + 1)
+  const indexes = catalog.map((row) => row && row.scene_index)
+  const ids = catalog.map((row) => row && row.scene_id)
+  const expectedIds = expectedNumbers.map((number) => `scene-${number}`)
+  const plotSequential = expectedNumbers.length > 0 && expectedNumbers.every((number, index) => number === index + 1)
+  const indexesMatch = indexes.length === expectedIndexes.length && indexes.every((number, index) => number === expectedIndexes[index])
+  const idsMatch = ids.length === expectedIds.length && ids.every((id, index) => id === expectedIds[index])
+  const idsDistinct = ids.every((id) => typeof id === 'string' && id.trim()) && new Set(ids).size === ids.length
+  const ok = plotSequential && indexesMatch && idsMatch && idsDistinct
+  return {
+    present: true,
+    ok,
+    evidence: ok
+      ? `scene_catalog 与 ${plotPoints.length} 个情节点一一对应`
+      : `情节点编号=${JSON.stringify(expectedNumbers)}；scene_id=${JSON.stringify(ids)}；scene_index=${JSON.stringify(indexes)}`,
+  }
+}
+
+function verify(file, options = {}) {
   const name = path.basename(file)
   const read = readUtf8(file)
   const checks = []
@@ -104,9 +183,22 @@ function verify(file) {
     'outline.intent-fields-substantive',
     hollow.length === 0,
     name,
-    hollow.length ? `只有占位符，没有实际内容：${hollow.join('、')}` : '目标情绪与主角目标/关键选择都写了实际内容',
-    '目标情绪写清前状态→后状态；主角目标/关键选择写清本章要什么、必须做出的判断。这两项不接受 [待补充]',
-    '只把这两个字段替换成本章的实际情绪变化与实际取舍；其余字段不动。'
+    hollow.length ? `只有占位符，没有实际内容：${hollow.join('、')}` : '写作意图、结尾拍、期待与读者验收都写了实际内容',
+    '目标情绪与主角选择写实际变化；结尾拍/期待写 ID、类型与落点；读者验收写 must_know / may_believe / must_not_know / open_ids。这五项不接受 [待补充]',
+    '只把报告点名字段替换成本章实际内容；其余字段不动。'
+  ))
+
+  const endingTypes = 'goal|conflict|choice|relationship|payoff|aftermath|open_question'
+  const endingOk = new RegExp(`结尾拍ID/类型\\s*[：:].*EB-[^\\s；;]+.*(?:${endingTypes})`, 'i').test(text)
+  const expectationOk = new RegExp(`期待ID/类型\\s*[：:].*EX-[^\\s；;]+.*(?:${endingTypes})`, 'i').test(text)
+  const oracleOk = ['must_know', 'may_believe', 'must_not_know', 'open_ids'].every((key) => new RegExp(`${key}\\s*=`).test(text))
+  checks.push(makeCheck(
+    'outline.reader-contract',
+    endingOk && expectationOk && oracleOk,
+    name,
+    `ending_beat=${endingOk}；expectation=${expectationOk}；reader_oracle=${oracleOk}`,
+    '结尾拍使用 EB-* + 七类之一；期待使用 EX-* + 七类之一；读者验收列全四个 oracle 集合',
+    '只修结尾拍、期待或读者验收字段；不为满足检查新增剧情或强悬念。'
   ))
 
   const missingSubs = SUBSECTIONS.filter((sub) => !new RegExp(`^#{3,4}\\s*${sub}`, 'm').test(text))
@@ -130,14 +222,7 @@ function verify(file) {
   ))
 
   const lines = text.split(/\r?\n/)
-  let header = null
-  for (const line of lines) {
-    const cells = parseTableRow(line)
-    if (cells && cells.length === 4 && PLOT_HEADER_FIRST.test(cells[0])) {
-      header = cells
-      break
-    }
-  }
+  const { header, points: plotPoints } = parsePlotPoints(lines)
   const headerOk = Boolean(header) && header[2].includes('功能标签') && header[3].includes('执行边界')
   checks.push(makeCheck(
     'outline.plotpoint-table',
@@ -146,6 +231,16 @@ function verify(file) {
     header ? `表头：${header.join(' | ')}` : '未找到 | # | 情节点 | 功能标签 | 执行边界 | 表头',
     '情节细化使用四列表格：# / 情节点（谁做了什么） / 功能标签 / 执行边界',
     '只把情节点序列改成四列表格，逐点补功能标签与执行边界；不增删情节点本身。'
+  ))
+
+  const p1 = validateP1Contract(text, plotPoints, options.requireP1 === true)
+  checks.push(makeCheck(
+    p1.present ? 'outline.p1-quality-contract' : 'outline.p1-required',
+    p1.ok,
+    name,
+    p1.evidence,
+    'P1 模式下质量契约为合法 JSON，scene_catalog 按情节点表实际编号生成，ID 唯一、index 连续且数量/顺序一致；legacy 模式允许整行不存在',
+    '不要虚构固定场景；按情节点表第 N 行生成 {"scene_id":"scene-N","scene_index":N}。旧纲未启用 P1 时不要只补空壳字段。'
   ))
 
   const targetMatch = text.match(/字数目标\s*[：:]\s*(?:约\s*)?([\d,，]+)/)
@@ -204,9 +299,14 @@ function parseArgs(argv) {
   const files = []
   let project = null
   let chapter = null
+  let requireP1 = false
   for (let index = 0; index < argv.length; index++) {
     const arg = argv[index]
     if (arg === '--json') continue
+    if (arg === '--require-p1') {
+      requireP1 = true
+      continue
+    }
     if (arg === '--project' || arg === '--chapter') {
       if (index + 1 >= argv.length || argv[index + 1].startsWith('--')) return null
       const value = argv[++index]
@@ -219,16 +319,16 @@ function parseArgs(argv) {
   }
   if (project || chapter) {
     if (!project || !chapter || files.length || !/^\d+$/.test(chapter)) return null
-    return { project, chapter }
+    return { project, chapter, requireP1 }
   }
   if (!files.length) return null
-  return { files }
+  return { files, requireP1 }
 }
 
 function main(argv) {
   const parsed = parseArgs(argv)
   if (!parsed) {
-    process.stderr.write('用法: node scripts/check-outline-contract.js --json <细纲路径...> | --json --project <书目录> --chapter N\n')
+    process.stderr.write('用法: node scripts/check-outline-contract.js --json [--require-p1] <细纲路径...> | --json [--require-p1] --project <书目录> --chapter N\n')
     return 2
   }
   let targets = parsed.files
@@ -240,7 +340,7 @@ function main(argv) {
     }
     targets = [resolved.file]
   }
-  const reports = targets.map((file) => verify(file))
+  const reports = targets.map((file) => verify(file, { requireP1: parsed.requireP1 }))
   const ok = reports.every((entry) => entry.ok)
   process.stdout.write(`${JSON.stringify(reports.length === 1 ? reports[0] : reports, null, 2)}\n`)
   return ok ? 0 : 1
@@ -248,4 +348,4 @@ function main(argv) {
 
 if (require.main === module) process.exitCode = main(process.argv.slice(2))
 
-module.exports = { verify, FIELDS, SUBSECTIONS, FIVE_ACT }
+module.exports = { verify, FIELDS, P1_FIELD, SUBSECTIONS, FIVE_ACT }

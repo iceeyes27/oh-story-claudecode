@@ -5,14 +5,14 @@
 
 ## Goal
 
-精简复合检查里对中文小说正文低效或高度重叠的检查项，把节省出的验收注意力让给新增的读者视角/逻辑层阶段，实现父任务 AC2（逻辑层 required 占比 7.8% → ≥25%，提升来自新增逻辑项与精简冗余风格项两侧）。
+为复合检查声明场景适用范围，使纯中文正文只计算实际适用的 required 项，并让逻辑项在该场景占比达到 25% 以上。阶段与 filter 目录均保留。
 
 ## 为什么
 
-`composite-check-manifest.json` 现状：
+`composite-check-manifest.json` 现状为 10 个 stage、108 个 required，逻辑类 13 项，占 12.04%。即使简单移除 humanizer 26 项和 general-deslop 10 项，也只有 13/72 = 18.06%，不能实现目标：
 - stage 8 `humanizer`（25 项）里 `title case`、`curly quotes`、`emoji`、`boldface`、`-ing analysis`、`copula avoidance` 等对**中文小说正文**基本无效——它们是英文/Markdown 文档的 AI 痕迹。
 - stage 7 `general-deslop`（10 项）与 stage 3 `novel-deslop`（15 项）大量重叠（都在查套路腔、空话、模板感）。
-- 结果：102 个 required 项里 94 项是风格/AI 味，逻辑仅 8 项（7.8%）。
+- 结果：同一 required 分母混入了当前场景不执行的规则，不能表达实际验收预算。
 
 ## Requirements
 
@@ -20,7 +20,7 @@
 
 - 对纯中文正文，把明显英文/Markdown 专属项（title case、curly quotes、emoji、boldface、inline headings、-ing analysis、copula avoidance 等）从**必检**降级或标注"中文正文不适用可 SKIPPED"。
 - 保留跨语言有效项（filler phrases、excessive hedging、generic conclusion、significance 夸大、否定式排比、三段式）。
-- 用 manifest 的 `skipPolicy`（`allowedOnlyWhen: not-applicable` + `requiresReason`）机制表达，不是硬删项——保持对双语/英文文案仍可用。
+- 为 filter 增加显式 `appliesWhen`；不适用项必须给出理由，且不进入该场景 required 分母。不能只报 SKIPPED 后仍计入分母。
 
 ### R2 general-deslop 与 novel-deslop 去重
 
@@ -29,7 +29,7 @@
 
 ### R3 契约与文案同步
 
-- manifest 改动后同步 `skills/story/SKILL.md` 的八阶段说明、`复合检查完成：8/8，过滤项 M/M` 里的 M（required 计数会变）。
+- manifest 改动后同步十阶段说明；完整目录仍为 108 项，完成文案另报告当前场景适用项完成数。
 - `skills/story/tests/composite-check-contract.test.js` 硬编码了 stage 顺序与 required 契约，必须同步更新并通过。
 - `stageCount`（`completion.stageCount`）若因 P0 新增 stage 而变化，以父任务统一后的实际值为准。
 
@@ -40,11 +40,11 @@
 
 ## Acceptance Criteria
 
-- [ ] AC1：humanizer 阶段对纯中文正文，英文/Markdown 专属项按 `not applicable` 合规 SKIPPED，跨语言有效项保留必检。
-- [ ] AC2：general-deslop 与 novel-deslop 的重叠项去重，正文套路腔覆盖维度不减。
-- [ ] AC3：逻辑层 required 项占比 ≥25%（分母 = 再平衡后 required 总数，分子 = 逻辑/连续性/读者视角项），在任务 notes 给出计算式。
-- [ ] AC4：`node skills/story/tests/composite-check-contract.test.js` 通过；`复合检查完成：N/N` 文案与实际一致。
-- [ ] AC5：`bash scripts/static-check.sh`、`python scripts/check-current-skill-contracts.py` 通过。
+- [x] AC1：humanizer 阶段对纯中文正文，英文/Markdown 专属项按 `not applicable` 合规 SKIPPED，跨语言有效项保留必检。
+- [x] AC2：general-deslop 与 novel-deslop 的重叠项去重，正文套路腔覆盖维度不减。
+- [x] AC3：纯中文正文场景中，逻辑 required 项占比 ≥25%；测试列出分子、分母、适用 filter ID 和计算式，不适用项不进入分母。
+- [x] AC4：`node skills/story/tests/composite-check-contract.test.js` 通过；`复合检查完成：N/N` 文案与实际一致。
+- [x] AC5：`bash scripts/static-check.sh`、`python scripts/check-current-skill-contracts.py` 通过。
 
 ## Out of Scope
 

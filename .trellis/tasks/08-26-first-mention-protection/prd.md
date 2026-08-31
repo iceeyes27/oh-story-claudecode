@@ -40,12 +40,12 @@
 
 ## Acceptance Criteria
 
-- [ ] AC1：`story-deslop/SKILL.md` 删除优先段落含"先判首次交代"前置步；narrative-writer 去味 prompt 同步。
-- [ ] AC2：`dialogue-mastery.md` 科普嘴规则收窄为"无压力整段独白"，明确首次必要因果可保留改写。
-- [ ] AC3：`anti-ai-writing.md` 模式 8 含首次交代闸。
-- [ ] AC4：`bash scripts/check-doc-budget.sh` 通过（未撑爆或已显式调 budget 记录理由）。
-- [ ] AC5：`bash scripts/static-check.sh`、`python scripts/check-current-skill-contracts.py` 通过。
-- [ ] AC6：对一个"首次交代被误删导致后文突兀"的样例，按新规则该交代被保留改写而非删除（人工走查 + 若有 deslop 相关测试则补例）。
+- [x] AC1：`story-deslop/SKILL.md` 删除优先段落含"先判首次交代"前置步；narrative-writer 去味 prompt 同步。
+- [x] AC2：`dialogue-mastery.md` 科普嘴规则收窄为"无压力整段独白"，明确首次必要因果可保留改写。
+- [x] AC3：`anti-ai-writing.md` 模式 8 含首次交代闸。
+- [x] AC4：`bash scripts/check-doc-budget.sh` 通过（未撑爆或已显式调 budget 记录理由）。
+- [x] AC5：`bash scripts/static-check.sh`、`python scripts/check-current-skill-contracts.py` 通过。
+- [x] AC6：对一个"首次交代被误删导致后文突兀"的样例，按新规则该交代被保留改写而非删除（人工走查 + 若有 deslop 相关测试则补例）。
 
 ## Out of Scope
 

@@ -8,13 +8,12 @@
 skills/reader-comprehension-scan/
 ├── SKILL.md                      # 三问连读法 + 脚本用法 + 结论边界
 ├── scripts/
-│   ├── check-first-mention.js    # 确定性：专名首现交代缺失
-│   └── test-first-mention.js     # 回归测试（node 原生 assert）
+│   └── test-first-mention.js     # 直接测试共享实现（node 原生 assert）
 └── references/
     └── reading-protocol.md       # 三问通读法的分批子代理 prompt（从 SKILL.md 链接可达）
 ```
 
-同时镜像到 `.agents/skills/`（该目录是 `../skills` 的符号链接，天然同步）。
+确定性实现唯一位于 `skills/_shared/scripts/check-first-mention.js`；平台入口由 adapter 生成器维护。
 
 ## 2. check-first-mention.js 判据
 

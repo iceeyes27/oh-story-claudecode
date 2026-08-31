@@ -34,16 +34,16 @@
 ### R4 落地形态
 
 - 优先做成新 skill `opening-arc-audit` 的语义连读流程（悬念开闭环判定需要语义，难纯脚本化）。
-- 可脚本化的辅助部分（章数统计、主线推进步数的初步计数、收支表渲染）写成 `scripts/arc-ledger.js` 辅助脚本 + 回归测试；语义判定留文档。
+- 可脚本化的辅助部分使用共享 `skills/_shared/scripts/arc-ledger.js` + 回归测试；语义判定留在本 skill 文档。
 - 是否并入复合检查作为 stage：**本任务先做成独立可调用 skill**，是否进 manifest 由父任务在两个 P0 都落地后统一决定（避免与 reader-comprehension-scan 同时改 contract 测试）。
 
 ## Acceptance Criteria
 
-- [ ] AC1：对 demo 书前 15 章连读，产出悬念收支表（累计开环/闭环/净悬空/平均延迟）与已知信息清单、悬而未决清单。
-- [ ] AC2：对一个人为构造的"只开不闭 + 主线打转"样例，阻断规则命中 `arc 级故弄玄虚` 并附证据；对一个正常推进样例不误报。
-- [ ] AC3：`scripts/arc-ledger.js` 有回归测试且通过。
-- [ ] AC4：阈值参数可配，文档写明不同题材的建议档位。
-- [ ] AC5：`bash scripts/static-check.sh`、`python scripts/check-current-skill-contracts.py` 通过；若登记新 skill，`platform-skill-set.json`/`local-only-skill-set.json` 与 adapters check 同步。
+- [x] AC1：对 demo 书前 15 章连读，产出悬念收支表（累计开环/闭环/净悬空/平均延迟）与已知信息清单、悬而未决清单。
+- [x] AC2：对一个人为构造的"只开不闭 + 主线打转"样例，阻断规则命中 `arc 级故弄玄虚` 并附证据；对一个正常推进样例不误报。
+- [x] AC3：共享 `skills/_shared/scripts/arc-ledger.js` 有回归测试且 `skills/opening-arc-audit/scripts/test-arc-ledger.js` 通过。
+- [x] AC4：阈值参数可配，文档写明不同题材的建议档位。
+- [x] AC5：`bash scripts/static-check.sh`、`python scripts/check-current-skill-contracts.py` 通过；若登记新 skill，`platform-skill-set.json`/`local-only-skill-set.json` 与 adapters check 同步。
 
 ## Out of Scope
 

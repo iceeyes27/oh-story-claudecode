@@ -21,11 +21,11 @@
 
 ### R2 确定性脚本层：专名首现检查
 
-- 新增脚本 `scripts/check-first-mention.js`（挂在新 skill 目录下，非 `_shared`，避免污染热路径共享目录）。
+- 确定性实现使用共享 `skills/_shared/scripts/check-first-mention.js`，本 skill 测试直接引用共享实现，避免候选采用再维护副本。
 - 扫描全部正文，提取被当作**已知前提**使用的专名/机构/物件/能力（人名、组织名、金手指名、关键道具），检查其**首次出现处**附近是否有一次身份/来历交代。
 - 判据（可机械化的子集）：一个专名 token 首现时，若同段或相邻段内没有任何解释性锚点（同位语、"是…"判断句、动作交代、外貌/职务描述），标记 `未交代即使用` finding，输出 `章节:行号 + token + 首现上下文`。
 - blocking / advisory 语义：默认 advisory（专名首现有大量正常情况，如主角自己）；只有"该 token 在后续章节被当作读者已知的关键前提回扣、但首现处零交代"才升级 blocking。这一步能机械判定的只有首现位置，"是否被当已知前提"由语义层补。
-- 必须带回归测试 `scripts/test-first-mention.js`：正常交代、首现零交代、跨章回扣未交代三类样例。
+- 必须带回归测试 `skills/reader-comprehension-scan/scripts/test-first-mention.js`：正常交代、首现零交代、跨章回扣未交代三类样例。
 
 ### R3 语义判读层：三问连读
 
@@ -48,11 +48,11 @@
 
 ## Acceptance Criteria
 
-- [ ] AC1：对 demo 书 `demo/长篇/让你管账号，你高燃混剪炸全网/` 跑本检查，只读 `正文/`，产出可核查的理解断点/首现未交代清单。
-- [ ] AC2：`node scripts/check-first-mention.js <书目录>` 对首现零交代样例返回 finding，对正常交代样例不误报；`node scripts/test-first-mention.js` 全绿。
-- [ ] AC3：manifest 新增 stage 后 `node skills/story/tests/composite-check-contract.test.js` 通过，`复合检查完成：N/N` 文案与实际 stage 数一致。
-- [ ] AC4：`bash scripts/static-check.sh`、`python scripts/check-current-skill-contracts.py`、`node .agents/skills/story-setup/scripts/manage-skill-adapters.js check` 通过。
-- [ ] AC5：语义三问通读法产出的 findings 在 demo 书上人工抽查，命中的确是"正文没交代清楚"，不是"设定里有但正文省略"被误判成——即隔离生效。
+- [x] AC1：对 demo 书 `demo/长篇/让你管账号，你高燃混剪炸全网/` 跑本检查，只读 `正文/`，产出可核查的理解断点/首现未交代清单。
+- [x] AC2：共享 `check-first-mention.js <书目录>` 对首现零交代样例返回 finding，对正常交代样例不误报；`node skills/reader-comprehension-scan/scripts/test-first-mention.js` 全绿。
+- [x] AC3：manifest 新增 stage 后 `node skills/story/tests/composite-check-contract.test.js` 通过，`复合检查完成：N/N` 文案与实际 stage 数一致。
+- [x] AC4：`bash scripts/static-check.sh`、`python scripts/check-current-skill-contracts.py`、`node .agents/skills/story-setup/scripts/manage-skill-adapters.js check` 通过。
+- [x] AC5：语义三问通读法产出的 findings 在 demo 书上人工抽查，命中的确是"正文没交代清楚"，不是"设定里有但正文省略"被误判成——即隔离生效。
 
 ## Out of Scope
 

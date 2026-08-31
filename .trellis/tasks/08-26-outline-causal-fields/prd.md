@@ -31,10 +31,11 @@
 
 ### R3 校验脚本
 
-- 新增 `scripts/check-outline-causal.py`（与既有 `check-outline-copy.js` 并列）：
+- `scripts/check-outline-causal.py` 增加 `--strict`（与既有 `check-outline-copy.js` 并列）：
   - 检查每章细纲三个新字段存在且非占位。
   - `前因` 指向的章号 ≤ 本章号且该章存在（不能引用未来章作前因）。
-  - 有 `_tracking-state.json` 时，交叉验证 `前因` 引用的事件是否为已登记的已发生事实；悬空即 fail。无追踪时降级为只查章号存在性。
+  - 有 `_tracking-state.json` 时，交叉验证 `前因` 引用的具体事件锚点是否为已登记的已发生事实；悬空即 fail。无追踪时严格模式仍要求可定位的正文事件锚点。
+- 新写作路径调用 `--strict`；缺字段、占位、未来章或悬空事件返回非零。旧项目无 `--strict` 时保持既有 advisory 行为。
 - 带回归测试：正常、前因指向未来章、前因指向不存在事件、字段缺失四类。
 
 ### R4 校验接入
@@ -43,11 +44,11 @@
 
 ## Acceptance Criteria
 
-- [ ] AC1：细纲模板与 demo 书 20 章补齐三个新字段。
-- [ ] AC2：`python scripts/check-outline-causal.py <书目录>` 对前因指向未来章/不存在事件/缺字段返回非零并指明；正常细纲返回 0。回归测试全绿。
-- [ ] AC3：`python scripts/check-current-skill-contracts.py`（含 `required_outline_sections` 与 demo 计数校验）通过。
-- [ ] AC4：`bash scripts/check-doc-budget.sh` 通过（新增说明未撑爆热路径，或已显式调 budget 并记录理由）。
-- [ ] AC5：`bash scripts/static-check.sh` 通过。
+- [x] AC1：细纲模板与 demo 书 20 章补齐三个新字段。
+- [x] AC2：`python scripts/check-outline-causal.py <书目录> --strict` 对前因指向未来章/不存在事件/缺字段/占位返回非零并指明；正常细纲返回 0。无 `--strict` 的旧项目行为兼容。回归测试全绿。
+- [x] AC3：`python scripts/check-current-skill-contracts.py`（含 `required_outline_sections` 与 demo 计数校验）通过。
+- [x] AC4：`bash scripts/check-doc-budget.sh` 通过（新增说明未撑爆热路径，或已显式调 budget 并记录理由）。
+- [x] AC5：`bash scripts/static-check.sh` 通过。
 
 ## Out of Scope
 

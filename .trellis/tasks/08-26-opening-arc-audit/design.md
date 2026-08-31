@@ -5,7 +5,7 @@
 悬念"开/闭"、主线"推进/打转"本质是语义判断，不可靠地纯脚本化。但一旦语义层把判断写成结构化 ledger，**累计计算与阈值裁决就是纯确定性的**，可回归测试。故：
 
 - **语义层**（连读子代理，`references/arc-reading-protocol.md`）：读前 N 章，逐章产出「本章开了哪些悬念(open) / 闭了哪些悬念(close，引用被闭的 open id) / 是否推进主线(mainAdvance)」，写成 ledger JSON。
-- **脚本层**（`scripts/arc-ledger.js`）：吃 ledger JSON，算累计开环/闭环/净悬空/平均闭环延迟/主线推进步数，套阈值判 blocking，渲染收支表。
+- **脚本层**（`skills/_shared/scripts/arc-ledger.js`）：吃 ledger JSON，算累计开环/闭环/净悬空/平均闭环延迟/主线推进步数，套阈值判 blocking，渲染收支表。
 
 ## 2. 目录形态
 
@@ -13,8 +13,7 @@
 skills/opening-arc-audit/
 ├── SKILL.md
 ├── scripts/
-│   ├── arc-ledger.js        # 收支表计算 + 阈值裁决
-│   └── test-arc-ledger.js
+│   └── test-arc-ledger.js   # 直接测试共享实现
 └── references/
     ├── arc-reading-protocol.md   # 连读产 ledger 的子代理协议
     └── ledger-example.json       # 基于 demo 书前 15 章的示例 ledger（AC1 演示）

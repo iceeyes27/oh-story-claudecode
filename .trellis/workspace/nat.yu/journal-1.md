@@ -187,3 +187,25 @@
 ### Status
 
 [OK] **Completed**
+
+
+## Session 9: 叙事逻辑与读者可读性整改
+
+**Date**: 2026-08-31
+**Task**: 叙事逻辑与读者可读性整改
+**Branch**: `main`
+
+### Summary
+
+完成读者理解、开篇连读、首次交代保护、因果字段、候选 v2、质量预算和平直叙事；release 23/23 与 E2E 17/17 通过。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `86280be` | (see git log) |
+| `a64f17a` | (see git log) |
+
+### Status
+
+[OK] **Completed**

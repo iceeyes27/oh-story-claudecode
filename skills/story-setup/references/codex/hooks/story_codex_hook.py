@@ -340,7 +340,7 @@ def _toxic_reverse_not_is_excluded(line: str, matched: str, start: int) -> bool:
 
 
 def _toxic_match_sentence(line: str) -> tuple[str, str, str] | None:
-    """每行只报第一条命中的句式规则（复扫到净哲学：改完一处再扫下一处）。"""
+    """每行只报第一条命中的句式规则；结果是深审 finding，不是机械清零命令。"""
     for rx, label, fix in _TOXIC_SENTENCE_PATTERNS:
         for m in rx.finditer(line):
             if label == "not-is-comparison" and _toxic_not_is_excluded(line, m.group(0), m.start()):
@@ -380,7 +380,7 @@ def toxic_phrase_findings(text: str) -> list[str]:
         if ms:
             findings.append(f"第{line_no}行 毒句式[trailer-summary]：『{ms.group(0)[:20]}』——删章尾状态总结句，收束状态是细纲的规划口径，正文落到具体动作、画面或台词上。")
     if findings:
-        findings.append("毒句式是确定性 AI 指纹：本章须清零后再继续。完整扫描：node <skill>/scripts/check-ai-patterns.js --check <正文文件>")
+        findings.append("句式命中只生成 finding：逐条复核清晰度、自然度与语义功能；无功能才改，有功能可在深审中保留。完整扫描：node <skill>/scripts/check-ai-patterns.js --check <正文文件>")
     return findings
 
 
@@ -1619,7 +1619,7 @@ def stop_event() -> None:
         if blocks:
             emit({
                 "continue": True,
-                "systemMessage": "=== 正文兜底检测（回合结束复扫，模型无关）===\n硬信号命中即回正文改掉、复扫到净：\n"
+                "systemMessage": "=== 正文兜底检测（回合结束复扫，模型无关）===\n命中项进入深审；只修损害清晰度、自然度或声线的用法，功能性表达可保留：\n"
                 + "\n".join(blocks),
             })
             return

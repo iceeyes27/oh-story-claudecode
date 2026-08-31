@@ -2,6 +2,10 @@
 
 > 本文件是 story-write 的 mode 参考，由 SKILL.md 按模式路由加载；文中 `references/...` 与 `scripts/...` 路径均相对 story-write skill 根目录。
 
+## 短篇 Reference Gate
+
+进入阶段前完整读取该阶段必需文件直到 EOF；`rg` 检索或局部摘读不算读完。格式先读 `short-format.md`；构思按需读 `short-genre-formulas.md`、`short-reversal.md`、`short-suspense.md` 与题材包；正文读 `short-craft.md`、`short-prose-quality.md` 和已选题材包。任一必需路径缺失或不可读即停止，不混读长篇资料。Phase 2 与交付分别执行 `check-phase2-contract.js`、`check-delivery-contract.js`。
+
 **执行规则：短篇以情绪为目标，所有内容为情绪服务。**
 
 短篇专属执行规则（在通用执行规则基础上追加）：
@@ -159,6 +163,15 @@
 5. 反转信息差验证（公式见 writing-workflow.md）
 6. 伏笔回查清单（标准见 writing-workflow.md）
 
+#### Phase 2 完成门禁
+
+两份文件生成后、声明构思完成或进入 Phase 3 前，运行 `node .agents/skills/_shared/scripts/check-phase2-contract.js --json {短篇目录}`：
+
+- exit 0：机械契约通过，才可进入下一阶段；这不替代故事质量判断
+- exit 1：只把 `repair_scope` 中的检查 ID、证据、期望、reference 路径和修复范围交给本轮 writer；只改失败字段，再运行同一命令
+- 最多做 2 轮定向 repair；仍失败则停止并报告剩余检查 ID，不得声称 Phase 2 已完成
+- exit 2、脚本缺失或不可执行：报告 verifier 不可用，不得用泛化自检替代
+
 #### Agent 调用：character-designer
 
 设计任务完成后，如果项目已部署 character-designer agent（查找顺序见顶部），可 spawn `Agent(subagent_type: "character-designer", prompt: "项目目录：{dir}\n任务类型：角色设定\n查询参数：{人设速写+关系}")` 辅助角色设定和语言风格档案。如 agent 不可用，由主线程直接执行。
@@ -168,6 +181,8 @@
 ### Phase 3：逐场景写作
 
 **项目文件结构**：文件结构见 Phase 2；设定.md/小节大纲.md 为 Phase 2 产出，正文.md 为 Phase 3 产出。
+
+**交付参数先锁定**：用户明确的字数范围优先，逐字取其最小值、最大值与节数；只给单一目标时用目标的 95%-105%；都未给时用 8000-20000 字和大纲节数。后文默认值不得覆盖用户范围。
 
 **拆文结果自动使用规则**：执行写作前必须按「对标上下文加载」（Phase 2）顺序扫描。找到拆文报告时，把“结构/情绪/反转/写作手法”作为技法参考；找到结构化子目录时，按当前小节目标检索最相关模块。
 
@@ -184,12 +199,12 @@
 - 段落按戏剧单元/画面自然断开：新动作、新线索、新对话、视线切换另起；完整推理、氛围或情绪链可稍长。
 - 高潮/打脸/反转压短，沉淀/推理/收束可长一点；爽点 beat 写密，过场 beat 写疏，避免通篇同长度。
 - 主语节奏：段首或主语重置时可点名；同一动作链内优先代词/省略；关键转折再点名。
-- 标点跟语气走：质问用问号，爆发处少量感叹；犹豫、未尽、打断用动作停顿、短句或换行处理，正文不使用 `……` / `——` / `—` / `--`。
+- 标点跟语气走：质问用问号，爆发处少量感叹；犹豫、未尽、打断可用动作、短句、换行或符合人物声线的省略与破折，detector 只登记 finding，无功能才改。
 - 具体字数表达（如“这五个字”）只有逐字核对且故事必要时才用；不能确认时改成“这句话一落”“那几个字”等非具体数字表达。
 - 短篇默认第一人称在场：受虐段可直白宣泄，反击段可冷静审判；只删中立无情绪的作者讲解，不删带主角偏色的审判/预告。
 - 情绪可以直写，但后面要接场景里特有的动作或物件；没有具体承接的情绪总结句才删。
 - 任务卡点也可以承接情绪，但必须直接加重羞辱、误会、背叛、证据、反击或心死节点；删掉后情绪/证据/关系无损就压缩。
-- 情绪宁烈不温，冲突前置、爽点具体、台词带刺；心死/余韵等以克制为爽感的桥段按题材包收敛。
+- 情绪强度服从题材、人物与铺垫；冲突、爽点和台词都要产生具体后果，心死或余韵可按题材包保持克制。
 
 #### Agent 调用：narrative-writer
 
@@ -294,7 +309,7 @@
 - 章末必须有钩子（悬念或余韵）
 - 用安静细节收尾（一个物件、一个动作、一句短话），不写大段抒情
 - 结尾方式见下表，参考 emotional-methods.md「余韵钝痛」
-- **贯穿道具第 3 次出现（回扣暴击）**
+- **贯穿道具自然回扣**：只在它承担关系、证据或选择变化时复现，不按次数补写。
 
 结尾类型：
 
@@ -313,7 +328,7 @@
 - [ ] 总字数 ≥ 8000（优先用 Python 字符统计验证，兼容 Windows 和中文字符计数）
 - [ ] 每节 ≥ 800 字（爽文等高信息密度题材 ≥ 500 字，见 genre-writing-formulas.md）
 - [ ] 节数 = 小节大纲规划节数（不得合并/省略）
-- [ ] 身体部位同一词全文 ≤ 5 次
+- [ ] 身体部位或同类反应反复出现时逐处做删除测试，不设统一次数上限
 - [ ] 「像/好像/仿佛/如同」不成片堆叠；超过 10 处需逐处复核功能，不机械全删
 - [ ] `node .agents/skills/_shared/scripts/check-ai-patterns.js --check --fail-on=blocking 正文.md` 无 blocking 命中；其余提示先通读，确属问题再改
 - [ ] `node .agents/skills/_shared/scripts/check-degeneration.js --check 正文.md` 无 blocking 退化命中（复读/截断/工程词泄漏）
@@ -331,6 +346,8 @@
 
 加载 `references/writing-workflow.md` 中的精修清单完成检查。
 重点：开头钩子、情绪曲线、反转铺垫、每句话价值、格式规范、AI 腔排查。文件模式先运行 `node .agents/skills/_shared/scripts/check-ai-patterns.js --check --fail-on=blocking 正文.md`：blocking 先改正文并复扫；其他提示只作为读感风险，功能性写法标 `[需复核]`。再运行 `node .agents/skills/_shared/scripts/normalize-punctuation.js 正文.md` 做标点兜底，并运行 `node .agents/skills/_shared/scripts/check-degeneration.js --check 正文.md`；退化 blocking 要重新生成受影响段落，不靠润色。
+
+上述修改完成后运行 `node .agents/skills/_shared/scripts/check-delivery-contract.js --json --min-chars {MIN} --max-chars {MAX} --sections {N} {短篇目录}`。exit 0 才可交付；exit 1 只按 `repair_scope` 修复并重跑受影响检查与本命令，最多 2 轮；仍失败则报告检查 ID 并停止。exit 2、脚本缺失或不可执行时不得声称交付契约通过。
 
 #### Agent 调用：narrative-writer（去AI味）+ consistency-checker
 
@@ -439,7 +456,7 @@
 
 | 场景 | 加载文件 |
 |------|---------|
-| 质量检查 | `references/quality-checklist.md` + `references/reader-contract-and-progression.md` |
+| 质量检查 | `references/short-prose-quality.md` + `references/reader-contract-and-progression.md` |
 | 禁用词扫描 | `.agents/skills/_shared/references/banned-words.md` |
 | AI句式脚本复扫 | `.agents/skills/_shared/scripts/check-ai-patterns.js` |
 | 稳定性批量验收（启用时） | `scripts/stability-audit.js` + `scripts/handoff-pack.js`（用法见 `references/longform-stability.md`） |
@@ -465,7 +482,7 @@
 | [references/hooks-paragraph.md](hooks-paragraph.md) | 段落钩子技巧 |
 | [references/villain-and-reveal.md](villain-and-reveal.md) | Phase 2 设计反派时 |
 | [references/reversal-toolkit.md](reversal-toolkit.md) | 设计反转时 |
-| [references/quality-checklist.md](quality-checklist.md) | 精修检查时 |
+| [references/short-prose-quality.md](short-prose-quality.md) | 精修检查时 |
 | [.agents/skills/_shared/references/banned-words.md](../../_shared/references/banned-words.md) | 禁用词表 |
 | [.agents/skills/_shared/scripts/normalize-punctuation.js](../../_shared/scripts/normalize-punctuation.js) | Phase 4 文件模式确定性标点收尾 |
 | [.agents/skills/_shared/scripts/check-ai-patterns.js](../../_shared/scripts/check-ai-patterns.js) | Phase 3 完成门槛与 Phase 4 复扫；报告高危 AI 句式、破折号、碎句号、长段落、微动作复读、抽象总结、套词/比喻密度、解释链、系统公告腔、提纲感短段、低连接密度 |
@@ -490,7 +507,7 @@
 | 反转 | **`references/reversal-toolkit.md`**（反转类型/铺垫/有效性自检） | `references/plot-core-methods.md`（假胜：先给希望再击碎） |
 | 人物 | **`references/character-basics.md`**（主角/配角/反派/动机模板速填） | `references/character-design-methods.md`（三层标签反差/九维深化）· `references/character-relations.md`（关系类型/感情线） |
 | 女频写作 | **`references/female-audience-writing.md`**（女频长篇：核心原则/文案/题材/感情线长线/平台） | `references/genre-readers.md`（读者心理/平台差异）· `references/character-relations.md`（感情线总框架） |
-| 去AI味 | **`.agents/skills/_shared/references/anti-ai-writing.md`**（AI指纹/核心规则/Show Don't Tell） | `.agents/skills/_shared/references/banned-words.md`（禁用词扫描）· `references/quality-checklist.md`（成稿检查） |
+| 去AI味 | **`.agents/skills/_shared/references/anti-ai-writing.md`**（AI指纹/核心规则/Show Don't Tell） | `.agents/skills/_shared/references/banned-words.md`（禁用词扫描）· `references/short-prose-quality.md`（成稿检查） |
 
 #### 短篇横切主题
 
@@ -507,7 +524,7 @@
 | 开头 | **各 `genre-styles/{题材}.md` 的「开篇范式」**（关系锚 + 全弧剧透导语 + 火葬场预告，真实开篇范例）+ `short-craft.md` 第12节（开头事件密度） | `references/hooks-chapter.md`（开篇钩子类型）· `references/hooks-paragraph.md`（段钩密度） |
 | 格式与节奏 | **`references/short-format.md`**（短篇正文格式，两平台模板） | `references/short-craft.md`（情绪按场景直写或落到选择/后果、有效维度织入、疏密）· `references/writing-workflow.md`（设计/精修工作流） |
 | 对话 | **`references/dialogue-mastery.md`**（对话技法主文件：差异化/潜台词/对话节奏） | `references/short-craft.md`（三类台词与对话权力博弈）· 各 `genre-styles/` 包的真实金句库 |
-| 去AI味 | **`references/short-deslop.md`**（短篇专属：只杀真·AI腔，不杀情绪烈度/审判句/火葬场预告） | `.agents/skills/_shared/references/banned-words.md`（禁用词扫描）· `.agents/skills/_shared/scripts/check-ai-patterns.js`（AI句式复扫）· `references/quality-checklist.md`（成稿检查） |
+| 去AI味 | **`references/short-deslop.md`**（短篇专属：只杀真·AI腔，不杀情绪烈度/审判句/火葬场预告） | `.agents/skills/_shared/references/banned-words.md`（禁用词扫描）· `.agents/skills/_shared/scripts/check-ai-patterns.js`（AI句式复扫）· `references/short-prose-quality.md`（成稿检查） |
 
 ---
 

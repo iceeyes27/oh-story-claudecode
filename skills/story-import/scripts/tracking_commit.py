@@ -24,6 +24,7 @@ from typing import Any
 SCRIPT_DIR = str(Path(__file__).resolve().parent)
 if SCRIPT_DIR not in sys.path:
     sys.path.insert(0, SCRIPT_DIR)
+import wordcount_core
 from project_lock import ProjectLockError, assert_no_unfinished_adoption, project_lock
 
 
@@ -48,6 +49,11 @@ CONTEXT_HEADINGS = (
 FORESHADOW_STATUSES = ("已埋", "已回收", "已过期", "放弃")
 FORESHADOW_IMPORTANCE = ("高", "中", "低")
 REVEAL_STATUSES = ("未揭示", "部分揭示", "已揭示")
+TIMELINE_KINDS = (
+    "fact", "knowledge_source", "knowledge", "relation", "arc",
+    "commitment", "open_question", "rule", "exception",
+)
+KNOWLEDGE_STATES = ("knows", "believes", "suspects", "misbelieves", "denies")
 INVALID_FILE_CHARS = re.compile(r"[<>:\"/\\|?*\x00-\x1f]")
 FORESHADOW_ID = re.compile(r"^F\d{3,}$")
 EVENT_ID = re.compile(r"^E\d{3,}$")
@@ -70,6 +76,16 @@ RETIRED_TRACKING_PATHS = (
 RETIRED_ARCHIVE_DIR = "_旧追踪存档"
 
 
+def project_write_lock(project: Path, *, timeout_seconds: float = 10.0):
+    """Compatibility name used by the quality lifecycle.
+
+    The fork's cross-platform project lock already owns timeout and stale-lock
+    behavior, so the upstream timeout argument remains API-compatible only.
+    """
+    del timeout_seconds
+    return project_lock(project)
+
+
 class TrackingError(ValueError):
     """Expected validation or tracking-state error."""
 
@@ -77,6 +93,13 @@ class TrackingError(ValueError):
 def require(condition: bool, message: str) -> None:
     if not condition:
         raise TrackingError(message)
+
+
+def wordcount_value(function: Any, *args: Any, **kwargs: Any) -> Any:
+    try:
+        return function(*args, **kwargs)
+    except wordcount_core.WordcountError as exc:
+        raise TrackingError(str(exc)) from exc
 
 
 def as_mapping(value: object, label: str) -> dict[str, Any]:
@@ -408,7 +431,11 @@ def normalize_timeline_change(
     event = as_mapping(value, label)
     require_known_keys(
         event,
-        {"action", "id", "story_time", "objective_fact", "reader_knowledge", "reveal_status", "reveal_chapter", "characters"},
+        {
+            "action", "id", "story_time", "objective_fact", "reader_knowledge",
+            "reveal_status", "reveal_chapter", "characters", "kind",
+            "occurrence_order", "knowledge",
+        },
         label,
     )
     action = clean_text(event.get("action", "upsert"), f"{label}.action", max_bytes=24)
@@ -426,7 +453,7 @@ def normalize_timeline_change(
     else:
         require(reveal_chapter is not None, f"{label}.reveal_chapter is required once revealed")
         require(reveal_chapter <= through_chapter, f"{label}.reveal_chapter cannot be in the future")
-    return {
+    normalized = {
         "action": action,
         "id": identifier,
         "story_time": clean_text(event.get("story_time"), f"{label}.story_time", max_bytes=240),
@@ -436,6 +463,55 @@ def normalize_timeline_change(
         "reveal_chapter": reveal_chapter,
         "characters": clean_string_list(event.get("characters", []), f"{label}.characters", maximum=12, item_max_bytes=120),
     }
+    kind = event.get("kind")
+    occurrence_order = event.get("occurrence_order")
+    knowledge = event.get("knowledge")
+    if kind is not None or occurrence_order is not None or knowledge is not None:
+        kind = clean_text(kind, f"{label}.kind", max_bytes=32)
+        require(kind in TIMELINE_KINDS, f"{label}.kind is invalid")
+        require(
+            isinstance(occurrence_order, int)
+            and not isinstance(occurrence_order, bool)
+            and occurrence_order >= 1,
+            f"{label}.occurrence_order must be a positive integer",
+        )
+        normalized["kind"] = kind
+        normalized["occurrence_order"] = occurrence_order
+        if kind == "knowledge":
+            knowledge = as_mapping(knowledge, f"{label}.knowledge")
+            require_known_keys(
+                knowledge,
+                {"character", "fact_id", "state", "source", "source_chapter", "source_order"},
+                f"{label}.knowledge",
+            )
+            source_chapter = as_int(
+                knowledge.get("source_chapter"), f"{label}.knowledge.source_chapter", minimum=1
+            )
+            require(source_chapter <= through_chapter, f"{label}.knowledge.source_chapter cannot be in the future")
+            source_order = as_int(
+                knowledge.get("source_order"), f"{label}.knowledge.source_order", minimum=1
+            )
+            if source_chapter == through_chapter:
+                require(source_order <= occurrence_order, f"{label}.knowledge source occurs after the knowledge event")
+            state = clean_text(knowledge.get("state"), f"{label}.knowledge.state", max_bytes=24)
+            require(state in KNOWLEDGE_STATES, f"{label}.knowledge.state is invalid")
+            normalized["knowledge"] = {
+                "character": clean_text(
+                    knowledge.get("character"), f"{label}.knowledge.character", max_bytes=120
+                ),
+                "fact_id": clean_text(
+                    knowledge.get("fact_id"), f"{label}.knowledge.fact_id", max_bytes=120
+                ),
+                "state": state,
+                "source": clean_text(
+                    knowledge.get("source"), f"{label}.knowledge.source", max_bytes=240
+                ),
+                "source_chapter": source_chapter,
+                "source_order": source_order,
+            }
+        else:
+            require(knowledge is None, f"{label}.knowledge is only valid for kind=knowledge")
+    return normalized
 
 
 def normalize_timeline_state(value: object, last_chapter: int) -> dict[str, dict[str, Any]]:
@@ -448,7 +524,8 @@ def normalize_timeline_state(value: object, last_chapter: int) -> dict[str, dict
             event,
             {
                 "id", "story_time", "objective_fact", "reader_knowledge", "reveal_status", "reveal_chapter",
-                "characters", "first_recorded_chapter", "updated_chapter",
+                "characters", "kind", "occurrence_order", "knowledge",
+                "first_recorded_chapter", "updated_chapter",
             },
             f"tracking state.timeline.{identifier}",
         )
@@ -740,6 +817,22 @@ def render_delta(chapter: int, title: str, delta: dict[str, Any], core_names: se
     return payload
 
 
+def normalize_wordcount_records(value: object, last_chapter: int) -> dict[str, dict[str, Any]]:
+    records = as_mapping(value, "tracking state.wordcount_records")
+    normalized: dict[str, dict[str, Any]] = {}
+    for raw_chapter, raw_record in records.items():
+        require(
+            isinstance(raw_chapter, str) and re.fullmatch(r"[1-9]\d*", raw_chapter) is not None,
+            "wordcount record chapter key is invalid",
+        )
+        chapter = int(raw_chapter)
+        require(chapter <= last_chapter, "wordcount record exceeds last committed chapter")
+        normalized[raw_chapter] = wordcount_value(
+            wordcount_core.normalize_wordcount_record, raw_record
+        )
+    return normalized
+
+
 def normalize_state(document: object) -> dict[str, Any]:
     root = as_mapping(document, "tracking state")
     require_known_keys(
@@ -747,6 +840,7 @@ def normalize_state(document: object) -> dict[str, Any]:
         {
             "schema_version", "book_title", "last_committed_chapter", "imported_through_chapter",
             "state_revision", "chapter_gaps", "context", "characters", "foreshadow", "timeline",
+            "wordcount_records",
         },
         "tracking state",
     )
@@ -795,17 +889,20 @@ def normalize_state(document: object) -> dict[str, Any]:
     if last_chapter == 0:
         require(not foreshadow, "a chapter-0 project cannot have planted foreshadow facts")
         require(not timeline, "a chapter-0 project cannot have established timeline facts")
+    state_revision = as_int(root.get("state_revision"), "tracking state.state_revision")
+    wordcount_records = normalize_wordcount_records(root.get("wordcount_records", {}), last_chapter)
     return {
         "schema_version": TRACKING_SCHEMA_VERSION,
         "book_title": clean_text(root.get("book_title"), "tracking state.book_title", max_bytes=240),
         "last_committed_chapter": last_chapter,
         "imported_through_chapter": imported_through,
-        "state_revision": as_int(root.get("state_revision"), "tracking state.state_revision"),
+        "state_revision": state_revision,
         "chapter_gaps": chapter_gaps,
         "context": context,
         "characters": characters,
         "foreshadow": foreshadow,
         "timeline": timeline,
+        "wordcount_records": wordcount_records,
     }
 
 
@@ -857,17 +954,18 @@ def normalize_initial_document(document: object) -> dict[str, Any]:
             "characters": snapshots,
             "foreshadow": foreshadow,
             "timeline": timeline,
+            "wordcount_records": {},
         }
     )
 
 
-def normalize_transaction(state: dict[str, Any], document: object) -> dict[str, Any]:
+def normalize_transaction(project: Path, state: dict[str, Any], document: object) -> dict[str, Any]:
     root = as_mapping(document, "transaction")
     require_known_keys(
         root,
         {
             "schema_version", "mode", "chapter", "chapter_title", "expected_state_revision",
-            "chapter_gap", "delta", "context", "character_snapshots",
+            "chapter_gap", "delta", "context", "character_snapshots", "wordcount",
         },
         "transaction",
     )
@@ -876,6 +974,7 @@ def normalize_transaction(state: dict[str, Any], document: object) -> dict[str, 
     require(mode in {"append", "revision"}, "mode must be append or revision")
     chapter = as_int(root.get("chapter"), "chapter", minimum=1)
     expected_revision = as_int(root.get("expected_state_revision"), "expected_state_revision")
+    wordcount_input = root.get("wordcount")
     require(expected_revision == state["state_revision"], "tracking state changed since this transaction was prepared")
     last = state["last_committed_chapter"]
     raw_gap = root.get("chapter_gap")
@@ -926,6 +1025,14 @@ def normalize_transaction(state: dict[str, Any], document: object) -> dict[str, 
         snapshots=snapshots,
         existing_core_names=existing_names,
     )
+    wordcount = None
+    if wordcount_input is not None:
+        wordcount = wordcount_value(
+            wordcount_core.validate_current_wordcount_record,
+            project,
+            chapter,
+            wordcount_input,
+        )
     return {
         "mode": mode,
         "chapter": chapter,
@@ -934,6 +1041,7 @@ def normalize_transaction(state: dict[str, Any], document: object) -> dict[str, 
         "delta": delta,
         "context": context,
         "snapshots": snapshots,
+        "wordcount": wordcount,
     }
 
 
@@ -956,6 +1064,8 @@ def merge_transaction(state: dict[str, Any], transaction: dict[str, Any]) -> dic
             next_state["chapter_gaps"].append(transaction["chapter_gap"])
     next_state["state_revision"] += 1
     next_state["characters"].update(transaction["snapshots"])
+    if transaction["wordcount"] is not None:
+        next_state["wordcount_records"][str(chapter)] = transaction["wordcount"]
 
     next_context = transaction["context"]
     # 退役说的是「从此刻起离开当前状态」，只有 append 的逐章记录代表此刻；
@@ -1101,11 +1211,11 @@ def initialize(project: Path, document: object) -> dict[str, Any]:
     return state
 
 
-def apply_transaction(project: Path, document: object) -> dict[str, Any]:
+def _apply_transaction_locked(project: Path, document: object) -> dict[str, Any]:
     tracking = tracking_root(project)
     require_no_retired_tracking_paths(tracking)
     state = load_state(project)
-    transaction = normalize_transaction(state, document)
+    transaction = normalize_transaction(project, state, document)
     next_state = merge_transaction(state, transaction)
 
     delta_payload = render_delta(
@@ -1130,6 +1240,21 @@ def apply_transaction(project: Path, document: object) -> dict[str, Any]:
     atomic_write_text(state_path(project), next_state_payload)
     warn_sizes(views, delta_payload)
     return next_state
+
+
+def require_direct_tracking_allowed(project: Path) -> None:
+    require(
+        not (project.resolve() / ".story-quality" / "HEAD.json").is_file(),
+        "quality lifecycle is initialized; tracking may advance only inside quality_lifecycle.py accept",
+    )
+
+
+def apply_transaction(project: Path, document: object) -> dict[str, Any]:
+    require_direct_tracking_allowed(project)
+    if os.environ.get("STORY_WRITE_LOCK_HELD") == "1":
+        return _apply_transaction_locked(project, document)
+    with project_lock(project):
+        return _apply_transaction_locked(project, document)
 
 
 def check_project(project: Path) -> dict[str, Any]:
@@ -1190,7 +1315,8 @@ def _execute(args: argparse.Namespace) -> dict[str, Any]:
     if args.command == "init":
         return initialize(args.project, read_json(args.input))
     if args.command == "commit":
-        return apply_transaction(args.project, read_json(args.input))
+        require_direct_tracking_allowed(args.project)
+        return _apply_transaction_locked(args.project, read_json(args.input))
     return check_project(args.project)
 
 

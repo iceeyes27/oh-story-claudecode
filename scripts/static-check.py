@@ -58,7 +58,7 @@ UNLINKED_SECTION_RE = re.compile(
     r"[^，。；;\n]*"
 )
 EXTERNAL_SCHEMES = ("http://", "https://", "ftp://", "mailto:", "data:", "tel:")
-DEPLOYED_RUNTIME_PREFIXES = (".claude/", ".codex/", ".opencode/")
+DEPLOYED_RUNTIME_PREFIXES = (".claude/", ".codex/", ".opencode/", ".agents/")
 # browser-cdp is the repository's explicit infrastructure skill.  Business
 # skills may reference its launcher; every other cross-skill file path remains
 # forbidden so domain workflows stay self-contained.
@@ -602,7 +602,13 @@ def validate_skill(
 
         def is_reference_content(candidate: Path) -> bool:
             # .gitkeep 是占位符；__pycache__ 是 .gitignore 的构建产物，都不是参考内容。
-            return candidate.name != ".gitkeep" and "__pycache__" not in candidate.parts
+            relative_parts = candidate.relative_to(references_dir).parts
+            generated_antigravity_agent = relative_parts[:2] == ("antigravity", "agents")
+            return (
+                candidate.name != ".gitkeep"
+                and "__pycache__" not in candidate.parts
+                and not generated_antigravity_agent
+            )
 
         def add_target(target: Path) -> None:
             try:

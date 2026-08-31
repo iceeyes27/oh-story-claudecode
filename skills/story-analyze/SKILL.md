@@ -43,7 +43,7 @@ disable: true
 
 > Agent 兼容性：检查专业 agent 是否可用时，按 `.claude/agents/{agent}.md` → `.opencode/agents/{agent}.md` → `.codex/agents/{agent}.toml` 的顺序查找。Codex 原生子代理调用优先使用同名 `agent_type`；如果当前 Codex 运行时返回 `unknown agent_type` 或未暴露 custom-agent registry，必须降级为 solo/direct。检测到 `.zcode/` 时同样直接 solo/direct，因为 ZCode 3.3.4 不执行项目 custom agents；报告 `Fallback: project custom agents unavailable -> solo`。Claude/OpenCode 兼容面保留 `subagent_type`。
 >
-> Spawn 版本提示（不阻断 spawn）：先读取项目根 `.story-deployed` 的 `agents_version`。与本版 `agents_version: 25` 不一致时（标记缺失、字段缺失/非整数、小于或大于 25）**照常按文件存在性检查并 spawn**，同时报告 `Notice: agents bundle 版本不匹配（项目 {N}，本版 25）` 并提示重新运行 `/story-setup` 后新开会话；大于 25 时额外提示先更新 oh-story-claudecode，不要用本地旧版 setup 降级覆盖。只有 agent 文件缺失、或运行时不暴露 custom agent 时才降级 solo/direct，报告 `Fallback: ... -> solo`。
+> Spawn 版本提示（不阻断 spawn）：先读取项目根 `.story-deployed` 的 `agents_version`。与本版 `agents_version: 29` 不一致时（标记缺失、字段缺失/非整数、小于或大于 29）**照常按文件存在性检查并 spawn**，同时报告 `Notice: agents bundle 版本不匹配（项目 {N}，本版 29）` 并提示重新运行 `/story-setup` 后新开会话；大于 29 时额外提示先更新 oh-story-claudecode，不要用本地旧版 setup 降级覆盖。只有 agent 文件缺失、或运行时不暴露 custom agent 时才降级 solo/direct，报告 `Fallback: ... -> solo`。
 
 ## 拆解边界声明（主线程同样适用，长篇/短篇通用）
 
@@ -546,6 +546,9 @@ Stage 6 内容写完后，**不**立刻 append `6` 到 `stages_completed[]`。�
 | [references/deconstruction-notes.md](references/deconstruction-notes.md) | 拆书方法+影视拆解+抽象拆解法+题材实战 |
 | [references/style-profile-protocol.md](references/style-profile-protocol.md) | Stage 6：文风模板 + 可信度/可用性说明 |
 | [references/style-profile-generator.md](references/style-profile-generator.md) | Stage 6：文风生成 SOP（6 步，含中文数字章节识别 + 全角冒号基调 grep） |
+| [references/hooks-chapter.md](references/hooks-chapter.md) / [references/hooks-suspense.md](references/hooks-suspense.md) | 长篇钩子与悬念结构分析 |
+| [references/character-basics.md](references/character-basics.md) / [references/character-design-methods.md](references/character-design-methods.md) / [references/character-relations.md](references/character-relations.md) | 长篇人物与关系结构分析 |
+| [references/genre-readers.md](references/genre-readers.md) / [references/genre-writing-techniques.md](references/genre-writing-techniques.md) | 长篇读者契约与题材技法分析 |
 
 ### 短篇核心方法论（mode = short 加载）
 
@@ -554,7 +557,7 @@ Stage 6 内容写完后，**不**立刻 append `6` 到 `stages_completed[]`。�
 | [references/output-contract.md](references/output-contract.md) | 全程：Stage→文件映射 / `_meta.json` schema（含 structure_counts）/ 下游消费规范 / Phase 7 检查接入点 |
 | [references/output-templates.md](references/output-templates.md) | 拆文时：输出模板 + 结构库 + 质量检查（含 [BLOCK]/[WARN] 标注） |
 | [references/material-decomposition.md](references/material-decomposition.md) | 拆文方法论：情节节点提取 + 写作手法 + 情感线 + 节奏分析 + 共鸣分析 + 人物规则 + **质量标准唯一权威** |
-| [references/quality-checklist.md](references/quality-checklist.md) | 评估**源文**质量时：短篇拆书的质量自检清单（评估对象的好坏，不是评估拆文报告本身） |
+| [references/source-story-quality.md](references/source-story-quality.md) | 评估**源文**质量时：短篇拆书的质量自检清单（评估对象的好坏，不是评估拆文报告本身） |
 | [.agents/skills/_shared/references/anti-ai-writing.md](../_shared/references/anti-ai-writing.md) | Phase 7.1：扫描**拆文报告本身**的 AI 腔（不是源文滤镜） |
 | [.agents/skills/_shared/references/banned-words.md](../_shared/references/banned-words.md) | Phase 7.1：拆文报告禁用词速查 |
 
@@ -564,15 +567,17 @@ Stage 6 内容写完后，**不**立刻 append `6` 到 `stages_completed[]`。�
 |------|----------|
 | [references/deconstruction-examples.md](references/deconstruction-examples.md) | 校准拆文方法时：3 个完整案例作为参照 |
 | [references/zhihu-style.md](references/zhihu-style.md) | 拆解知乎盐言故事时作为平台特性对照 |
-| [references/genre-catalog.md](references/genre-catalog.md) | 拆解特定题材时：加载对应题材的「短篇视角」章节作为标准模式 |
-| [references/hooks-chapter.md](references/hooks-chapter.md) | 拆解章节钩子设计时作为钩子类型对照 |
-| [references/hooks-suspense.md](references/hooks-suspense.md) | 拆解悬念设计时作为悬念分类对照 |
-| [references/hooks-paragraph.md](references/hooks-paragraph.md) | 拆解段落钩子时作为 11 种段落级钩子对照 |
-| [references/character-basics.md](references/character-basics.md) | 拆解人物基础设定时作为人设要素对照 |
-| [references/character-design-methods.md](references/character-design-methods.md) | 拆解人物内在矛盾时作为三层标签反差对照（contradiction_axis 来源） |
-| [references/character-relations.md](references/character-relations.md) | 拆解人物关系网时作为关系类型对照 |
-| [references/genre-core-mechanics.md](references/genre-core-mechanics.md) | 拆解题材核心梗与循环机制时作为机制对照 |
-| [references/genre-readers.md](references/genre-readers.md) | 拆解读者心理与期待管理时作为读者画像对照 |
+| [references/analysis-short-genres.md](references/analysis-short-genres.md) | 拆解特定短篇题材时作为观察分类 |
+| [references/analysis-short-patterns.md](references/analysis-short-patterns.md) | 归纳源文结构模式时使用，不反推写作处方 |
+| [references/analysis-short-hooks.md](references/analysis-short-hooks.md) | 拆解章节与段落留存设计时作为观察分类 |
+| [references/analysis-short-suspense.md](references/analysis-short-suspense.md) | 拆解悬念建立、维持与回收时作为观察分类 |
+| [references/analysis-paragraph-hooks.md](references/analysis-paragraph-hooks.md) | 拆解段落留存设计时作为观察分类 |
+| [references/analysis-character-basics.md](references/analysis-character-basics.md) | 拆解人物基础设定时作为观察分类 |
+| [references/analysis-character-design.md](references/analysis-character-design.md) | 拆解人物内在矛盾时作为证据分类 |
+| [references/analysis-character-relations.md](references/analysis-character-relations.md) | 拆解人物关系网时作为证据分类 |
+| [references/analysis-short-mechanics.md](references/analysis-short-mechanics.md) | 拆解题材核心梗与循环机制时作为观察分类 |
+| [references/analysis-reader-profile.md](references/analysis-reader-profile.md) | 拆解读者心理与期待管理时作为观察分类 |
+| [references/analysis-writing-techniques.md](references/analysis-writing-techniques.md) | 拆解可复用技法时记录证据、限制和失败条件 |
 
 ### 短篇补充资料（拆 Stage 6「可复用结构」时按需对照）
 

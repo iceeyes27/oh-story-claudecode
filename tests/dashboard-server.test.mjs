@@ -507,6 +507,15 @@ describe("CLI portability", () => {
 });
 
 describe("HTTP API", () => {
+  test("handles the browser favicon request without a console-visible 404", async () => {
+    const root = await createWorkspace();
+    const baseUrl = await startServer(root);
+
+    const response = await fetch(`${baseUrl}/favicon.ico`);
+    assert.equal(response.status, 204);
+    assert.equal(await response.text(), "");
+  });
+
   test("serves lazy roots, directory pages, and on-demand search", async () => {
     const root = await createWorkspace();
     const baseUrl = await startServer(root);

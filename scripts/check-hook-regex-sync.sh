@@ -186,15 +186,14 @@ TOXIC_SYNC=(
   '，,。.！!？?；;：:、…—~ \t　'
   '"吗", "吧", "嘛"'
   '"的", "啊", "呀", "呢"'
-  # 文案（findings 行格式与各规则修法、清零要求 + 完整扫描提示，两端须逐字一致）
+  # 文案（findings 行格式、功能复核建议与完整扫描提示，两端须逐字一致）
   '行 毒句式['
-  '删「不X…却Y」反差腔，直接写具体效果或动作。'
-  '「没有…，没有…」排比删到只剩一个或全删，改写正面在场的细节。'
-  '删否定铺垫，直接写肯定项，或改成动作细节。'
-  '删章尾预告腔，用正在发生的动作或画面收章。'
-  '删章尾状态总结句，收束状态是细纲的规划口径，正文落到具体动作、画面或台词上。'
-  '毒句式是确定性 AI 指纹：本章须清零后再继续。完整扫描：node <skill>/scripts/check-ai-patterns.js --check <正文文件>'
-  '处未清毒句式欠账，'
+  '若只是模板反差就直写效果；承担人物声线或真实对照时可保留。'
+  '复核否定排比是否递进新信息；重复铺陈才压缩，角色化节奏可保留。'
+  '复核否定对照的语义功能；模板铺垫才改，辩解、排除或反讽可保留。'
+  '复核是否为空泛预告；有具体信息边界或人物声线时可保留。'
+  '复核是否替读者空泛总结；承担人物判断或必要结算时可保留。'
+  '句式命中只生成 finding：逐条复核清晰度、自然度与语义功能；无功能才改，有功能可在深审中保留。完整扫描：node <skill>/scripts/check-ai-patterns.js --check <正文文件>'
   '去味:跳过'
   '去味(：|:)跳过'
   '\r?\n'
@@ -209,25 +208,8 @@ for needle in "${TOXIC_SYNC[@]}"; do
   done
 done
 
-# 欠账门在 Claude bash 侧另有一份前置实现（guard-outline-before-prose.sh：上一章发现 +
-# 首 6 行豁免窗口 + 拦截文案，毒句式扫描本身走共享核 prose-toxic），豁免标记与门文案
-# 必须与 js/py 三处同步。
-GUARD_SH="$REPO_ROOT/skills/story-setup/references/templates/hooks/guard-outline-before-prose.sh"
-GATE_SYNC=(
-  '去味(：|:)跳过'
-  '未清毒句式欠账'
-  '<!-- 去味:跳过 --> 后重试'
-)
-for needle in "${GATE_SYNC[@]}"; do
-  for file in "$JS_CORE" "$PY_HOOK" "$GUARD_SH"; do
-    if ! grep -Fq -- "$needle" "$file"; then
-      echo "FAIL: 欠账门规范串缺失/漂移 — 「${needle}」未出现在 $(basename "$file")"
-      toxic_fail=1
-    fi
-  done
-done
 if [ "$toxic_fail" -ne 0 ]; then
   exit 1
 fi
 
-echo "OK: 毒句式正则/常量/文案 js↔py 逐字同步（欠账门标记/文案含 bash 前置门三处同步）"
+echo "OK: 毒句式正则/常量/功能复核文案 js↔py 逐字同步；风格 finding 不构成下一章前置门"

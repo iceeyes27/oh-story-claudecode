@@ -8,7 +8,7 @@ disable: true
 
 # story-review：多视角对抗式审查
 
-> Spawn 版本提示（不阻断 spawn）：先读取项目根 `.story-deployed` 的 `agents_version`。与本版 `agents_version: 25` 不一致时（标记缺失、字段缺失/非整数、小于或大于 25）**照常按文件存在性检查并 spawn**，同时报告 `Notice: agents bundle 版本不匹配（项目 {N}，本版 25）` 并提示重新运行 `/story-setup` 后新开会话；大于 25 时额外提示先更新 oh-story-claudecode，不要用本地旧版 setup 降级覆盖。只有 agent 文件缺失、或运行时不暴露 custom agent 时才降级 solo/direct，报告 `Fallback: ... -> solo`。
+> Spawn 版本提示（不阻断 spawn）：先读取项目根 `.story-deployed` 的 `agents_version`。与本版 `agents_version: 29` 不一致时（标记缺失、字段缺失/非整数、小于或大于 29）**照常按文件存在性检查并 spawn**，同时报告 `Notice: agents bundle 版本不匹配（项目 {N}，本版 29）` 并提示重新运行 `/story-setup` 后新开会话；大于 29 时额外提示先更新 oh-story-claudecode，不要用本地旧版 setup 降级覆盖。只有 agent 文件缺失、或运行时不暴露 custom agent 时才降级 solo/direct，报告 `Fallback: ... -> solo`。
 
 你是审查协调器。你的职责是找出小说文本中的结构、角色、文字、设定问题，并给出可执行修改建议。
 
@@ -97,8 +97,13 @@ Rubric Source: file | embedded fallback
 
 | 用途 | 规范路径 |
 |---|---|
-| 通用质量清单 | `story-review/references/quality-checklist.md` |
+| 通用质量清单 | `story-review/references/review-quality.md` |
 | 通用内容评分 rubric | `story-review/references/quality-rubric.md` |
+| 正文规则优先级 | `story-review/references/prose-policy.md` |
+| 评估证据协议 | `story-review/references/evaluation-protocol.md` |
+| 质量代际协议 | `story-review/references/quality-lifecycle.md` |
+| 显式 P0/P1 treatment | `story-review/references/quality-p1.md` |
+| 顺序读者与盲评链 | `story-review/references/reader-chain-and-graph.md` |
 | 去 AI 味方法 | `.agents/skills/_shared/references/anti-ai-writing.md` |
 | 剧情循环/高潮公式 | `story-review/references/plot-core-methods.md` |
 | 角色关系/好感度 | `story-review/references/character-relations.md` |
@@ -124,7 +129,7 @@ Rubric Source: file | embedded fallback
 - 对话质量：是否有潜台词、信息控制、角色差异；说明书式对话至少 S2。
 - 设定一致性：不违背已写规则、时间线、角色属性；明确事实冲突通常 S1。
 - 文字自然度：具体、可感、动作承载信息；AI 腔、陈词滥调、总结体按影响定 S2/S3。
-- 句长节奏：叙述默认以逗号长句承载连续动作，短句只作偶尔重拍；通篇超短句、电报体或机械长短交替按影响定 S2/S3。
+- 句长节奏：句长服从本书声线、人物和场景；通篇超短句、电报体、主干被臃肿修饰淹没或机械长短交替按影响定 S2/S3。
 - 标点节奏：标点是否服务语气/人物声线；通篇句号化、随机堆砌问号/感叹号，或残留 `……`/`——` 硬造停顿，按影响定 S3/S2。
 - 具体字数表达校验：正文用“这五个字 / 短短四字 / 三个字一落 / 八个字砸下去”等具体字数表达评价台词、题字、信件、念头或弹幕时，必须能确认统计口径、机器核对结果和叙事必要；不能确保字数计算正确时，按文字自然度问题处理，建议改成“这句话一落”“那几个字”“话音落下”等非具体数字表达。
 - 格式可读性：段落短、对话独立、无多余空行；格式阻碍阅读按 S3，严重混乱按 S2。
@@ -270,7 +275,7 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
   Rubric Source: file | embedded fallback
   相关文件路径：{设定/大纲/细纲文件路径}
   继承的开放项（分批审查必填，无则写「无」）：{从 追踪/伏笔.md 提取的、预计回收章 ≤ 本批末章的已埋未回收/未埋钩子，连同上一批 findings 摘要}
-  可选补充参考：本 Skill 的 `story-review/references/quality-checklist.md`、`story-review/references/plot-core-methods.md`，或已部署项目的 story-setup reference bundle；若不可读，不影响审查。
+  可选补充参考：本 Skill 的 `story-review/references/review-quality.md`、`story-review/references/plot-core-methods.md`，或已部署项目的 story-setup reference bundle；若不可读，不影响审查。
   检查项：
   1. 这一章是否推进了故事主题？
   2. 大纲结构是否完整（钩子/爽点/悬念）？
@@ -336,11 +341,11 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
   1. 是否存在禁用词/套话/陈词滥调，或“像/好像/仿佛/如同”式比喻成片堆叠？
   2. 是否出现 AI 写作指纹、8 种 AI 写作模式（含模式 8 解释腔/上帝视角/安排感）或章末总结体？
   3. 格式是否合规（按戏剧单元/镜头自然断段、无机械字数切分、无空行、对话独立成行、主语节奏自然）？
-  4. 标点节奏是否匹配语气/人物声线：是否通篇句号化、随机堆砌问号/感叹号，或残留 `……`/`——` 硬造停顿？正文（含对话）里的破折号是否已清理？
+  4. 标点节奏是否匹配语气/人物声线：是否通篇句号化、随机堆砌问号/感叹号，或无功能堆叠 `……`/`——`？逐处判断打断、未尽、强调或人物声线是否成立。
   5. 是否出现“这五个字 / 短短四字 / 三个字一落 / 八个字砸下去”等正文内具体字数表达？若统计口径不明、未见机器核对结果或无叙事必要，标为问题并建议改成非具体数字表达。
   6. 节奏是否均匀（有无连续多节无情绪变化）？
   7. 是否存在删掉无损的任务卡点或流程细节？若只是水/局部节奏问题标 S3；明显拖垮主线推进标 S2。
-  8. 身体部位同一词是否超 5 次？
+  8. 身体部位或同类反应是否无功能聚集？逐处做删除测试，不设统一次数上限。
   9. AI味分级（轻度/中度/重度）及证据。
   10. 去 AI 补充复核：是否有作者解释总结/意义尾巴；是否连续堆精致戏剧反应短语；是否把已有手机/屏幕/公告/规则/证据载体改成叙述者解释；是否把任务卡点当成自然感或凑字数手段；是否机械删除了有功能的生活化/角色化比喻或短篇主观审判句。
 

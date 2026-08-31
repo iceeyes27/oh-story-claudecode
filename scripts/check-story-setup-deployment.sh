@@ -16,6 +16,7 @@ CLAUDE_MERGE="$SKILL_DIR/scripts/merge-claude-settings.py"
 COPY_PATH_SAFETY="$SKILL_DIR/scripts/copy-path-safety.py"
 TMP_DIR="$(mktemp -d)"
 CURRENT_AGENTS_VERSION="$(node -e 'process.stdout.write(String(require(process.argv[1]).agents_version))' "$SCRIPT_DIR/current-contract.json")"
+CURRENT_SETUP_SKILL_VERSION="$(node -e 'process.stdout.write(String(require(process.argv[1]).setup_skill_version))' "$SCRIPT_DIR/current-contract.json")"
 PREVIOUS_AGENTS_VERSION=$((CURRENT_AGENTS_VERSION - 1))
 NEXT_AGENTS_VERSION=$((CURRENT_AGENTS_VERSION + 1))
 
@@ -446,8 +447,8 @@ assert_grep '网文写作工具集（OpenClaw）' "$SKILL_DIR/references/opencla
 echo "  OK TS2 deployment manifest"
 
 # TS3 — Agent reference bundle integrity
-historical_missing=(genre-readers.md genre-writing-formulas.md emotional-methods.md style-combat-face.md output-templates.md)
-for name in "${historical_missing[@]}"; do
+required_references=(genre-readers.md agent-reference-profiles.md long-genre-mechanics.md short-genre-formulas.md emotional-methods.md style-combat-face.md output-templates.md)
+for name in "${required_references[@]}"; do
   if [ "$name" = "output-templates.md" ]; then
     assert_no_grep 'output-templates\.md' "$SKILL_DIR/references/templates/agents/chapter-extractor.md" "chapter-extractor must not point at missing output-templates.md"
   else
@@ -738,7 +739,7 @@ assert_grep "agents_version.*小于 \`$CURRENT_AGENTS_VERSION\`|版本 < $CURREN
 assert_grep "agents_version.*大于 \`$CURRENT_AGENTS_VERSION\`" "$SKILL_DIR/SKILL.md" "story-setup must stop before downgrading a newer deployment"
 assert_grep 'Notice: agents bundle 版本不匹配' "$REPO_ROOT/skills/story-review/SKILL.md" "story-review must surface an agents_version mismatch"
 assert_grep "大于 $CURRENT_AGENTS_VERSION 时额外提示先更新 oh-story-claudecode" "$REPO_ROOT/skills/story-review/SKILL.md" "story-review must tell newer deployments to update the package first"
-assert_grep '^version:[[:space:]]*1\.2\.7$' "$SKILL_FILE" "story-setup frontmatter must match the deployed setup version"
+assert_grep "^version:[[:space:]]*$CURRENT_SETUP_SKILL_VERSION$" "$SKILL_FILE" "story-setup frontmatter must match the deployed setup version"
 
 # Phase 1 自检的目录名单是硬编码的，必须与实际 references/ 子目录集合一致。
 # 漏写一个 → 半装的包检不出；名单里多出已删除的目录 → 完好的包被判残缺，fail-closed 卡死所有部署。
@@ -753,7 +754,7 @@ for ref_dir in "$SKILL_DIR"/references/*/; do
   esac
 done
 ref_dir_count="$(find "$SKILL_DIR/references" -maxdepth 1 -mindepth 1 -type d | wc -l | tr -d ' ')"
-[ "$ref_dir_count" -eq 8 ] || fail "story-setup references/ now has $ref_dir_count subdirs (expected 8); update the Phase 1 self-check list and this assertion"
+[ "$ref_dir_count" -eq 9 ] || fail "story-setup references/ now has $ref_dir_count subdirs (expected 9); update the Phase 1 self-check list and this assertion"
 assert_grep '剧情/情绪模块\.md.*missing_primary_contract|missing_primary_contract.*剧情/情绪模块\.md' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must require the current emotion-module artifact"
 assert_grep '剧情/节奏\.md.*missing_primary_contract|missing_primary_contract.*剧情/节奏\.md' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must require the current rhythm artifact"
 assert_no_grep 'legacy_deconstruction|contract_version.*legacy|pre-v12' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must not keep legacy benchmark branches"
@@ -763,14 +764,13 @@ assert_grep 'missing_primary_contract' "$REPO_ROOT/skills/story-write/references
 assert_grep '内容概括（五段式）|情节安排（多线）|人物关系和出场顺序|结尾设定和钩子' "$SKILL_DIR/references/templates/agents/story-architect.md" "story-architect must output v13 chapter blueprint fields"
 assert_grep '逻辑线|人物关系变化|行动成本（可无）/收益归属|结尾设定' "$SKILL_DIR/references/templates/agents/consistency-checker.md" "consistency-checker must consume current outline blueprint fields"
 assert_grep '语气标点谱系' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must enforce v13 tone punctuation"
-assert_grep '不用.*……|不使用.*……|不保留.*……|不残留.*……' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must reject ellipsis pause punctuation"
-assert_grep '不用.*——|不使用.*——|不保留.*——|不残留.*——' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must reject dialogue dash exception"
+assert_grep '标点、句长、省略与留白先看清晰度和叙事功能' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must review punctuation by narrative function"
+assert_grep '不做全局清零' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must not mechanically remove functional punctuation"
 assert_grep '语气标点谱系' "$AGENT_REFS_DIR/format-and-structure.md" "agent references must include v13 tone punctuation format rules"
-assert_grep '不用.*……|不使用.*……|不保留.*……|不残留.*……' "$AGENT_REFS_DIR/format-and-structure.md" "agent references must forbid ellipsis pause punctuation"
-assert_grep '不用.*——|不使用.*——|不保留.*——|不残留.*——|正文和对话都禁止.*——' "$AGENT_REFS_DIR/format-and-structure.md" "agent references must forbid dialogue dash exception"
-assert_grep '禁止高置信否定铺垫后再肯定翻转|禁止高置信否定翻转句式' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must hard-ban high-confidence not-then-is flips"
-assert_grep '跨段.*不是A / 也不是B / 只是C.*(只作语义复核|advisory)' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must treat cross-paragraph negation as advisory"
-assert_grep '承担辩解、悬念排除或情绪递进时可保留|承担辩解、悬念排除、情绪递进等功能时可保留' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must preserve functional cross-paragraph negation"
+assert_grep '破折号、省略号.*逐处看打断、拖长、强调和人物声线.*无功能才改.*可保留' "$AGENT_REFS_DIR/format-and-structure.md" "agent references must review ellipsis and dashes by narrative function"
+assert_grep '复核否定铺垫后再肯定翻转' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must review not-then-is patterns"
+assert_grep '跨段否定三连.*语义功能裁决' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must review cross-paragraph negation by semantic function"
+assert_grep '承担辩解、悬念排除、反讽或情绪递进时可保留' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must preserve functional negation"
 assert_grep '至于X不X，怎么X' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must review formulaic dialogue too"
 assert_grep 'check-ai-patterns\.js --check' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must require detector rescan handoff"
 assert_grep '裸调用.*不得自动进入正文写作|不得自动进入正文写作.*裸调用' "$REPO_ROOT/skills/story-write/SKILL.md" "story-write bare invocation must not auto-write prose"

@@ -100,7 +100,7 @@ class CandidateCommitTests(unittest.TestCase):
     def read_state(self) -> dict:
         return json.loads((self.project / "追踪/_tracking-state.json").read_text(encoding="utf-8"))
 
-    # 触发 check-ai-patterns blocking 的短句（reverse-not-is + negation-parade）。
+    # 触发 check-ai-patterns finding 的短句（reverse-not-is + negation-parade）。
     TOXIC = "他想要的是尊严，而不是金钱。他知道，这世上没有光，没有声音，没有温度。"
 
     def make_candidate(
@@ -263,13 +263,26 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertFalse(by_chapter[2]["has_transaction"])
         self.assertFalse(by_chapter[1]["final_exists"])
 
-    def test_promote_quality_gate_blocks_toxic(self) -> None:
-        self.make_candidate(1, body=f"# 第1章\n{self.TOXIC}\n")
-        self._candidate(["promote", "--chapter", "1"], expect=2)
-        # 未过质量门：正稿与追踪不变，候选仍在原处。
-        self.assertEqual(self.final_files(), [])
-        self.assertEqual(self.read_state()["state_revision"], 0)
-        self.assertTrue((self.candidate_dir / "第001章_测试章名.md").exists())
+    def test_promote_treats_style_pattern_as_review_finding(self) -> None:
+        prose = self.make_candidate(1, body=f"# 第1章\n{self.TOXIC}\n")
+        scan = subprocess.run(
+            [
+                "node",
+                str(ROOT / "skills/_shared/scripts/check-ai-patterns.js"),
+                "--check",
+                "--fail-on=blocking",
+                str(prose),
+            ],
+            text=True,
+            capture_output=True,
+            check=False,
+            encoding="utf-8",
+        )
+        self.assertEqual(scan.returncode, 0)
+        self.assertIn("reverse-not-is", scan.stdout)
+        self._candidate(["promote", "--chapter", "1"])
+        self.assertEqual(self.final_files(), ["第001章_测试章名.md"])
+        self.assertEqual(self.read_state()["state_revision"], 1)
 
     def test_promote_quality_gate_fails_when_node_is_unavailable(self) -> None:
         self.make_candidate(1)

@@ -32,7 +32,8 @@ fi
 IGNORE_NAMES="output-templates.md material-decomposition.md quality-checklist.md \
 genre-catalog.md genre-core-mechanics.md genre-readers.md \
 genre-writing-techniques.md \
-AGENTS.md.tmpl hooks.json"
+hooks-suspense.md \
+AGENTS.md.tmpl hooks.json agent.md"
 
 # Analyst-divergent (basename): the story-analyze copy intentionally prepends the
 # "## 用作拆文标尺时" analyst-lens header, so it is dropped from the comparison set; all

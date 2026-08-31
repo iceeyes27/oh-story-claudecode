@@ -2,14 +2,14 @@
 
 ## 当前版本
 
-- `setup_skill_version: 1.2.7`
-- `agents_version: 25`
+- `setup_skill_version: 1.2.11`
+- `agents_version: 29`
 
 > **本 fork 的取值约定**：`setup_skill_version` 跟随上游 zenstory-ai/oh-story-claudecode，不另起 fork 自有版本线。本 fork 的架构差异由 `resolver_strategy: agents-canonical-v1` 连同 `canonical_skills_dir` / `adapter_manifest` 两个上游没有的字段标识，那几行远离上游高频改动区，能自动合并。
 >
 > 原因：`setup_skill_version` 与 `agents_version` 在本文件、`SKILL.md`、`current-contract.json`、`session-start.sh` 里都是相邻行，而上游每次发版都会 bump `agents_version`。两行贴在一起时会落进同一个 diff 块，只要 fork 在其中一行有自己的取值，每次合并上游必然冲突。让 `setup_skill_version` 与上游一致即可消除这类冲突，且不损失任何信息——运行时只用 `agents_version` 判断部署是否过期（见 `check-story-setup-deployment.sh` TS10 的 mixed-version 夹具），`setup_skill_version` 只做仓库内三处一致性校验。
 
-`.story-deployed` 缺失任一字段，或 `agents_version` 缺失 / 非整数 / 小于 `25`，都视为待更新部署。直接重新运行 `/story-setup`（Codex 用 `$story-setup`）；不在运行时逐级兼容历史模板。如项目 `agents_version` 大于 `25`，说明本地 story-setup 比项目旧：先更新 oh-story-claudecode，不得用 v25 降级覆盖。历史版本改动见仓库根目录 `CHANGELOG.md`。
+`.story-deployed` 缺失任一字段，或 `agents_version` 缺失 / 非整数 / 小于 `29`，都视为待更新部署。直接重新运行 `/story-setup`（Codex 用 `$story-setup`，Antigravity 用 `/skills` 或自然语言点名）；不在运行时逐级兼容历史模板。如项目 `agents_version` 大于 `29`，说明本地 story-setup 比项目旧：先更新 oh-story-claudecode，不得用 v29 降级覆盖。历史版本改动见仓库根目录 `CHANGELOG.md`。
 
 ## 升级策略
 
@@ -36,6 +36,7 @@ OpenClaw / Reasonix / generic 三条路径的 skill 副本在项目 `skills/` �
 - `.claude/agents/` — 所有 agent 定义
 - `.claude/rules/` — 所有 path-scoped 规则
 - `.agents/skills/` — 唯一 Skill 实体目录；平台 Skill 目录由 adapter manager 生成，不作为可覆盖实体
+- `.agents/agents/{name}/agent.md`、`.agents/rules/oh-story.md`、`.agents/hooks/{story_antigravity_hook.js,story_hook_core.js}` — Antigravity 受管文件；其他用户定义保留
 - `.zcode/commands/{13 known commands}.md` — 仅覆盖 oh-story 已知命令名称
 - `.zcode/hooks/story_zcode_hook.js` — ZCode 专用 Hook runner
 
@@ -45,6 +46,7 @@ OpenClaw / Reasonix / generic 三条路径的 skill 副本在项目 `skills/` �
 - `CLAUDE.md` — 按 marker/section 合并，用户独有 section 保留
 - `.claude/settings.local.json` — 按 command 识别 story hooks；已存在的受管 command 会迁移到当前模板的 event/matcher/timeout/if（例如 v25 的 Bash 正文 pre-guard），其他用户 hook 与配置保留
 - `AGENTS.md` — ZCode/OpenCode/Codex/OpenClaw/generic 按 marker/section 合并
+- `.agents/hooks.json` — 只替换顶层 `oh-story` 组，保留用户其他 hook groups
 - `.zcode/config.json` — 仅按事件、matcher 和 process args 去重合并 oh-story Hooks，其他字段保留
 
 ### 不碰
@@ -55,7 +57,28 @@ OpenClaw / Reasonix / generic 三条路径的 skill 副本在项目 `skills/` �
 - `.active-book` — 用户活跃书目
 - 短篇项目的 `追踪/` — setup/hooks 不应为短篇自动创建
 
-## v25 当前契约
+## v29 当前契约
+
+- 正文候选、质量审查、读者证据和追踪事务由不可变质量生命周期绑定；旧章修订会使后续审查链失效并要求顺序重放。
+- 运行锁文件不进入代际快照；正文、追踪和审查产物按原始字节物化，Windows 换行差异不得改变内容哈希。
+- 表达规则按叙事功能审查，不使用强制短句、固定悬念配额或自动改写制造省略感。
+
+## v28 历史契约
+
+- Agent 资料按 Common / Long / Short profile 分层；长短篇悬念、反转、题材和格式引用分开部署。
+- 跨 Skill 的派生参考资料登记在 `shared-references.json`，生成副本由同步脚本维护。
+
+## v27 历史契约
+
+- story-architect 先选择长篇或短篇 profile，只加载 common 与当前篇幅资料；无法判断时明确报告 unresolved。
+- 长篇使用独立题材卡、情绪方法和章节格式，短篇保留小节级结构方法。
+
+## v26 历史契约
+
+- 新增 Google Antigravity 2.0 项目部署：公开 Skill 与 `_shared` 安装到 `.agents/skills/`，7 个 agent 生成到 `.agents/agents/{name}/agent.md`，并安装 always-on rule 与 workspace hooks。
+- `.agents/hooks.json` 只合并顶层 `oh-story` 组；不写 `~/.gemini/`，不沿 symlink 修改项目外目标。Antigravity 不提供 PreCompact/PostCompact，压缩后由 always-on rule 读取追踪上下文。
+
+## v25 历史契约
 
 - Claude Code 的正文前置守卫现在也注册到 Bash：常见的重定向、`tee`、`touch`、`cp`、`mv`、`install` 写入正文时复用共享 JS 核识别目标并执行大纲/追踪门；只读命令里的引号示例与 heredoc 正文提及不拦，并按 hook `cwd` 解析相对路径。该面是**静态 best-effort 识别，不是 shell 沙箱**：环境变量间接路径、运行时生成命令与未列出的任意写文件程序无法可靠静态判定；这类写入应改用 Write/Edit。Bash 命令面依赖 node，node/共享核异常时显式告警后 fail-open；Write/Edit/MultiEdit 的纯 bash 兜底不受影响。
 - Codex Python 与共享 JS 的书目录发现统一限制为项目下 4 层，并剪枝隐藏目录、`node_modules`，避免 SessionStart/Stop 无界扫描和跨端发现范围漂移。
@@ -97,7 +120,7 @@ OpenClaw / Reasonix / generic 三条路径的 skill 副本在项目 `skills/` �
 
 1. 在项目根目录重新运行 story-setup。
 2. 运行 `node .agents/skills/story-setup/scripts/manage-skill-adapters.js install --replace-managed-copies` 迁移旧平台副本。
-3. 确认 `.story-deployed` 写入 `agents_version: 25`、`setup_skill_version: 1.2.7`、`resolver_strategy: agents-canonical-v1`、`canonical_skills_dir` 与 `adapter_manifest`。
+3. 确认 `.story-deployed` 写入 `agents_version: 29`、`setup_skill_version: 1.2.11`、`resolver_strategy: agents-canonical-v1`、`canonical_skills_dir` 与 `adapter_manifest`。
 4. 运行 adapter `check`，确认 Skill 入口、agents、hooks/rules 和 references 通过验证。
 5. 新开会话，使 custom agents 与 hooks 按当前文件重新注册。
 6. **长篇在写项目必做**：检查每本书的 `追踪/_tracking-state.json` 是否存在。不存在就是旧追踪结构，按下方「追踪模型迁移」重建，否则写下一章会被拦。

@@ -2,6 +2,47 @@
   "version": 1,
   "groups": [
     {
+      "name": "story-outline-contract",
+      "source": "skills/story-write/scripts/check-outline-contract.js",
+      "targets": [
+        "skills/story-import/scripts/check-outline-contract.js"
+      ]
+    },
+    {
+      "name": "story-quality-benchmarks",
+      "source": "skills/story-write/scripts/positive-benchmark-fixtures.json",
+      "targets": [
+        "skills/story-import/scripts/positive-benchmark-fixtures.json",
+        "skills/story-review/scripts/positive-benchmark-fixtures.json"
+      ]
+    },
+    {
+      "name": "story-quality-lifecycle",
+      "source": "skills/story-write/scripts/quality_lifecycle.py",
+      "targets": [
+        "skills/story-import/scripts/quality_lifecycle.py",
+        "skills/story-review/scripts/quality_lifecycle.py"
+      ]
+    },
+    {
+      "name": "story-quality-cli",
+      "source": "skills/story-write/scripts/storyctl.py",
+      "targets": [
+        "skills/story-import/scripts/storyctl.py",
+        "skills/story-review/scripts/storyctl.py"
+      ]
+    },
+    {
+      "name": "story-wordcount-core",
+      "source": "skills/_shared/scripts/wordcount_core.py",
+      "targets": [
+        "skills/story-write/scripts/wordcount_core.py",
+        "skills/story-import/scripts/wordcount_core.py",
+        "skills/story-review/scripts/wordcount_core.py",
+        "skills/story/scripts/wordcount_core.py"
+      ]
+    },
+    {
       "name": "prose-outline-copy-detector",
       "source": "skills/_shared/scripts/check-outline-copy.js",
       "targets": [
@@ -54,6 +95,7 @@
       "name": "story-hook-core",
       "source": "skills/story-setup/references/templates/hooks/story_hook_core.js",
       "targets": [
+        "skills/story-setup/references/antigravity/hooks/story_hook_core.js",
         "skills/story-setup/references/opencode/story_hook_core.js",
         "skills/story-setup/references/zcode/hooks/story_hook_core.js"
       ]

@@ -290,7 +290,7 @@ def validate_binding(
     tracking_payload = dict(document)
     tracking_payload.pop("candidate_binding", None)
     try:
-        normalized = tracking.normalize_transaction(state, tracking_payload)
+        normalized = tracking.normalize_transaction(project, state, tracking_payload)
         next_state = tracking.merge_transaction(state, normalized)
     except Exception as exc:
         if exc.__class__.__name__ == "TrackingError":

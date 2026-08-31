@@ -889,7 +889,7 @@ function toxicReverseNotIsExcluded(line, matched, start) {
   return false
 }
 
-// 每行只报第一条命中的句式规则（复扫到净哲学：改完一处再扫下一处）。
+// 每行只报第一条命中的句式规则；结果是深审 finding，不是机械清零命令。
 function matchToxicSentence(line) {
   for (const [regex, label, fix] of TOXIC_SENTENCE_PATTERNS) {
     regex.lastIndex = 0
@@ -937,7 +937,7 @@ function toxicPhraseFindings(text) {
     const summary = masked.match(TOXIC_TRAILER_SUMMARY_PATTERN)
     if (summary) findings.push(`第${lineNo}行 毒句式[trailer-summary]：『${codePointSlice(summary[0], 0, 20)}』——删章尾状态总结句，收束状态是细纲的规划口径，正文落到具体动作、画面或台词上。`)
   }
-  if (findings.length) findings.push("毒句式是确定性 AI 指纹：本章须清零后再继续。完整扫描：node <skill>/scripts/check-ai-patterns.js --check <正文文件>")
+  if (findings.length) findings.push("句式命中只生成 finding：逐条复核清晰度、自然度与语义功能；无功能才改，有功能可在深审中保留。完整扫描：node <skill>/scripts/check-ai-patterns.js --check <正文文件>")
   return findings
 }
 
@@ -1055,7 +1055,7 @@ function proseAfterWrite(root, absolute) {
   }
   findings.push(...duplicateTitleFindings(absolute))
   if (!findings.length) return ""
-  return `=== 正文兜底检测（${safeRelative(root, absolute)}）===\n轻量确定性网自动复扫（模型无关，防主会话漏跑收尾）。按类型处理后复扫到净：\n${findings.join("\n")}`
+  return `=== 正文兜底检测（${safeRelative(root, absolute)}）===\n轻量规则网只登记待审证据；逐条判断是否损害清晰度、自然度或声线，功能性用法可保留：\n${findings.join("\n")}`
 }
 
 // 线性手写分词，不用带歧义交替的正则：旧式 /"(?:\\.|[^"])*"|'[^']*'|[^\s]+/ 里 \\. 与 [^"] 都能吃

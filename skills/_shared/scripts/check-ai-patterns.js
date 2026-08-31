@@ -13,10 +13,10 @@ Detect high-risk AI-flavor prose patterns that need human rewrite:
   - repeated negative setup followed by positive flip
   - em-dash (按功能改写), 碎句号 (连续短叙述句), 长段落 (按镜头断段)
   - 微动作复读 (「了下/了一下」式轻量补语高密度，电报体指纹)
+  - 套式反应细节 (指尖/指节/目光等无功能微动作与「平静得像在念」式语气比喻成片)
   - 抽象总结复读 (命运/棋局/这一刻终于明白/才刚刚开始，AI 结尾腔)
   - 套词密度过高 (仿佛/一丝/深吸一口气/平静无波等禁用词聚集)
   - 比喻密度过高 (像/好像/仿佛/如同等比喻标记成片复现)
-  - 抽象裁判金句 (水里/海里/河里“认的是X，不是嘴/威风”、认活路、长骨头等逻辑不落地硬话)
   - 解释链密度过高 (知道/明白/这意味着/必须/需要等判断链聚集)
   - 系统公告公文腔过密 (方括号系统/规则行里硬规则词聚集)
   - 过度精炼短段 (长文本里短叙述段过密且自然连接偏少)
@@ -25,16 +25,15 @@ Detect high-risk AI-flavor prose patterns that need human rewrite:
   - 音量反差腔 (声音不高/不大…却…, 实战漏网句式)
   - 否定排比 (没有X，没有Y…连排 / 没X…只是Y 先否定后肯定, 实战漏网句式)
   - 工整并列 (至于X不X，怎么X / 同动词「不V A，不V B」，含台词，advisory)
-  - 否定校正式排比 (不讲A，只讲B；不求C，只求D, 实战漏网句式)
   - 反序对比 (是A，不是B — not-is 的反序变种, 实战漏网句式)
   - 预告式总结收尾 (文末窗口 没人知道/才刚刚开始/正朝着…压了过去, 实战漏网句式)
-  - 旁白口号腔 (引号外叙述喊口号 不胜不休/正义必胜/法治的晴空/正义的铁壁, 实战漏网 F)
+  - 章尾状态总结体 (文末窗口 这一夜注定/这一切都结束了/新的人生才刚刚开始/命运的齿轮)
   - 引号强调滥用 (叙述里 1-4 字短词加引号强调，密度型)
-  - 双端悬空的“的”字身份跳转句 (动作/状态+的，成了+代词)
-  - 空壳式人体失真比喻 (骨头/骨架被抽走，只剩皮壳支撑)
 
-Each finding carries severity: blocking by default for generation/deslop cleanup (not-is-comparison / em-dash / voice-contrast / negation-parade / negation-only-parallel / reverse-not-is / trailer-ending). This is a local style/readability gate, not an AIGC detector score; functional human text can be marked for review instead of hard-edited for a detector.
-或 advisory (period-stutter / long-paragraph / micro-action-tic / stock-reaction-tic / action-list-tic / abstract-summary-tic / cliche-density-tic / metaphor-density-tic / reasoning-chain-tic / system-notice-formality-tic / overcompressed-prose-tic / low-connective-density-tic / quote-emphasis-tic / formulaic-parallelism，是提示，justified 的长推理/氛围段可保留)。
+All findings are advisory style/readability evidence, not AIGC verdicts or
+automatic rejection rules. A functional human sentence may be recorded as
+PRESERVED_WITH_FUNCTION after contextual review; only semantic review can decide
+whether it harms clarity, continuity, voice, or pacing.
 --fail-on=blocking 只在出现 blocking finding 时退出 1；默认 --fail-on=all 有任何 finding 即退出 1。
 
 The script reports findings only. It never rewrites text, because the safe fix is
@@ -61,6 +60,10 @@ const MICRO_TIC_PATTERN = /了(?:[一两三几半])?[下阵圈道声眼口气会
 const MICRO_TIC_MIN_HITS = 5;
 const MICRO_TIC_PER_KILO = 6;
 
+// 套式反应细节：不是禁写身体，而是提示成片出现的“部位 + 轻微动作/状态”、
+// “胸口像被撞了一下”、喉结/眼圈/声音放轻等通用情绪尾巴，以及“平静语气 +
+// 像在念/宣判”模板。此类句子词面变化大，不能逐词 blocking；按章聚集到 4 处才
+// advisory，要求逐处做删除测试。正常受伤、打斗、生理反应若承担物理后果可保留。
 const STOCK_REACTION_PATTERNS = [
   /(?:指尖|手指|指节|手背|掌心|拳头|袖口|衣角|裙角|下唇|嘴唇|唇角|嘴角|眉头|眼底|眸光|目光|视线|肩膀|呼吸)[^。！？!?\n]{0,16}(?:轻轻|微微|缓缓|悄然|不自觉|无意识|下意识|攥紧|握紧|收紧|绞紧|泛白|发白|叩|敲|摩挲|抿紧|抿成|移开|垂下|躲开|一颤|颤了?一下|停了?一下|顿了?一下)/g,
   /(?:语气|声音)[^。！？!?\n]{0,12}(?:平静|冷静|平淡|冷淡|淡漠|平直)[^。！？!?\n]{0,12}(?:像|仿佛|如同|好像)[^。！？!?\n]{0,16}(?:念|读|报|说|陈述|宣判|背诵)/g,
@@ -71,6 +74,10 @@ const STOCK_REACTION_PATTERNS = [
   /(?:抿了?下唇|抿了?抿唇|抿了?下嘴|抿着笑)/g,
 ];
 const STOCK_REACTION_MIN_HITS = 4;
+// 校准（真人语料，<br> 已还原为换行）：qimao 长篇 5584 章 + heiyan 短篇整篇 3983 篇。
+// 长篇章尺度（中位约 2100 字）per-kilo 1.0→1.5 误报 0.43%→0.39%，几乎不动；
+// 短篇整篇 8000-20000 字下 MIN_HITS 形同虚设、只剩密度门，1.0 时误报 5.57%，
+// 1.5 降到 1.46%。故取 1.5，把两个总体拉到同一量级（四份副本共用一组阈值）。
 const STOCK_REACTION_PER_KILO = 1.5;
 
 // 监控摄像头式动作清单：同一段连续堆叠通用动作动词（伸手/拿起/取过/挑开/放下/转身等），
@@ -117,42 +124,6 @@ const METAPHOR_MARKER_PATTERN = /好像|像是|仿佛|宛如|如同|犹如|(?<![
 const METAPHOR_LIKE_PHRASE_PATTERN = /(?:死|水|冰|火|潮水|石头|木头|机器|纸|铁|鬼|死人|刀|针|网|墙)一样/g;
 const METAPHOR_DENSITY_MIN_HITS = 7;
 const METAPHOR_DENSITY_PER_KILO = 3;
-
-// 抽象裁判金句：台词里常见“海里/水里认的是X，不是你嘴上那点Y”这类硬话。
-// 问题不是角色不能说狠话，而是把“水/真/命”写成抽象裁判，逻辑落不到能力、证据或规矩上。
-// 本规则查全行（含台词），因为这类问题常出现在引号内。
-const ABSTRACT_AUTHORITY_PATTERNS = [
-  /(?:海里|水里|江里|河里|海上|水上)[^。！？!?\n]{0,24}认的是[^。！？!?\n]{1,18}，?不是(?:你|他|她|他们|咱们|我们)?[^。！？!?\n]{0,18}(?:嘴|口气|威风|漂亮话|狠话)/g,
-  /认的是[^。！？!?\n]{0,12}水里那口真/g,
-  /认活路/g,
-  /长骨头/g,
-];
-
-// 旁白口号腔（实战漏网 F，2026-08-19 从《法援律师》168 章全量扫描固化）：
-// 叙述者跳出剧情替全书喊口号——「法援律师用铁一般的证据与法条，逐一击穿了……，
-// 必将在法治的晴空下……，正义必胜！」。判据：把句子抽出来读，像不像电视普法节目的
-// 旁白字幕/法治宣传片解说词。像 → 命中。只扫引号外叙述（maskQuoted），引号内台词
-// 由 dialogue-naturalness-scan 第 6 类覆盖，不重复计；in-world 群聊/群众口号
-// （如家长群刷「正义必胜」）在引号内被 mask 排除。
-// 校准：修复前《法援律师》全书 20+ 处旁白命中；修复后 0 命中（群聊豁免）。
-const NARRATION_SLOGAN_PATTERNS = [
-  /不胜不休|正义必胜|朗朗乾坤|朗朗晴空|公道自在人心|依法维权到底|公平正义重见天日/g,
-  /正义的(?:审判|锁链|巨浪|钟声|铁壁|利剑|之剑|之笔|铁拳|法网|利刃|防线)/g,
-  /法治的(?:晴空|轨道|底线|威严|蓝天|审判)/g,
-  /正义(?:绝不|永不|终将|必将)(?:向|对|被|让|洗|还|守|来|到|低|妥|缺)/g,
-  /胜利(?:终将|必将)属于/g,
-  /(?:法援律师|律师团队|我们)(?:用|以|拿|紧握|手握着|的目光坚定如铁)/g,
-  /(?:筑起|铸就|扛起|举起|高擎)(?:了)?(?:正义|法治|法律的)(?:铁壁|屏障|盾牌|巨伞|大旗|旗帜|长城)/g,
-  /(?:撕开|揭开|撕碎|击穿|戳穿|砸碎)(?:了)?(?:一切|所有)?(?:虚伪|伪善|伪装)(?:面具|外壳|皮|壁)/g,
-  /(?:真相|正义|公理)(?:终将|必将|一定|迟早会)大白(?:于天下)?/g,
-  /(?:光明|阳光|黎明)(?:终将|必将)来临|(?:黑夜|黑暗)终将过去/g,
-  /(?:告慰|不负)[^。！？!?\n]{0,12}(?:在天之灵|亡灵)/g,
-  /(?:任何|一切)[^。！？!?\n]{0,12}(?:违法|践踏|亵渎|阴谋|黑恶)[^。！？!?\n]{0,12}(?:必将|都将|都会)[^。！？!?\n]{0,8}(?:严惩|制裁|付出代价|无处遁形|灰飞烟灭|化为乌有)/g,
-  /(?:铸就|奠定|树立|打造|建立)(?:了)?(?:一座|一道)?(?:坚如磐石|永不磨灭|坚不可摧|崇高无暇|不可动摇)?(?:的)?(?:堡垒|丰碑|长城|奇迹|基石|神话|大厦|伟业|铠甲)/g,
-  /(?:粉碎|击碎|挫败)(?:了)?(?:来自|所有)?(?:各方|一切|旧官僚|对手|国际金融)?(?:的)?(?:暗算|阴谋|企图|挑衅|围剿|反扑|计划|妄想)/g,
-  /一场(?:体制|商业|金融|暗流)?(?:层面)?(?:的)?(?:暗流)?交锋[^。！？!?\n]{0,20}(?:化为无形|落幕|定鼎)/g,
-  /地位愈发(?:固若金汤|坚不可摧|牢不可破|不可动摇)/g,
-];
 
 // 解释链密度：常见“他知道/他明白/这意味着/必须需要”
 // 连续替读者推理，读感像报告。单个判断词可服务推理；高密度聚集才提示回到角色当下证据。
@@ -223,7 +194,7 @@ const QUOTE_SOURCES = QUOTE_PAIRS.map(([open, close]) => `${escapeRegExp(open)}[
 
 // 音量反差腔（实战漏网 A）：「声音不高，第一句却稳稳压住了整个大厅。」
 // 旧网只有套词密度桶里的「声音不大，却带着」，音量词/转折词一换就漏。
-// 引号外叙述逐处 blocking；修法是删掉音量铺垫，直接写声音落进场子的具体效果。
+// 引号外叙述逐处提示；是否修改取决于语境中的信息、声线与节奏功能。
 // 校准：《万疆》20 章 0 命中，demo 前 20 章 0 命中。
 const VOICE_CONTRAST_PATTERN = /声音(?:并)?不[大高响亮][^。！？!?\n]{0,16}[却但偏]/g;
 
@@ -249,10 +220,6 @@ const CROSS_NEGATION_END = /^只是[^。！？!?\n]{1,32}[。！？!?]?$/;
 const DECISION_FRAME_PATTERN = /至于([\u3400-\u9fff]{1,3})不\1[，,]\s*怎么\1/g;
 const REPEATED_NEGATIVE_VERB_PATTERN = /不([\u3400-\u9fff]{1,2})([\u3400-\u9fff]{2,8})[，,]\s*不\1([\u3400-\u9fff]{2,8})/g;
 
-// 否定校正式排比（实战漏网 B2）：“不讲A，只讲B；不求C，只求D”。
-// 单个“不X，只Y”在自然口语中很常见，只拦同句双联且中间用分号对齐的变体，避免误报。
-const NEGATION_ONLY_PARALLEL_PATTERN = /(?:不讲|不求|不谈|不要|不看|不管|不图|不问|不争|不算|不在乎|不考虑)[^。！？!?\n；;，,]{1,18}[，,]\s*(?:要的)?只[^。！？!?\n；;]{1,24}[；;]\s*(?:也)?(?:不讲|不求|不谈|不要|不看|不管|不图|不问|不争|不算|不在乎|不考虑)[^。！？!?\n；;，,]{1,18}[，,]\s*只[^。！？!?\n]{1,30}/g;
-
 // 反序对比腔（实战漏网 C）：「是真嗓子，不是修音修出来的」——not-is-comparison 的反序变种。
 // 复用 not-is 的排除基建：引号内剥离（maskQuoted）、「是的/是啊」确认语（isAffirmationTagAt）；
 // 前字排除从 either-or 的 不/就/也 扩展到全部「X是」连词/副词合成词（还是/只是/可是/但是/
@@ -272,9 +239,19 @@ const REVERSE_NOT_IS_PREV_EXCLUDE = new Set([...COMPACT_EITHER_OR_PREV, '还', '
 const TRAILER_ENDING_PATTERN = /没人知道|谁也不知道|谁也没想到|殊不知|(?:这)?才刚刚开(?:始|头)|正(?:朝着|向着)[^。！？!?\n]{0,24}(?:压|涌|袭|逼)(?:了?过去|了?过来|来)|(?<!正式)拉开(?:序幕|帷幕)|即将(?:开始|来临|降临)/g;
 const TRAILER_ENDING_WINDOW_CHARS = 600;
 
-// 章尾状态总结体与部署 hook 使用同一规格：收束状态是细纲的规划口径，正文应停在
-// 具体动作、画面或台词上。每个分支都要求落在句末，避免误伤条件从句、动补、成语、
-// 系表与认知句；引号内容仍由 maskQuoted 排除。
+// 章尾状态总结体：把细纲「结尾设定/收束状态」原样写成总结句收章（「这一夜注定无人入眠」
+// 「这一切都结束了」「新的人生才刚刚开始」「命运的齿轮」）。与 trailer-ending 共用文末窗口，
+// 区别是它盖章过去、trailer-ending 预告将来；收的都是 banned-words 已按名禁掉的形态。
+// 不收「(这|那)一刻…终于明白」：真人语料里那是正常的认知节拍，短篇第一人称审判句还是卖点
+// （short-craft「审判金句 / 心死余韵」），密度型由 advisory 的 abstract-summary-tic 兜。
+// 各分支都要求落在句末断言位，否则会吃进条件从句（等这一切结束了，我们就…）、动补
+// （这一切都说明得非常清楚）、成语跨匹配（这一刻…命中注定）、系表（这一战的结果是注定的）、
+// 及物用法（就这样…才结束了这个话题）、场内报幕（就这样…宣布…圆满落幕）和否定认知
+// （他不知道这一切意味着什么）——最后一类靠 (?!什么) 排掉间接疑问，那是盖章的反面。
+// 校准（文末 600 字窗口，命中逐条人工复核）：qimao 章中段 20000 章命中 1 处（0.005%）、
+// heiyan 整篇 3999 篇命中 22 处（0.550%，全部是上列禁用形态）；同批既有 trailer-ending
+// 分别命中 1.345% / 6.602%——本规则误报面显著小于已上线的同窗口规则。短篇整篇即收口，
+// 基线天然高于长篇章中段，故两个总体分别报数。
 const TRAILER_SUMMARY_PATTERN = /这一(?:夜|天|刻|战|年|局|役)[，,]?[^。！？!?，,\n]{0,6}(?<!命中)(?<!是)注定[^。！？!?\n]{0,8}[。！]|就这样[，,][^。！？!?，,\n]{0,8}(?:一切|全部)[^。！？!?，,\n]{0,4}(?:结束了|落幕|收场)[。！]|这一切[，,]?[^。！？!?，,\n]{0,6}(?:都)?(?:说明|意味着|结束了)(?!的)(?:(?!什么)[^。！？!?\n]){0,6}[。！]|(?:新的篇章|新的旅程|崭新的篇章|新的人生)[^。！？!?\n]{0,6}(?:开始|拉开|展开)|命运[^。！？!?\n]{0,6}齿轮/g;
 
 // 引号强调滥用（实战漏网 E，advisory 密度型，风格照 metaphor-density-tic）：
@@ -345,15 +322,10 @@ if (options.json) {
   }
 }
 
-// Do not call process.exit() after writing JSON to a pipe. Large multi-file
-// reports may still be buffered, and an immediate exit truncates the JSON.
-// Setting exitCode preserves the status while allowing stdout to flush.
-if (failed) process.exitCode = 2;
+if (failed) process.exit(2);
 // --fail-on=blocking 只在出现 blocking finding 时退出 1（advisory 仅报告）；默认 all 沿用「有任何 finding 即 1」。
 const hasBlocking = allFindings.some((f) => f.severity === 'blocking');
-if (!failed && (options.failOn === 'blocking' ? hasBlocking : allFindings.length > 0)) {
-  process.exitCode = 1;
-}
+if (options.failOn === 'blocking' ? hasBlocking : allFindings.length > 0) process.exit(1);
 
 function escapeRegExp(text) {
   return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -431,7 +403,7 @@ function scanProsePatterns(proseLines) {
         line: lineNo,
         column: dash.index + 1,
         type: 'em-dash',
-        severity: 'blocking',
+        severity: 'advisory',
         message: '破折号按功能改写：打断→动作 beat/短句，拖长音→省略或动作，插入说明→逗号/冒号；勿一律改句号。',
         excerpt: compact(text.slice(Math.max(0, dash.index - 8), dash.index + dash[0].length + 8)),
       });
@@ -452,16 +424,13 @@ function scanProsePatterns(proseLines) {
   findings.push(...findVoiceContrast(proseLines));
   findings.push(...findNegationParade(proseLines));
   findings.push(...findFormulaicParallelism(proseLines));
-  findings.push(...findNegationOnlyParallel(proseLines));
   findings.push(...findReverseNotIs(proseLines));
   findings.push(...findTrailerEnding(proseLines));
-  findings.push(...findTrailerSummary(proseLines));
   findings.push(...findQuoteEmphasisTic(proseLines));
   findings.push(...findPeriodStutter(proseLines));
   findings.push(...findMicroActionTic(proseLines));
   findings.push(...findStockReactionTic(proseLines));
   findings.push(...findActionListTic(proseLines));
-  findings.push(...findAbstractAuthoritySlogan(proseLines));
   findings.push(...findAbstractSummaryTic(proseLines));
   findings.push(...findClicheDensityTic(proseLines));
   findings.push(...findMetaphorDensityTic(proseLines));
@@ -469,52 +438,10 @@ function scanProsePatterns(proseLines) {
   findings.push(...findNoticeFormalityTic(proseLines));
   findings.push(...findOvercompressedProseTic(proseLines));
   findings.push(...findLowConnectiveDensityTic(proseLines));
-  findings.push(...findBannedWordsExact(proseLines));
-  findings.push(...findSynestheticMetaphor(proseLines));
-  findings.push(...findAntithesis(proseLines));
-  findings.push(...findDanglingIdentityShift(proseLines));
-  findings.push(...findBodyShellMetaphor(proseLines));
-  findings.push(...findContrastRhetorical(proseLines));
-  findings.push(...findPhysicalClear(proseLines));
-  findings.push(...findAbstractObjectForced(proseLines));
-  findings.push(...findPainAsObject(proseLines));
-  findings.push(...findGreyCrackInHead(proseLines));
-  findings.push(...findSummarySlogan(proseLines));
-  findings.push(...findNarrationSlogan(proseLines));
-  findings.push(...findEnglishResidue(proseLines));
-  findings.push(...findProcessTermAsObject(proseLines));
   return findings;
 }
 
-// 抽象裁判金句：逐句报告，blocking。修法是把抽象裁判落成具体能力/证据/规矩。
-function findAbstractAuthoritySlogan(proseLines) {
-  const findings = [];
-
-  for (const { text, lineNo } of proseLines) {
-    const trimmed = text.trim();
-    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
-
-    for (const pattern of ABSTRACT_AUTHORITY_PATTERNS) {
-      pattern.lastIndex = 0;
-      let match;
-      while ((match = pattern.exec(text)) !== null) {
-        const hit = match[0];
-        findings.push({
-          line: lineNo,
-          column: match.index + 1,
-          type: 'abstract-authority-slogan',
-          severity: 'blocking',
-          message: '抽象裁判金句：把“水/真/命/骨头/活路”写成裁判但逻辑不落地；改成具体能力、来路证据、行内规矩或组织结果，如“海里讲的是水性，不是嘴上那点威风”。',
-          excerpt: compact(hit),
-        });
-      }
-    }
-  }
-
-  return findings;
-}
-
-// 音量反差腔（实战漏网 A）：引号外叙述逐处 blocking，位置与摘录取自原文
+// 音量反差腔（实战漏网 A）：引号外叙述逐处提示，位置与摘录取自原文
 // （maskQuoted 等长占位保偏移；命中片段不含问号占位符，故不会落进占位区）。
 function findVoiceContrast(proseLines) {
   const findings = [];
@@ -530,48 +457,9 @@ function findVoiceContrast(proseLines) {
         line: lineNo,
         column: match.index + 1,
         type: 'voice-contrast',
-        severity: 'blocking',
+        severity: 'advisory',
         message: '音量反差腔：「声音不大/不高…却/但…」是 AI 高频反差模板；删掉音量铺垫，直接写声音落进场子的具体效果（谁停了手、哪排安静了）。',
         excerpt: compact(text.slice(match.index, match.index + match[0].length)),
-      });
-    }
-  }
-
-  return findings;
-}
-
-// 旁白口号腔：逐处 blocking。只扫引号外叙述；摘录取自 mask 前原文保持可读。
-function findNarrationSlogan(proseLines) {
-  const findings = [];
-
-  for (const { text, lineNo } of proseLines) {
-    const trimmed = text.trim();
-    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
-    const masked = maskQuoted(text);
-    const spans = [];
-    for (const pattern of NARRATION_SLOGAN_PATTERNS) {
-      pattern.lastIndex = 0;
-      let match;
-      while ((match = pattern.exec(masked)) !== null) {
-        spans.push([match.index, match.index + match[0].length]);
-      }
-    }
-    spans.sort((a, b) => a[0] - b[0]);
-
-    let lastEnd = -1;
-    for (const [start, end] of spans) {
-      if (start < lastEnd) {
-        lastEnd = Math.max(lastEnd, end);
-        continue;
-      }
-      lastEnd = end;
-      findings.push({
-        line: lineNo,
-        column: start + 1,
-        type: 'narration-slogan',
-        severity: 'blocking',
-        message: '旁白口号腔：叙述者跳出剧情喊口号（「不胜不休/正义必胜/法治的晴空/正义的铁壁」家族），读着像普法宣传片解说词。删掉口号尾，收束成角色当下可见的场景/动作/物件（窗外、白板、证据链、灯光、卷宗），情绪留给下一章钩子，不替读者下结论。',
-        excerpt: compact(text.slice(Math.max(0, start - 12), Math.min(text.length, end + 12))),
       });
     }
   }
@@ -610,7 +498,7 @@ function findNegationParade(proseLines) {
         line: lineNo,
         column: start + 1,
         type: 'negation-parade',
-        severity: 'blocking',
+        severity: 'advisory',
         message: '否定排比：「没有X，没有Y…」/「没X，没有Y，只是Z」是 AI 高频排比模板；删掉否定清单，直接写现场实际有什么，最多留一个最有信息量的否定。',
         excerpt: compact(text.slice(start, end)),
       });
@@ -675,31 +563,6 @@ function findFormulaicParallelism(proseLines) {
   return findings;
 }
 
-// 否定校正式排比（实战漏网 B2）：只扫引号外叙述，双联对齐逐处 blocking。
-function findNegationOnlyParallel(proseLines) {
-  const findings = [];
-
-  for (const { text, lineNo } of proseLines) {
-    const trimmed = text.trim();
-    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
-    const masked = maskQuoted(text);
-    NEGATION_ONLY_PARALLEL_PATTERN.lastIndex = 0;
-    let match;
-    while ((match = NEGATION_ONLY_PARALLEL_PATTERN.exec(masked)) !== null) {
-      findings.push({
-        line: lineNo,
-        column: match.index + 1,
-        type: 'negation-only-parallel',
-        severity: 'blocking',
-        message: '否定校正式排比：“不讲A，只讲B；不求C，只求D”是工整的作者总结腔；改写为具体动作、利益或后果。',
-        excerpt: compact(text.slice(match.index, match.index + match[0].length)),
-      });
-    }
-  }
-
-  return findings;
-}
-
 // 反序对比腔（实战漏网 C）：「是A，不是B」。排除基建复用 not-is-comparison：
 // 引号内剥离、「是的/是啊」确认语；前字合成词与反问尾巴见 REVERSE_NOT_IS_PREV_EXCLUDE 注释。
 function findReverseNotIs(proseLines) {
@@ -725,7 +588,7 @@ function findReverseNotIs(proseLines) {
         line: lineNo,
         column: start + 1,
         type: 'reverse-not-is',
-        severity: 'blocking',
+        severity: 'advisory',
         message: '反序对比腔：「是A，不是B」与「不是A，是B」同族；删掉后置否定，直接写 A 的具体表现，或用细节让读者自己对比。',
         excerpt: compact(text.slice(start, start + match[0].length)),
       });
@@ -737,7 +600,7 @@ function findReverseNotIs(proseLines) {
 
 // 预告式总结收尾（实战漏网 D）：只扫文末窗口。从文末往回收集叙述行，
 // 直到剥引号后的可见字数达到窗口大小（按行取整，边界行整行计入）。
-function trailerWindowLines(proseLines) {
+function findTrailerEnding(proseLines) {
   const windowLines = [];
   let accumulated = 0;
 
@@ -749,12 +612,6 @@ function trailerWindowLines(proseLines) {
     accumulated += visibleLength(stripQuoted(trimmed));
   }
 
-  return windowLines;
-}
-
-function findTrailerEnding(proseLines) {
-  const windowLines = trailerWindowLines(proseLines);
-
   const findings = [];
   for (const { text, lineNo } of windowLines) {
     const masked = maskQuoted(text);
@@ -765,33 +622,25 @@ function findTrailerEnding(proseLines) {
         line: lineNo,
         column: match.index + 1,
         type: 'trailer-ending',
-        severity: 'blocking',
+        severity: 'advisory',
         message: '预告式总结收尾：「没人知道/才刚刚开始/正朝着…压了过去」是 AI 章尾预告腔；结尾停在具体动作、画面或一句台词上，悬念让事件自己挂住，别替读者预告下一章。',
         excerpt: compact(text.slice(match.index, match.index + match[0].length)),
       });
     }
-  }
-
-  return findings;
-}
-
-function findTrailerSummary(proseLines) {
-  const findings = [];
-  for (const { text, lineNo } of trailerWindowLines(proseLines)) {
-    const masked = maskQuoted(text);
     TRAILER_SUMMARY_PATTERN.lastIndex = 0;
-    let match;
-    while ((match = TRAILER_SUMMARY_PATTERN.exec(masked)) !== null) {
+    let summaryMatch;
+    while ((summaryMatch = TRAILER_SUMMARY_PATTERN.exec(masked)) !== null) {
       findings.push({
         line: lineNo,
-        column: match.index + 1,
+        column: summaryMatch.index + 1,
         type: 'trailer-summary',
-        severity: 'blocking',
-        message: '章尾状态总结体：收束状态是细纲的规划口径；正文停在具体动作、画面或台词上，不替读者盖章总结。',
-        excerpt: compact(text.slice(match.index, match.index + match[0].length)),
+        severity: 'advisory',
+        message: '章尾状态总结体：「这一夜注定…/这一切都结束了/新的人生才刚刚开始/命运的齿轮」是把细纲的收束状态原样写成了总结句；收束状态是规划口径，正文落到最后一个具体动作、画面或台词上，别替读者盖章。',
+        excerpt: compact(text.slice(summaryMatch.index, summaryMatch.index + summaryMatch[0].length)),
       });
     }
   }
+
   return findings;
 }
 
@@ -875,6 +724,9 @@ function findMicroActionTic(proseLines) {
   }];
 }
 
+// 套式反应细节：统计引号外叙述中通用的部位/声线反应与固定语气比喻。
+// 这是删除测试的候选集，不是身体描写黑名单；全篇只报一条，保留有动作后果、
+// 伤势、人物习惯或情节功能的细节。
 function findStockReactionTic(proseLines) {
   let hits = 0;
   let narrativeChars = 0;
@@ -886,6 +738,7 @@ function findStockReactionTic(proseLines) {
     if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
     const narrative = stripQuoted(trimmed);
     narrativeChars += visibleLength(narrative);
+
     for (const pattern of STOCK_REACTION_PATTERNS) {
       pattern.lastIndex = 0;
       let match;
@@ -901,6 +754,7 @@ function findStockReactionTic(proseLines) {
   if (narrativeChars === 0 || hits < STOCK_REACTION_MIN_HITS) return [];
   const perKilo = (hits / narrativeChars) * 1000;
   if (perKilo < STOCK_REACTION_PER_KILO) return [];
+
   return [{
     line: firstLine,
     column: 1,
@@ -1325,7 +1179,7 @@ function stripQuoted(text) {
 }
 
 // 把成对引号片段（含引号）替换为等长问号占位：既豁免引号内台词/播报，又保住原文
-// 偏移量，供逐处 blocking 规则定位与截取原文摘录（stripQuoted 会移位，不适合定位）。
+// 偏移量，供逐处 finding 定位与截取原文摘录（stripQuoted 会移位，不适合定位）。
 // 占位字符用「？」而不是「。」：占位既要截断各规则的 [^。！？!?…] 否定类（？与句号在每条
 // 规则的否定类里等效），又不能落在任何规则的接受位。句号占位会替 trailer-summary 的句末
 // [。！] 伪造出终止符，让「这一战注定是「血屠」的开端，…」这类引号里放代号/绰号的叙述行
@@ -1476,7 +1330,7 @@ function findNotIsComparisons(text, getPosition) {
         line: position.line,
         column: position.column,
         type: 'not-is-comparison',
-        severity: 'blocking',
+        severity: 'advisory',
         message: '高频 AI 对比句式；删掉否定铺垫，直接写后项，或改成动作/细节呈现。',
         excerpt: compact(raw),
       });
@@ -1574,553 +1428,6 @@ function isInlineSpace(char) {
 
 function trimTrailingNoise(text) {
   return text.replace(/[\s|）)】\]]+$/u, '');
-}
-
-
-// 精确禁词：运行时读取 references/banned-words.md 的「一级禁用词」整段，对所有短语做
-// 精确子串匹配；每命中一次报一条 blocking finding，对应「出现即替换」。与 CLICHE_PATTERNS
-// 密度表互补：密度表管 paraphrase/成片堆砌，本表管被点名的精确禁词。项目根 .deslop-whitelist
-// （一行一词，# 注释）中的子串命中时跳过，避免误伤世界观术语/绰号。
-
-var _bannedExactCache = null;
-function loadBannedExactPhrases() {
-  if (_bannedExactCache) return _bannedExactCache;
-  const result = { phrases: [], error: null };
-  try {
-    const mdPath = path.join(__dirname, '..', 'references', 'banned-words.md');
-    const md = fs.readFileSync(mdPath, 'utf8');
-    const lines = md.split(/\r?\n/);
-    let inPrimary = false;
-    for (const raw of lines) {
-      const line = raw.trim();
-      if (/^##\s/.test(line)) {
-        inPrimary = /^##\s*一级禁用词/.test(line);
-        continue;
-      }
-      if (!inPrimary) continue;
-      if (line === '' || line.startsWith('#') || line.startsWith('<!--')) continue;
-      for (const piece of line.split('、')) {
-        const phrase = piece.trim();
-        if (phrase) result.phrases.push(phrase);
-      }
-    }
-  } catch (error) {
-    result.error = error.message;
-  }
-  _bannedExactCache = result;
-  return result;
-}
-
-
-
-var _regexSectionCache = null;
-function loadRegexSectionPatterns(cacheKey, headingPattern) {
-  if (!_regexSectionCache) _regexSectionCache = new Map();
-  if (_regexSectionCache.has(cacheKey)) return _regexSectionCache.get(cacheKey);
-  const result = { patterns: [], error: null };
-  try {
-    const mdPath = path.join(__dirname, '..', 'references', 'banned-words.md');
-    const md = fs.readFileSync(mdPath, 'utf8');
-    const lines = md.split(/\r?\n/);
-    let inSec = false;
-    for (const raw of lines) {
-      const line = raw.trim();
-      if (/^##\s/.test(line)) {
-        inSec = headingPattern.test(line);
-        continue;
-      }
-      if (!inSec) continue;
-      const m = line.match(/^\/(.+)\/$/);
-      if (m) {
-        try { result.patterns.push(new RegExp(m[1], 'g')); } catch (e) { /* skip invalid regex */ }
-      }
-    }
-  } catch (error) {
-    result.error = error.message;
-  }
-  _regexSectionCache.set(cacheKey, result);
-  return result;
-}
-
-function loadSynaPatterns() {
-  return loadRegexSectionPatterns('syna', /^##\s*通感隐喻/);
-}
-
-function loadAntithesisPatterns() {
-  return loadRegexSectionPatterns('antithesis', /^##\s*对仗反义俏皮话/);
-}
-
-function loadDanglingIdentityPatterns() {
-  return loadRegexSectionPatterns('dangling-identity', /^##\s*双端悬空的[“\"]的[”\"]字身份跳转句/);
-}
-
-function loadBodyShellPatterns() {
-  return loadRegexSectionPatterns('body-shell', /^##\s*空壳式人体失真比喻/);
-}
-
-function loadContrastPatterns() {
-  return loadRegexSectionPatterns('contrast', /^##\s*(?:反问式内省|伪深刻对比)/);
-}
-
-function loadPhysicalClearPatterns() {
-  return loadRegexSectionPatterns('physical-clear', /^##\s*物理清除动词/);
-}
-
-function loadAbstractObjectForcedPatterns() {
-  return loadRegexSectionPatterns('abstract-object-forced', /^##\s*抽象对象被当物理对象处理/);
-}
-
-function loadPainAsObjectPatterns() {
-  return loadRegexSectionPatterns('pain-as-object', /^##\s*痛感\/感受当物理动作的可数宾语/);
-}
-
-var _whitelistCache = null;
-function loadWhitelist() {
-  if (_whitelistCache) return _whitelistCache;
-  const set = new Set();
-  try {
-    const wlPath = path.resolve(process.cwd(), '.deslop-whitelist');
-    if (fs.existsSync(wlPath)) {
-      const text = fs.readFileSync(wlPath, 'utf8');
-      for (const raw of text.split(/\r?\n/)) {
-        const line = raw.trim();
-        if (line === '' || line.startsWith('#')) continue;
-        set.add(line);
-      }
-    }
-  } catch (error) {
-    // whitelist 读取失败：当作空，不阻断扫描
-  }
-  _whitelistCache = set;
-  return set;
-}
-
-// 白名单子串重叠豁免：若命中点与某个白名单词条在字符上重叠（如禁词「几分」落在「分钟」内），跳过该命中，避免误伤正常复合词。
-function isWhitelistedOverlap(narrative, idx, phraseLen, whitelist) {
-  if (whitelist.size === 0) return false;
-  const start = idx, end = idx + phraseLen;
-  for (const w of whitelist) {
-    const wi = narrative.indexOf(w);
-    if (wi === -1) continue;
-    const we = wi + w.length;
-    if (wi < end && we > start) return true;
-  }
-  return false;
-}
-
-function ruleLoadFailure(section, error) {
-  return [{
-    line: 1,
-    column: 1,
-    type: 'rule-load-error',
-    severity: 'blocking',
-    message: `无法加载共享禁词规则（${section}）：${error || '规则段为空'}。检查 .agents/skills/_shared/references/banned-words.md；禁止回退到 skill-local 旧副本。`,
-    excerpt: section,
-  }];
-}
-
-function findBannedWordsExact(proseLines) {
-  const { phrases, error } = loadBannedExactPhrases();
-  if (error || phrases.length === 0) return ruleLoadFailure('一级禁用词', error);
-  const whitelist = loadWhitelist();
-  const findings = [];
-
-  for (const { text, lineNo } of proseLines) {
-    const trimmed = text.trim();
-    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
-    // 只查引号外叙述；台词/系统播报里出现不算（与碎句号一致豁免）。
-    const narrative = stripQuoted(trimmed);
-    for (const phrase of phrases) {
-      if (whitelist.has(phrase)) continue;
-      let from = 0;
-      let idx;
-      while ((idx = narrative.indexOf(phrase, from)) !== -1) {
-        if (isWhitelistedOverlap(narrative, idx, phrase.length, whitelist)) { from = idx + phrase.length; continue; }
-        findings.push({
-          line: lineNo,
-          column: idx + 1,
-          type: 'banned-word-exact',
-          severity: 'blocking',
-          message: `精确禁词「${phrase}」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。`,
-          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + phrase.length + 8)),
-        });
-        from = idx + phrase.length;
-      }
-    }
-  }
-  return findings;
-}
-
-
-
-// 通感隐喻：运行时读取 references/banned-words.md 的「通感隐喻」整段，把其中 /.../ 正则
-// 编译为 blocking 规则；每命中一次报一条 banned-word-syna finding，对应「出现即改」。
-// 与 一级禁用词精确匹配互补：本类问题多为句式而非固定词，用正则覆盖变体。
-// 项目根 .deslop-whitelist 中的子串仍豁免（沿用 isWhitelistedOverlap）。
-function findSynestheticMetaphor(proseLines) {
-  const { patterns, error } = loadSynaPatterns();
-  if (error || patterns.length === 0) return ruleLoadFailure('通感隐喻', error);
-  const whitelist = loadWhitelist();
-  const findings = [];
-
-  for (const { text, lineNo } of proseLines) {
-    const trimmed = text.trim();
-    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
-    const narrative = stripQuoted(trimmed);
-    for (const re of patterns) {
-      re.lastIndex = 0;
-      let match;
-      while ((match = re.exec(narrative)) !== null) {
-        const hit = match[0];
-        const idx = narrative.indexOf(hit);
-        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
-        findings.push({
-          line: lineNo,
-          column: idx + 1,
-          type: 'banned-word-syna',
-          severity: 'blocking',
-          message: '通感隐喻[' + hit + ']：banned-words.md 通感隐喻规则，感官词抽象化情绪/局势，出现即改；用角色当下可见的动作、物件、对话或具体后果展示，不要同义词轮换。',
-          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
-        });
-      }
-    }
-  }
-  return findings;
-}
-
-
-
-function findAntithesis(proseLines) {
-  const { patterns, error } = loadAntithesisPatterns();
-  if (error || patterns.length === 0) return ruleLoadFailure('对仗反义俏皮话', error);
-  const whitelist = loadWhitelist();
-  const findings = [];
-
-  for (const { text, lineNo } of proseLines) {
-    const trimmed = text.trim();
-    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
-    const narrative = stripQuoted(trimmed);
-    for (const re of patterns) {
-      re.lastIndex = 0;
-      let match;
-      while ((match = re.exec(narrative)) !== null) {
-        const hit = match[0];
-        const idx = narrative.indexOf(hit);
-        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
-        findings.push({
-          line: lineNo,
-          column: idx + 1,
-          type: 'banned-word-antithesis',
-          severity: 'blocking',
-          message: '对仗反义俏皮话[' + hit + ']：banned-words.md 对仗反义俏皮话规则，工整对称反义金句（如"X轻，Y不轻"）是 AI 写作套路，出现即改；改成角色自然口语或具体动作/物件/对话，不要同义词轮换。',
-          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
-        });
-      }
-    }
-  }
-  return findings;
-}
-
-function findDanglingIdentityShift(proseLines) {
-  const { patterns, error } = loadDanglingIdentityPatterns();
-  if (error || patterns.length === 0) return ruleLoadFailure('双端悬空的“的”字身份跳转句', error);
-  const whitelist = loadWhitelist();
-  const findings = [];
-
-  for (const { text, lineNo } of proseLines) {
-    const trimmed = text.trim();
-    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
-    const narrative = stripQuoted(trimmed);
-    for (const re of patterns) {
-      re.lastIndex = 0;
-      let match;
-      while ((match = re.exec(narrative)) !== null) {
-        const hit = match[0];
-        const idx = match.index;
-        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
-        findings.push({
-          line: lineNo,
-          column: idx + 1,
-          type: 'banned-word-dangling-identity',
-          severity: 'blocking',
-          message: '双端悬空的“的”字身份跳转句[' + hit + ']：左端省掉中心语或经历者，右端只用代词代替新身份，再靠逗号制造伪停顿，导致“谁醒来、谁成了谁”同时含混；补齐时间、经历者和新身份中的必要信息，改成完整主谓句。',
-          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
-        });
-      }
-    }
-  }
-  return findings;
-}
-
-function findBodyShellMetaphor(proseLines) {
-  const { patterns, error } = loadBodyShellPatterns();
-  if (error || patterns.length === 0) return ruleLoadFailure('空壳式人体失真比喻', error);
-  const whitelist = loadWhitelist();
-  const findings = [];
-
-  for (const { text, lineNo } of proseLines) {
-    const trimmed = text.trim();
-    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
-    const narrative = stripQuoted(trimmed);
-    for (const re of patterns) {
-      re.lastIndex = 0;
-      let match;
-      while ((match = re.exec(narrative)) !== null) {
-        const hit = match[0];
-        const idx = match.index;
-        // 本规则已经由「比喻标记＋骨架消失＋皮壳支撑」三重条件限死，不能让项目级
-        // 单词白名单（如“仿佛”）仅凭局部重叠豁免整句；只接受整条命中被显式放行。
-        if (whitelist.has(hit)) continue;
-        findings.push({
-          line: lineNo,
-          column: idx + 1,
-          type: 'banned-word-body-shell',
-          severity: 'blocking',
-          message: '空壳式人体失真比喻[' + hit + ']：用“骨架被抽走＋只剩皮壳支撑”代替可见反应，身体逻辑失真，且容易与“僵、绷直”等姿态互相冲突；改成上下文中能看见的姿态、动作或生理反应，不要换一套人体比喻。',
-          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
-        });
-      }
-    }
-  }
-  return findings;
-}
-
-function findContrastRhetorical(proseLines) {
-  const { patterns, error } = loadContrastPatterns();
-  if (error || patterns.length === 0) return ruleLoadFailure('反问式内省/伪深刻对比', error);
-  const whitelist = loadWhitelist();
-  const findings = [];
-
-  for (const { text, lineNo } of proseLines) {
-    const trimmed = text.trim();
-    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
-    const narrative = stripQuoted(trimmed);
-    for (const re of patterns) {
-      re.lastIndex = 0;
-      let match;
-      while ((match = re.exec(narrative)) !== null) {
-        const hit = match[0];
-        const idx = narrative.indexOf(hit);
-        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
-        findings.push({
-          line: lineNo,
-          column: idx + 1,
-          type: 'contrast-rhetorical',
-          severity: 'blocking',
-          message: '反问式内省/伪深刻对比[' + hit + ']：用「倒被X吓住？」式伪深刻反问做内省，靠过去/现在反差+模糊指代（一沓纸/那页东西/这玩意）撑"人物复杂"，是高级 AI 味；改成角色当下可见的具体动作/生理反应（手抖/手顿/把纸翻过去）或本书招牌"裂痕"装置展示，对象写具体（这份材料/这份协议），去掉文艺腔反问。',
-          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
-        });
-      }
-    }
-  }
-  return findings;
-}
-
-// 物理清除动词 × 抽象对象：把抽象域（时间/记忆/痕迹/棱角）当实物"抹平/冲走/刮掉"，blocking。
-function findPhysicalClear(proseLines) {
-  const { patterns, error } = loadPhysicalClearPatterns();
-  if (error || patterns.length === 0) return ruleLoadFailure('物理清除动词×抽象对象', error);
-  const whitelist = loadWhitelist();
-  const findings = [];
-  for (const { text, lineNo } of proseLines) {
-    const trimmed = text.trim();
-    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
-    const narrative = stripQuoted(trimmed);
-    for (const re of patterns) {
-      re.lastIndex = 0;
-      let match;
-      while ((match = re.exec(narrative)) !== null) {
-        const hit = match[0];
-        const idx = match.index;
-        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
-        findings.push({
-          line: lineNo,
-          column: idx + 1,
-          type: 'banned-word-physical-clear',
-          severity: 'blocking',
-          message: '物理清除动词×抽象对象[' + hit + ']：把时间/记忆/痕迹等抽象域当实物去抹平/冲走/刮掉，出现即改；用具体说法（趁痕迹还在→别让证据被清掉、把记忆冲走→记不起来了）。',
-          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
-        });
-      }
-    }
-  }
-  return findings;
-}
-
-// 抽象对象被当物理对象处理：目光/视线/情绪/声音被"压/钉/砸/拽"等施力，blocking。
-function findAbstractObjectForced(proseLines) {
-  const { patterns, error } = loadAbstractObjectForcedPatterns();
-  if (error || patterns.length === 0) return ruleLoadFailure('抽象对象被当物理对象处理', error);
-  const whitelist = loadWhitelist();
-  const findings = [];
-  for (const { text, lineNo } of proseLines) {
-    const trimmed = text.trim();
-    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
-    const narrative = stripQuoted(trimmed);
-    for (const re of patterns) {
-      re.lastIndex = 0;
-      let match;
-      while ((match = re.exec(narrative)) !== null) {
-        const hit = match[0];
-        const idx = match.index;
-        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
-        findings.push({
-          line: lineNo,
-          column: idx + 1,
-          type: 'banned-word-abstract-forced',
-          severity: 'blocking',
-          message: '抽象对象被当物理对象处理[' + hit + ']：目光/视线/情绪/声音不是物理实体，不能被压/钉/砸/拽；改成"落/停/移/转"等视线自身动作，或改主体为实体。',
-          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
-        });
-      }
-    }
-  }
-  return findings;
-}
-
-// 痛感/感受当物理动作的可数宾语："刮出+一道/阵/股+感受"，blocking。
-function findPainAsObject(proseLines) {
-  const { patterns, error } = loadPainAsObjectPatterns();
-  if (error || patterns.length === 0) return ruleLoadFailure('痛感/感受当物理动作的可数宾语', error);
-  const whitelist = loadWhitelist();
-  const findings = [];
-  for (const { text, lineNo } of proseLines) {
-    const trimmed = text.trim();
-    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
-    const narrative = stripQuoted(trimmed);
-    for (const re of patterns) {
-      re.lastIndex = 0;
-      let match;
-      while ((match = re.exec(narrative)) !== null) {
-        const hit = match[0];
-        const idx = match.index;
-        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
-        findings.push({
-          line: lineNo,
-          column: idx + 1,
-          type: 'banned-word-pain-object',
-          severity: 'blocking',
-          message: '痛感/感受当物理动作的可数宾语[' + hit + ']：痛感是身体反应不是物体，不能被"刮出/划出"；写痛感的性质（蜇/灼/锐/钝）或身体反应（缩手/倒吸气/咬牙）。',
-          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
-        });
-      }
-    }
-  }
-  return findings;
-}
-
-// ---- 全面检查补充维度（来源：实战写作抓到的真实漏网，2026-08 校准）----
-// 覆盖项目已立铁律中被原版 check 漏检的部分：灰裂脑子里裂、总结腔、英文残留、
-// 过程术语不作动作宾语。均为「出现即修」级硬伤，单处即 blocking（不像密度型放行）。
-// 校准基线：第一卷全扫回填（新增维度首次全扫应 0 命中或仅命中已知残留）。
-
-// 灰裂铁律：裂痕必须锚定证据/纸面/屏幕等可见物，绝不写「脑子里…裂」。
-// 单处 blocking；引号内台词豁免（与碎句号一致）。
-function findGreyCrackInHead(proseLines) {
-  const GREY_CRACK_IN_HEAD_PATTERN = /脑子里.{0,8}(?:裂|裂开|裂缝|裂痕|裂了一道|裂着)/g;
-  const findings = [];
-  for (const { text, lineNo } of proseLines) {
-    const trimmed = text.trim();
-    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
-    const narrative = stripQuoted(trimmed);
-    GREY_CRACK_IN_HEAD_PATTERN.lastIndex = 0;
-    let match;
-    while ((match = GREY_CRACK_IN_HEAD_PATTERN.exec(narrative)) !== null) {
-      findings.push({
-        line: lineNo,
-        column: narrative.indexOf(match[0]) + 1,
-        type: 'grey-crack-in-head',
-        severity: 'blocking',
-        message: '灰裂铁律：裂痕必须锚定证据/纸面/屏幕等可见物，绝不写「脑子里…裂」；改为「视野里/纸面上/那几行上」等具体落点。',
-        excerpt: compact(narrative.slice(Math.max(0, match.index - 8), match.index + match[0].length + 8)),
-      });
-    }
-  }
-  return findings;
-}
-
-// 总结腔：角色给自己写跨时段人生格言（「X辈子的经验合起来只有一条」）是 AI 总结腔高危形态，
-// 单处即 blocking。必须含「经验/教训/总结/活法/道理」或「合起来/说到底/到头来/总结起来」等
-// 总结标记，避免误伤普通「这辈子只想X」式正常叙述。
-function findSummarySlogan(proseLines) {
-  const SUMMARY_SLOGAN_PATTERNS = [
-    /(?:两辈子|这辈子|上辈子|半辈子|两世)(?:的)?[^。！？!?\n]{0,16}(?:经验|教训|总结|活法|道理|合起来|说到底|归根到底|到头来)[^。！？!?\n]{0,12}(?:只有|就|不外乎|无非|是)[^。！？!?\n]{0,10}(?:一条|这一条|一个|一句话|一句)/g,
-    /(?:合起来|说到底|归根到底|到头来|总结起来|横竖|无论如何|说白了|一句话)[^。！？!?\n]{0,6}(?:只有|就|不外乎|无非|是)[^。！？!?\n]{0,10}(?:一条|这一条|一个|一种|一句话|一句)/g,
-  ];
-  const findings = [];
-  for (const { text, lineNo } of proseLines) {
-    const trimmed = text.trim();
-    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
-    const narrative = stripQuoted(trimmed);
-    for (const pattern of SUMMARY_SLOGAN_PATTERNS) {
-      pattern.lastIndex = 0;
-      let match;
-      while ((match = pattern.exec(narrative)) !== null) {
-        findings.push({
-          line: lineNo,
-          column: narrative.indexOf(match[0]) + 1,
-          type: 'summary-slogan',
-          severity: 'blocking',
-          message: '总结腔：角色给自己写跨时段人生格言（「X辈子的经验合起来只有一条」）是 AI 总结腔；改成具体画面/身体记忆/当下闪念，不要替读者盖章。',
-          excerpt: compact(narrative.slice(Math.max(0, match.index - 8), match.index + match[0].length + 8)),
-        });
-      }
-    }
-  }
-  return findings;
-}
-
-// 英文残留：正文（引号外叙述）出现 ASCII 英文词（≥2 字母）即视为残留；
-// 白名单放常见有意英文。法援律师正文应为纯中文，叙述里夹英文是编辑/生成残留。
-function findEnglishResidue(proseLines) {
-  const ENGLISH_WORD_PATTERN = /[A-Za-z]{2,}/g;
-  const ENGLISH_WHITELIST = new Set(['OK', 'APP', 'DNA', 'GPS', 'WiFi', 'AI', 'ID', 'QQ']);
-  const findings = [];
-  for (const { text, lineNo } of proseLines) {
-    const trimmed = text.trim();
-    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
-    const narrative = stripQuoted(trimmed);
-    ENGLISH_WORD_PATTERN.lastIndex = 0;
-    let match;
-    while ((match = ENGLISH_WORD_PATTERN.exec(narrative)) !== null) {
-      const word = match[0];
-      if (ENGLISH_WHITELIST.has(word)) continue;
-      findings.push({
-        line: lineNo,
-        column: match.index + 1,
-        type: 'english-residue',
-        severity: 'blocking',
-        message: `英文残留「${word}」：正文应为纯中文，英文词是编辑/生成残留，译为对应中文或删除。`,
-        excerpt: compact(narrative.slice(Math.max(0, match.index - 8), match.index + word.length + 8)),
-      });
-    }
-  }
-  return findings;
-}
-
-// 过程术语不作动作宾语：动词（确认/核对/检查/复查/比对/核实）的宾语是过程术语本身
-// （校验/验证/认证/审核/确认），等于「确认了一遍验证」。宾语须是具体结果或对象（文件、编号、页码）。
-function findProcessTermAsObject(proseLines) {
-  const PROCESS_TERM_OBJECT_PATTERN = /(?:确认|核对|检查|复查|比对|核实)(?:了|过)?(?:一遍|一下|一次|这份|这些|所有|都)?[^，。！？!?\n]{0,8}(?:校验|验证|认证|审核)/g;
-  const findings = [];
-  for (const { text, lineNo } of proseLines) {
-    const trimmed = text.trim();
-    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
-    const narrative = stripQuoted(trimmed);
-    PROCESS_TERM_OBJECT_PATTERN.lastIndex = 0;
-    let match;
-    while ((match = PROCESS_TERM_OBJECT_PATTERN.exec(narrative)) !== null) {
-      findings.push({
-        line: lineNo,
-        column: narrative.indexOf(match[0]) + 1,
-        type: 'process-term-as-object',
-        severity: 'blocking',
-        message: '过程术语不作动作宾语：动词宾语必须是具体结果或对象（文件、编号、页码、时间戳），不能拿过程术语本身（校验/验证/认证/审核）当宾语；改为「确认了一遍文件都在」之类。',
-        excerpt: compact(narrative.slice(Math.max(0, match.index - 8), match.index + match[0].length + 8)),
-      });
-    }
-  }
-  return findings;
 }
 
 function compact(text) {

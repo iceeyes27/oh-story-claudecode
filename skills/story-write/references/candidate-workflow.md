@@ -28,6 +28,10 @@
 
 候选正文必须沿用 SKILL.md Phase 4 的细纲边界；存在章节骨架时，还要逐项核对 `细纲覆盖`。本项目生成成稿时有两项固定分支：
 
+### 显式 P1 treatment（默认关闭）
+
+只有调用方明确启用 P0/P1 时，才按 `quality-p1.md` 先执行 `open-treatment-run`：P0 生成单稿，P1 独立生成 `plain_direct` 与 `voice_restore` 两遍并保留完整证据。treatment 只改变候选生成与评审方式，不得绕过作者采用；关闭后的候选仍停在 `候选/`，作者明确采用后才能进入正式正文和追踪。
+
 1. **step 7 正文执行**：输出路径传书根 `候选/第{N}章_{章名}.md`，不写 `正文/`。
 2. **step 12 更新追踪**：不执行 `tracking_commit.py commit`。主会话通读实际候选正文后，按现有事务 schema（`mode` / `chapter` / `delta` / `context` / `character_snapshots` 等）写入 `候选/第{N}章_追踪事务.json`。事务不得从骨架直接推算；必须保存候选创建时的 `expected_state_revision`，不得在采用时刷新。
 3. **绑定采用输入**：事务必须包含 `candidate_binding` v1，记录候选正文、细纲、骨架的项目内相对路径与 SHA-256，`quality_profile` 固定为 `fanqie-long-v1`，`coverage` 逐项覆盖骨架中的全部 O-ID 并写出候选正文证据。任一输入变化后，旧候选必须重新检查并重新生成绑定。

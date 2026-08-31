@@ -2,6 +2,12 @@
 
 > 本文件是 story-write 的 mode 参考，由 SKILL.md 按模式路由加载；文中 `references/...` 与 `scripts/...` 路径均相对 story-write skill 根目录。
 
+## 长篇 Reference Gate
+
+进入具体阶段前，完整读取该阶段路由的参考文件直到 EOF；`rg` 检索或局部摘读不算完整读取。开书依次路由 `workflow-setup.md`；章节骨架路由 `chapter-skeleton-workflow.md`；明确成稿路由本文件 Phase 4、`candidate-workflow.md`、`writing-craft.md`、`long-format.md`、`long-chapter-quality.md`、`long-chapter-hooks.md`、`long-suspense.md` 与 `long-reversal.md`；修订路由 `workflow-revision.md`；明确批量定稿才路由 `workflow-daily.md`。必需文件缺失或不可读时停止，不得先写正文再补读。
+
+**Constraint Lock**：用户要求、已采用正文、当前设定、细纲、追踪与公理点台账是项目事实权威；references 只提供技法，不得覆盖这些项目事实。
+
 根据用户意图和项目状态选择场景：
 
 | 场景 | 触发条件 | 执行流程 |
@@ -321,7 +327,7 @@
 
 ### Phase 5：质量检查
 
-检查三个维度：(1) **情绪交付**——每章是否交付了细纲中规划的目标情绪？(2) **契约风险**——按 `references/reader-contract-and-progression.md` 检查因果权 + 结算权、关键节点四问、期待所有权、期待债、终局储备（透支两问）与换书债；章级推进按权威文件的七类状态分档（快节奏保留可见事件/爽点下限），强弱相对本书题材与对标判断，标记 契约安全 / 需补强 / 契约破坏；契约破坏 先修正文或修后续纲。(3) **技术质量**——一致性、格式、禁用词。参考 [references/quality-checklist.md](quality-checklist.md) 中的通用检查和长篇专项清单。
+检查三个维度：(1) **情绪交付**——每章是否交付了细纲中规划的目标情绪？(2) **契约风险**——按 `references/reader-contract-and-progression.md` 检查因果权 + 结算权、关键节点四问、期待所有权、期待债、终局储备（透支两问）与换书债；章级推进按权威文件的七类状态分档（快节奏保留可见事件/爽点下限），强弱相对本书题材与对标判断，标记 契约安全 / 需补强 / 契约破坏；契约破坏 先修正文或修后续纲。(3) **技术质量**——一致性、格式、禁用词。参考 [references/long-chapter-quality.md](long-chapter-quality.md) 中的通用检查和长篇专项清单。
 
 **能力边界**：确定性扫描器只能识别已注册的词句、结构和退化模式。全部通过只表示“未发现已知 blocking 模式”，不能据此断言成稿自然、没有 AI 味或已经达到出版质量；候选仍须由作者审读后采用。
 
@@ -343,7 +349,7 @@ advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界�
 
 #### Agent 调用：consistency-checker
 
-质量检查阶段，如果项目已部署 consistency-checker agent（优先检查 `.claude/agents/consistency-checker.md` 是否存在；不存在时再检查 `.opencode/agents/`，再不存在时检查 `.codex/agents/`），spawn `Agent(subagent_type: "consistency-checker", prompt: "项目目录：{dir}\n检查范围：{本次写作的章节}\n检查类型：事实冲突+伏笔断线+角色属性不一致")` 执行一致性检查，获取 S1-S4 分级报告。如 agent 不可用，由主线程参照 quality-checklist.md 直接检查。
+质量检查阶段，如果项目已部署 consistency-checker agent（优先检查 `.claude/agents/consistency-checker.md` 是否存在；不存在时再检查 `.opencode/agents/`，再不存在时检查 `.codex/agents/`），spawn `Agent(subagent_type: "consistency-checker", prompt: "项目目录：{dir}\n检查范围：{本次写作的章节}\n检查类型：事实冲突+伏笔断线+角色属性不一致")` 执行一致性检查，获取 S1-S4 分级报告。如 agent 不可用，由主线程参照 long-chapter-quality.md 直接检查。
 
 #### Agent 调用：narrative-writer（去AI味审查）
 
@@ -438,7 +444,7 @@ advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界�
 
 | 场景 | 加载文件 |
 |------|---------|
-| 质量检查 | `references/quality-checklist.md` + `references/reader-contract-and-progression.md` |
+| 质量检查 | `references/long-chapter-quality.md` + `references/reader-contract-and-progression.md` |
 | 禁用词扫描 | `../_shared/references/banned-words.md` |
 | AI句式脚本复扫 | `../_shared/scripts/check-ai-patterns.js` |
 | 去AI味 | `../_shared/references/anti-ai-writing.md` |
@@ -458,7 +464,7 @@ advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界�
 | 反转 | **`references/reversal-toolkit.md`**（反转类型/铺垫/有效性自检） | `references/plot-core-methods.md`（假胜：先给希望再击碎） |
 | 人物 | **`references/character-basics.md`**（主角/配角/反派/动机模板速填） | `references/character-design-methods.md`（三层标签反差/九维深化）· `references/character-relations.md`（关系类型/感情线） |
 | 女频写作 | **`references/female-audience-writing.md`**（女频长篇：核心原则/文案/题材/感情线长线/平台） | `references/genre-readers.md`（读者心理/平台差异）· `references/character-relations.md`（感情线总框架） |
-| 去AI味 | **`../_shared/references/anti-ai-writing.md`**（AI指纹/核心规则/Show Don't Tell） | `../_shared/references/banned-words.md`（禁用词扫描）· `references/quality-checklist.md`（成稿检查） |
+| 去AI味 | **`../_shared/references/anti-ai-writing.md`**（AI指纹/核心规则/Show Don't Tell） | `../_shared/references/banned-words.md`（禁用词扫描）· `references/long-chapter-quality.md`（成稿检查） |
 
 ---
 

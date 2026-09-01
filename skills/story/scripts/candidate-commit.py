@@ -38,7 +38,6 @@ ARC_IDS = ("arc-01", "arc-02")
 SEMANTIC_RECEIPT_IDS = ("rc-01", "rc-02", "rc-03", "arc-01")
 PHASES = ("prepared", "prose_moved", "tracking_committed", "done")
 CHAPTER_PREFIX = re.compile(r"^第0*(\d+)章")
-EXEMPTION = re.compile(r"去味(：|:)跳过")
 TRACKING_TOOL = Path(__file__).resolve().parent / "tracking_commit.py"
 SKELETON_TOOL = Path(__file__).resolve().parent / "check-chapter-skeleton.js"
 OUTLINE_COPY_TOOL = Path(__file__).resolve().parent / "check-outline-copy.js"
@@ -427,7 +426,8 @@ def validate_logic_checks(
 
 
 def validate_binding(
-    project: Path, chapter: int, prose: Path, transaction: Path, document: dict[str, Any], *, skip_scan: bool,
+    project: Path, chapter: int, prose: Path, transaction: Path, document: dict[str, Any], *,
+    skip_scan: bool, scan_skip_reason: str | None = None,
 ) -> dict[str, Any]:
     state = read_state(project)
     expected = document.get("expected_state_revision")
@@ -488,8 +488,12 @@ def validate_binding(
 
     outline_result = run_node([str(OUTLINE_COPY_TOOL), "--outline", str(outline), str(prose)], "细纲照搬检查")
     require(outline_result.returncode == 0, f"候选存在未处理的细纲照搬：\n{(outline_result.stdout or outline_result.stderr).strip()}")
-    head = "\n".join(prose_text.split("\n", 6)[:6])
-    if not skip_scan and not EXEMPTION.search(head):
+    # 语言门禁只认 CLI 侧的显式豁免。正文里的 `<!-- 去味:跳过 -->` 由写正文的一方产出，
+    # 不能用来决定检查自己的门是否运行；作者要跳过时用 promote --no-scan --reason，留痕可审计。
+    scan_skip: dict[str, Any] | None = None
+    if skip_scan:
+        scan_skip = {"reason": scan_skip_reason, "skipped_at": datetime.now().astimezone().isoformat()}
+    else:
         findings = scan_gate(prose)
         require(findings is None, f"候选未通过采用前确定性检查：\n{findings}")
 
@@ -522,6 +526,7 @@ def validate_binding(
         "skeleton": project_relative(project, skeleton),
         "logic_results": logic_results,
         "reader_view_binding": reader_view_binding,
+        "scan_skip": scan_skip,
     }
 
 
@@ -580,6 +585,7 @@ def create_journal(project: Path, chapter: int, prose: Path, transaction: Path, 
         "length": preflight["length"],
         "logic_results": preflight["logic_results"],
         "reader_view_binding": preflight["reader_view_binding"],
+        "scan_skip": preflight["scan_skip"],
         "created_at": datetime.now().astimezone().isoformat(),
         "updated_at": datetime.now().astimezone().isoformat(),
     }
@@ -762,7 +768,9 @@ def completed_journals(project: Path, chapter: int) -> list[Path]:
     return matches
 
 
-def promote_chapter(project: Path, chapter: int, *, skip_scan: bool = False) -> dict[str, Any]:
+def promote_chapter(
+    project: Path, chapter: int, *, skip_scan: bool = False, scan_skip_reason: str | None = None,
+) -> dict[str, Any]:
     project = project.resolve()
     with project_lock(project):
         pending = pending_journals(project)
@@ -775,7 +783,10 @@ def promote_chapter(project: Path, chapter: int, *, skip_scan: bool = False) -> 
         require(transaction is not None, f"第{chapter}章缺少追踪事务 JSON（{TRANSACTION_SUFFIX}）")
         require(find_final(project, chapter) is None, f"正稿已存在第{chapter}章，promote 不覆盖正稿")
         document = read_json(transaction, "追踪事务")
-        preflight = validate_binding(project, chapter, prose, transaction, document, skip_scan=skip_scan)
+        preflight = validate_binding(
+            project, chapter, prose, transaction, document,
+            skip_scan=skip_scan, scan_skip_reason=scan_skip_reason,
+        )
         path, journal = create_journal(project, chapter, prose, transaction, preflight)
         result = recover_journal(project, path)
         result["recovered"] = False
@@ -852,11 +863,11 @@ def list_candidates(project: Path) -> list[dict[str, Any]]:
     return entries
 
 
-def promote_all(project: Path, *, skip_scan: bool = False) -> list[dict[str, Any]]:
+def promote_all(project: Path, *, skip_scan: bool = False, scan_skip_reason: str | None = None) -> list[dict[str, Any]]:
     chapters = sorted({entry["chapter"] for entry in list_candidates(project) if entry["chapter"] is not None})
     require(chapters, "候选目录没有可采用的正文")
     require(len(chapters) == 1, "promote --all 不支持多个候选；请逐章采用，尚未修改任何正文或追踪")
-    return [promote_chapter(project, chapters[0], skip_scan=skip_scan)]
+    return [promote_chapter(project, chapters[0], skip_scan=skip_scan, scan_skip_reason=scan_skip_reason)]
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -867,7 +878,8 @@ def build_parser() -> argparse.ArgumentParser:
     group = promote.add_mutually_exclusive_group(required=True)
     group.add_argument("--chapter", type=int)
     group.add_argument("--all", action="store_true", help="兼容单个待审候选；多个候选会在写入前拒绝")
-    promote.add_argument("--no-scan", action="store_true", help="只跳过 AI 模式扫描，不跳过结构与状态门禁")
+    promote.add_argument("--no-scan", action="store_true", help="只跳过 AI 模式扫描，不跳过结构与状态门禁；必须同时给 --reason")
+    promote.add_argument("--reason", help="使用 --no-scan 时必填：跳过语言门禁的理由，写入采用回执备查")
     recover_parser = sub.add_parser("recover")
     recover_parser.add_argument("--project", type=Path, required=True)
     recover_group = recover_parser.add_mutually_exclusive_group(required=True)
@@ -886,7 +898,14 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
         if args.command == "promote":
-            result: Any = promote_all(args.project, skip_scan=args.no_scan) if args.all else promote_chapter(args.project, args.chapter, skip_scan=args.no_scan)
+            reason = (args.reason or "").strip()
+            require(not args.no_scan or reason, "--no-scan 必须同时给出 --reason（跳过语言门禁的理由会写入采用回执）")
+            require(args.no_scan or not reason, "--reason 只在 --no-scan 时有意义")
+            result: Any = (
+                promote_all(args.project, skip_scan=args.no_scan, scan_skip_reason=reason or None)
+                if args.all
+                else promote_chapter(args.project, args.chapter, skip_scan=args.no_scan, scan_skip_reason=reason or None)
+            )
         elif args.command == "recover":
             result = recover(args.project, None if args.all else args.chapter)
         elif args.command == "reject":

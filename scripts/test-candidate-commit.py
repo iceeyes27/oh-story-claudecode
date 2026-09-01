@@ -108,6 +108,9 @@ class CandidateCommitTests(unittest.TestCase):
 
     # 触发 check-ai-patterns finding 的短句（reverse-not-is + negation-parade）。
     TOXIC = "他想要的是尊严，而不是金钱。他知道，这世上没有光，没有声音，没有温度。"
+    # scan_gate 真正会 blocking 的样本（check-degeneration.js 的 meta-leak 工程词泄漏）。
+    # TOXIC 那组 AI 句式当前全是 advisory，`--fail-on=blocking` 对它永不触发，不能用来测门禁。
+    GATE_BLOCKING = "他站在门口。细纲要求他必须离开。"
 
     @staticmethod
     def _canonical_sha(value: object) -> str:
@@ -419,16 +422,37 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertEqual(self.read_state()["state_revision"], 0)
 
     def test_promote_no_scan_bypasses_ai_gate_only(self) -> None:
-        self.make_candidate(1, body=f"# 第1章\n{self.TOXIC}\n")
-        self._candidate(["promote", "--chapter", "1", "--no-scan"])
+        self.make_candidate(1, body=f"# 第1章\n{self.GATE_BLOCKING}\n")
+        self._candidate(["promote", "--chapter", "1", "--no-scan", "--reason", "作者确认本章为引用体"])
         self.assertEqual(self.final_files(), ["第001章_测试章名.md"])
         self.assertEqual(self.read_state()["state_revision"], 1)
 
-    def test_promote_exemption_marker_bypasses_gate(self) -> None:
-        self.make_candidate(1, body=f"# 第1章\n<!-- 去味:跳过 -->\n{self.TOXIC}\n")
-        self._candidate(["promote", "--chapter", "1"])
-        self.assertEqual(self.final_files(), ["第001章_测试章名.md"])
-        self.assertEqual(self.read_state()["state_revision"], 1)
+    def test_promote_no_scan_requires_reason(self) -> None:
+        self.make_candidate(1, body=f"# 第1章\n{self.GATE_BLOCKING}\n")
+        result = self._candidate(["promote", "--chapter", "1", "--no-scan"], expect=2)
+        self.assertIn("--no-scan 必须同时给出 --reason", result.stderr)
+        self.assertEqual(self.final_files(), [])
+        self.assertEqual(self.read_state()["state_revision"], 0)
+
+    def test_promote_records_scan_skip_reason(self) -> None:
+        self.make_candidate(1, body=f"# 第1章\n{self.GATE_BLOCKING}\n")
+        self._candidate(["promote", "--chapter", "1", "--no-scan", "--reason", "作者确认本章为引用体"])
+        journals = [
+            json.loads(path.read_text(encoding="utf-8"))
+            for path in (self.candidate_dir / "_历史").iterdir()
+            if path.name.startswith("采用事务-")
+        ]
+        self.assertTrue(journals)
+        self.assertEqual(journals[0]["scan_skip"]["reason"], "作者确认本章为引用体")
+
+    def test_promote_ignores_in_prose_exemption_marker(self) -> None:
+        # 正文里的 `<!-- 去味:跳过 -->` 由写正文的一方产出，不得用来关掉检查自己的门。
+        # 作者要豁免走 CLI 的 --no-scan --reason，留痕可审计。
+        self.make_candidate(1, body=f"# 第1章\n<!-- 去味:跳过 -->\n{self.GATE_BLOCKING}\n")
+        result = self._candidate(["promote", "--chapter", "1"], expect=2)
+        self.assertIn("候选未通过采用前确定性检查", result.stderr)
+        self.assertEqual(self.final_files(), [])
+        self.assertEqual(self.read_state()["state_revision"], 0)
 
     def test_promote_honors_explicit_terse_title_profile(self) -> None:
         settings = self.project / "设定"
@@ -514,7 +538,7 @@ class CandidateCommitTests(unittest.TestCase):
         first = next((self.project / "正文").glob("第001章_*.md"))
         first.write_text(first.read_text(encoding="utf-8") + "九幽阁忽然亮了。\n", encoding="utf-8")
         self.make_candidate(3, body="# 第3章\n九幽阁再次亮起。\n")
-        result = self._candidate(["promote", "--chapter", "3", "--no-scan"], expect=2)
+        result = self._candidate(["promote", "--chapter", "3", "--no-scan", "--reason", "回归测试"], expect=2)
         self.assertIn("rc-01 复验发现 blocking", result.stderr)
         self.assertEqual(self.final_files(), sorted(path.name for path in (self.project / "正文").glob("*.md")))
 
@@ -587,7 +611,7 @@ class CandidateCommitTests(unittest.TestCase):
     def test_no_scan_cannot_bypass_logic_receipts(self) -> None:
         self.make_candidate(1, body=f"# 第1章\n{self.TOXIC}\n")
         self._mutate_binding(1, lambda binding: binding["logic_checks"].pop("rc-02"))
-        result = self._candidate(["promote", "--chapter", "1", "--no-scan"], expect=2)
+        result = self._candidate(["promote", "--chapter", "1", "--no-scan", "--reason", "回归测试"], expect=2)
         self.assertIn("logic_checks 必须精确包含", result.stderr)
         self.assertEqual(self.final_files(), [])
 

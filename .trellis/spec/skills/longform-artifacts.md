@@ -11,7 +11,7 @@
 - 正稿：`{书名}/正文/**/第NNN章_章名.md`
 - 骨架验证：`node skills/story-write/scripts/check-chapter-skeleton.js [--dir DIR] [--from N] [--to N] [--json] [files...]`
 - 流程动作：`write_chapter_skeleton`、`expand_chapter_skeleton`、`review_candidate`
-- 候选采用：`python skills/story-write/scripts/candidate-commit.py promote --project DIR --chapter N [--no-scan]`（兼容 `--all` 只接受单候选）
+- 候选采用：`python skills/story-write/scripts/candidate-commit.py promote --project DIR --chapter N [--no-scan --reason "<理由>"]`（兼容 `--all` 只接受单候选）
 - 候选恢复：`python skills/story-write/scripts/candidate-commit.py recover --project DIR (--chapter N|--all)`
 
 ## 3. Contracts
@@ -23,7 +23,7 @@
 - 候选绑定必须使用 `candidate_binding.schema_version = 2` 与 `quality_profile = fanqie-long-v2`。每章必须包含 `rc-01`、`rc-02`、`rc-03`；只有第 15 章增加 `arc-01`、`arc-02`，其他章号不按倍数触发 arc 门。
 - `rc-01/02/03` 与 `arc-01` 的语义 receipt 必须包含 `run_id`、`status`、`findings`、非空 `evidence`、`candidate_sha256`、逐文件 `prose_files` 和 `prose_set_sha256`。每个 evidence 路径必须属于 `prose_files`，其非空 anchor 必须能在对应文件中直接定位；`rc-01` 另存确定性结果摘要，第 15 章的两个 arc receipt 绑定同一 ledger 摘要。
 - `promote` 通过项目锁串行执行，按 `prepared → prose_moved → tracking_committed → done` 记录阶段；失败或中断后用 `recover` 幂等恢复。恢复在移动正文或回放追踪前重验原始事务、逐文件读者视图摘要和文件集合摘要。
-- `promote` 在首次写入前执行状态、摘要、骨架、覆盖、标题、严格字数、细纲照抄、追踪 dry-run 与 AI 模式检查。`--no-scan` 或 `<!-- 去味:跳过 -->` 只能跳过 AI 模式扫描。
+- `promote` 在首次写入前执行状态、摘要、骨架、覆盖、标题、严格字数、细纲照抄、追踪 dry-run 与 AI 模式检查。只有 `--no-scan --reason "<理由>"` 能跳过 AI 模式扫描，理由写进采用回执；正文内的 `<!-- 去味:跳过 -->` 对采用无效。
 - 确定性扫描通过只表示未发现已登记 blocking 模式，不能表述为文风自然或没有 AI 痕迹。
 
 ## 4. Validation & Error Matrix

@@ -228,21 +228,44 @@ NODE
 [ "$adv_all" -eq 1 ] || { echo "FAIL: advisory-only 默认 --fail-on=all 应退出 1，实际 $adv_all" >&2; exit 1; }
 [ "$adv_blk" -eq 0 ] || { echo "FAIL: advisory-only --fail-on=blocking 应退出 0，实际 $adv_blk" >&2; exit 1; }
 
-# blocking（em-dash）：severity=blocking，--fail-on=blocking 退出 1。
-FIXTURE7="$TMP_DIR/fixture-blocking.md"
+# 风格类（em-dash）：severity=advisory，--fail-on=blocking 退出 0。
+# severity 只分两档：词表类（banned-word-* / rule-load-error）blocking，其余风格/密度规则 advisory。
+FIXTURE7="$TMP_DIR/fixture-style.md"
 printf '%s\n' '她停住——没说话。' > "$FIXTURE7"
 set +e
 node "$SCRIPT" --json "$FIXTURE7" > "$OUT"
 node "$SCRIPT" --fail-on=blocking "$FIXTURE7" >/dev/null 2>&1
-blk_blk=$?
+style_blk=$?
 set -e
 node - "$OUT" <<'NODE'
 const fs = require('fs');
 const r = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const dash = r.findings.find((f) => f.type === 'em-dash');
-if (!dash || dash.severity !== 'blocking') throw new Error('em-dash 应为 blocking: ' + JSON.stringify(dash));
+if (!dash) throw new Error('em-dash 应被检出');
+if (dash.severity !== 'advisory') throw new Error('em-dash 应为 advisory（风格类需语境判断）: ' + JSON.stringify(dash));
+if (r.findings.some((f) => f.severity === 'blocking')) {
+  throw new Error('纯风格 fixture 不应有 blocking: ' + JSON.stringify(r.findings.map((f) => `${f.type}=${f.severity}`)));
+}
 NODE
-[ "$blk_blk" -eq 1 ] || { echo "FAIL: em-dash --fail-on=blocking 应退出 1，实际 $blk_blk" >&2; exit 1; }
+[ "$style_blk" -eq 0 ] || { echo "FAIL: 纯风格 fixture --fail-on=blocking 应退出 0，实际 $style_blk" >&2; exit 1; }
+
+# 词表类（banned-word-exact）：severity=blocking，--fail-on=blocking 退出 1。
+# 词表运行时读 references/banned-words.md，判定不需要语境，出现即替换。
+FIXTURE7B="$TMP_DIR/fixture-blocking.md"
+printf '%s\n' '他脸上浮现出一丝笑意。' > "$FIXTURE7B"
+set +e
+node "$SCRIPT" --json "$FIXTURE7B" > "$OUT"
+node "$SCRIPT" --fail-on=blocking "$FIXTURE7B" >/dev/null 2>&1
+blk_blk=$?
+set -e
+node - "$OUT" <<'NODE'
+const fs = require('fs');
+const r = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
+const banned = r.findings.find((f) => f.type === 'banned-word-exact');
+if (!banned) throw new Error('一级禁用词「一丝」应被检出（词表加载是否失效？）: ' + JSON.stringify(r.findings.map((f) => f.type)));
+if (banned.severity !== 'blocking') throw new Error('banned-word-exact 应为 blocking: ' + JSON.stringify(banned));
+NODE
+[ "$blk_blk" -eq 1 ] || { echo "FAIL: banned-word-exact --fail-on=blocking 应退出 1，实际 $blk_blk" >&2; exit 1; }
 
 echo "Prose pattern (碎句号/长段落/破折号) regression tests passed."
 
@@ -258,7 +281,7 @@ const r = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const ni = r.findings.filter((f) => f.type === 'not-is-comparison');
 if (ni.length !== 1) throw new Error('跨空行 不是A。/是B 应命中 1 处 not-is: ' + JSON.stringify(r.findings.map((f) => `${f.type}@${f.line}`)));
 if (ni[0].line !== 3) throw new Error('not-is 应定位到「不是」所在行 3，实际 ' + ni[0].line);
-if (ni[0].severity !== 'blocking') throw new Error('not-is 应为 blocking');
+if (ni[0].severity !== 'advisory') throw new Error('not-is 应为 advisory（风格类）: ' + JSON.stringify(ni[0]));
 NODE
 
 # 引号内台词「不是A，是B」是口语辩解，不算叙述层 AI 对比句式（与碎句号一致豁免引号内容）。
@@ -992,11 +1015,11 @@ const fs = require('fs');
 const r = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const vc = r.findings.filter((f) => f.type === 'voice-contrast');
 if (vc.length !== 1) throw new Error('音量反差腔应命中 1 处 voice-contrast: ' + JSON.stringify(r.findings.map((f) => `${f.type}@${f.line}`)));
-if (vc[0].line !== 1 || vc[0].severity !== 'blocking') throw new Error('voice-contrast 应为 line 1 blocking: ' + JSON.stringify(vc[0]));
+if (vc[0].line !== 1 || vc[0].severity !== 'advisory') throw new Error('voice-contrast 应为 line 1 advisory: ' + JSON.stringify(vc[0]));
 // 引号内台词（line 2）与无转折的平铺（line 3）不算音量反差腔。
 if (vc[0].excerpt.includes('火气')) throw new Error('引号内台词不应命中 voice-contrast: ' + JSON.stringify(vc[0]));
 NODE
-[ "$voice_blk" -eq 1 ] || { echo "FAIL: voice-contrast --fail-on=blocking 应退出 1，实际 $voice_blk" >&2; exit 1; }
+[ "$voice_blk" -eq 0 ] || { echo "FAIL: voice-contrast 是 advisory，--fail-on=blocking 应退出 0，实际 $voice_blk" >&2; exit 1; }
 
 echo "voice-contrast (音量反差腔) regression tests passed."
 
@@ -1020,7 +1043,7 @@ const r = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const np = r.findings.filter((f) => f.type === 'negation-parade');
 if (np.length !== 3) throw new Error('否定排比应命中 3 处 negation-parade: ' + JSON.stringify(r.findings.map((f) => `${f.type}@${f.line}`)));
 if (np[0].line !== 1 || np[1].line !== 2 || np[2].line !== 8) throw new Error('negation-parade 应命中 line 1/2 与重复「没等」的 line 8: ' + JSON.stringify(np));
-if (!np.every((f) => f.severity === 'blocking')) throw new Error('negation-parade 应为 blocking');
+if (!np.every((f) => f.severity === 'advisory')) throw new Error('negation-parade 应为 advisory（风格类）');
 // 引号内台词（line 3）与分句独立否定（line 4）不算排比；
 // 黏着语素「沉没/淹没」（line 5/6）与单个时间惯用语「没多久」（line 6/7）不算；
 // 但重复「没等 A，没等 B，只是 C」本身就是目标排比，不能被时间短语豁免吞掉。
@@ -1087,7 +1110,7 @@ const fs = require('fs');
 const r = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const rn = r.findings.filter((f) => f.type === 'reverse-not-is');
 if (rn.length !== 1) throw new Error('反序对比腔应命中 1 处 reverse-not-is: ' + JSON.stringify(r.findings.map((f) => `${f.type}@${f.line}`)));
-if (rn[0].line !== 1 || rn[0].severity !== 'blocking') throw new Error('reverse-not-is 应为 line 1 blocking: ' + JSON.stringify(rn[0]));
+if (rn[0].line !== 1 || rn[0].severity !== 'advisory') throw new Error('reverse-not-is 应为 line 1 advisory: ' + JSON.stringify(rn[0]));
 if (!rn[0].excerpt.includes('是真嗓子')) throw new Error('reverse-not-is excerpt 应含正例片段: ' + JSON.stringify(rn[0]));
 // 反例必须全部保持沉默：引号内辩解（2）、就是/也是合成词（3/4）、是啊确认语（5）、
 // 是不是问句（6）、不是吗反问尾巴（7）。
@@ -1110,15 +1133,17 @@ printf '%s\n' \
   '一场从县城炸向省台的接力，正朝着他，缓缓压了过去。' >> "$FIXTURE_TRAILER"
 set +e
 node "$SCRIPT" --json "$FIXTURE_TRAILER" > "$OUT"
-node "$SCRIPT" --fail-on=blocking "$FIXTURE_TRAILER" >/dev/null 2>&1
-trailer_blk=$?
 set -e
 node - "$OUT" <<'NODE'
 const fs = require('fs');
 const r = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const te = r.findings.filter((f) => f.type === 'trailer-ending');
 if (te.length !== 3) throw new Error('章尾预告腔应命中 3 处 trailer-ending: ' + JSON.stringify(r.findings.map((f) => `${f.type}@${f.line}:${f.excerpt}`)));
-if (!te.every((f) => f.severity === 'blocking')) throw new Error('trailer-ending 应为 blocking');
+if (!te.every((f) => f.severity === 'advisory')) throw new Error('trailer-ending 应为 advisory（风格类）');
+// 契约：blocking 只给词表类。本 fixture 含一级禁用词「缓缓」，整体退出码会是 1，
+// 所以不能断言退出 0——要断言的是「没有任何风格类规则是 blocking」。
+const styleBlocking = r.findings.filter((f) => f.severity === 'blocking' && !/^banned-word-|^rule-load-error$/.test(f.type));
+if (styleBlocking.length) throw new Error('风格类规则不得为 blocking: ' + JSON.stringify(styleBlocking.map((f) => f.type)));
 if (te.some((f) => f.line === 1)) throw new Error('窗口外（文首）的「没人知道」不应命中 trailer-ending');
 if (te.some((f) => f.excerpt.includes('下一场'))) throw new Error('对话里的「没人知道」不应命中 trailer-ending');
 if (te.some((f) => f.excerpt.includes('拉开序幕'))) throw new Error('真人报幕句「正式拉开序幕」不应命中 trailer-ending');
@@ -1127,7 +1152,6 @@ for (const marker of ['没人知道', '这才刚刚开头', '压了过去']) {
   if (!excerpts.includes(marker)) throw new Error(`trailer-ending 缺少正例命中 ${marker}: ${excerpts}`);
 }
 NODE
-[ "$trailer_blk" -eq 1 ] || { echo "FAIL: trailer-ending --fail-on=blocking 应退出 1，实际 $trailer_blk" >&2; exit 1; }
 
 echo "trailer-ending (预告式总结收尾) regression tests passed."
 
@@ -1183,17 +1207,16 @@ printf '%s\n' \
   '这一切都结束了。这一夜注定无眠。' > "$FIXTURE_TRAILER_SUMMARY"
 set +e
 node "$SCRIPT" --json "$FIXTURE_TRAILER_SUMMARY" > "$OUT"
-node "$SCRIPT" --fail-on=blocking "$FIXTURE_TRAILER_SUMMARY" >/dev/null 2>&1
-trailer_sum_blk=$?
 set -e
 node - "$OUT" <<'NODE'
 const fs = require('fs');
 const r = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const ts = r.findings.filter((f) => f.type === 'trailer-summary');
 if (ts.length < 2) throw new Error('章尾「这一切都结束了」+「这一夜注定」应各报一条: ' + JSON.stringify(ts));
-if (ts.some((f) => f.severity !== 'blocking')) throw new Error('trailer-summary 应为 blocking: ' + JSON.stringify(ts));
+if (ts.some((f) => f.severity !== 'advisory')) throw new Error('trailer-summary 应为 advisory: ' + JSON.stringify(ts));
+const styleBlocking = r.findings.filter((f) => f.severity === 'blocking' && !/^banned-word-|^rule-load-error$/.test(f.type));
+if (styleBlocking.length) throw new Error('风格类规则不得为 blocking: ' + JSON.stringify(styleBlocking.map((f) => f.type)));
 NODE
-[ "$trailer_sum_blk" -eq 1 ] || { echo "FAIL: trailer-summary --fail-on=blocking 应退出 1，实际 $trailer_sum_blk" >&2; exit 1; }
 
 # 负例：语料实测出的六类结构性误报形状，逐条钉死——时间跳转（就这样，时间过去了）、
 # 及物用法（才结束了这个话题）、场内报幕（宣布…圆满落幕）、条件从句（等这一切结束了，…）、

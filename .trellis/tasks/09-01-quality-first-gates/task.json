@@ -26,7 +26,8 @@
     "09-01-causal-promote",
     "09-01-name-drift-dict",
     "09-01-metrics-ledger",
-    "09-01-regression-fixture-book"
+    "09-01-regression-fixture-book",
+    "09-01-restore-ai-pattern-blocking"
   ],
   "parent": null,
   "relatedFiles": [],

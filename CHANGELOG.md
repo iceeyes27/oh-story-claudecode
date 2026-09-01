@@ -12,6 +12,9 @@ All notable changes to this project will be documented in this file.
 
 ### 修复
 
+- **恢复 `check-ai-patterns.js` 在一次合并中丢失的规则集**。合并 `7c380a1` 取了旧目录布局的过时副本，导致 17 个规则族（`banned-word-*` 全家族、`contrast-rhetorical`、`english-residue`、`grey-crack-in-head`、`narration-slogan`、`summary-slogan`、`process-term-as-object` 等）与 `banned-words.md` 的**运行时加载器**一并消失，规则数从 38 降到 21。现按三方合并恢复，同时保留合并另一侧新增的真人语料校准与 `套式反应` / `章尾状态总结体` / `引号强调` 规则。
+- **`--fail-on=blocking` 不再是空跑**。此前全部规则都是 advisory，`candidate-commit.py` 的采用前语言门禁对本脚本永远返回通过。现在 severity 按「判定是否需要语境」两分：词表类（`banned-word-*` 与词表加载失败的 `rule-load-error`，判据来自 `banned-words.md` 明文，出现即替换）为 blocking；其余风格/密度/句式规则（含 `voice-contrast`、`negation-parade`、`reverse-not-is`、`trailer-ending`、`trailer-summary`、`em-dash`、`english-residue` 与各 `*-tic`）保持 advisory，交由语义审查判断。`english-residue` 尤其依赖题材——短视频/军宣类作品里的 MV、BGM 是正当行业词。
+- `scripts/test-ai-patterns.sh` 的 severity 断言与上述契约对齐（此前该测试自 severity 降级起一直失败，且未纳入 `quality-gate.mjs`）；风格类规则改为断言「不得出现 blocking」而非断言退出码，避免 fixture 中正当的一级禁用词干扰判定。
 - Codex CLI E2E 支持展开 Skill roots 别名，兼容新版 CLI 的短路径输出。
 
 ## v0.8.1

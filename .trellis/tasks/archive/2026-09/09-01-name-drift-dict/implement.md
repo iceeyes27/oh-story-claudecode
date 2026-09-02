@@ -30,3 +30,11 @@ node skills/_shared/scripts/check-name-drift.js "demo/长篇/让你管账号，�
 ## 回滚
 
 单 commit revert；词典与书级声明为新增文件。
+
+## 执行记录（2026-09-02）
+
+- [x] 现实平台/产品词典与书级 `保留真名` 分离。
+- [x] 正文卷目录递归发现，候选历史目录排除，设定目录不扫描。
+- [x] 3～4 字角色名从角色设定、角色快照及追踪状态运行时派生；单字替换仅 advisory。
+- [x] `candidate-commit check/promote` 对新章 blocking、历史章 advisory。
+- [x] `node scripts/test-name-drift.js`、`python scripts/test-candidate-commit.py`、Skill adapter check 通过。

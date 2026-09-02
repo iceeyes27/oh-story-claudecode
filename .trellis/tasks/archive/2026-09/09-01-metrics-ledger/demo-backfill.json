@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "mode": "revision",
+  "chapter": 20,
+  "chapter_title": "老兵的礼物",
+  "expected_state_revision": 0,
+  "delta": {
+    "result": "《如愿》点击破亿，江晨获得《离别开出花》伴奏和钢琴能力，钟嘉嘉送来老兵书法礼。",
+    "character_changes": [],
+    "foreshadow_changes": [],
+    "timeline_events": [],
+    "constraints": [],
+    "next_chapter_commitments": [
+      "先补第21章细纲，再承接老兵邀请、新歌伴奏和钢琴能力。"
+    ]
+  },
+  "context": {
+    "position": {
+      "volume": "第一卷·军宣整顿（候选）",
+      "volume_start_chapter": 1,
+      "story_time": "《如愿》点击破亿后的第二天",
+      "scene": "火箭军文工团，钟嘉嘉送来老兵书法礼后"
+    },
+    "long_term_constraints": [
+      "军宣爽点必须通过作品效果、传播数据和围观反应链兑现，不能只靠系统播报。",
+      "正式军宣内容仍受组织审核与领导决策约束，江晨不能无说明绕过流程。",
+      "地球作品落地要结合军旅场景和当代传播语境，不能只报歌名。",
+      "钟嘉嘉未公开的军方培养安排属于作者真相，正文揭示前不能当成读者已知。"
+    ],
+    "active_character_names": ["江晨", "钟嘉嘉", "周薄森", "张耀祖"],
+    "continuity_risks": [
+      "第一卷卷界仍是候选方案，未确认前不要擅自开新卷。",
+      "第21章尚无细纲，不能直接写正文。",
+      "吴伟公诉、钟嘉嘉背景和军方培养安排仍未完整揭示。"
+    ]
+  },
+  "character_snapshots": {},
+  "metrics": {
+    "抖手账号粉丝": {
+      "value": "260万",
+      "as_of_chapter": 20,
+      "source_phrase": "火箭军的媒体账号，已经达到了 260 万粉丝"
+    },
+    "《如愿》点击量": {
+      "value": "1亿",
+      "as_of_chapter": 20,
+      "source_phrase": "《如愿》的点击量居然破亿了"
+    },
+    "华国国运": {
+      "value": "+30000",
+      "as_of_chapter": 20,
+      "source_phrase": "【叮！华国国运值+20000】】"
+    },
+    "任务·老兵的愿望": {
+      "value": "已结算",
+      "as_of_chapter": 20,
+      "source_phrase": "视频影响力突破 1000 万！恭喜宿主超额完成任务"
+    }
+  }
+}

@@ -78,6 +78,10 @@ R7.1 要「旧 state 无 `metrics` 键也能跑」，R7.5(a) 要「事务缺 `me
 
 ## 未决（动手前必须确认）
 
-1. `require_known_keys` 是严格白名单还是宽松校验 → 决定 schema 升不升
-2. `normalize_delta` 与 state root 的 metrics 语义是否需要分别定义
-3. 结算句式表的最终清单与误报率
+已在实现前确认：
+
+1. `require_known_keys` 是严格白名单；schema 保持 4，state 可缺 `metrics`，事务必须显式提交。
+2. metrics 不属于 `delta`，而是与 `character_snapshots` 同级的全量当前快照。
+3. 记录采用 `{value, as_of_chapter, source_phrase}`；state 最多保存 100 项，上下文按事实章倒序显示 12 项并标注隐藏数量。
+4. 来源短语必须能在正文定位；数字允许正文直接值，或由前值加本章增量得到当前值。
+5. 结算句式表为共享文件；误报通过非空 `metrics_unchanged_reason` 显式说明，不静默跳过。

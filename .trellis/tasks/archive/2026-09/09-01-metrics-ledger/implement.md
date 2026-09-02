@@ -2,10 +2,10 @@
 
 ## 前置调研（动手前必做）
 
-- [ ] 读 `require_known_keys` 实现，确认是否严格白名单 → 敲定 schema 4 保持 or 升 5，结论写回 `design.md`
-- [ ] 读 `normalize_delta`（:689-704）与 state root 校验（:841）的关系
-- [ ] 确认 `character_snapshots` 的「全量而非 delta」是怎么实现的，metrics 照抄同一模式
-- [ ] 从 `金手指.md` 任务史与正文抽出 demo 的真实数值，作为回填素材
+- [x] 读 `require_known_keys` 实现，确认是否严格白名单 → **保持 schema 4**：state 允许缺 `metrics`（按 `{}`），事务必须显式带 `metrics`（空表也要 `{}`）
+- [x] 读 `normalize_delta` 与 state root 校验的关系
+- [x] 确认 `character_snapshots` 的「全量而非 delta」是怎么实现的，metrics 照抄同一模式
+- [x] 从第 11、20 章正文抽出 demo 的真实数值，使用 `demo-backfill.json` 经 tracking 事务回填；旧 state 兼容由独立回归覆盖
 
 ## 实现步骤
 
@@ -18,6 +18,16 @@
 7. **写前注入**：`long-mode.md` 状态筛选一步加半句，不新开块。
 8. **同步 4 份副本**：`python scripts/sync-shared-assets.py` —— 必须一次性同步，不可分批（`design.md` 已说明原因）。
 9. **补测试**：`test-tracking-commit.py` 加——旧 state 无 metrics 可读、事务缺 metrics 被拒、渲染后仍 7 栏、空表不输出子弹。
+
+## 执行记录（2026-09-02）
+
+- [x] schema 保持 4；旧 state 缺 metrics 可读且不改写，新事务 metrics 必填。
+- [x] metrics 采用结构化全量记录，保留 value、事实章和正文来源短语。
+- [x] 上下文仍为 7 栏，显示最近 12 项并标注隐藏数量。
+- [x] 结算句式无数值变化时阻断；显式理由、正文直接值与累计增量均有回归。
+- [x] demo 经 tracking 事务回填 4 项当前值，`tracking_commit.py check` 通过。
+- [x] tracking 36 项、candidate 45 项全量回归通过；追加累计值修正后 5 项定向回归通过。
+- [x] 4 份 tracking 副本、共享文件治理与 Skill adapter 检查通过。
 
 ## 端到端验收（本批唯一需要新写一章的）
 

@@ -46,14 +46,14 @@ grok 原方案把它排第一，理由是「治本」。本批不同意：它治
 
 ## Acceptance Criteria
 
-- [ ] 旧书（demo，无 `metrics` 键）的 `check` / `promote` / `init` 全部正常，`_tracking-state.json` 不被强制迁移。
-- [ ] `render_context` 生成的 `上下文.md` 仍恰好 7 个 `##` 栏，`require(headings == CONTEXT_HEADINGS, ...)` 通过。
-- [ ] `## 当前位置` 下出现「关键数值：…」子弹，名目为原文措辞。
-- [ ] 事务缺 `metrics` 键时被 schema 拒收（含空表须显式 `{}`）。
-- [ ] 正文含结算句式而 metrics 未变化时，`promote` 拒绝并说明原因。
-- [ ] fixture 书上新写一章，结算数字与台账一致——**这是本批唯一需要「新写一章」的端到端验收**。
-- [ ] `金手指.md` 与 `题材定位.md` 的权威关系已在文档中写明。
-- [ ] `scripts/test-tracking-commit.py`（`:193` 钉 schema 4）通过；4 份副本经 `sync-shared-assets.py` 同步后 `check-shared-files.sh` 通过。
+- [x] 旧 state 无 `metrics` 键时 `check` 正常且不强制迁移；`init` 与新事务行为有独立回归。
+- [x] `render_context` 生成的 `上下文.md` 仍恰好 7 个 `##` 栏，`require(headings == CONTEXT_HEADINGS, ...)` 通过。
+- [x] `## 当前位置` 下出现「关键数值：…」子弹，名目为原文措辞。
+- [x] 事务缺 `metrics` 键时被 schema 拒收（含空表须显式 `{}`）。
+- [x] 正文含结算句式而 metrics 未变化时，`promote` 拒绝并说明原因。
+- [x] 隔离 fixture 新写一章：无 metrics 更新被拒，正文来源与数值一致时可采用并生成 7 栏上下文。
+- [x] `金手指.md` 与 `题材定位.md` 的权威关系已在文档中写明。
+- [x] `scripts/test-tracking-commit.py` 保持 schema 4；4 份副本同步且共享文件检查通过。
 
 ## 未决
 

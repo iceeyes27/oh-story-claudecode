@@ -1,0 +1,29 @@
+{
+  "book_title": "质量门禁样本",
+  "chapter_gaps": [],
+  "characters": {},
+  "context": {
+    "active_character_names": [],
+    "continuity_risks": [],
+    "long_term_constraints": [
+      "数字以纸质回条为准，口头承诺不算数"
+    ],
+    "next_chapter_commitments": [
+      "让林乔在对账单上指出那笔对不上的拨款"
+    ],
+    "position": {
+      "scene": "县档案室",
+      "story_time": "年终对账前夜",
+      "volume": "第一卷对账",
+      "volume_start_chapter": 1
+    },
+    "recent_chapters": []
+  },
+  "foreshadow": {},
+  "imported_through_chapter": 0,
+  "last_committed_chapter": 0,
+  "schema_version": 4,
+  "state_revision": 0,
+  "timeline": {},
+  "wordcount_records": {}
+}

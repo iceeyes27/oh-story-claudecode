@@ -33,11 +33,19 @@ demo 继续作为 **causal / 字数 / name-drift** 的回归 fixture（那三项
 
 ## Acceptance Criteria
 
-- [ ] `node skills/story-write/scripts/check-outline-contract.js --json --project <fixture> --chapter N` 对每章 `ok=true`。
-- [ ] fixture 的 `_tracking-state.json` 通过 `tracking_commit.py` 的 state 校验，`imported_through_chapter = 0`。
-- [ ] `目标情绪` 序列中存在连续 ≥4 章同值的片段（供子任务 2 调阈值观察）。
-- [ ] 缺字段变体能被 `check-outline-contract.js` 判为 `ok=false` 且命中 `outline.required-fields`。
-- [ ] fixture 放置位置不污染 `demo/` 的既有内容，且被 `scripts/check-release-manifest.mjs` 接受（或明确排除）。
+- [x] `node skills/story-write/scripts/check-outline-contract.js --json --project <fixture> --chapter N` 对每章 `ok=true`。
+- [x] fixture 的 `_tracking-state.json` 通过 `tracking_commit.py` 的 state 校验，`imported_through_chapter = 0`。
+- [x] `目标情绪` 序列中存在连续 ≥4 章同值的片段（供子任务 2 调阈值观察）。
+- [x] 缺字段变体能被 `check-outline-contract.js` 判为 `ok=false` 且命中 `outline.required-fields`。
+- [x] fixture 放置位置不污染 `demo/` 的既有内容，且被 `scripts/check-release-manifest.mjs` 接受（或明确排除）。
+
+## 验证记录（2026-09-02）
+
+- 第 1–5 章逐章检查均为 `ok=true`。
+- `tracking_commit.py check` 返回 `last_committed_chapter=0`、`state_revision=0`、`chapter_gaps=[]`；状态中的 `imported_through_chapter=0`。
+- 情绪序列为 `打脸 / 家国 / 家国 / 家国 / 家国`。
+- 缺字段变体返回 `ok=false`，命中 `outline.required-fields` 与 `outline.reader-contract`。
+- `check-release-manifest.mjs` 通过。
 
 ## 未决
 

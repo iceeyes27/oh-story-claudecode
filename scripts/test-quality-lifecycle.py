@@ -85,6 +85,7 @@ def transaction(chapter: int, revision: int, *, mode: str = "append") -> dict[st
             "continuity_risks": [],
         },
         "character_snapshots": {},
+        "metrics": {},
     }
 
 

@@ -1,5 +1,6 @@
 {
   "book_title": "让你管账号，你高燃混剪炸全网",
+  "chapter_gaps": [],
   "characters": {
     "吴伟": {
       "abilities_resources": [],
@@ -289,8 +290,30 @@
   },
   "imported_through_chapter": 20,
   "last_committed_chapter": 20,
+  "metrics": {
+    "《如愿》点击量": {
+      "as_of_chapter": 20,
+      "source_phrase": "《如愿》的点击量居然破亿了",
+      "value": "1亿"
+    },
+    "任务·老兵的愿望": {
+      "as_of_chapter": 20,
+      "source_phrase": "视频影响力突破 1000 万！恭喜宿主超额完成任务",
+      "value": "已结算"
+    },
+    "华国国运": {
+      "as_of_chapter": 20,
+      "source_phrase": "【叮！华国国运值+20000】】",
+      "value": "+30000"
+    },
+    "抖手账号粉丝": {
+      "as_of_chapter": 20,
+      "source_phrase": "火箭军的媒体账号，已经达到了 260 万粉丝",
+      "value": "260万"
+    }
+  },
   "schema_version": 4,
-  "state_revision": 0,
+  "state_revision": 1,
   "timeline": {
     "E001": {
       "characters": [
@@ -472,5 +495,6 @@
       "story_time": "第十章看片会后",
       "updated_chapter": 20
     }
-  }
+  },
+  "wordcount_records": {}
 }

@@ -13,6 +13,8 @@
 - 情绪连排：`node skills/_shared/scripts/check-emotion-run.js --json --project DIR [--chapter N]`
 - 细纲因果：`python skills/story-write/scripts/check-outline-causal.py DIR --json --strict --from=N --to=N`
 - 专名漂移：`node skills/_shared/scripts/check-name-drift.js --json --project DIR [--chapter N] [--fail-on=blocking]`
+- 数值状态：`_tracking-state.json.metrics: Record<string, {value, as_of_chapter, source_phrase}>`
+- 追踪事务：`transaction.metrics` 必填全量快照；无变化也显式提交 `{}`，可选 `metrics_unchanged_reason`
 - 流程动作：`write_chapter_skeleton`、`expand_chapter_skeleton`、`review_candidate`
 - 候选采用：`python skills/story-write/scripts/candidate-commit.py promote --project DIR --chapter N [--no-scan --reason "<理由>"]`（兼容 `--all` 只接受单候选）
 - 候选预检：`python skills/story-write/scripts/candidate-commit.py check --project DIR --chapter N [--json]`
@@ -32,6 +34,8 @@
 - `目标情绪` 只取 `skills/_shared/references/target-emotion-vocab.md` 的首个词；词表外取值对新章 blocking、历史章 advisory。连排 3 章为 advisory、4 章为 blocking；传 `--chapter N` 时只读取 `N` 及以前的细纲，不得用未来章节阻断当前章。
 - `check` 与 `promote` 对本章运行严格因果检查，只传相同的 `--from=N --to=N`；新章 blocking，`imported_through_chapter` 内的历史章 advisory。不得为写第 N 章扫描整本书的历史因果欠账。
 - 专名漂移扫描只读共享现实平台/产品词典及项目 `设定/题材定位.md` 的 `保留真名`；扫描正文、候选与细纲，不扫描设定正文。现实专名对新章 blocking、历史章 advisory；从角色设定、角色快照和追踪状态运行时派生的 3～4 字人名，单字替换近似只作 advisory。正文卷目录必须递归发现。
+- tracking schema 保持 4：旧 state 可缺 `metrics` 且 `check` 不改写；新事务必须提交结构化全量 metrics。每条记录保存原文名目、当前值、事实章号和可在正文定位的来源短语。上下文仍为 7 栏，只在 `## 当前位置` 显示按事实章倒序的前 12 项，超出时报告隐藏数量。
+- 候选正文命中共享结算句式而 metrics 无变化时阻断，只有非空 `metrics_unchanged_reason` 可说明本章为何不改数值。变更记录的来源短语必须能在正文定位；数值按“正文直接值”或“前值 + 本章增量”验证，非数值状态只验证来源锚点。
 - 确定性扫描通过只表示未发现已登记 blocking 模式，不能表述为文风自然或没有 AI 痕迹。
 
 ## 4. Validation & Error Matrix
@@ -51,6 +55,9 @@
 | 历史章存在严格因果 finding | 输出 advisory，继续其余采用预检 |
 | 新章出现未声明现实平台/产品名 | `check` 退出 1；候选、正文与追踪均不变 |
 | 历史章现实专名或新章疑似单字人名漂移 | 输出 advisory，继续其余采用预检 |
+| 新事务缺 `metrics`、记录形状非法或事实章晚于当前章 | tracking 拒绝，state 与派生视图不变 |
+| 正文出现结算句式但 metrics 未变且无理由 | `check` 退出 1，候选、正文与追踪均不变 |
+| metrics 来源短语无法定位，或数字既非直接值也非前值加增量 | `check` 退出 1，候选、正文与追踪均不变 |
 | 候选绑定为 v1、逻辑项缺失或出现未知 ID | `promote` 退出 2，要求重新生成绑定 |
 | evidence 为空、路径不属于读者视图或 anchor 无法定位 | `promote` 退出 2，首次写入前终止 |
 | 第 15 章 arc-02 为 blocking 且没有绑定当前结果的作者批准 | `promote` 退出 2；旧结果或正文变化会使批准失效 |
@@ -74,11 +81,13 @@
 - `python scripts/test-candidate-commit.py`：新章因果 finding 阻断、历史章 advisory、未来坏细纲不影响当前章。
 - `node scripts/test-name-drift.js`：共享词典、项目白名单、设定豁免、卷目录发现、3～4 字人名单字替换 advisory 与错误退出码。
 - `python scripts/test-candidate-commit.py`：新章现实专名阻断、历史章现实专名 advisory、人名近似不阻断。
+- `python scripts/test-tracking-commit.py`：schema 4 旧 state 兼容、事务必填、结构化记录、7 栏渲染与 12 项显示上限。
+- `python scripts/test-candidate-commit.py`：结算无更新阻断、显式理由、直接值与累计增量、来源锚点和采用后上下文。
 - `bash scripts/static-check.sh`：Skill 链接、frontmatter 和自包含边界。
 
 ## 7. Wrong vs Correct
 
 ```text
-Wrong:  候选写入 正文/候选/，用 N+1 之后的细纲计算第 N 章连排，或把 check 通过当成作者已采用。
-Correct: 候选写入书根 候选/；第 N 章只检查截至 N 的情绪序列；作者明确采用并通过 promote 后才进入 正文/ 并更新 tracking。
+Wrong:  候选写入 正文/候选/，用 N+1 之后的细纲计算第 N 章连排，或只在设定文档维护会过期的当前数值。
+Correct: 候选写入书根 候选/；第 N 章只检查截至 N 的情绪序列；活数字由 tracking metrics 维护，采用前绑定正文来源，作者明确采用后才同时推进正文与 tracking。
 ```

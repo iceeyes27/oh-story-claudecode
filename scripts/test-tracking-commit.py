@@ -129,10 +129,19 @@ def transaction(
             "continuity_risks": [],
         },
         "character_snapshots": {"江晨": snapshot()} if character else {},
+        "metrics": {},
     }
     if chapter_gap is not None:
         document["chapter_gap"] = chapter_gap
     return document
+
+
+def metric(value: str, chapter: int, source_phrase: str) -> dict[str, object]:
+    return {
+        "value": value,
+        "as_of_chapter": chapter,
+        "source_phrase": source_phrase,
+    }
 
 
 def load_tool_module():
@@ -625,6 +634,71 @@ class TrackingCommitTests(unittest.TestCase):
         invalid["character_snapshots"] = {"CON": invalid["character_snapshots"]["江晨"]}
         self.run_tool("commit", invalid, expect=2)
         self.assertEqual(self.read_state()["state_revision"], 0)
+
+    def test_metrics_default_empty_and_render_stays_seven_headings(self) -> None:
+        self.init()
+        state = self.read_state()
+        self.assertEqual(state["schema_version"], 4)
+        self.assertEqual(state.get("metrics"), {})
+        context = (self.project / "追踪/上下文.md").read_text(encoding="utf-8")
+        headings = [line for line in context.splitlines() if line.startswith("## ")]
+        self.assertEqual(headings, [
+            "## 当前位置", "## 长期约束", "## 核心角色状态", "## 活跃伏笔",
+            "## 近三章速记", "## 下一章承诺", "## 连贯性风险",
+        ])
+        self.assertNotIn("关键数值：", context)
+
+        state_path = self.project / "追踪/_tracking-state.json"
+        state.pop("metrics")
+        state_path.write_text(json.dumps(state, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        self.run_tool("check")
+        self.assertNotIn("metrics", json.loads(state_path.read_text(encoding="utf-8")))
+
+    def test_transaction_missing_metrics_is_rejected(self) -> None:
+        self.init()
+        payload = transaction(1)
+        del payload["metrics"]
+        result = self.run_tool("commit", payload, expect=2)
+        self.assertIn("transaction.metrics is required", result.stderr)
+        self.assertEqual(self.read_state()["state_revision"], 0)
+
+    def test_metrics_render_as_position_bullet(self) -> None:
+        self.init()
+        payload = transaction(1)
+        payload["metrics"] = {
+            "粉丝数": metric("100万", 1, "粉丝突破100万"),
+            "国运值": metric("10000", 1, "国运值达到10000"),
+        }
+        self.run_tool("commit", payload)
+        context = (self.project / "追踪/上下文.md").read_text(encoding="utf-8")
+        self.assertIn("关键数值：国运值 10000｜粉丝数 100万", context)
+        headings = [line for line in context.splitlines() if line.startswith("## ")]
+        self.assertEqual(len(headings), 7)
+
+    def test_metrics_render_twelve_most_recent_and_report_hidden_count(self) -> None:
+        self.init()
+        payload = transaction(1)
+        payload["metrics"] = {
+            f"指标{index:02d}": metric(str(index), 1, f"指标{index:02d}达到{index}")
+            for index in range(14)
+        }
+        self.run_tool("commit", payload)
+        context = (self.project / "追踪/上下文.md").read_text(encoding="utf-8")
+        self.assertIn("…（另 2 项见台账）", context)
+        metric_line = next(line for line in context.splitlines() if "关键数值：" in line)
+        self.assertEqual(metric_line.count("指标"), 12)
+
+    def test_metrics_require_structured_record_and_changed_chapter(self) -> None:
+        self.init()
+        flat = transaction(1)
+        flat["metrics"] = {"粉丝数": "100万"}
+        result = self.run_tool("commit", flat, expect=2)
+        self.assertIn("transaction.metrics.粉丝数 must be a JSON object", result.stderr)
+
+        stale = transaction(1)
+        stale["metrics"] = {"粉丝数": metric("100万", 2, "粉丝突破100万")}
+        result = self.run_tool("commit", stale, expect=2)
+        self.assertIn("as_of_chapter exceeds current chapter", result.stderr)
 
 
 if __name__ == "__main__":

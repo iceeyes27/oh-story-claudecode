@@ -34,6 +34,8 @@ DELTA_TARGET_BYTES = 1536
 DELTA_MAX_BYTES = 3072
 CONTEXT_TARGET_BYTES = 8192
 CONTEXT_MAX_BYTES = 12288
+METRICS_RENDER_MAX = 12
+METRICS_MAX_ENTRIES = 100
 SNAPSHOT_TARGET_BYTES = 4096
 SNAPSHOT_MAX_BYTES = 8192
 
@@ -641,12 +643,56 @@ def active_foreshadow_lines(rows: dict[str, dict[str, Any]]) -> list[str]:
     return result
 
 
+def normalize_metrics(value: object, label: str, *, through_chapter: int) -> dict[str, dict[str, Any]]:
+    metrics = as_mapping(value, label)
+    require(len(metrics) <= METRICS_MAX_ENTRIES, f"{label} may contain at most {METRICS_MAX_ENTRIES} entries")
+    normalized: dict[str, dict[str, Any]] = {}
+    for raw_name, raw_record in metrics.items():
+        name = clean_text(raw_name, f"{label} key", max_bytes=80)
+        require(name not in normalized, f"{label} contains duplicate normalized key {name}")
+        record = as_mapping(raw_record, f"{label}.{name}")
+        require_known_keys(record, {"value", "as_of_chapter", "source_phrase"}, f"{label}.{name}")
+        as_of_chapter = as_int(record.get("as_of_chapter"), f"{label}.{name}.as_of_chapter", minimum=1)
+        require(as_of_chapter <= through_chapter, f"{label}.{name}.as_of_chapter exceeds current chapter")
+        normalized[name] = {
+            "value": clean_text(record.get("value"), f"{label}.{name}.value", max_bytes=160),
+            "as_of_chapter": as_of_chapter,
+            "source_phrase": clean_text(
+                record.get("source_phrase"), f"{label}.{name}.source_phrase", max_bytes=360
+            ),
+        }
+    return normalized
+
+
+def render_metrics_bullet(metrics: dict[str, dict[str, Any]]) -> str | None:
+    if not metrics:
+        return None
+    ordered = sorted(
+        metrics.items(),
+        key=lambda item: (-item[1]["as_of_chapter"], item[0]),
+    )
+    visible = ordered[:METRICS_RENDER_MAX]
+    joined = "｜".join(f"{name} {record['value']}" for name, record in visible)
+    hidden = len(ordered) - len(visible)
+    suffix = f"｜…（另 {hidden} 项见台账）" if hidden else ""
+    return f"关键数值：{joined}{suffix}"
+
+
 def render_context(state: dict[str, Any]) -> str:
     context = state["context"]
     position = context["position"]
     current_chapter = (
         "尚未开篇" if state["last_committed_chapter"] == 0 else f"第{state['last_committed_chapter']}章"
     )
+    position_lines = [
+        f"当前章：{current_chapter}",
+        f"卷：{position['volume']}（始于第{position['volume_start_chapter']}章）",
+        f"故事时间：{position['story_time']}",
+        f"场景：{position['scene']}",
+    ]
+    metrics_bullet = render_metrics_bullet(state.get("metrics", {}))
+    if metrics_bullet:
+        position_lines.append(metrics_bullet)
     character_lines = [
         f"{name}｜{state['characters'][name]['identity']}｜{state['characters'][name]['state']}｜"
         f"目标：{state['characters'][name]['goal']}"
@@ -655,12 +701,7 @@ def render_context(state: dict[str, Any]) -> str:
     sections: list[tuple[str, list[str]]] = [
         (
             "## 当前位置",
-            [
-                f"当前章：{current_chapter}",
-                f"卷：{position['volume']}（始于第{position['volume_start_chapter']}章）",
-                f"故事时间：{position['story_time']}",
-                f"场景：{position['scene']}",
-            ],
+            position_lines,
         ),
         ("## 长期约束", context["long_term_constraints"]),
         ("## 核心角色状态", character_lines),
@@ -840,7 +881,7 @@ def normalize_state(document: object) -> dict[str, Any]:
         {
             "schema_version", "book_title", "last_committed_chapter", "imported_through_chapter",
             "state_revision", "chapter_gaps", "context", "characters", "foreshadow", "timeline",
-            "wordcount_records",
+            "wordcount_records", "metrics",
         },
         "tracking state",
     )
@@ -891,6 +932,9 @@ def normalize_state(document: object) -> dict[str, Any]:
         require(not timeline, "a chapter-0 project cannot have established timeline facts")
     state_revision = as_int(root.get("state_revision"), "tracking state.state_revision")
     wordcount_records = normalize_wordcount_records(root.get("wordcount_records", {}), last_chapter)
+    metrics = normalize_metrics(
+        root.get("metrics", {}), "tracking state.metrics", through_chapter=last_chapter
+    )
     return {
         "schema_version": TRACKING_SCHEMA_VERSION,
         "book_title": clean_text(root.get("book_title"), "tracking state.book_title", max_bytes=240),
@@ -903,6 +947,7 @@ def normalize_state(document: object) -> dict[str, Any]:
         "foreshadow": foreshadow,
         "timeline": timeline,
         "wordcount_records": wordcount_records,
+        "metrics": metrics,
     }
 
 
@@ -916,7 +961,10 @@ def normalize_initial_document(document: object) -> dict[str, Any]:
     root = as_mapping(document, "init input")
     require_known_keys(
         root,
-        {"schema_version", "book_title", "last_chapter", "context", "character_snapshots", "foreshadow", "timeline_events"},
+        {
+            "schema_version", "book_title", "last_chapter", "context", "character_snapshots",
+            "foreshadow", "timeline_events", "metrics",
+        },
         "init input",
     )
     require(root.get("schema_version") == INPUT_SCHEMA_VERSION, "init input schema_version is unsupported")
@@ -955,6 +1003,9 @@ def normalize_initial_document(document: object) -> dict[str, Any]:
             "foreshadow": foreshadow,
             "timeline": timeline,
             "wordcount_records": {},
+            "metrics": normalize_metrics(
+                root.get("metrics", {}), "init input.metrics", through_chapter=last_chapter
+            ),
         }
     )
 
@@ -965,11 +1016,13 @@ def normalize_transaction(project: Path, state: dict[str, Any], document: object
         root,
         {
             "schema_version", "mode", "chapter", "chapter_title", "expected_state_revision",
-            "chapter_gap", "delta", "context", "character_snapshots", "wordcount",
+            "chapter_gap", "delta", "context", "character_snapshots", "wordcount", "metrics",
+            "metrics_unchanged_reason",
         },
         "transaction",
     )
     require(root.get("schema_version") == INPUT_SCHEMA_VERSION, "transaction schema_version is unsupported")
+    require("metrics" in root, "transaction.metrics is required (submit {} when unchanged)")
     mode = clean_text(root.get("mode"), "mode", max_bytes=24)
     require(mode in {"append", "revision"}, "mode must be append or revision")
     chapter = as_int(root.get("chapter"), "chapter", minimum=1)
@@ -1033,6 +1086,19 @@ def normalize_transaction(project: Path, state: dict[str, Any], document: object
             chapter,
             wordcount_input,
         )
+    metrics = normalize_metrics(
+        root.get("metrics"), "transaction.metrics", through_chapter=through_chapter
+    )
+    for name, record in metrics.items():
+        if state.get("metrics", {}).get(name) != record:
+            require(
+                record["as_of_chapter"] == chapter,
+                f"transaction.metrics.{name}.as_of_chapter must equal changed chapter {chapter}",
+            )
+    reason_raw = root.get("metrics_unchanged_reason")
+    metrics_unchanged_reason = (
+        None if reason_raw is None else clean_text(reason_raw, "metrics_unchanged_reason", max_bytes=240)
+    )
     return {
         "mode": mode,
         "chapter": chapter,
@@ -1042,6 +1108,8 @@ def normalize_transaction(project: Path, state: dict[str, Any], document: object
         "context": context,
         "snapshots": snapshots,
         "wordcount": wordcount,
+        "metrics": metrics,
+        "metrics_unchanged_reason": metrics_unchanged_reason,
     }
 
 
@@ -1063,6 +1131,7 @@ def merge_transaction(state: dict[str, Any], transaction: dict[str, Any]) -> dic
         if transaction["chapter_gap"] is not None:
             next_state["chapter_gaps"].append(transaction["chapter_gap"])
     next_state["state_revision"] += 1
+    next_state["metrics"] = dict(transaction["metrics"])
     next_state["characters"].update(transaction["snapshots"])
     if transaction["wordcount"] is not None:
         next_state["wordcount_records"][str(chapter)] = transaction["wordcount"]

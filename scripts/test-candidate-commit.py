@@ -34,6 +34,7 @@ _fixtures = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_fixtures)
 initial_document = _fixtures.initial_document
 transaction = _fixtures.transaction
+metric = _fixtures.metric
 
 
 def run(
@@ -766,6 +767,77 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertTrue(json.loads(completed.stdout)["ok"])
         self.assertIn("专名漂移 advisory", completed.stderr)
         self.assertIn("钟嘉佳", completed.stderr)
+
+    def test_settlement_phrase_without_metrics_change_is_blocked(self) -> None:
+        self.make_candidate(1, body="# 第1章\n任务完成，粉丝突破100万。\n")
+
+        blocked = self._candidate(["check", "--chapter", "1"], expect=1)
+        self.assertIn("metrics 未变化", blocked.stderr)
+        self.assertIn("粉丝突破", blocked.stderr)
+        self.assertEqual(self.final_files(), [])
+
+    def test_settlement_reason_explicitly_allows_unchanged_metrics(self) -> None:
+        self.make_candidate(
+            1,
+            body="# 第1章\n他回看旧视频里的任务完成提示。\n",
+            tx_overrides={"metrics_unchanged_reason": "仅回看旧提示，本章没有新结算"},
+        )
+
+        completed = self._candidate(["check", "--chapter", "1"])
+        self.assertTrue(json.loads(completed.stdout)["ok"])
+
+    def test_metrics_update_binds_value_and_source_then_promotes(self) -> None:
+        self.make_candidate(
+            1,
+            body="# 第1章\n任务完成，粉丝突破100万。\n",
+            tx_overrides={
+                "metrics": {"抖手粉丝": metric("100万", 1, "粉丝突破100万")},
+            },
+        )
+
+        checked = self._candidate(["check", "--chapter", "1"])
+        self.assertTrue(json.loads(checked.stdout)["ok"])
+        self._candidate(["promote", "--chapter", "1"])
+        state = self.read_state()
+        self.assertEqual(state["metrics"]["抖手粉丝"]["value"], "100万")
+        context = (self.project / "追踪/上下文.md").read_text(encoding="utf-8")
+        self.assertIn("关键数值：抖手粉丝 100万", context)
+        self.assertEqual(sum(line.startswith("## ") for line in context.splitlines()), 7)
+
+    def test_metrics_value_must_match_source_phrase(self) -> None:
+        self.make_candidate(
+            1,
+            body="# 第1章\n任务完成，粉丝突破100万。\n",
+            tx_overrides={
+                "metrics": {"抖手粉丝": metric("200万", 1, "粉丝突破100万")},
+            },
+        )
+
+        blocked = self._candidate(["check", "--chapter", "1"], expect=1)
+        self.assertIn("与 source_phrase", blocked.stderr)
+        self.assertEqual(self.final_files(), [])
+
+    def test_metrics_cumulative_value_accepts_prose_delta(self) -> None:
+        self.temporary.cleanup()
+        self._reset_project(last_chapter=1)
+        state_path = self.project / "追踪" / "_tracking-state.json"
+        state = self.read_state()
+        state["metrics"] = {"华国国运": metric("+10000", 1, "国运值+10000")}
+        state_path.write_text(json.dumps(state, ensure_ascii=False), encoding="utf-8")
+        tracking = importlib.util.module_from_spec(importlib.util.spec_from_file_location("tracking_render", TRACKING_TOOL))
+        assert tracking.__spec__ and tracking.__spec__.loader
+        tracking.__spec__.loader.exec_module(tracking)
+        (self.project / "追踪/上下文.md").write_text(tracking.render_context(tracking.normalize_state(state)), encoding="utf-8")
+        self.make_candidate(
+            2,
+            body="# 第2章\n任务完成，国运值+20000。\n",
+            tx_overrides={
+                "metrics": {"华国国运": metric("+30000", 2, "国运值+20000")},
+            },
+        )
+
+        completed = self._candidate(["check", "--chapter", "2"])
+        self.assertTrue(json.loads(completed.stdout)["ok"])
 
     def test_new_chapter_fourth_same_emotion_is_blocked(self) -> None:
         self.temporary.cleanup()

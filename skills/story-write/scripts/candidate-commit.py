@@ -18,6 +18,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from decimal import Decimal
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -586,6 +587,75 @@ def validate_logic_checks(
     return result
 
 
+def load_settlement_phrases() -> list[str]:
+    path = SHARED_SCRIPTS.parent / "references" / "settlement-phrases.md"
+    lines = path.read_text(encoding="utf-8").splitlines()
+    return [line[2:].strip() for line in lines if line.startswith("- ") and line[2:].strip()]
+
+
+def metric_quantities(value: object) -> list[Decimal]:
+    multipliers = {"": Decimal(1), "万": Decimal(10_000), "亿": Decimal(100_000_000)}
+    text = re.sub(r"[\s,，]", "", str(value or ""))
+    return [
+        Decimal(match.group(1)) * multipliers[match.group(2) or ""]
+        for match in re.finditer(r"([+-]?\d+(?:\.\d+)?)(万|亿)?", text)
+    ]
+
+
+def metrics_settlement_gate(
+    prose: Path,
+    chapter: int,
+    previous: dict[str, Any],
+    current: dict[str, Any],
+    reason: str | None,
+) -> None:
+    text = prose.read_text(encoding="utf-8-sig")
+    lines = text.splitlines()
+    hits = [
+        f"{phrase}@{line_number}"
+        for phrase in load_settlement_phrases()
+        for line_number, line in enumerate(lines, start=1)
+        if phrase and phrase in line
+    ]
+    changed = {
+        name: record for name, record in current.items()
+        if previous.get(name) != record
+    }
+    if hits and not changed and not (isinstance(reason, str) and reason.strip()):
+        require(
+            False,
+            "正文含结算句式（" + "、".join(hits) + "）但 metrics 未变化；更新台账或提供 metrics_unchanged_reason",
+        )
+    normalized_prose = "".join(text.split())
+    for name, record in changed.items():
+        require(isinstance(record, dict), f"metrics.{name} 必须是结构化记录")
+        source_phrase = str(record.get("source_phrase") or "")
+        value = str(record.get("value") or "")
+        require(record.get("as_of_chapter") == chapter, f"metrics.{name}.as_of_chapter 必须是本章 {chapter}")
+        require(
+            "".join(source_phrase.split()) in normalized_prose,
+            f"metrics.{name}.source_phrase 无法在本章正文定位：{source_phrase}",
+        )
+        current_values = metric_quantities(value)
+        source_values = metric_quantities(source_phrase)
+        previous_record = previous.get(name)
+        previous_values = metric_quantities(
+            previous_record.get("value") if isinstance(previous_record, dict) else None
+        )
+        if current_values and source_values:
+            direct_match = any(current == source for current in current_values for source in source_values)
+            delta_match = any(
+                current == old + delta
+                for current in current_values
+                for old in previous_values
+                for delta in source_values
+            )
+            require(
+                direct_match or delta_match,
+                f"metrics.{name}.value「{value}」与 source_phrase「{source_phrase}」不一致",
+            )
+
+
 def validate_binding(
     project: Path, chapter: int, prose: Path, transaction: Path, document: dict[str, Any], *,
     skip_scan: bool, scan_skip_reason: str | None = None,
@@ -671,6 +741,13 @@ def validate_binding(
         if exc.__class__.__name__ == "TrackingError":
             raise CandidateError(f"追踪事务预演失败：{exc}") from exc
         raise
+    metrics_settlement_gate(
+        prose,
+        chapter,
+        state.get("metrics") or {},
+        next_state.get("metrics") or {},
+        tracking_payload.get("metrics_unchanged_reason"),
+    )
     hashes["tracking_payload"] = sha256_bytes(canonical_json(tracking_payload))
     hashes["state_after"] = sha256_bytes(tracking.json_payload(next_state).encode("utf-8"))
     hashes["candidate_after_checks"] = sha256_file(prose)

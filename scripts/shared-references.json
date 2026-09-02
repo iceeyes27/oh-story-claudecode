@@ -244,6 +244,13 @@
       ]
     },
     {
+      "name": "narrative-complexity",
+      "source": "skills/story-write/references/narrative-complexity.md",
+      "targets": [
+        "skills/story-setup/references/agent-references/narrative-complexity.md"
+      ]
+    },
+    {
       "name": "state-tracking",
       "source": "skills/story-write/references/state-tracking.md",
       "targets": [

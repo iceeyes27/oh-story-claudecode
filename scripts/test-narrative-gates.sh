@@ -14,6 +14,7 @@ for c in python3 python py; do "$c" -c "" >/dev/null 2>&1 && { PYBIN="$c"; break
 suites=(
   "test-outline-causal.py $PYBIN scripts/test-outline-causal.py"
   "test-outline-contract.js node --test scripts/test-outline-contract.js"
+  "test-emotion-run.js node scripts/test-emotion-run.js"
   "test-outline-copy.sh bash scripts/test-outline-copy.sh"
   "test-phase2-contract.js node --test scripts/test-phase2-contract.js"
   "test-delivery-contract.js node --test scripts/test-delivery-contract.js"

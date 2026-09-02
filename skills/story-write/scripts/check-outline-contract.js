@@ -33,6 +33,22 @@ const PLOT_HEADER_FIRST = /^(?:#|序号)$/
 // 这两个字段实测直接影响正文质量，必须有实际内容
 const INTENT_FIELDS = ['目标情绪', '主角目标/关键选择', '结尾拍ID/类型', '期待ID/类型', '读者验收预期']
 const CALIBER = 'visible_chars_v1'
+const EMOTION_VOCAB_PATH = path.join(__dirname, '..', '..', '_shared', 'references', 'target-emotion-vocab.md')
+
+function loadEmotionVocab(file) {
+  const text = fs.readFileSync(file, 'utf8')
+  return new Set(
+    text.split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter((line) => line.startsWith('- '))
+      .map((line) => line.slice(2).trim())
+      .filter(Boolean),
+  )
+}
+
+function emotionToken(value) {
+  return String(value || '').split(/[；;：:→\s]/).find(Boolean) || ''
+}
 
 function fieldPattern(name) {
   // 允许 -/*/+ 项目符号、可选 ** 加粗、全角或半角冒号
@@ -186,6 +202,26 @@ function verify(file, options = {}) {
     hollow.length ? `只有占位符，没有实际内容：${hollow.join('、')}` : '写作意图、结尾拍、期待与读者验收都写了实际内容',
     '目标情绪与主角选择写实际变化；结尾拍/期待写 ID、类型与落点；读者验收写 must_know / may_believe / must_not_know / open_ids。这五项不接受 [待补充]',
     '只把报告点名字段替换成本章实际内容；其余字段不动。'
+  ))
+
+  const emotionRaw = fieldValue(text, '目标情绪')
+  let vocab = null
+  try {
+    vocab = loadEmotionVocab(EMOTION_VOCAB_PATH)
+  } catch (_error) {
+    vocab = null
+  }
+  const token = emotionToken(emotionRaw)
+  const vocabOk = emotionRaw === null || (vocab != null && vocab.has(token))
+  checks.push(makeCheck(
+    'outline.emotion-vocab',
+    vocabOk,
+    name,
+    vocab == null
+      ? `无法读取目标情绪词表：${EMOTION_VOCAB_PATH}`
+      : (vocabOk ? `目标情绪词「${token}」在闭合词表内` : `目标情绪「${token || emotionRaw}」不在闭合词表`),
+    '目标情绪必须取自 skills/_shared/references/target-emotion-vocab.md，可在词后追加说明',
+    '只把目标情绪改成词表中的词；不要新增字段。'
   ))
 
   const endingTypes = 'goal|conflict|choice|relationship|payoff|aftermath|open_question'

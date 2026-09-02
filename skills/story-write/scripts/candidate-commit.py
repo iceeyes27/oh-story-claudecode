@@ -44,6 +44,7 @@ OUTLINE_CONTRACT_TOOL = Path(__file__).resolve().parent / "check-outline-contrac
 OUTLINE_COPY_TOOL = Path(__file__).resolve().parent / "check-outline-copy.js"
 INTENT_FIELDS = ("目标情绪", "主角目标/关键选择", "结尾拍ID/类型", "期待ID/类型", "读者验收预期")
 SHARED_SCRIPTS = Path(__file__).resolve().parent.parent.parent / "_shared" / "scripts"
+EMOTION_RUN_TOOL = SHARED_SCRIPTS / "check-emotion-run.js"
 TITLE_TOOL = SHARED_SCRIPTS / "check-chapter-titles.js"
 FIRST_MENTION_TOOL = SHARED_SCRIPTS / "check-first-mention.js"
 ARC_LEDGER_TOOL = SHARED_SCRIPTS / "arc-ledger.js"
@@ -258,6 +259,9 @@ def outline_contract_gate(project: Path, chapter: int, state: dict[str, Any]) ->
     readable = by_id.get("outline.readable")
     if readable is not None and not readable.get("ok"):
         require(False, f"细纲不可读：{readable.get('evidence')}")
+    emotion_vocab = by_id.get("outline.emotion-vocab")
+    if emotion_vocab is not None and not emotion_vocab.get("ok") and chapter_is_new(state, chapter):
+        require(False, f"目标情绪取值不在闭合词表：{emotion_vocab.get('evidence')}")
     outline_file = report.get("file")
     text = ""
     if isinstance(outline_file, str) and outline_file:
@@ -271,7 +275,7 @@ def outline_contract_gate(project: Path, chapter: int, state: dict[str, Any]) ->
         if not isinstance(item, dict) or item.get("ok"):
             continue
         check_id = str(item.get("id") or "")
-        if check_id == "outline.readable":
+        if check_id in {"outline.readable", "outline.emotion-vocab"}:
             continue
         advisory.append(f"{check_id}：{item.get('evidence')}")
     if missing:
@@ -279,8 +283,33 @@ def outline_contract_gate(project: Path, chapter: int, state: dict[str, Any]) ->
         if chapter_is_new(state, chapter):
             require(False, message)
         advisory.insert(0, f"[历史章 advisory] {message}")
+    if emotion_vocab is not None and not emotion_vocab.get("ok"):
+        advisory.insert(0, f"[历史章 advisory] outline.emotion-vocab：{emotion_vocab.get('evidence')}")
     if advisory:
         emit("细纲契约 advisory：\n" + "\n".join(advisory), error=True)
+
+
+def emotion_run_gate(project: Path, chapter: int, state: dict[str, Any]) -> None:
+    result = run_node(
+        [str(EMOTION_RUN_TOOL), "--json", "--project", str(project), "--chapter", str(chapter)],
+        "目标情绪连排检查",
+    )
+    if result.returncode == 2:
+        require(False, f"目标情绪连排检查无法执行：\n{(result.stdout or result.stderr).strip()}")
+    report = parse_node_json(result, "目标情绪连排检查", {0, 1})
+    findings = [item for item in report.get("findings", []) if isinstance(item, dict)]
+    blocking = [item for item in findings if item.get("severity") == "blocking"]
+    advisory = [item for item in findings if item.get("severity") != "blocking"]
+    if blocking:
+        message = "；".join(str(item.get("evidence") or item) for item in blocking)
+        if chapter_is_new(state, chapter):
+            require(False, f"目标情绪连排过长：{message}")
+        advisory = blocking + advisory
+    if advisory:
+        emit(
+            "目标情绪连排 advisory：\n" + "\n".join(str(item.get("evidence") or item) for item in advisory),
+            error=True,
+        )
 
 
 def scan_gate(prose: Path) -> str | None:
@@ -536,6 +565,7 @@ def validate_binding(
     skeleton_result = run_node([str(SKELETON_TOOL), str(skeleton)], "骨架检查")
     require(skeleton_result.returncode == 0, f"骨架未通过：\n{(skeleton_result.stdout or skeleton_result.stderr).strip()}")
     outline_contract_gate(project, chapter, state)
+    emotion_run_gate(project, chapter, state)
     validate_titles(project, prose)
     length = wordcount.fanqie_length(prose.read_text(encoding="utf-8-sig"))
     require(length["status"] == "pass", f"番茄长篇字数必须为 2200–2800，有效字数为 {length['actual']}")

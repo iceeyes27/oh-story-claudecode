@@ -17,7 +17,7 @@ const FIELDS = [
   ['字数口径', 'visible_chars_v1'],
   ['阶段位置', '收尾期 · 第2阶段第11章'],
   ['单元ID/位置', 'U03；单元内第 1 拍'],
-  ['目标情绪', '踏实的期待 → 被托付的沉重'],
+  ['目标情绪', '家国；踏实的期待 → 被托付的沉重'],
   ['主角目标/关键选择', '要真实素材；在报批与先去听故事之间选一个'],
   ['结尾拍ID/类型', 'EB-01-021；relationship；老人把铁盒交给江晨'],
   ['期待ID/类型', 'EX-01-021；choice；江晨如何使用这份托付'],
@@ -215,6 +215,10 @@ try {
   const badTarget = run(writeCase('bad-target', outline({ fieldValues: { 字数目标: '很多字' } })))
   assert.strictEqual(badTarget.status, 1)
   assert(failureIds(badTarget).includes('outline.wordcount-target'))
+
+  const badEmotion = run(writeCase('bad-emotion', outline({ fieldValues: { 目标情绪: '家国泪目' } })))
+  assert.strictEqual(badEmotion.status, 1)
+  assert(failureIds(badEmotion).includes('outline.emotion-vocab'))
 
   const noCaliber = run(writeCase('no-caliber', outline({ fieldValues: { 字数口径: 'chars' } })))
   assert.strictEqual(noCaliber.status, 1)

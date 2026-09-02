@@ -717,6 +717,34 @@ class CandidateCommitTests(unittest.TestCase):
         self._candidate(["promote", "--chapter", "1"], expect=2)
         self.assertEqual(self.final_files(), [])
 
+    def test_new_chapter_invalid_emotion_value_is_blocked(self) -> None:
+        self.make_candidate(1)
+        outline = self.project / "大纲" / "细纲_第001章.md"
+        text = outline.read_text(encoding="utf-8").replace("- 目标情绪：紧张", "- 目标情绪：家国泪目")
+        self._rewrite_outline(1, text)
+
+        blocked = self._candidate(["check", "--chapter", "1"], expect=1)
+        self.assertIn("目标情绪取值不在闭合词表", blocked.stderr)
+        self.assertEqual(self.read_state()["state_revision"], 0)
+        self.assertEqual(self.final_files(), [])
+
+    def test_new_chapter_fourth_same_emotion_is_blocked(self) -> None:
+        self.temporary.cleanup()
+        self._reset_project(last_chapter=3)
+        outline_dir = self.project / "大纲"
+        outline_dir.mkdir(exist_ok=True)
+        for chapter in range(1, 4):
+            (outline_dir / f"细纲_第{chapter:03d}章.md").write_text(
+                "- 目标情绪：紧张\n",
+                encoding="utf-8",
+            )
+        self.make_candidate(4)
+
+        blocked = self._candidate(["check", "--chapter", "4"], expect=1)
+        self.assertIn("目标情绪连排过长", blocked.stderr)
+        self.assertEqual(self.read_state()["state_revision"], 0)
+        self.assertEqual(len(self.final_files()), 3)
+
     def test_historical_chapter_missing_intent_fields_is_advisory(self) -> None:
         self.make_candidate(1)
         self._rewrite_outline(1, "# 第1章细纲\n- 情节点：本章完成一次可验证推进。\n")

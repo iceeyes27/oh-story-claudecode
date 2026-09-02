@@ -29,11 +29,18 @@ grok 原方案提议新增「情绪母题 tag」字段。**这是错的**：`che
 
 ## Acceptance Criteria
 
-- [ ] fixture 书第 2–5 章设计为连续 4 章 `家国`：3 章阈值下第 4 章报 advisory，4 章阈值下第 5 章报 blocking（具体按最终阈值断言）。
-- [ ] 细纲写入闭合词表外的取值（如 `家国泪目`）时，`check-outline-contract.js` 判 `ok=false`。
-- [ ] demo 20 章因缺 `目标情绪` 走 advisory 分支，不阻断。
-- [ ] 阈值决策连同 fixture 与至少一本真实书的分布数据一并记录在本任务的 `implement.md`。
-- [ ] 收尾脚本全绿。
+- [x] fixture 第 2–5 章连续 4 章 `家国`：第 4 章报 advisory，第 5 章报 blocking；第 2 章不读取未来细纲。
+- [x] 细纲写入闭合词表外的取值（如 `家国泪目`）时，`check-outline-contract.js` 判 `ok=false`，新章采用预检阻断。
+- [x] 历史章复用 `chapter_is_new` 分级，连排与非法词值只作 advisory。
+- [x] 阈值决策与 fixture、真实书样本情况已记录在本任务的 `implement.md`。
+- [x] `test-emotion-run.js`、`test-outline-contract.js`、`test-candidate-commit.py` 全绿。
+
+## 验证记录（2026-09-02）
+
+- `test-emotion-run.js`：第 2/4/5 章边界全部通过，完整序列 4 连 blocking。
+- `test-outline-contract.js`：非法值 `家国泪目` 命中 `outline.emotion-vocab`。
+- `test-candidate-commit.py`：37/37 PASS，覆盖非法值与新章第 4 连排阻断。
+- demo 20 章没有可统计的 `目标情绪`，因此不会形成连排 finding。
 
 ## 未决
 

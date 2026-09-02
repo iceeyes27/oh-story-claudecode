@@ -209,3 +209,25 @@
 ### Status
 
 [OK] **Completed**
+
+
+## Session 10: 完成 quality-gate 覆盖审计
+
+**Date**: 2026-09-02
+**Task**: 完成 quality-gate 覆盖审计
+**Branch**: `feat/quality-first-gates`
+
+### Summary
+
+覆盖本地回归、修复跨平台门禁与 Node 18 兼容问题，恢复 hook 功能复核文案，并精确忽略 story-write 运行锁。quality:fast 7/7、quality:affected 14/14；quality:release 无真实失败，3 项因本机依赖缺失按设计 BLOCKED。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `4c55f7a` | (see git log) |
+| `c7c61d6` | (see git log) |
+
+### Status
+
+[OK] **Completed**

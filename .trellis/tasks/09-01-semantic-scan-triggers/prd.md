@@ -1,6 +1,6 @@
 # 3 · 语义扫描触发式接入
 
-父任务：`.trellis/tasks/09-01-quality-first-gates`
+原父任务：`.trellis/tasks/09-01-quality-first-gates`；2026-09-02 按父任务评审决定延期，解除本批关联，保留为下一迭代 planning 任务。
 依赖：`09-01-outline-contract-promote`（复用 `check` 子命令）
 
 ## Goal
@@ -48,3 +48,7 @@
 ## 备注
 
 本任务可推迟到下一迭代。它省 token、改善语言轴的覆盖，但不引入新的质量保证。若前面几项超期，**优先砍这一项**，不砍子任务 1/2。
+
+## 延期记录（2026-09-02）
+
+恢复 AI pattern blocking 后，原先以 advisory 总密度为核心的触发前提已变化。继续实现需要重新统计剩余 advisory 类别，并重新评审阈值与误报率。本批不实现、不归档为完成。

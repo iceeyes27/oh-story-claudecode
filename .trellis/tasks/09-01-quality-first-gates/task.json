@@ -22,12 +22,12 @@
     "09-01-scan-gate-bypass",
     "09-01-outline-contract-promote",
     "09-01-emotion-motif-gate",
-    "09-01-semantic-scan-triggers",
     "09-01-causal-promote",
     "09-01-name-drift-dict",
     "09-01-metrics-ledger",
     "09-01-regression-fixture-book",
-    "09-01-restore-ai-pattern-blocking"
+    "09-01-restore-ai-pattern-blocking",
+    "09-01-quality-gate-coverage-audit"
   ],
   "parent": null,
   "relatedFiles": [],

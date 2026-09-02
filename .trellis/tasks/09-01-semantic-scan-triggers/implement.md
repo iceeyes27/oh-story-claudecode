@@ -32,3 +32,7 @@ for n in $(seq 1 20); do python skills/story-write/scripts/candidate-commit.py c
 ## 回滚
 
 单 commit revert。
+
+## 当前状态
+
+2026-09-02：按父任务已评审的执行顺序延期到下一迭代。原谓词设计需基于恢复 blocking 后的剩余 advisory 分布重新研究；本批没有代码实现。

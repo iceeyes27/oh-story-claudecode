@@ -46,6 +46,7 @@ CAUSAL_TOOL = Path(__file__).resolve().parent / "check-outline-causal.py"
 INTENT_FIELDS = ("目标情绪", "主角目标/关键选择", "结尾拍ID/类型", "期待ID/类型", "读者验收预期")
 SHARED_SCRIPTS = Path(__file__).resolve().parent.parent.parent / "_shared" / "scripts"
 EMOTION_RUN_TOOL = SHARED_SCRIPTS / "check-emotion-run.js"
+NAME_DRIFT_TOOL = SHARED_SCRIPTS / "check-name-drift.js"
 TITLE_TOOL = SHARED_SCRIPTS / "check-chapter-titles.js"
 FIRST_MENTION_TOOL = SHARED_SCRIPTS / "check-first-mention.js"
 ARC_LEDGER_TOOL = SHARED_SCRIPTS / "arc-ledger.js"
@@ -352,6 +353,29 @@ def causal_gate(project: Path, chapter: int, state: dict[str, Any]) -> None:
         )
 
 
+def name_drift_gate(project: Path, chapter: int, state: dict[str, Any]) -> None:
+    result = run_node(
+        [
+            str(NAME_DRIFT_TOOL), "--json", "--project", str(project),
+            "--chapter", str(chapter), "--fail-on=blocking",
+        ],
+        "专名漂移检查",
+    )
+    if result.returncode == 2:
+        require(False, f"专名漂移检查无法执行：\n{(result.stdout or result.stderr).strip()}")
+    report = parse_node_json(result, "专名漂移检查", {0, 1})
+    findings = [item for item in report.get("findings", []) if isinstance(item, dict)]
+    blocking = [item for item in findings if item.get("severity") == "blocking"]
+    advisory = [item for item in findings if item.get("severity") != "blocking"]
+    if chapter_is_new(state, chapter) and blocking:
+        message = "；".join(str(item.get("evidence") or item) for item in blocking)
+        require(False, f"正文/细纲出现未声明的现实专名：{message}")
+    visible = advisory if chapter_is_new(state, chapter) else findings
+    if visible:
+        message = "；".join(str(item.get("evidence") or item) for item in visible)
+        emit(f"专名漂移 advisory：{message}", error=True)
+
+
 def scan_gate(prose: Path) -> str | None:
     blocked: list[str] = []
     for name in SCAN_SCRIPTS:
@@ -607,6 +631,7 @@ def validate_binding(
     outline_contract_gate(project, chapter, state)
     emotion_run_gate(project, chapter, state)
     causal_gate(project, chapter, state)
+    name_drift_gate(project, chapter, state)
     validate_titles(project, prose)
     length = wordcount.fanqie_length(prose.read_text(encoding="utf-8-sig"))
     require(length["status"] == "pass", f"番茄长篇字数必须为 2200–2800，有效字数为 {length['actual']}")

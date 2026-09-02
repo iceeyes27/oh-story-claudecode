@@ -12,6 +12,7 @@
 - 骨架验证：`node skills/story-write/scripts/check-chapter-skeleton.js [--dir DIR] [--from N] [--to N] [--json] [files...]`
 - 情绪连排：`node skills/_shared/scripts/check-emotion-run.js --json --project DIR [--chapter N]`
 - 细纲因果：`python skills/story-write/scripts/check-outline-causal.py DIR --json --strict --from=N --to=N`
+- 专名漂移：`node skills/_shared/scripts/check-name-drift.js --json --project DIR [--chapter N] [--fail-on=blocking]`
 - 流程动作：`write_chapter_skeleton`、`expand_chapter_skeleton`、`review_candidate`
 - 候选采用：`python skills/story-write/scripts/candidate-commit.py promote --project DIR --chapter N [--no-scan --reason "<理由>"]`（兼容 `--all` 只接受单候选）
 - 候选预检：`python skills/story-write/scripts/candidate-commit.py check --project DIR --chapter N [--json]`
@@ -30,6 +31,7 @@
 - `check` 与 `promote` 复用 `validate_binding`；`check` 不获取项目锁、不移动候选、不写采用日志或追踪状态。`imported_through_chapter` 之后的新章缺任一 INTENT_FIELDS 时阻断，历史章只输出 advisory。
 - `目标情绪` 只取 `skills/_shared/references/target-emotion-vocab.md` 的首个词；词表外取值对新章 blocking、历史章 advisory。连排 3 章为 advisory、4 章为 blocking；传 `--chapter N` 时只读取 `N` 及以前的细纲，不得用未来章节阻断当前章。
 - `check` 与 `promote` 对本章运行严格因果检查，只传相同的 `--from=N --to=N`；新章 blocking，`imported_through_chapter` 内的历史章 advisory。不得为写第 N 章扫描整本书的历史因果欠账。
+- 专名漂移扫描只读共享现实平台/产品词典及项目 `设定/题材定位.md` 的 `保留真名`；扫描正文、候选与细纲，不扫描设定正文。现实专名对新章 blocking、历史章 advisory；从角色设定、角色快照和追踪状态运行时派生的 3～4 字人名，单字替换近似只作 advisory。正文卷目录必须递归发现。
 - 确定性扫描通过只表示未发现已登记 blocking 模式，不能表述为文风自然或没有 AI 痕迹。
 
 ## 4. Validation & Error Matrix
@@ -47,6 +49,8 @@
 | 仅未来章会把连排推到 4 章 | 当前章不受未来细纲影响 |
 | 新章本章因果字段缺失或前因无锚点 | `check` 退出 1；候选、正文与追踪均不变 |
 | 历史章存在严格因果 finding | 输出 advisory，继续其余采用预检 |
+| 新章出现未声明现实平台/产品名 | `check` 退出 1；候选、正文与追踪均不变 |
+| 历史章现实专名或新章疑似单字人名漂移 | 输出 advisory，继续其余采用预检 |
 | 候选绑定为 v1、逻辑项缺失或出现未知 ID | `promote` 退出 2，要求重新生成绑定 |
 | evidence 为空、路径不属于读者视图或 anchor 无法定位 | `promote` 退出 2，首次写入前终止 |
 | 第 15 章 arc-02 为 blocking 且没有绑定当前结果的作者批准 | `promote` 退出 2；旧结果或正文变化会使批准失效 |
@@ -68,6 +72,8 @@
 - `node --test scripts/test-outline-contract.js`：闭合词表合法值通过、非法值命中 `outline.emotion-vocab`。
 - `python scripts/test-outline-causal.py`：严格/非严格、缺字段、悬空事件、章节范围与退出码。
 - `python scripts/test-candidate-commit.py`：新章因果 finding 阻断、历史章 advisory、未来坏细纲不影响当前章。
+- `node scripts/test-name-drift.js`：共享词典、项目白名单、设定豁免、卷目录发现、3～4 字人名单字替换 advisory 与错误退出码。
+- `python scripts/test-candidate-commit.py`：新章现实专名阻断、历史章现实专名 advisory、人名近似不阻断。
 - `bash scripts/static-check.sh`：Skill 链接、frontmatter 和自包含边界。
 
 ## 7. Wrong vs Correct

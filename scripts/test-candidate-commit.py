@@ -747,6 +747,26 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertEqual(self.read_state()["state_revision"], 0)
         self.assertEqual(self.final_files(), [])
 
+    def test_new_chapter_undeclared_real_world_name_is_blocked(self) -> None:
+        self.make_candidate(1, body="# 第1章\n他打开抖音查看视频。\n")
+
+        blocked = self._candidate(["check", "--chapter", "1"], expect=1)
+        self.assertIn("未声明的现实专名", blocked.stderr)
+        self.assertIn("抖音", blocked.stderr)
+        self.assertEqual(self.read_state()["state_revision"], 0)
+        self.assertEqual(self.final_files(), [])
+
+    def test_new_chapter_character_near_name_is_advisory(self) -> None:
+        role_dir = self.project / "设定" / "角色"
+        role_dir.mkdir(parents=True)
+        (role_dir / "钟嘉嘉.md").write_text("name: 钟嘉嘉\n", encoding="utf-8")
+        self.make_candidate(1, body="# 第1章\n钟嘉佳走进会议室。\n")
+
+        completed = self._candidate(["check", "--chapter", "1"])
+        self.assertTrue(json.loads(completed.stdout)["ok"])
+        self.assertIn("专名漂移 advisory", completed.stderr)
+        self.assertIn("钟嘉佳", completed.stderr)
+
     def test_new_chapter_fourth_same_emotion_is_blocked(self) -> None:
         self.temporary.cleanup()
         self._reset_project(last_chapter=3)
@@ -778,6 +798,19 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertIn("细纲因果 advisory", completed.stderr)
         self.assertEqual(self.read_state()["imported_through_chapter"], 1)
         self.assertTrue((self.candidate_dir / "第001章_测试章名.md").is_file())
+        self.assertEqual(self.final_files(), [])
+
+    def test_historical_chapter_real_world_name_is_advisory(self) -> None:
+        self.make_candidate(1, body="# 第1章\n他打开抖音查看视频。\n")
+        state_path = self.project / "追踪" / "_tracking-state.json"
+        state = self.read_state()
+        state["imported_through_chapter"] = 1
+        state_path.write_text(json.dumps(state, ensure_ascii=False), encoding="utf-8")
+
+        completed = self._candidate(["check", "--chapter", "1"])
+        self.assertTrue(json.loads(completed.stdout)["ok"])
+        self.assertIn("专名漂移 advisory", completed.stderr)
+        self.assertIn("抖音", completed.stderr)
         self.assertEqual(self.final_files(), [])
 
 

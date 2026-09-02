@@ -42,6 +42,7 @@ TRACKING_TOOL = Path(__file__).resolve().parent / "tracking_commit.py"
 SKELETON_TOOL = Path(__file__).resolve().parent / "check-chapter-skeleton.js"
 OUTLINE_CONTRACT_TOOL = Path(__file__).resolve().parent / "check-outline-contract.js"
 OUTLINE_COPY_TOOL = Path(__file__).resolve().parent / "check-outline-copy.js"
+CAUSAL_TOOL = Path(__file__).resolve().parent / "check-outline-causal.py"
 INTENT_FIELDS = ("目标情绪", "主角目标/关键选择", "结尾拍ID/类型", "期待ID/类型", "读者验收预期")
 SHARED_SCRIPTS = Path(__file__).resolve().parent.parent.parent / "_shared" / "scripts"
 EMOTION_RUN_TOOL = SHARED_SCRIPTS / "check-emotion-run.js"
@@ -207,6 +208,15 @@ def read_state(project: Path) -> dict[str, Any]:
     return read_json(project.resolve() / TRACKING_STATE, TRACKING_STATE)
 
 
+def run_python(args: list[str], label: str) -> subprocess.CompletedProcess[str]:
+    try:
+        return subprocess.run(
+            [sys.executable, *args], capture_output=True, text=True, encoding="utf-8", check=False,
+        )
+    except OSError as exc:
+        raise CandidateError(f"无法执行{label}：{exc}") from exc
+
+
 def run_node(args: list[str], label: str) -> subprocess.CompletedProcess[str]:
     node = shutil.which("node")
     require(node is not None, f"未找到 node，无法执行{label}")
@@ -308,6 +318,36 @@ def emotion_run_gate(project: Path, chapter: int, state: dict[str, Any]) -> None
     if advisory:
         emit(
             "目标情绪连排 advisory：\n" + "\n".join(str(item.get("evidence") or item) for item in advisory),
+            error=True,
+        )
+
+
+def causal_gate(project: Path, chapter: int, state: dict[str, Any]) -> None:
+    result = run_python(
+        [
+            str(CAUSAL_TOOL), str(project), "--json", "--strict",
+            f"--from={chapter}", f"--to={chapter}",
+        ],
+        "细纲因果检查",
+    )
+    if result.returncode == 2:
+        require(False, f"细纲因果检查无法执行：\n{(result.stdout or result.stderr).strip()}")
+    require(result.returncode in {0, 1}, f"细纲因果检查执行失败：\n{(result.stdout or result.stderr).strip()}")
+    try:
+        report = json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise CandidateError(f"细纲因果检查未返回合法 JSON：{(result.stdout or result.stderr).strip()}") from exc
+    findings = [item for item in report.get("findings", []) if isinstance(item, dict)]
+    blocking = [item for item in findings if item.get("severity") == "blocking"]
+    advisory = [item for item in findings if item.get("severity") != "blocking"]
+    if blocking:
+        message = "；".join(str(item.get("msg") or item) for item in blocking)
+        if chapter_is_new(state, chapter):
+            require(False, f"细纲因果链未通过：{message}")
+        advisory = blocking + advisory
+    if advisory:
+        emit(
+            "细纲因果 advisory：\n" + "\n".join(str(item.get("msg") or item) for item in advisory),
             error=True,
         )
 
@@ -566,6 +606,7 @@ def validate_binding(
     require(skeleton_result.returncode == 0, f"骨架未通过：\n{(skeleton_result.stdout or skeleton_result.stderr).strip()}")
     outline_contract_gate(project, chapter, state)
     emotion_run_gate(project, chapter, state)
+    causal_gate(project, chapter, state)
     validate_titles(project, prose)
     length = wordcount.fanqie_length(prose.read_text(encoding="utf-8-sig"))
     require(length["status"] == "pass", f"番茄长篇字数必须为 2200–2800，有效字数为 {length['actual']}")

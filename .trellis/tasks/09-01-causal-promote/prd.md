@@ -36,8 +36,15 @@ demo 全量 `--strict` = **11 条 blocking**，章号 4,5,6,7,8,9,10,13,14,15,20
 
 ## Acceptance Criteria
 
-- [ ] demo 全量 `--strict` 仍为 11 条，章号不变（改 matcher 才需重新冻结，本任务不改）。
-- [ ] demo 任一历史章走 `check` / `promote` 时，causal 降为 advisory，**不阻断**。
-- [ ] fixture 书（`imported_through_chapter = 0`）新写章缺前因锚点时被 blocking。
-- [ ] 采用链只跑本章范围，不做全量扫描（可由运行时长或日志确认）。
-- [ ] 收尾脚本全绿。
+- [x] demo 全量 `--strict` 仍为 11 条，章号为 4,5,6,7,8,9,10,13,14,15,20。
+- [x] `imported_through_chapter` 内的历史章走真实 `check` 入口时，causal 降为 advisory。
+- [x] 新写章缺因果三字段时被 blocking。
+- [x] 采用链只传 `--from=N --to=N`；测试证明未来坏细纲不影响当前章。
+- [x] `test-candidate-commit.py` 全部 38 项通过。
+
+## 验证记录（2026-09-02）
+
+- demo 严格基线：11 条，章号与任务记录一致。
+- 新章删去 `前因` / `后果指向` / `读者已知` 后，`check` 退出 1，正文与追踪不变。
+- 历史章相同缺失仅输出 `细纲因果 advisory`，`check` 返回 `ok=true`。
+- 第 2 章故意放入坏因果字段时，第 1 章 `check` 仍通过。

@@ -227,7 +227,7 @@
    - (11) 对标书路径下 `剧情/情绪模块.md`（按对标书路径查找）— 读者需求 / 情绪引擎、爽文套路框架、可复现模块；缺失按上方「缺失文件处理」设置 `missing_primary_contract` 并停止准备
    - (12) 对标书路径下 `剧情/节奏.md`（按对标书路径查找）— 关键信息推进、情绪触动点、爆发节奏；缺失按上方「缺失文件处理」设置 `missing_primary_contract` 并停止准备
    - (13) `设定/题材正文提示卡.md`（如存在）— 本书正文层题材卡；缺失时从 `设定/题材定位.md` + `references/genre-prose-cards.md` 索引 + `references/genre-prose-cards/` 单题材卡目录（按题材分类优先）+ `references/style-genre-modules.md`（兜底）即时生成 `genre_prose_card`，不阻塞写作
-3. **写前准备**（下面的 3 步是核心方法在单章写作中的落地：筛选状态 → 召回模块 → 确认意图）。出骨架前对本章跑 `node skills/story-write/scripts/check-outline-contract.js --json --project {书目录} --chapter {N}`，缺 INTENT_FIELDS 先补细纲；写完候选跑 `candidate-commit.py check`，作者采用跑 `promote`，两条命令不得合并：
+3. **写前准备**（下面的 3 步是核心方法在单章写作中的落地：筛选状态 → 召回模块 → 确认意图）。出骨架前对本章跑 `node skills/story-write/scripts/check-outline-contract.js --json --project {书目录} --chapter {N}`，再跑 `python skills/story-write/scripts/check-outline-causal.py "{书目录}" --strict --from={N} --to={N}`；缺 INTENT_FIELDS 或本章因果锚点不成立时先修细纲。写完候选跑 `candidate-commit.py check`，作者采用跑 `promote`，两条命令不得合并：
    - **状态筛选**：从 `追踪/上下文.md` 的 `## 核心角色状态` 取当前角色，从 `## 活跃伏笔` 取需回收/推进项，从 `## 下一章承诺` 取本章必须履行项，输出本节速记（参考 state-tracking.md）。久别角色按名读取 `追踪/角色状态/{名}.md`；只有追查变化原因时才定点查逐章增量。续写状态卡或 meta 不存在时按 workflow-daily 的当前协议处理，不手写替代文件
    - **模块召回、题材卡与文风召回**：
      - ① 本章目标情绪词？② 借鉴哪个参考文件的哪个技法？③ 用在哪些段落？答不出 → 先回读参考再动笔

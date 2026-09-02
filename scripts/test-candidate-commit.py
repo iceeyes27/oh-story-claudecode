@@ -248,7 +248,10 @@ class CandidateCommitTests(unittest.TestCase):
             "- 主角目标/关键选择：核验物证并决定是否上报\n"
             f"- 结尾拍ID/类型：EB-01-{chapter:03d}；choice；主角带走物证\n"
             f"- 期待ID/类型：EX-01-{chapter:03d}；open_question；物证指向谁\n"
-            f"- 读者验收预期：must_know=[物证在场]；may_believe=[只是笔误]；must_not_know=[终局真凶]；open_ids=[EX-01-{chapter:03d}]\n",
+            f"- 读者验收预期：must_know=[物证在场]；may_believe=[只是笔误]；must_not_know=[终局真凶]；open_ids=[EX-01-{chapter:03d}]\n"
+            "- 前因：开篇无前因\n"
+            "- 后果指向：本章推进可被后续章节使用\n"
+            "- 读者已知：已知现场；尚不知真凶\n",
             encoding="utf-8",
         )
         skeleton = skeleton_dir / f"第{chapter:03d}章_{title}.md"
@@ -696,6 +699,8 @@ class CandidateCommitTests(unittest.TestCase):
 
     def test_check_passes_on_new_chapter_with_intent_fields(self) -> None:
         self.make_candidate(1)
+        future_outline = self.project / "大纲" / "细纲_第002章.md"
+        future_outline.write_text("# 第2章细纲\n- 前因：[待补充]\n", encoding="utf-8")
         state_path = self.project / "追踪" / "_tracking-state.json"
         before = (self.read_state()["state_revision"], state_path.stat().st_mtime_ns)
         result = json.loads(self._candidate(["check", "--chapter", "1"]).stdout)
@@ -715,6 +720,20 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertEqual(self.read_state()["state_revision"], 0)
         self.assertEqual(self.final_files(), [])
         self._candidate(["promote", "--chapter", "1"], expect=2)
+        self.assertEqual(self.final_files(), [])
+
+    def test_new_chapter_missing_causal_fields_is_blocked(self) -> None:
+        self.make_candidate(1)
+        outline = self.project / "大纲" / "细纲_第001章.md"
+        text = "\n".join(
+            line for line in outline.read_text(encoding="utf-8").splitlines()
+            if not line.startswith(("- 前因：", "- 后果指向：", "- 读者已知："))
+        ) + "\n"
+        self._rewrite_outline(1, text)
+
+        blocked = self._candidate(["check", "--chapter", "1"], expect=1)
+        self.assertIn("细纲因果链未通过", blocked.stderr)
+        self.assertEqual(self.read_state()["state_revision"], 0)
         self.assertEqual(self.final_files(), [])
 
     def test_new_chapter_invalid_emotion_value_is_blocked(self) -> None:
@@ -753,8 +772,10 @@ class CandidateCommitTests(unittest.TestCase):
         state["imported_through_chapter"] = 1
         state_path.write_text(json.dumps(state, ensure_ascii=False), encoding="utf-8")
 
-        checked = json.loads(self._candidate(["check", "--chapter", "1"]).stdout)
+        completed = self._candidate(["check", "--chapter", "1"])
+        checked = json.loads(completed.stdout)
         self.assertTrue(checked["ok"])
+        self.assertIn("细纲因果 advisory", completed.stderr)
         self.assertEqual(self.read_state()["imported_through_chapter"], 1)
         self.assertTrue((self.candidate_dir / "第001章_测试章名.md").is_file())
         self.assertEqual(self.final_files(), [])

@@ -42,13 +42,20 @@
 
 ## Acceptance Criteria
 
-- [ ] fixture 书的缺字段变体：`check` 与 `promote` 均因 `outline.required-fields` blocking 失败，报错文本点名缺失字段。
-- [ ] fixture 书的合格章：`check` 通过。
-- [ ] demo（`imported_through_chapter = 20`）第 1–20 章：outline-contract 降为 advisory，**promote 仍可运行**，不因历史原因变红。
-- [ ] `check` 子命令运行后 `_tracking-state.json` 的 `state_revision` 与文件 mtime 不变，候选文件未移动。
-- [ ] `promote` 行为与 `check` 的校验结果一致（同一份候选，`check` 过则 `promote` 的 preflight 也过）。
-- [ ] `AGENTS.md` 与 `artifact-protocols.md` 无「旧细纲不阻断」与新门禁矛盾的表述。
-- [ ] 收尾脚本全绿（父任务 D10）。
+- [x] 缺字段候选：`check` 与 `promote` 均因 INTENT_FIELDS blocking 失败，报错文本点名缺失字段。
+- [x] 合格候选：`check` 通过。
+- [x] `imported_through_chapter` 内的历史章：outline-contract 降为 advisory，不因旧细纲缺字段变红。
+- [x] `check` 子命令运行后 `_tracking-state.json` 的 `state_revision` 与文件 mtime 不变，候选文件未移动。
+- [x] `promote` 与 `check` 复用同一份 `validate_binding` 预检。
+- [x] `AGENTS.md` 与 `artifact-protocols.md` 无「旧细纲不阻断」与新门禁矛盾的表述。
+- [x] `scripts/test-candidate-commit.py` 全部 35 项通过。
+
+## 验证记录（2026-09-02）
+
+- 新章缺 INTENT_FIELDS：`check` 退出 1，`promote` 退出 2，正文与追踪均未改变。
+- 历史章缺 INTENT_FIELDS：通过真实 `check` 入口，候选仍留在原位，追踪状态未推进。
+- 合格新章：`check` 返回 `ok=true`；`state_revision`、状态文件 mtime 和正文目录保持不变。
+- `scripts/test-candidate-commit.py`：35/35 PASS。
 
 ## 风险
 

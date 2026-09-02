@@ -44,14 +44,17 @@
 
 作者审阅候选后，用命令行脚本落地决定。工具：`skills/story-write/scripts/candidate-commit.py`（探测 `python3/python/py`）。
 
+写完候选后跑 `check`；作者采用时跑 `promote`。两条命令不得合并。
+
 | 作者说 | 动作 | 命令 |
 |---|---|---|
+| 这章先自检 / 写完检查 | 跑与 promote 相同的 `validate_binding`，不移动文件、不写追踪 | `candidate-commit.py check --project {书名} --chapter X` |
 | 采用第X章 / 这章可以 / 定稿 | 并入正稿 + 回放追踪 + 归档事务 | `candidate-commit.py promote --project {书名} --chapter X` |
 | 重写第X章 更XX | 归档旧候选，随后按新意图重走写作阶段产出新候选 | `candidate-commit.py reject --project {书名} --chapter X --rewrite` |
 | 弃用第X章 / 不要这版 | 归档候选，正稿与追踪不动 | `candidate-commit.py reject --project {书名} --chapter X` |
 | 有哪些待审 | 列出候选目录待审项 | `candidate-commit.py list --project {书名}` |
 
-**promote 前检查**：在首次写入前核验项目锁、原始状态修订号、全部绑定摘要、`rc-01/02/03` 证据并重跑 `rc-01`，以及骨架、标题、2200～2800 字、细纲照抄、追踪 dry-run。第 15 章另核验 `arc-01/02` 并重跑 `arc-02`；arc 阻断只有作者批准且批准绑定当前结果摘要时可采用。`--no-scan` 只跳过 AI 模式扫描，不能跳过逻辑、状态、结构、字数、覆盖与追踪检查；使用时必须同时给 `--reason`，理由写进采用回执备查。正文里的 `<!-- 去味:跳过 -->` **对采用无效**——它由写正文的一方产出，不能用来关掉检查自己的门（该标记在写前 hook 的毒句式欠账门里仍然有效）。v1 候选必须重新生成绑定。
+**promote 前检查**：在首次写入前核验项目锁、原始状态修订号、全部绑定摘要、`rc-01/02/03` 证据并重跑 `rc-01`，以及骨架、细纲 INTENT_FIELDS（新写章 blocking，历史章 advisory）、标题、2200～2800 字、细纲照抄、追踪 dry-run。第 15 章另核验 `arc-01/02` 并重跑 `arc-02`；arc 阻断只有作者批准且批准绑定当前结果摘要时可采用。`--no-scan` 只跳过 AI 模式扫描，不能跳过逻辑、状态、结构、字数、覆盖与追踪检查；使用时必须同时给 `--reason`，理由写进采用回执备查。正文里的 `<!-- 去味:跳过 -->` **对采用无效**——它由写正文的一方产出，不能用来关掉检查自己的门（该标记在写前 hook 的毒句式欠账门里仍然有效）。v1 候选必须重新生成绑定。
 
 **promote 语义**（见脚本内注释）：检查通过后创建采用日志，并按 `prepared → prose_moved → tracking_committed → done` 持久化阶段。异常中断后运行 `candidate-commit.py recover --project {书名} --chapter X`；恢复过程先复验原始事务与逐文件读者视图摘要，再判断已经完成的步骤，不覆盖已有正稿，也不重复提交追踪。候选必须逐章采用；兼容参数 `--all` 仅在候选目录恰有一章时执行，多章时在任何写入前拒绝。
 

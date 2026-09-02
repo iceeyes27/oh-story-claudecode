@@ -242,7 +242,13 @@ class CandidateCommitTests(unittest.TestCase):
         skeleton_dir.mkdir(exist_ok=True)
         outline = outline_dir / f"细纲_第{chapter:03d}章.md"
         outline.write_text(
-            f"# 第{chapter}章细纲\n- 情节点：本章完成一次可验证推进。\n",
+            f"# 第{chapter}章细纲\n"
+            "- 情节点：本章完成一次可验证推进。\n"
+            "- 目标情绪：紧张\n"
+            "- 主角目标/关键选择：核验物证并决定是否上报\n"
+            f"- 结尾拍ID/类型：EB-01-{chapter:03d}；choice；主角带走物证\n"
+            f"- 期待ID/类型：EX-01-{chapter:03d}；open_question；物证指向谁\n"
+            f"- 读者验收预期：must_know=[物证在场]；may_believe=[只是笔误]；must_not_know=[终局真凶]；open_ids=[EX-01-{chapter:03d}]\n",
             encoding="utf-8",
         )
         skeleton = skeleton_dir / f"第{chapter:03d}章_{title}.md"
@@ -679,6 +685,51 @@ class CandidateCommitTests(unittest.TestCase):
                 self.assertEqual(second[0]["state_revision"], 1)
                 self.assertEqual(self.read_state()["state_revision"], 1)
                 self.assertEqual(self.final_files(), ["第001章_测试章名.md"])
+
+    def _rewrite_outline(self, chapter: int, text: str) -> None:
+        outline = self.project / "大纲" / f"细纲_第{chapter:03d}章.md"
+        outline.write_text(text, encoding="utf-8")
+        path = self._transaction_path(chapter)
+        document = json.loads(path.read_text(encoding="utf-8"))
+        document["candidate_binding"]["outline"]["sha256"] = hashlib.sha256(outline.read_bytes()).hexdigest()
+        path.write_text(json.dumps(document, ensure_ascii=False), encoding="utf-8")
+
+    def test_check_passes_on_new_chapter_with_intent_fields(self) -> None:
+        self.make_candidate(1)
+        state_path = self.project / "追踪" / "_tracking-state.json"
+        before = (self.read_state()["state_revision"], state_path.stat().st_mtime_ns)
+        result = json.loads(self._candidate(["check", "--chapter", "1"]).stdout)
+        self.assertEqual(result["action"], "check")
+        self.assertTrue(result["ok"])
+        self.assertEqual(self.read_state()["state_revision"], before[0])
+        self.assertEqual(state_path.stat().st_mtime_ns, before[1])
+        self.assertTrue((self.candidate_dir / "第001章_测试章名.md").is_file())
+        self.assertEqual(self.final_files(), [])
+
+    def test_new_chapter_missing_intent_fields_is_blocked(self) -> None:
+        self.make_candidate(1)
+        self._rewrite_outline(1, "# 第1章细纲\n- 情节点：本章完成一次可验证推进。\n")
+        blocked = self._candidate(["check", "--chapter", "1"], expect=1)
+        self.assertIn("目标情绪", blocked.stderr)
+        self.assertIn("结尾拍ID/类型", blocked.stderr)
+        self.assertEqual(self.read_state()["state_revision"], 0)
+        self.assertEqual(self.final_files(), [])
+        self._candidate(["promote", "--chapter", "1"], expect=2)
+        self.assertEqual(self.final_files(), [])
+
+    def test_historical_chapter_missing_intent_fields_is_advisory(self) -> None:
+        self.make_candidate(1)
+        self._rewrite_outline(1, "# 第1章细纲\n- 情节点：本章完成一次可验证推进。\n")
+        state_path = self.project / "追踪" / "_tracking-state.json"
+        state = self.read_state()
+        state["imported_through_chapter"] = 1
+        state_path.write_text(json.dumps(state, ensure_ascii=False), encoding="utf-8")
+
+        checked = json.loads(self._candidate(["check", "--chapter", "1"]).stdout)
+        self.assertTrue(checked["ok"])
+        self.assertEqual(self.read_state()["imported_through_chapter"], 1)
+        self.assertTrue((self.candidate_dir / "第001章_测试章名.md").is_file())
+        self.assertEqual(self.final_files(), [])
 
 
 if __name__ == "__main__":

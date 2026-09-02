@@ -40,7 +40,9 @@ PHASES = ("prepared", "prose_moved", "tracking_committed", "done")
 CHAPTER_PREFIX = re.compile(r"^第0*(\d+)章")
 TRACKING_TOOL = Path(__file__).resolve().parent / "tracking_commit.py"
 SKELETON_TOOL = Path(__file__).resolve().parent / "check-chapter-skeleton.js"
+OUTLINE_CONTRACT_TOOL = Path(__file__).resolve().parent / "check-outline-contract.js"
 OUTLINE_COPY_TOOL = Path(__file__).resolve().parent / "check-outline-copy.js"
+INTENT_FIELDS = ("目标情绪", "主角目标/关键选择", "结尾拍ID/类型", "期待ID/类型", "读者验收预期")
 SHARED_SCRIPTS = Path(__file__).resolve().parent.parent.parent / "_shared" / "scripts"
 TITLE_TOOL = SHARED_SCRIPTS / "check-chapter-titles.js"
 FIRST_MENTION_TOOL = SHARED_SCRIPTS / "check-first-mention.js"
@@ -213,6 +215,72 @@ def run_node(args: list[str], label: str) -> subprocess.CompletedProcess[str]:
         )
     except OSError as exc:
         raise CandidateError(f"无法执行{label}：{exc}") from exc
+
+
+def chapter_is_new(state: dict[str, Any], chapter: int) -> bool:
+    return chapter > int(state.get("imported_through_chapter") or 0)
+
+
+def intent_field_value(text: str, name: str) -> str | None:
+    escaped = re.escape(name)
+    match = re.search(
+        rf"^\s*[-*+]\s*\*{{0,2}}{escaped}\*{{0,2}}\s*[：:]\s*(.*)$",
+        text,
+        re.MULTILINE,
+    )
+    return match.group(1).strip() if match else None
+
+
+def intent_fields_missing(text: str) -> list[str]:
+    missing: list[str] = []
+    for field in INTENT_FIELDS:
+        value = intent_field_value(text, field)
+        if value is None:
+            missing.append(field)
+            continue
+        hollow = re.sub(r"[\s、，,。;；]", "", value.replace("[待补充]", ""))
+        if not hollow:
+            missing.append(field)
+    return missing
+
+
+def outline_contract_gate(project: Path, chapter: int, state: dict[str, Any]) -> None:
+    result = run_node(
+        [str(OUTLINE_CONTRACT_TOOL), "--json", "--project", str(project), "--chapter", str(chapter)],
+        "细纲契约检查",
+    )
+    if result.returncode == 2:
+        require(False, f"细纲契约检查无法执行：\n{(result.stdout or result.stderr).strip()}")
+    report = parse_node_json(result, "细纲契约检查", {0, 1})
+    checks = report.get("checks")
+    require(isinstance(checks, list), "细纲契约检查结果缺少 checks")
+    by_id = {item.get("id"): item for item in checks if isinstance(item, dict)}
+    readable = by_id.get("outline.readable")
+    if readable is not None and not readable.get("ok"):
+        require(False, f"细纲不可读：{readable.get('evidence')}")
+    outline_file = report.get("file")
+    text = ""
+    if isinstance(outline_file, str) and outline_file:
+        try:
+            text = Path(outline_file).read_text(encoding="utf-8-sig")
+        except (OSError, UnicodeError) as exc:
+            require(False, f"无法读取细纲：{outline_file}: {exc}")
+    missing = intent_fields_missing(text)
+    advisory: list[str] = []
+    for item in checks:
+        if not isinstance(item, dict) or item.get("ok"):
+            continue
+        check_id = str(item.get("id") or "")
+        if check_id == "outline.readable":
+            continue
+        advisory.append(f"{check_id}：{item.get('evidence')}")
+    if missing:
+        message = f"细纲 INTENT_FIELDS 缺失或无实际内容：{'、'.join(missing)}"
+        if chapter_is_new(state, chapter):
+            require(False, message)
+        advisory.insert(0, f"[历史章 advisory] {message}")
+    if advisory:
+        emit("细纲契约 advisory：\n" + "\n".join(advisory), error=True)
 
 
 def scan_gate(prose: Path) -> str | None:
@@ -467,6 +535,7 @@ def validate_binding(
 
     skeleton_result = run_node([str(SKELETON_TOOL), str(skeleton)], "骨架检查")
     require(skeleton_result.returncode == 0, f"骨架未通过：\n{(skeleton_result.stdout or skeleton_result.stderr).strip()}")
+    outline_contract_gate(project, chapter, state)
     validate_titles(project, prose)
     length = wordcount.fanqie_length(prose.read_text(encoding="utf-8-sig"))
     require(length["status"] == "pass", f"番茄长篇字数必须为 2200–2800，有效字数为 {length['actual']}")
@@ -768,6 +837,27 @@ def completed_journals(project: Path, chapter: int) -> list[Path]:
     return matches
 
 
+def check_chapter(project: Path, chapter: int) -> dict[str, Any]:
+    """Run promote preflight without moving files, taking a lock, or writing state."""
+    project = project.resolve()
+    prose = find_prose_candidate(project, chapter)
+    transaction = find_transaction(project, chapter)
+    require(transaction is not None, f"第{chapter}章缺少追踪事务 JSON（{TRANSACTION_SUFFIX}）")
+    document = read_json(transaction, "追踪事务")
+    preflight = validate_binding(
+        project, chapter, prose, transaction, document,
+        skip_scan=False,
+    )
+    return {
+        "action": "check",
+        "chapter": chapter,
+        "ok": True,
+        "outline": preflight["outline"],
+        "skeleton": preflight["skeleton"],
+        "expected_revision": preflight["expected_revision"],
+    }
+
+
 def promote_chapter(
     project: Path, chapter: int, *, skip_scan: bool = False, scan_skip_reason: str | None = None,
 ) -> dict[str, Any]:
@@ -891,6 +981,10 @@ def build_parser() -> argparse.ArgumentParser:
     reject.add_argument("--rewrite", action="store_true")
     listing = sub.add_parser("list")
     listing.add_argument("--project", type=Path, required=True)
+    check = sub.add_parser("check")
+    check.add_argument("--project", type=Path, required=True)
+    check.add_argument("--chapter", type=int, required=True)
+    check.add_argument("--json", action="store_true")
     return parser
 
 
@@ -910,11 +1004,13 @@ def main(argv: list[str] | None = None) -> int:
             result = recover(args.project, None if args.all else args.chapter)
         elif args.command == "reject":
             result = reject_chapter(args.project, args.chapter, rewrite=args.rewrite)
+        elif args.command == "check":
+            result = check_chapter(args.project, args.chapter)
         else:
             result = list_candidates(args.project)
     except (CandidateError, ProjectLockError, OSError, UnicodeError) as exc:
         emit(f"ERROR: {exc}", error=True)
-        return 2
+        return 1 if args.command == "check" and isinstance(exc, CandidateError) else 2
     emit(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
 

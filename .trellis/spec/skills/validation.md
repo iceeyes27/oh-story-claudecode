@@ -16,6 +16,51 @@
 - `node scripts/check-release-manifest.mjs`：校验发布身份、上游基线与权威资产摘要。
 - 跨平台校验必须读取 `scripts/platform-skill-set.json`，不得另建公开 Skill 名单；不公开的 Skill 必须在 `scripts/local-only-skill-set.json` 中写明原因，两个集合必须无交集且完整覆盖仓库 Skill。复合检查及其嵌套路由的契约测试还要证明全部必需 Skill 依赖属于公开集合且资产存在。
 
+## Quality Gate Aggregate Runner Contract
+
+### 1. Scope / Trigger
+
+修改 `scripts/quality-gate.mjs`、`quality-gate.json` 或 `test-*-gates.sh` 聚合 runner 时适用。
+
+### 2. Signatures
+
+- 入口：`node scripts/quality-gate.mjs --profile fast|affected|release`
+- 聚合 runner：成功时退出 0；真实失败时退出非 0。
+
+### 3. Contracts
+
+- `SKIP:` / `SKIPPED:` 是整个 check 无法执行的状态标记，不能用于某个已有等价覆盖的可选子场景。
+- 可选平台或 locale 子场景不适用时输出 `note:`，并继续执行其余断言。
+- 质量门模块的仓库根目录必须用 `dirname(fileURLToPath(import.meta.url))` 解析，兼容 Node 18 与 Node 22；不得依赖 Node 20.11 才提供的 `import.meta.dirname`。
+
+### 4. Validation & Error Matrix
+
+| 条件 | 结果 |
+| --- | --- |
+| runner 退出 0 且无 check 级状态标记 | PASS |
+| runner 任意输出行以 `SKIP:` / `SKIPPED:` 开头 | SKIP，整体至少 BLOCKED |
+| 输出命中 `blocked_patterns` | BLOCKED |
+| runner 退出非 0 且未命中 blocked pattern | FAIL |
+
+### 5. Good / Base / Bad Cases
+
+- Good：GBK locale 不存在时输出 `note:`，cp936 等价测试通过，平台聚合结果为 PASS。
+- Base：CLI 缺失命中声明的 `blocked_patterns`，结果为 BLOCKED。
+- Bad：子用例不适用却输出 `SKIP:`，把已通过的整个聚合 runner 提升为 SKIP。
+
+### 6. Tests Required
+
+- `node --test scripts/quality-gate.test.mjs`：验证状态聚合与全部 `test-*` 可达。
+- `bash scripts/test-platform-gates.sh`：在 WSL Node 18 和 Windows Node 22 路径下均通过，输出不得含意外的 check 级 `SKIP:`。
+- `node scripts/quality-gate.mjs --profile release`：零 FAIL；只允许 manifest 已声明的环境型 BLOCKED。
+
+### 7. Wrong vs Correct
+
+```text
+Wrong: 可选子场景不适用时打印 "SKIP: ..."，或用 import.meta.dirname 解析质量门根目录。
+Correct: 子场景打印 "note: ..."；根目录从 import.meta.url 转为文件路径后解析。
+```
+
 ## Public Skill / Deployment Contract
 
 ### 1. Scope / Trigger

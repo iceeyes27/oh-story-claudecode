@@ -20,6 +20,10 @@ set -euo pipefail
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
 [ -z "$ROOT" ] && { echo "Error: not in a git repository" >&2; exit 1; }
 
+# Windows 上裸 python3 落到 Microsoft Store 占位程序（exit 49、空输出），会让 codex python 网
+# 静默产出空结果、parity 假性 diff。shim 定义同名 shell 函数委托真 python（命令替换继承函数）。
+. "$ROOT/scripts/python3-shim.sh"
+
 CODEX="$ROOT/skills/story-setup/references/codex/hooks/story_codex_hook.py"
 OPENCODE="$ROOT/skills/story-setup/references/opencode/plugin.ts"
 ZCODE="$ROOT/skills/story-setup/references/zcode/hooks/story_zcode_hook.js"

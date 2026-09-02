@@ -52,10 +52,24 @@ class ProsePolicyInventoryTests(unittest.TestCase):
             "global-emotion-score": "开头情绪强度 ≥7",
             "direct-body-before-review": "每章写完直接写入 正文/",
             "optional-per-chapter-review": "本章写作完成。如需一致性检查",
-            "detector-style-blocking": "severity: 'blocking'",
         }
         for rule_id, text in samples.items():
             self.assertRegex(text, module.FORBIDDEN[rule_id])
+
+    def test_detector_blocking_is_restricted_to_context_free_wordlist_types(self) -> None:
+        # blocking 仅允许免语境词表族：banned-word-*（封闭词表）与 rule-load-error。
+        for allowed_type in ("banned-word-exact", "banned-word-syna", "rule-load-error"):
+            self.assertTrue(module.detector_blocking_allowed(allowed_type, 2), allowed_type)
+        self.assertTrue(module.detector_blocking_allowed("banned-word-exact", module.BLOCKING_TYPE_WINDOW))
+        # 风格类、缺 type、type 距离过远都必须拦下。
+        for disallowed in (
+            ("ai-metaphor-fusion", 2),
+            ("trailer-summary", 2),
+            (None, 2),
+            ("banned-word-exact", module.BLOCKING_TYPE_WINDOW + 1),
+            ("rule-load-error", 0),
+        ):
+            self.assertFalse(module.detector_blocking_allowed(*disallowed), repr(disallowed))
 
     def test_p1_treatment_and_suspense_priority_remain_explicit(self) -> None:
         prose = (ROOT / "skills/story-write/references/prose-policy.md").read_text(encoding="utf-8")

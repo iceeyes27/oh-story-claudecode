@@ -589,7 +589,7 @@ def test_launcher_reports_missing_git_repository() -> None:
 def test_launcher_accepts_windows_worktree_marker_under_wsl() -> None:
     bash = shutil.which("bash")
     if os.name != "nt" or bash is None:
-        print("SKIP: Windows WSL worktree marker regression not applicable")
+        print("note: Windows WSL worktree marker regression case not applicable")
         return
     probe = subprocess.run(
         [bash, "-lc", "uname -s"],
@@ -599,7 +599,7 @@ def test_launcher_accepts_windows_worktree_marker_under_wsl() -> None:
         encoding="utf-8",
     )
     if probe.stdout.strip() != "Linux":
-        print("SKIP: bash is not WSL; Windows worktree marker regression not applicable")
+        print("note: bash is not WSL; Windows worktree marker regression case not applicable")
         return
 
     def as_wsl_path(path: Path) -> str:

@@ -4,6 +4,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+# Windows 上裸 python3 落到 Microsoft Store 占位程序（exit 49、空输出）；shim 委托真 python。
+. "$REPO_ROOT/scripts/python3-shim.sh"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 cd "$REPO_ROOT"
@@ -39,7 +41,7 @@ python3 - <<'PY'
 import json
 from pathlib import Path
 
-hooks = json.loads(Path('skills/story-setup/references/antigravity/hooks/hooks.json').read_text())
+hooks = json.loads(Path('skills/story-setup/references/antigravity/hooks/hooks.json').read_text(encoding='utf-8'))
 assert set(hooks) == {'oh-story'}
 group = hooks['oh-story']
 assert set(group) == {'PreToolUse', 'PostToolUse', 'PreInvocation', 'Stop'}
@@ -55,7 +57,7 @@ for event, entries in group.items():
 assert group['PreToolUse'][0]['matcher'] == 'run_command|write_to_file|replace_file_content|multi_replace_file_content'
 assert group['PostToolUse'][0]['matcher'] == 'run_command|write_to_file|replace_file_content|multi_replace_file_content'
 
-rule = Path('skills/story-setup/references/antigravity/rules/oh-story.md').read_text()
+rule = Path('skills/story-setup/references/antigravity/rules/oh-story.md').read_text(encoding='utf-8')
 assert rule.startswith('---\ntrigger: always_on\n---\n')
 assert len(rule) < 12_000
 assert '.agents/skills/' in rule and 'invoke_subagent' in rule

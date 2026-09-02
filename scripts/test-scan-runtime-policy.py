@@ -12,6 +12,30 @@ import tempfile
 ROOT = Path(__file__).resolve().parents[1]
 
 
+class FixtureDir:
+    """mkdtemp + best-effort cleanup.
+
+    TemporaryDirectory 的上下文清理在 Windows 上会因 bash/node 子进程短暂
+    持有句柄而抛 WinError 32，把逻辑上已通过的用例误报成失败；清理失败
+    不应判定测试结果，遗留目录交给系统临时区回收。
+    """
+
+    def __init__(self) -> None:
+        self.path = Path(tempfile.mkdtemp(prefix="scan-runtime-policy-"))
+
+    def __enter__(self) -> Path:
+        return self.path
+
+    def __exit__(self, *_exc: object) -> None:
+        for attempt in range(3):
+            try:
+                shutil.rmtree(self.path, ignore_errors=True)
+                if not self.path.exists():
+                    return
+            except OSError:
+                pass
+
+
 def make_fixture(destination: Path) -> None:
     (destination / "scripts").mkdir()
     shutil.copy2(ROOT / "scripts/check-scan-runtime-policy.sh", destination / "scripts")
@@ -36,7 +60,7 @@ def run_guard(fixture: Path) -> subprocess.CompletedProcess[str]:
 
 
 def require_rejection(label: str, mutate, expected: str) -> None:
-    with tempfile.TemporaryDirectory() as raw:
+    with FixtureDir() as raw:
         fixture = Path(raw)
         make_fixture(fixture)
         mutate(fixture)
@@ -67,7 +91,7 @@ def mutate_http_get_with_dead_safe_call(fixture: Path) -> None:
 
 
 def main() -> None:
-    with tempfile.TemporaryDirectory() as raw:
+    with FixtureDir() as raw:
         fixture = Path(raw)
         make_fixture(fixture)
         baseline = run_guard(fixture)

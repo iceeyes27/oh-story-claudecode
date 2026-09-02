@@ -59,7 +59,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 - `scripts/static-check.sh` — frontmatter、引用路径、死文件、references 交叉引用
 - `scripts/check-doc-budget.sh` — 热路径文档字符预算（防 skill/agent 模板无声膨胀，改动 story-write/_shared/narrative-writer 相关文档后必跑）
 - `scripts/check-hook-regex-sync.sh` — hook 伏笔状态检测行为
-- `scripts/check-shared-files.sh` — 共享 runtime 资产清单 + 跨 skill reference 副本一致性
+- `scripts/check-shared-files.sh` — Shared File Governance Check（5 个 guard：runtime 副本、shared-references、reference similarity、agent reference consumers、short analysis scope）
 - `scripts/check-scan-runtime-policy.sh` — scraper 本地日期依赖与 CDP 源码策略守卫
 - `python3 scripts/test-scan-runtime-policy.py` — 验证无关/死代码关键词不能骗过 scan/browser 策略守卫
 - `scripts/check-story-setup-deployment.sh` — story-setup 部署完整性
@@ -76,6 +76,8 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 以上为代表性列举；完整清单与触发时机见 [scripts/README.md](scripts/README.md)。真实 CLI smoke 需要本机安装对应 CLI，按改动范围手动执行。
 
 跨平台改动必须在对应系统本地验证；无法访问目标系统时，在提交说明中明确未验证范围。
+
+提交前优先跑闭合质量网，而不是只挑几个 `test-*` 手跑：`npm run quality:fast`（check 集不变）、改动相关时 `npm run quality:affected`（含 `language-gates`）、发版前 `npm run quality:release`。`scripts/test-*` 的归属见 [scripts/README.md](scripts/README.md)；文档/注释里出现的名字不算运行时引用。
 
 提交前运行本地检查：
 

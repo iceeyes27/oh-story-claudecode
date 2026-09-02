@@ -95,7 +95,7 @@ if mkdir -p "$P1/C:/book184/大纲" 2>/dev/null && : > "$P1/C:/book184/大纲/�
     || bad  "[win] backslash drive path mishandled — issue #184 regression"
   rm -rf "$P1/C:"
 else
-  echo "  SKIP: 文件系统不支持含 ':' 的目录名（无法构造盘符 fixture）"
+  echo "  note: 文件系统不支持含 ':' 的目录名（盘符 fixture 不适用）"
 fi
 
 # ===== Part 1c：真实 Windows 盘符路径（cygpath，仅 Windows/MSYS 跑）=====
@@ -124,11 +124,11 @@ if command -v cygpath >/dev/null 2>&1; then
       rm -rf "$P1/winbook"
       ;;
     *)
-      echo "  SKIP: cygpath present but did not yield a drive-letter path ($WINROOT)"
+      echo "  note: cygpath present but did not yield a drive-letter path ($WINROOT); drive-letter case not applicable"
       ;;
   esac
 else
-  echo "  SKIP: cygpath not available (not a Windows/MSYS runner)"
+  echo "  note: cygpath not available; Windows/MSYS drive-letter case not applicable"
 fi
 
 # ===== Part 2：真实 GBK 区域下跑全部 hook =====
@@ -146,7 +146,7 @@ detect_gbk_locale() {
 }
 GBK_LOCALE="$(detect_gbk_locale || true)"
 if [ -z "$GBK_LOCALE" ]; then
-  echo "  SKIP: 系统无可用 zh_CN.GBK 类 locale（Part 1 已覆盖 python 那层；Part 2 需真实 GBK 区域）"
+  echo "  note: 系统无可用 zh_CN.GBK 类 locale（Part 1 已覆盖 python 那层；Part 2 不适用）"
 else
   echo "  using locale: $GBK_LOCALE"
   GBK() { LANG="$GBK_LOCALE" LC_ALL="$GBK_LOCALE" env "$@"; }

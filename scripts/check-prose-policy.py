@@ -50,8 +50,24 @@ FORBIDDEN = {
     "detector-clear-all": re.compile(r"须清零后再继续|复扫到净|命中即改.{0,12}改完再交付|AI\s*套话清零"),
     "direct-body-before-review": re.compile(r"每章写完直接写入\s*`?正文/|备份原文.{0,30}正文/.*_原稿_"),
     "optional-per-chapter-review": re.compile(r"本章写作完成。如需一致性检查|批量写作模式跳过此步骤，全部写完后再统一审查"),
-    "detector-style-blocking": re.compile(r"severity\s*:\s*['\"]blocking['\"]"),
 }
+
+# check-ai-patterns.js 内联 blocking 的唯一合法形态：免语境词表族
+# （banned-words.md 加载的封闭词表类 + 规则加载失败本身）。风格类判定需要
+# 作者语境裁决，只能 advisory——「是否需要语境」两分是 5007cb8 恢复的作者
+# 裁意，取代 2026-08-31 的「检测器一律 advisory」方针。
+DETECTOR_BLOCKING_LINE = re.compile(r"severity\s*:\s*['\"]blocking['\"]")
+DETECTOR_TYPE_LINE = re.compile(r"type\s*:\s*['\"]([a-z0-9-]+)['\"]")
+ALLOWED_BLOCKING_TYPES = {"rule-load-error"}
+BLOCKING_TYPE_WINDOW = 6
+
+
+def detector_blocking_allowed(last_type: str | None, distance: int) -> bool:
+    return (
+        last_type is not None
+        and 0 < distance <= BLOCKING_TYPE_WINDOW
+        and (last_type in ALLOWED_BLOCKING_TYPES or last_type.startswith("banned-word-"))
+    )
 
 
 def classify(path: Path, line: str) -> str:
@@ -82,6 +98,8 @@ def inventory() -> dict[str, object]:
                 lines = path.read_text(encoding="utf-8").splitlines()
             except UnicodeError:
                 continue
+            last_type = None
+            last_type_line = 0
             for number, line in enumerate(lines, 1):
                 if CANDIDATE.search(line):
                     rows.append({
@@ -94,8 +112,6 @@ def inventory() -> dict[str, object]:
                     continue
                 explicitly_non_global = classify(path, line) in {"explicitly-non-global", "observed-market-data", "historical-record"}
                 for rule_id, pattern in FORBIDDEN.items():
-                    if rule_id == "detector-style-blocking" and path.name != "check-ai-patterns.js":
-                        continue
                     if explicitly_non_global:
                         continue
                     if pattern.search(line):
@@ -104,6 +120,20 @@ def inventory() -> dict[str, object]:
                             "file": path.relative_to(ROOT).as_posix(),
                             "line": number,
                             "text": line.strip(),
+                        })
+                if path.name == "check-ai-patterns.js":
+                    type_match = DETECTOR_TYPE_LINE.search(line)
+                    if type_match:
+                        last_type = type_match.group(1)
+                        last_type_line = number
+                    if DETECTOR_BLOCKING_LINE.search(line) and not detector_blocking_allowed(
+                        last_type, number - last_type_line
+                    ):
+                        violations.append({
+                            "rule_id": "detector-style-blocking",
+                            "file": path.relative_to(ROOT).as_posix(),
+                            "line": number,
+                            "text": f"blocking severity needs a context-free wordlist type (banned-word-*/{sorted(ALLOWED_BLOCKING_TYPES)[0]}); nearest type: {last_type or 'none'} :: {line.strip()}",
                         })
     authority = ROOT / "skills/story-write/references/prose-policy.md"
     authority_text = authority.read_text(encoding="utf-8") if authority.is_file() else ""

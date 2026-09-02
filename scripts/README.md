@@ -14,11 +14,12 @@
 | `skill-numbering.py check` | 工作流 Step/Phase/Stage 编号策略、引用绑定、SKILL.md 裸编号/子步骤小数守卫 | 提交前本地；改工作流结构后 |
 | `check-current-skill-contracts.sh` + `.py` + `current-contract.json` | 从结构化 manifest 校验当前版本、Phase、schema、主产物、细纲契约与 GitHub Actions 禁用策略；保留 legacy/path 守卫并拦截缺主产物后的静默替代 | 提交前本地 |
 | `check-unified-skill-upstream-drift.py` + `upstream-integration.json` | 固定上游基线并检查 split skill 到 unified skill 的人工迁移义务；`--report` 只读输出 source -> target 清单 | 上游同步后；提交前本地 |
-| `check-shared-files.sh` | 调 `sync-shared-assets.py check` 验 runtime 副本，再验共享 reference 字节一致 | 提交前本地 |
+| `check-shared-files.sh` | Shared File Governance Check：依次跑 `sync-shared-assets.py check`、`shared-references.py check`、`check-reference-similarity.py`、`check-agent-reference-consumers.py`、`check-short-analysis-scope.py` 五个 guard | `shared-assets`（affected + release） |
 | `check-scan-runtime-policy.sh` | scraper 输出文件名依赖本地日期 helper；CDP 探测/Windows 监听解析的源码策略 | 提交前本地；这些依赖方向无法由隔离 helper 测试证明 |
 | `check-story-setup-deployment.sh` | story-setup 部署/运行时回归（慢，>2min） | story-setup 改动后本地 |
-| `check-hook-regex-sync.sh` | `detect-story-gaps.sh` 伏笔状态检测行为 | 相关改动后本地 |
-| `check-hook-locale-safety.sh` | 部署 hook 在 Windows 中文 GBK 区域的字节安全 | hook 改动后本地 |
+| `check-hook-regex-sync.sh` | 5 份 hook 核正则同步 | `hook-regex-sync`（release） |
+| `check-hook-locale-safety.sh` | 部署 hook 在 Windows 中文 GBK 区域的字节安全（静态守卫；行为回归见 `test-hook-encoding-portable.sh`） | `hook-locale-safety`（release） |
+| `check-antigravity-adapter.sh` | Antigravity 适配层 + 内部跑 3 个 antigravity `test-*` | `antigravity-adapter`（release） |
 | `check-python-invocation.sh` | 技能文档禁止裸调 `python3`（须 python3→python→py 探测） | 提交前本地 |
 | `check-doc-budget.sh` + `doc-budget.json` | 校验每次会话或每章加载的热路径文档没有超过显式预算 | 修改 Skill 入口与写作热路径后 |
 | `platform-skill-set.json` | 跨平台公开发布 Skill 的唯一清单；Claude、OpenCode、ZCode 与 OpenClaw 校验共用 | 增减公开 Skill 时先修改 |
@@ -36,35 +37,67 @@
 
 ## 测试回归（test-*）
 
-| 脚本 | 测什么 | 何时跑 |
+`scripts/test-*` 必须被 `quality-gate.json` 的某个 profile 跑到（直接引用、聚合 runner 或适配器内部调用都算）。注释/文档里出现的名字不算运行时引用。新增 `test-*` 不接线会让 `scripts/quality-gate.test.mjs` 在 `platform-gates` 红掉。`fast` 的 check 集保持原样，不承担这张回归网。
+
+聚合 runner（沿用 `test-story-continuity.sh` 可调其他 test 的先例）：
+
+| runner | quality-gate check | profile |
 |---|---|---|
-| `test-ai-patterns.sh` | 确定性 AI 句式检测器 `check-ai-patterns.js` 回归 | 本地 |
-| `test-chapter-titles.js` | 章节标题设问规则回归：明确疑问形态 blocking、悬念式疑问词开头 advisory | 改 `check-chapter-titles.js` 后本地 |
-| `test-degeneration.sh` | 模型退化检测器 `check-degeneration.js` 回归 | 本地 |
-| `test-prose-net-parity.sh` | 正文后置「轻量确定性网」Claude/OpenCode/Codex/ZCode parity | 本地（调 check-hook-regex-sync） |
-| `test-prose-backstop-hook.sh` | `check-prose-after-write.sh` 回归 | 本地 |
-| `test-story-continuity.sh` | `detect-story-gaps.sh` 跨批连续性后置回归 | 本地 |
-| `test-longform-stability.sh` | 长篇稳定性工具链（`stability-audit.js` + `handoff-pack.js` + `archive-stability.js`）回归：契约 beat/禁词/门控/角色不变量 POV 扫描/世界观不变量违规词/交接继承/归档透明回退 | 本地 |
-| `test-flow-state.sh` | `story-write` 写作阶段披露状态工具（`flow-state.js`）回归：阶段识别、`.active-book` 路径边界、缺追踪/缺细纲阻塞、短篇正文检查路径、状态更新字段校验 | 改 `flow-state.js` 或 `progressive-disclosure.md` 后 |
-| `test-state-store.sh` | 结构化状态库（`state-query.js`）回归：分片路由/时点快照折叠/活跃与超期伏笔/矛盾检测（死亡后活动、未埋先收、重复回收、分片错位） | 本地 |
-| `test-codex-hooks.sh` | Codex hook 合成 stdin/stdout 契约 | 本地 |
-| `test-static-check.py` | 真 frontmatter block、精确路径/锚点、跨 Skill 引用、fence、死 reference、Agent 与章节链接 fixture | 本地 |
-| `test-current-skill-contracts.py` | current-contract manifest 类型/固定值与主产物 fail-fast 语义 fixture | 本地 |
-| `test-shared-assets.py` | 共享资产 manifest 的 drift、sync、路径越界、basename 单一 owner 与未登记重复检测 | 本地 |
-| `test-normalize-punctuation.js` | 标点归一化的只读检查、frontmatter/fence、CRLF、引号模式与幂等性 | 本地 |
-| `test-scan-runtime.js` | CDP argv 边界/报错/JSON 契约与 7 个 scraper 无副作用 import | 本地 |
-| `test-scan-runtime-policy.py` | 变异验证 scan/browser 静态策略不会被无关或死代码关键词骗过 | 本地；改 `check-scan-runtime-policy.sh` 后 |
-| `test-tracking-commit.py` | 单权威追踪行为：state 最后提交、失败同事务重跑、派生一致性、修订语义、导入截止章 | 本地 |
-| `test-author-memory-commit.py` | 工作区作者记忆行为：单事件回执、≤2KB 相关查询、证据候选、冲突替代、撤回、失败零写入、旧修订、幂等重放与派生修复 | 本地 |
-| `test-opencode-plugin.mjs` | 直接执行 OpenCode TypeScript plugin，验大纲守卫、Bash 绕过、写后检查与 compact 恢复 | 被 `check-opencode-adapter.sh` 调用 |
-| `test-codex-cli-e2e.sh` | 隔离 HOME 后用真实 Codex CLI 检查完整仓库 Skill 的发现结果 | 可选本地；需已安装 `codex` |
-| `test-zcode-hooks.sh` | ZCode 严格 JSON Hook、正文守卫与连续性回归 | 本地 |
-| `test-charcount-portable.sh` | 跨平台字符统计命令在三平台 + Windows 的正确性 | 本地（调 check-python-invocation） |
-| `test-hook-encoding-portable.sh` | 部署 hook 在 Windows 中文系统的编码健壮性 | 本地 |
-| `test-opencode-cli-e2e.sh` | 真实 OpenCode CLI 加载 smoke（公开 Skill 命令 / 7 agents / plugin） | 可选本地；需已安装 `opencode` |
-| `test-skill-numbering.sh` | Step 重排级联安全、锚点 fail-closed、代码块引用、验证零写入/提交回滚、dry-run/write/幂等性 | 对应系统本地 |
-| `test-unified-skill-upstream-drift.py` | 上游旧拆分目录变化时，迁移检查会显示统一目标路径，并验证 `--report` 只读返回成功 | 改上游漂移检查后 |
-| `test-reasonix-adapter.sh` | Reasonix AGENTS 路由表拒绝已废弃的 split Skill 名称 | 改 Reasonix 模板或检查脚本后 |
+| `test-language-gates.sh` | `language-gates` | affected + release |
+| `test-narrative-gates.sh` | `narrative-gates` | release |
+| `test-platform-gates.sh` | `platform-gates` | release |
+
+| 脚本 | 测什么 | 归属 |
+|---|---|---|
+| `test-ai-patterns.sh` | 确定性 AI 句式检测器 `check-ai-patterns.js` 回归 | `language-gates` |
+| `test-degeneration.sh` | 模型退化检测器 `check-degeneration.js` 回归 | `language-gates` |
+| `test-prose-policy.py` | 写作策略守卫：全局规则冲突 + detector blocking 仅允许 `banned-word-*` / `rule-load-error` | `language-gates` |
+| `test-normalize-punctuation.js` | 标点归一化的只读检查、frontmatter/fence、CRLF、引号模式与幂等性 | `language-gates` |
+| `test-charcount-portable.sh` | 跨平台字符统计命令在三平台 + Windows 的正确性 | `language-gates` |
+| `test-prose-backstop-hook.sh` | `check-prose-after-write.sh` 回归 | `language-gates` |
+| `test-prose-net-parity.sh` | 正文后置「轻量确定性网」Claude/OpenCode/Codex/ZCode parity | `language-gates` |
+| `test-chapter-titles.js` | 章节标题设问规则回归：明确疑问形态 blocking、悬念式疑问词开头 advisory | `contracts`（fast/affected/release） |
+| `test-narrative-complexity.js` | 平直叙事模式契约 | `contracts` |
+| `test-foreshadow-overdue.js` | 逾期伏笔门 | `contracts` |
+| `test-foreshadow-gate.js` | 伏笔热卡/欠账门 | `contracts` |
+| `test-candidate-commit.py` | 候选采用事务：预检、语义证据、状态过期、故障注入与幂等恢复 | `candidate-transaction`（fast/affected/release） |
+| `test-tracking-commit.py` | 单权威追踪行为：state 最后提交、失败同事务重跑、派生一致性、修订语义、导入截止章 | `tracking`（affected/release） |
+| `test-tracking-workflow-contracts.py` | 追踪工作流契约 | `tracking-workflow`（affected/release） |
+| `test-chapter-skeleton.js` | 章节骨架验证器 | `chapter-skeleton`（affected/release） |
+| `test-unified-skill-upstream-drift.py` | 上游旧拆分目录变化时，迁移检查会显示统一目标路径，并验证 `--report` 只读返回成功 | `sync-drift`（fast/affected/release） |
+| `test-outline-causal.py` | 细纲因果链 | `narrative-gates` |
+| `test-outline-contract.js` | 细纲读者体验契约 | `narrative-gates` |
+| `test-emotion-run.js` | 目标情绪闭合词表连排：3 章 advisory / 4 章 blocking | `narrative-gates` |
+| `test-name-drift.js` | 现实专名漂移：demo 抖音 blocking，微博/东风/知乎/设定 gloss 不误杀 | `narrative-gates` |
+| `test-outline-copy.sh` | 细纲照抄门 | `narrative-gates` |
+| `test-phase2-contract.js` | Phase 2 契约 | `narrative-gates` |
+| `test-delivery-contract.js` | 交付契约 | `narrative-gates` |
+| `test-scan-contract.js` | 扫榜契约 | `narrative-gates` |
+| `test-scan-runtime.js` | CDP argv 边界/报错/JSON 契约与 7 个 scraper 无副作用 import | `narrative-gates` |
+| `test-scan-runtime-policy.py` | 变异验证 scan/browser 静态策略不会被无关或死代码关键词骗过 | `narrative-gates` |
+| `test-review-state.js` | 审查状态 | `narrative-gates` |
+| `test-story-continuity.sh` | `detect-story-gaps.sh` 跨批连续性后置回归 | `narrative-gates` |
+| `test-chapter-completion-lifecycle.py` | 章节完成生命周期 | `narrative-gates` |
+| `test-longform-stability.sh` | 长篇稳定性工具链回归 | `narrative-gates` |
+| `test-state-store.sh` | 结构化状态库回归 | `narrative-gates` |
+| `test-author-memory-commit.py` | 工作区作者记忆行为 | `narrative-gates` |
+| `test-flow-state.sh` | `story-write` 写作阶段披露状态工具回归 | `narrative-gates` |
+| `test-zcode-hooks.sh` | ZCode 严格 JSON Hook、正文守卫与连续性回归 | `platform-gates` |
+| `test-codex-hooks.sh` | Codex hook 合成 stdin/stdout 契约 | `platform-gates` |
+| `test-reasonix-adapter.sh` | Reasonix AGENTS 路由表拒绝已废弃的 split Skill 名称 | `platform-gates` |
+| `test-skill-numbering.sh` | Step 重排级联安全、锚点 fail-closed、代码块引用、验证零写入/提交回滚、dry-run/write/幂等性 | `platform-gates` |
+| `test-storyctl.py` | storyctl 回归 | `platform-gates` |
+| `test-current-skill-contracts.py` | current-contract manifest 类型/固定值与主产物 fail-fast 语义 fixture | `platform-gates` |
+| `test-shared-assets.py` | 共享资产 manifest 的 drift、sync、路径越界、basename 单一 owner 与未登记重复检测 | `platform-gates` |
+| `test-shared-references.py` | 共享 reference 组登记 | `platform-gates` |
+| `test-static-check.py` | 真 frontmatter block、精确路径/锚点、跨 Skill 引用、fence、死 reference、Agent 与章节链接 fixture | `platform-gates` |
+| `test-hook-encoding-portable.sh` | 部署 hook 在 Windows 中文系统的编码健壮性 | `platform-gates`（不经 locale-safety 守卫，后者只做静态检查） |
+| `test-codex-hook-merge.py` | Codex hook 合并 | `codex-adapter`（release） |
+| `test-opencode-plugin.mjs` | 直接执行 OpenCode TypeScript plugin，验大纲守卫、Bash 绕过、写后检查与 compact 恢复 | `opencode-adapter`（release） |
+| `test-antigravity-hook-merge.py` / `test-antigravity-hooks.mjs` / `test-antigravity-skills-deploy.py` | Antigravity 适配回归 | `antigravity-adapter`（release） |
+| `test-quality-lifecycle.py` | 质量生命周期（约 90s） | `quality-lifecycle`（release） |
+| `test-codex-cli-e2e.sh` | 隔离 HOME 后用真实 Codex CLI 检查完整仓库 Skill 的发现结果 | `codex-cli-e2e`（release；CLI 缺失 → BLOCKED） |
+| `test-opencode-cli-e2e.sh` | 真实 OpenCode CLI 加载 smoke | `opencode-cli-e2e`（release；CLI 缺失 → BLOCKED） |
 
 ## 代码生成 / 同步
 

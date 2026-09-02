@@ -12,8 +12,13 @@ HOOK="$REPO_ROOT/skills/story-setup/references/templates/hooks/check-prose-after
 
 bash -n "$HOOK" || { echo "FAIL: hook has syntax errors" >&2; exit 1; }
 
-TMP="$(mktemp -d)"
-TMP_ALIAS_ROOT="$(mktemp -d)"
+# Git Bash/MSYS 把 argv 里的 /tmp/... 自动转成原生 Windows 路径，但 env/stdin 内容（本测试
+# 塞进 payload 的 file_path）不转。若 $TMP 保持 /tmp 形态，hook 收到的 ROOT（走 argv，被转）
+# 与 payload 里的目标路径（不转）会解析到不同的 Windows 位置，pathWithin 失败 → 目标被丢弃 →
+# 空输出 → JSON.parse 炸。归一为 cygpath -m 的混合式（C:/...，正斜杠）：bash 文件操作、
+# Node path.resolve、JSON 无转义三者一致，Windows 与 Linux（无 cygpath 时回退 /tmp）都稳。
+TMP="$(mktemp -d)"; TMP="$(cygpath -m "$TMP" 2>/dev/null || printf '%s' "$TMP")"
+TMP_ALIAS_ROOT="$(mktemp -d)"; TMP_ALIAS_ROOT="$(cygpath -m "$TMP_ALIAS_ROOT" 2>/dev/null || printf '%s' "$TMP_ALIAS_ROOT")"
 trap 'rm -rf "$TMP" "$TMP_ALIAS_ROOT"' EXIT
 # 真书结构：设定.md + 大纲/ + 正文/
 mkdir -p "$TMP/某书/正文" "$TMP/某书/大纲" "$TMP/docs/正文" "$TMP/游离/正文"
@@ -60,7 +65,10 @@ if ln -s "$TMP" "$TMP_ALIAS_ROOT/project-alias" 2>/dev/null && [ -L "$TMP_ALIAS_
   ln -s "$TMP_ALIAS_ROOT/outside-book" "$TMP/外链书"
   expect_silent "$TMP/外链书/正文/第001章_外部.md"
 else
-  echo "SKIP: symlink alias regression unavailable on this platform"
+  # 不用行首 "SKIP:" 前缀：quality-gate.mjs 的 skip 启发式会把任何行首 SKIP: 视作
+  # 整项 check 被跳过，从而把本聚合（13 条真断言已过）误判为 SKIP → 聚合 BLOCKED。
+  # 这里只是单个平台不适用的用例，不该下拉整项状态。
+  echo "note: symlink alias regression unavailable on this platform — case not applicable"
 fi
 
 # ③ 内容网：真正文里的硬信号必须被抓，且抓对类型；干净正文（排比+AI角色对话+悬念收尾）静默。

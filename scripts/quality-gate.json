@@ -23,7 +23,8 @@
       "contracts",
       "publication",
       "shared-assets",
-      "static"
+      "static",
+      "language-gates"
     ],
     "release": [
       "sync-unit",
@@ -48,32 +49,228 @@
       "reasonix-adapter",
       "static",
       "dashboard",
-      "dashboard-e2e"
+      "dashboard-e2e",
+      "language-gates",
+      "narrative-gates",
+      "platform-gates",
+      "quality-lifecycle",
+      "antigravity-adapter",
+      "hook-regex-sync",
+      "hook-locale-safety",
+      "codex-cli-e2e",
+      "opencode-cli-e2e"
     ]
   },
   "checks": {
-    "sync-unit": { "command": "node", "args": ["--test", "scripts/sync-upstream.test.js"] },
-    "sync-drift": { "command": "python", "args": ["scripts/test-unified-skill-upstream-drift.py"] },
-    "platform-capabilities": { "command": "node", "args": ["scripts/check-platform-capabilities.mjs"] },
-    "release-manifest": { "command": "node", "args": ["scripts/check-release-manifest.mjs"] },
-    "doc-budget": { "command": "bash", "args": ["scripts/check-doc-budget.sh"] },
-    "candidate-transaction": { "command": "python", "args": ["scripts/test-candidate-commit.py"] },
-    "tracking": { "command": "python", "args": ["scripts/test-tracking-commit.py"] },
-    "tracking-workflow": { "command": "python", "args": ["scripts/test-tracking-workflow-contracts.py"] },
-    "chapter-skeleton": { "command": "node", "args": ["scripts/test-chapter-skeleton.js"] },
-    "contracts": { "command": "npm", "args": ["run", "test:contracts", "--silent"] },
-    "publication": { "command": "node", "args": ["--test", "scripts/skill-publication-coverage.test.js"] },
-    "current-contracts": { "command": "python", "args": ["scripts/check-current-skill-contracts.py"] },
-    "shared-assets": { "command": "bash", "args": ["scripts/check-shared-files.sh"] },
-    "story-setup": { "command": "bash", "args": ["scripts/check-story-setup-deployment.sh"] },
-    "claude-adapter": { "command": "bash", "args": ["scripts/check-claude-adapter.sh"] },
-    "codex-adapter": { "command": "bash", "args": ["scripts/check-codex-adapter.sh"] },
-    "opencode-adapter": { "command": "bash", "args": ["scripts/check-opencode-adapter.sh"] },
-    "zcode-adapter": { "command": "bash", "args": ["scripts/check-zcode-adapter.sh"] },
-    "openclaw-adapter": { "command": "bash", "args": ["scripts/check-openclaw-skills.sh"] },
-    "reasonix-adapter": { "command": "bash", "args": ["scripts/check-reasonix-adapter.sh"] },
-    "static": { "command": "bash", "args": ["scripts/static-check.sh"] },
-    "dashboard": { "command": "npm", "args": ["run", "test:dashboard", "--silent"] },
-    "dashboard-e2e": { "command": "npm", "args": ["run", "test:dashboard:e2e", "--silent"], "blocked_patterns": ["Executable doesn't exist", "Please run the following command to download new browsers"] }
+    "sync-unit": {
+      "command": "node",
+      "args": [
+        "--test",
+        "scripts/sync-upstream.test.js"
+      ]
+    },
+    "sync-drift": {
+      "command": "python",
+      "args": [
+        "scripts/test-unified-skill-upstream-drift.py"
+      ]
+    },
+    "platform-capabilities": {
+      "command": "node",
+      "args": [
+        "scripts/check-platform-capabilities.mjs"
+      ]
+    },
+    "release-manifest": {
+      "command": "node",
+      "args": [
+        "scripts/check-release-manifest.mjs"
+      ]
+    },
+    "doc-budget": {
+      "command": "bash",
+      "args": [
+        "scripts/check-doc-budget.sh"
+      ]
+    },
+    "candidate-transaction": {
+      "command": "python",
+      "args": [
+        "scripts/test-candidate-commit.py"
+      ]
+    },
+    "tracking": {
+      "command": "python",
+      "args": [
+        "scripts/test-tracking-commit.py"
+      ]
+    },
+    "tracking-workflow": {
+      "command": "python",
+      "args": [
+        "scripts/test-tracking-workflow-contracts.py"
+      ]
+    },
+    "chapter-skeleton": {
+      "command": "node",
+      "args": [
+        "scripts/test-chapter-skeleton.js"
+      ]
+    },
+    "contracts": {
+      "command": "npm",
+      "args": [
+        "run",
+        "test:contracts",
+        "--silent"
+      ]
+    },
+    "publication": {
+      "command": "node",
+      "args": [
+        "--test",
+        "scripts/skill-publication-coverage.test.js"
+      ]
+    },
+    "current-contracts": {
+      "command": "python",
+      "args": [
+        "scripts/check-current-skill-contracts.py"
+      ]
+    },
+    "shared-assets": {
+      "command": "bash",
+      "args": [
+        "scripts/check-shared-files.sh"
+      ]
+    },
+    "story-setup": {
+      "command": "bash",
+      "args": [
+        "scripts/check-story-setup-deployment.sh"
+      ]
+    },
+    "claude-adapter": {
+      "command": "bash",
+      "args": [
+        "scripts/check-claude-adapter.sh"
+      ]
+    },
+    "codex-adapter": {
+      "command": "bash",
+      "args": [
+        "scripts/check-codex-adapter.sh"
+      ]
+    },
+    "opencode-adapter": {
+      "command": "bash",
+      "args": [
+        "scripts/check-opencode-adapter.sh"
+      ]
+    },
+    "zcode-adapter": {
+      "command": "bash",
+      "args": [
+        "scripts/check-zcode-adapter.sh"
+      ]
+    },
+    "openclaw-adapter": {
+      "command": "bash",
+      "args": [
+        "scripts/check-openclaw-skills.sh"
+      ]
+    },
+    "reasonix-adapter": {
+      "command": "bash",
+      "args": [
+        "scripts/check-reasonix-adapter.sh"
+      ]
+    },
+    "static": {
+      "command": "bash",
+      "args": [
+        "scripts/static-check.sh"
+      ]
+    },
+    "dashboard": {
+      "command": "npm",
+      "args": [
+        "run",
+        "test:dashboard",
+        "--silent"
+      ]
+    },
+    "dashboard-e2e": {
+      "command": "npm",
+      "args": [
+        "run",
+        "test:dashboard:e2e",
+        "--silent"
+      ],
+      "blocked_patterns": [
+        "Executable doesn't exist",
+        "Please run the following command to download new browsers"
+      ]
+    },
+    "language-gates": {
+      "command": "bash",
+      "args": [
+        "scripts/test-language-gates.sh"
+      ]
+    },
+    "narrative-gates": {
+      "command": "bash",
+      "args": [
+        "scripts/test-narrative-gates.sh"
+      ]
+    },
+    "platform-gates": {
+      "command": "bash",
+      "args": [
+        "scripts/test-platform-gates.sh"
+      ]
+    },
+    "quality-lifecycle": {
+      "command": "python",
+      "args": [
+        "scripts/test-quality-lifecycle.py"
+      ]
+    },
+    "antigravity-adapter": {
+      "command": "bash",
+      "args": [
+        "scripts/check-antigravity-adapter.sh"
+      ]
+    },
+    "hook-regex-sync": {
+      "command": "bash",
+      "args": [
+        "scripts/check-hook-regex-sync.sh"
+      ]
+    },
+    "hook-locale-safety": {
+      "command": "bash",
+      "args": [
+        "scripts/check-hook-locale-safety.sh"
+      ]
+    },
+    "codex-cli-e2e": {
+      "command": "bash",
+      "args": [
+        "scripts/test-codex-cli-e2e.sh"
+      ],
+      "blocked_patterns": [
+        "CLI not found"
+      ]
+    },
+    "opencode-cli-e2e": {
+      "command": "bash",
+      "args": [
+        "scripts/test-opencode-cli-e2e.sh"
+      ],
+      "blocked_patterns": [
+        "CLI not found"
+      ]
+    }
   }
 }

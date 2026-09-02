@@ -1,0 +1,5 @@
+{"file":".trellis/spec/skills/index.md","reason":"Skill 仓库入口与修改边界"}
+{"file":".trellis/spec/skills/canonical-assets.md","reason":"hook canonical 资产与生成副本同步规则"}
+{"file":".trellis/spec/skills/validation.md","reason":"本地质量门与跨平台验证要求"}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"修改共享常量前搜索及批量副本复核"}
+{"file":".trellis/tasks/09-01-quality-gate-coverage-audit/research/coverage-audit.md","reason":"测试引用图、Windows 实跑故障与 release 追加诊断"}

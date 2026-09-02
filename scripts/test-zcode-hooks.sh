@@ -4,6 +4,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+# Windows 上裸 python3 落到 Microsoft Store 占位程序（exit 49、空输出）；shim 委托真 python。
+. "$REPO_ROOT/scripts/python3-shim.sh"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 

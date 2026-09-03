@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 10
-- **Last Active**: 2026-09-02
+- **Total Sessions**: 11
+- **Last Active**: 2026-09-03
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~233 | Active |
+| `journal-1.md` | ~261 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 11 | 2026-09-03 | 完成提质优先叙事门禁 | `b9b1fd1`, `caea546`, `a983df5`, `c856bdd`, `3b65153`, `508e0d2`, `e3ca4cf`, `afc978b` | `feat/quality-first-gates` |
 | 10 | 2026-09-02 | 完成 quality-gate 覆盖审计 | `4c55f7a`, `c7c61d6` | `feat/quality-first-gates` |
 | 9 | 2026-08-31 | 叙事逻辑与读者可读性整改 | `86280be`, `a64f17a` | `main` |
 | 8 | 2026-08-24 | 长篇章节骨架模式 | `196e304` | `main` |

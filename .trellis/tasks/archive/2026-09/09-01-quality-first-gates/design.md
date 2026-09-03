@@ -14,7 +14,7 @@
 | promote 已有 preflight：skeleton / title / outline-copy / first-mention(rc-01) / arc-ledger(仅第 15 章) / fanqie 字数 / scan_gate | 同文件 :219-229, :471-494 |
 | 语言门禁两个绕过口 | `EXEMPTION = /去味(：|:)跳过/` :41，命中前 6 行即跳过 :492；`--no-scan` → `skip_scan` :765/:889 |
 | `check-ai-patterns.js` 1436 行、约 24 类指纹；`check-degeneration.js` 330 行 | `skills/_shared/scripts/` |
-| 词表双源 | `banned-words.md` 353 行；`check-ai-patterns.js:105` 注释自认只手工收录部分形态，脚本不读该文件 |
+| 词表双源 | ~~`banned-words.md` 353 行；脚本不读该文件~~ — 已随 `5007cb8`（0.7）恢复运行时加载器，父任务已知债 #1 划掉 |
 | `目标情绪` **已是必填** | `check-outline-contract.js:24` `FIELDS`；:35 `INTENT_FIELDS`「实测直接影响正文质量，必须有实际内容」 |
 | 该检查不在 promote，且对旧细纲明确不阻断 | `skills/story-write/references/artifact-protocols.md:274` |
 | demo 20 章**全部** outline-contract blocking | 逐章实跑：`outline.required-fields` + `outline.reader-contract` + `outline.plotpoint-table`；缺字段 = 单元ID/位置、目标情绪、主角目标/关键选择、结尾拍ID/类型、期待ID/类型、读者验收预期、章节定位、契约风险 |
@@ -152,6 +152,13 @@ node scripts/check-release-manifest.mjs
 
 ## 未决问题
 
-1. metrics 是否需要 schema 4→5（子任务 6 敲定，倾向否）。
-2. 母题连排阈值 3 章还是 4 章（子任务 2 先看 fixture 分布）。
-3. `artifact-protocols.md:274` 的「既有项目旧细纲不阻断」表述如何与 R2 并存（子任务 1 处理，倾向改写为按 `imported_through_chapter` 分级）。
+1. metrics 保持 schema 4；旧 state 缺字段按空表读取，新事务必须提交结构化全量 metrics。
+2. 母题连排阈值确定为 3 章 advisory、4 章 blocking。
+3. `artifact-protocols.md` 已改为按 `imported_through_chapter` 分级：新章阻断、历史章 advisory。
+
+## 最终验证（2026-09-02）
+
+- demo causal 严格基线仍为 11 条：章 4、5、6、7、8、9、10、13、14、15、20。
+- demo 字数基线保持：under = 2、4、6、7、8、11、12、13、17；over = 16；18 = pass。
+- tracking 36 项、candidate 46 项及共享资产、平台适配器检查通过。
+- release profile：29/32 PASS、0 FAIL；Dashboard E2E、Codex CLI E2E、OpenCode CLI E2E 因本机依赖缺失标记为 BLOCKED。

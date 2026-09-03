@@ -11,7 +11,7 @@
 | 轴 | 现状 | 结论 |
 |---|---|---|
 | 没有基本毛病 | `check-outline-causal.py` 存在但未接采用链；专名漂移检查不存在；数值台账不存在 | 要新建，最贵 |
-| 语言通顺 | `check-ai-patterns.js`（1436 行 / 约 24 类句式指纹）+ `check-degeneration.js` **已接 promote**，但有两个 agent 自己就能开的绕过口；三个语义扫描 skill 无脚本、不在日更回路 | 装备最好，只差堵洞与触发 |
+| 语言通顺 | `check-ai-patterns.js` 规则集与词表加载器已恢复（0.7），`banned-word-*` / `rule-load-error` 为 blocking；正文自带豁免已关闭（子任务 0）。三个语义扫描 skill 仍无脚本、不在日更回路；原「advisory 密度峰值」触发前提已不成立，子任务 3 推迟并重做设计 | 装备已经接上；剩下的是 advisory 风格类触发，不是堵洞 |
 | 读者爱看 | `check-outline-contract.js` 已定义整套读者体验必填字段，但只在建纲时跑、对既有项目明确不阻断、promote 不跑 | 定义齐全，只差接线 |
 
 ## Requirements
@@ -66,11 +66,13 @@
 
 | # | 子任务 | 轴 | 满足 | 依赖 |
 |---|---|---|---|---|
-| 0 | `09-01-scan-gate-bypass` | 语言通顺 | R1 | 无 |
+| 0 | `09-01-scan-gate-bypass` | 语言通顺 | R1 | 无（已完成） |
+| 0.7 | `09-01-restore-ai-pattern-blocking` | 语言通顺 | 规则集/词表加载器 | 插队（已完成） |
+| B | `09-01-quality-gate-coverage-audit` | 测试网 | 消灭 test-* 孤儿 | 插在 0.5 前 |
 | 0.5 | `09-01-regression-fixture-book` | 验收基础 | R8 | 无 |
 | 1 | `09-01-outline-contract-promote` | 读者爱看 | R2 | 0.5 |
 | 2 | `09-01-emotion-motif-gate` | 读者爱看 | R3 | 1 |
-| 3 | `09-01-semantic-scan-triggers` | 语言通顺 | R4 | 1（复用 `check` 子命令） |
+| 3 | `09-01-semantic-scan-triggers` | 语言通顺 | R4 | 1（复用 `check` 子命令）；**推迟下一迭代**，触发谓词需针对剩余 advisory 风格类密度重做 |
 | 4 | `09-01-causal-promote` | 基本毛病 | R5 | 1 |
 | 5 | `09-01-name-drift-dict` | 基本毛病 | R6 | 4 |
 | 6 | `09-01-metrics-ledger` | 基本毛病 | R7 | 无（但排最后） |
@@ -81,30 +83,36 @@
 
 跨子任务的整体验收：
 
-- [ ] 采用链（`candidate-commit.py promote`）上，语言门禁无法由候选正文自身内容关闭。
-- [ ] 新写章缺 `目标情绪` / `结尾拍ID/类型` / `期待ID/类型` / `读者验收预期` 时无法采用；fixture 书上可复现。
-- [ ] fixture 书上连续同 `目标情绪` 达阈值时产出 finding。
-- [ ] demo 20 章在新门禁下**不因历史原因变红**：`promote` 对 `imported_through_chapter` 内的章仍可运行（causal / outline-contract 均降级 advisory）。
-- [ ] demo 已知基线不回归：causal `--strict` 仍为 11 条（章 4,5,6,7,8,9,10,13,14,15,20）；`fanqie_length` under = 2,4,6,7,8,11,12,13,17，over = 16，18 = pass。
-- [ ] 第 11、20 章正文的 `抖音` 被 name-drift blocking；`微博` / `东风` / `知乎` 不 blocking；设定层化名声明不 blocking。
-- [ ] fixture 书上新写一章，正文结算数字与 metrics 台账一致；台账未更新时 promote 拒绝。
-- [ ] `scripts/check-shared-files.sh` 通过；`scripts/test-tracking-commit.py`、`scripts/test-candidate-commit.py` 通过。
-- [ ] `AGENTS.md` 不再引用不存在的脚本。
+- [x] 采用链（`candidate-commit.py promote`）上，语言门禁无法由候选正文自身内容关闭。
+- [x] 新写章缺 `目标情绪` / `结尾拍ID/类型` / `期待ID/类型` / `读者验收预期` 时无法采用；fixture 书上可复现。
+- [x] fixture 书上连续同 `目标情绪` 达阈值时产出 finding。
+- [x] demo 20 章在新门禁下**不因历史原因变红**：`promote` 对 `imported_through_chapter` 内的章仍可运行（causal / outline-contract 均降级 advisory）。
+- [x] demo 已知基线不回归：causal `--strict` 仍为 11 条（章 4,5,6,7,8,9,10,13,14,15,20）；`fanqie_length` under = 2,4,6,7,8,11,12,13,17，over = 16，18 = pass。
+- [x] 第 11、20 章正文的 `抖音` 被 name-drift blocking；`微博` / `东风` / `知乎` 不 blocking；设定层化名声明不 blocking。
+- [x] fixture 书上新写一章，正文结算数字与 metrics 台账一致；台账未更新时 promote 拒绝。
+- [x] `scripts/check-shared-files.sh` 通过；`scripts/test-tracking-commit.py`、`scripts/test-candidate-commit.py` 通过。
+- [x] `AGENTS.md` 不再引用不存在的脚本。
+
+## Final verification
+
+- 2026-09-02：`node scripts/quality-gate.mjs --profile release` 完成，29/32 PASS、0 FAIL。
+- 3 项为环境阻断：本机缺 Playwright Chromium、Codex CLI、OpenCode CLI。
+- R4 的语义扫描触发任务已从本批解除父子关系，保留为下一迭代独立 planning 任务。
 
 ## Out of Scope
 
 - 字数权威三选一 / `quality_profile` 多档（登记为债）
-- `banned-words.md`（353 行）与 `check-ai-patterns.js` 硬编码词表的双源同步（登记为债）
+- ~~`banned-words.md` 与 `check-ai-patterns.js` 硬编码词表双源~~（0.7 已恢复运行时加载器，本条划掉）
 - 逐章记录回填、causal 过去时预设规则（下一迭代）
 - 角色行为不变量出现性扫描
 - 跨平台 hook parity
 
 ## 已知债（本批登记，不修）
 
-1. `check-ai-patterns.js` **不读** `skills/_shared/references/banned-words.md`，词表是手工同步进脚本的硬编码。与被砍掉的「别名手工表」属同类腐烂。
+1. ~~`check-ai-patterns.js` **不读** `skills/_shared/references/banned-words.md`~~ — 0.7（`5007cb8`）已恢复规则集与词表加载器，本条划掉。
 2. 字数三套权威并存。
 3. demo 的 `字数目标` 系倒填，`细纲目标 90%` 这套权威在 demo 上恒过。
-4. `promote` 不跑 `check-outline-contract.js` 是本批 R2 要改的；但 `artifact-protocols.md:274` 明写「既有项目的旧细纲不因此阻断写正文」，该文档需同步修订以免自相矛盾。
+4. ~~`promote` 不跑 `check-outline-contract.js`，且旧文档与分级策略矛盾~~ — 已按 `imported_through_chapter` 完成新章 blocking、历史章 advisory，并同步文档。
 
 ## Notes
 

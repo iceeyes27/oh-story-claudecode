@@ -47,17 +47,17 @@
     },
     {
       "path": "skills/_shared/references/banned-words.md",
-      "budget": 14800,
-      "why": "跨 skill 共享禁用词表，写作/审查/去AI味都读，持续「发现即注册」增长，需要显式预算刹车"
+      "budget": 15200,
+      "why": "跨 skill 共享禁用词表，写作/审查/去AI味都读，持续「发现即注册」增长（新增说明文式感官对仗与反知觉状态词包），需要显式预算刹车"
     },
     {
       "path": "skills/_shared/references/anti-ai-writing.md",
-      "budget": 14800,
+      "budget": 14100,
       "why": "去 AI 味完整指南，narrative-writer 与 story-deslop 共读"
     },
     {
       "path": "skills/story-setup/references/templates/agents/narrative-writer.md",
-      "budget": 16500,
+      "budget": 14000,
       "why": "部署到项目的正文 agent 模板，每次 spawn narrative-writer 都全量加载"
     }
   ],

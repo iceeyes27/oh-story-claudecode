@@ -491,6 +491,7 @@ function scanProsePatterns(proseLines) {
   findings.push(...findBannedWordsExact(proseLines));
   findings.push(...findSynestheticMetaphor(proseLines));
   findings.push(...findAntithesis(proseLines));
+  findings.push(...findExpositoryContrast(proseLines));
   findings.push(...findDanglingIdentityShift(proseLines));
   findings.push(...findBodyShellMetaphor(proseLines));
   findings.push(...findContrastRhetorical(proseLines));
@@ -502,6 +503,8 @@ function scanProsePatterns(proseLines) {
   findings.push(...findNarrationSlogan(proseLines));
   findings.push(...findEnglishResidue(proseLines));
   findings.push(...findProcessTermAsObject(proseLines));
+  findings.push(...findReferentialCountMismatch(proseLines));
+  findings.push(...findSpatialPresenceCollision(proseLines));
   return findings;
 }
 
@@ -1674,6 +1677,10 @@ function loadAntithesisPatterns() {
   return loadRegexSectionPatterns('antithesis', /^##\s*对仗反义俏皮话/);
 }
 
+function loadExpositoryContrastPatterns() {
+  return loadRegexSectionPatterns('expository-contrast', /^##\s*说明文式感官对仗/);
+}
+
 function loadDanglingIdentityPatterns() {
   return loadRegexSectionPatterns('dangling-identity', /^##\s*双端悬空的[“\"]的[”\"]字身份跳转句/);
 }
@@ -1837,6 +1844,37 @@ function findAntithesis(proseLines) {
           type: 'banned-word-antithesis',
           severity: 'blocking',
           message: '对仗反义俏皮话[' + hit + ']：banned-words.md 对仗反义俏皮话规则，工整对称反义金句（如"X轻，Y不轻"）是 AI 写作套路，出现即改；改成角色自然口语或具体动作/物件/对话，不要同义词轮换。',
+          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+function findExpositoryContrast(proseLines) {
+  const { patterns, error } = loadExpositoryContrastPatterns();
+  if (error || patterns.length === 0) return ruleLoadFailure('说明文式感官对仗', error);
+  const whitelist = loadWhitelist();
+  const findings = [];
+
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const narrative = stripQuoted(trimmed);
+    for (const re of patterns) {
+      re.lastIndex = 0;
+      let match;
+      while ((match = re.exec(narrative)) !== null) {
+        const hit = match[0];
+        const idx = match.index;
+        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
+        findings.push({
+          line: lineNo,
+          column: idx + 1,
+          type: 'banned-word-expository-contrast',
+          severity: 'blocking',
+          message: '说明文式感官对仗[' + hit + ']：「X还在眼前/耳边…，…闻/看/听到的却是Y」是从外部讲解角色恍惚状态的说明文对仗；删掉对仗框架，用角色当下动作带出感官（闭眼/睁眼看见什么、闻到什么），直接并置，不做「还在…却是…」转折解释。',
           excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
         });
       }
@@ -2145,6 +2183,101 @@ function findProcessTermAsObject(proseLines) {
     }
   }
   return findings;
+}
+
+// 台词/引用与指代字数不符：台词“<X>”后紧跟“这N个字”，但 X 的中文字符数不等于 N，blocking。
+function findReferentialCountMismatch(proseLines) {
+  const cnNums = { '一': 1, '两': 2, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9, '十': 10 };
+  const pattern = /[“「]([^”」\n]{1,30})[”」][，。！？\s]*这([一两二三四五六七八九十]+)个字/g;
+  const findings = [];
+
+  for (let i = 0; i < proseLines.length; i++) {
+    const { text, lineNo } = proseLines[i];
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+
+    // 1. 同行检测
+    pattern.lastIndex = 0;
+    let match;
+    while ((match = pattern.exec(text)) !== null) {
+      const content = match[1].trim();
+      const declared = cnNums[match[2]];
+      if (!declared) continue;
+      const actual = (content.match(/[\u4e00-\u9fa5a-zA-Z0-9]/g) || []).length;
+      if (actual !== declared) {
+        findings.push({
+          line: lineNo,
+          column: match.index + 1,
+          type: 'referential-count-mismatch',
+          severity: 'blocking',
+          message: `台词与指代字数不符[${match[0]}]：引号内实际有 ${actual} 个字，但后文声明为“这${match[2]}个字”；数错字数属于低级逻辑硬伤，请核正字数或改用“这话/这个数/这个价码”。`,
+          excerpt: compact(match[0]),
+        });
+      }
+    }
+
+    // 2. 跨行检测（上一句以引号结尾，下一句开头紧跟“这N个字”）
+    let nextIdx = i + 1;
+    while (nextIdx < proseLines.length && !proseLines[nextIdx].text.trim()) {
+      nextIdx++;
+    }
+    if (nextIdx < proseLines.length) {
+      const nextLine = proseLines[nextIdx].text.trim();
+      const crossMatch = nextLine.match(/^这([一两二三四五六七八九十]+)个字/);
+      if (crossMatch) {
+        const declared = cnNums[crossMatch[1]];
+        const quoteMatch = text.match(/[“「]([^”」\n]{1,30})[”」][^”」]*$/);
+        if (quoteMatch && declared) {
+          const content = quoteMatch[1].trim();
+          const actual = (content.match(/[\u4e00-\u9fa5a-zA-Z0-9]/g) || []).length;
+          if (actual !== declared) {
+            findings.push({
+              line: proseLines[nextIdx].lineNo,
+              column: 1,
+              type: 'referential-count-mismatch',
+              severity: 'blocking',
+              message: `台词与指代字数不符[${quoteMatch[0]} ... ${crossMatch[0]}]：上一行引号内实际有 ${actual} 个字，但本行声明为“这${crossMatch[1]}个字”；数错字数属于低级逻辑硬伤，请核正字数或改用“这话/这个数/这个价码”。`,
+              excerpt: compact(`${quoteMatch[0]} -> ${crossMatch[0]}`),
+            });
+          }
+        }
+      }
+    }
+  }
+  return findings;
+}
+
+// 空间引荐与在场人物冲突：前文刚交代“去/找某人”，后文同一封闭场景却写“某人的伙计/手下一直站在”，blocking。
+function findSpatialPresenceCollision(proseLines) {
+  const introPattern = /(?:去|找|联络)(?:西平码头|后街|铺子|栈|店|码头)?[^，。！？\n]{0,10}找?([^\s，。！？\n]{1,4}(?:掌柜|老板|东家|爷|叔))/g;
+  const findings = [];
+  const fullText = proseLines.map(p => p.text).join('\n');
+
+  let match;
+  while ((match = introPattern.exec(fullText)) !== null) {
+    const targetPerson = match[1];
+    const subPattern = new RegExp(escapeRegex(targetPerson) + '的(?:伙计|手下|随从|跟班|人)(?:一直)?站在', 'g');
+    const remainingText = fullText.slice(match.index + match[0].length);
+    let subMatch;
+    if ((subMatch = subPattern.exec(remainingText)) !== null) {
+      const offset = match.index + match[0].length + subMatch.index;
+      const linesBefore = fullText.slice(0, offset).split('\n');
+      const lineNo = linesBefore.length;
+      findings.push({
+        line: lineNo,
+        column: 1,
+        type: 'spatial-presence-collision',
+        severity: 'blocking',
+        message: `空间在场与引荐冲突[${match[0]} ... ${subMatch[0]}]：前文刚通过纸条/口头交代“${match[0]}”（将该人物作为未来新联络点），后文却突然出现“${subMatch[0]}”已在场；空间逻辑断裂、角色瞬移穿帮，请将换钱/跟班角色替换为茶楼掌柜、跑堂或随行人员。`,
+        excerpt: compact(`${match[0]} -> ${subMatch[0]}`)
+      });
+    }
+  }
+  return findings;
+}
+
+function escapeRegex(string) {
+  return string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
 }
 
 function compact(text) {

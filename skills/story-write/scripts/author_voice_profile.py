@@ -15,6 +15,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
+from project_lock import ProjectLockError, project_lock
+
 
 SCHEMA = "author-voice-profile/v1"
 START_MARKER = b"<!-- author-voice:machine:start -->"
@@ -356,8 +358,7 @@ def atomic_replace(path: Path, expected: bytes, replacement: bytes) -> None:
         raise VoiceProfileError(f"无法更新文风机器区：{path}: {exc}") from exc
 
 
-def execute(args: argparse.Namespace) -> int:
-    project = resolved_project(args.project)
+def execute_profile(args: argparse.Namespace, project: Path) -> int:
     target, current, newline = style_document(project)
     samples = discover_samples(project)
     profile, metrics = render_profile(samples)
@@ -383,6 +384,15 @@ def execute(args: argparse.Namespace) -> int:
     return 0
 
 
+def execute(args: argparse.Namespace) -> int:
+    project = resolved_project(args.project)
+    tracking = project / "追踪"
+    if args.command == "update" and not args.dry_run and tracking.is_dir():
+        with project_lock(project):
+            return execute_profile(args, project)
+    return execute_profile(args, project)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="仅从已采用正文生成确定性作者声纹统计，保护文风文件的作者区。"
@@ -402,7 +412,7 @@ def main() -> int:
     args = parser.parse_args()
     try:
         return execute(args)
-    except VoiceProfileError as exc:
+    except (VoiceProfileError, ProjectLockError, OSError, UnicodeError) as exc:
         payload = {"status": "error", "error": str(exc)}
         emit(payload if getattr(args, "json", False) else f"ERROR: {exc}", as_json=getattr(args, "json", False), error=True)
         return 2

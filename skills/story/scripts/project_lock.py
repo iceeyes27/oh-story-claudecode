@@ -51,15 +51,24 @@ def _unlock(handle: TextIO) -> None:
 @contextmanager
 def project_lock(project: Path) -> Iterator[None]:
     path = lock_path(project)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a+b") as raw:
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        raw = path.open("a+b")
+    except OSError as exc:
+        raise ProjectLockError("unable to acquire the project lock") from exc
+    with raw:
         raw.seek(0)
-        if raw.read(1) == b"":
-            raw.seek(0)
-            raw.write(b"0")
-            raw.flush()
-        handle = raw  # msvcrt/fcntl only require fileno/seek.
-        _lock(handle)  # type: ignore[arg-type]
+        try:
+            if raw.read(1) == b"":
+                raw.seek(0)
+                raw.write(b"0")
+                raw.flush()
+            handle = raw  # msvcrt/fcntl only require fileno/seek.
+            _lock(handle)  # type: ignore[arg-type]
+        except ProjectLockError:
+            raise
+        except OSError as exc:
+            raise ProjectLockError("unable to acquire the project lock") from exc
         try:
             yield
         finally:

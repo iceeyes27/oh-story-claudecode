@@ -1079,10 +1079,16 @@ def record_evidence_bundle(project: Path, input_path: Path) -> dict[str, Any]:
         record = evidence_record_by_hash(project, digest)
         require(record["evidence"] == document, "evidence bundle hash collision")
     else:
+        recorded_at = now()
+        require(
+            parse_utc_timestamp(document["collected_at"], "evidence collected_at")
+            <= parse_utc_timestamp(recorded_at, "quality evidence lifecycle receipt"),
+            "evidence collected_at cannot be later than its lifecycle receipt",
+        )
         record = {
             "schema": EVIDENCE_RECORD_SCHEMA,
             "evidence_sha256": digest,
-            "recorded_by_lifecycle_at": now(),
+            "recorded_by_lifecycle_at": recorded_at,
             "evidence": document,
         }
         atomic_json(target, record)
@@ -1103,9 +1109,13 @@ def evidence_record_by_hash(project: Path, digest: object) -> dict[str, Any]:
     record = read_json(path, "recorded quality evidence")
     require(record.get("schema") == EVIDENCE_RECORD_SCHEMA, "quality evidence record schema mismatch")
     require(record.get("evidence_sha256") == digest, "quality evidence record pointer mismatch")
-    parse_utc_timestamp(record.get("recorded_by_lifecycle_at"), "quality evidence lifecycle receipt")
+    recorded_at = parse_utc_timestamp(record.get("recorded_by_lifecycle_at"), "quality evidence lifecycle receipt")
     require(isinstance(record.get("evidence"), dict), "quality evidence record lacks its bundle")
     document = validate_evidence_bundle(record["evidence"], project)
+    require(
+        parse_utc_timestamp(document["collected_at"], "evidence collected_at") <= recorded_at,
+        "evidence collected_at cannot be later than its lifecycle receipt",
+    )
     require(sha_json(document) == digest, "recorded evidence bundle hash mismatch")
     return {**record, "evidence": document}
 
@@ -4863,6 +4873,7 @@ def validate_between_subject_readers(
     arm_counts = {label: 0 for label in labels}
     results: list[dict[str, Any]] = []
     human_receipt_times: list[datetime] = []
+    human_collection_times: list[datetime] = []
     for row in readers:
         require(isinstance(row, dict), "between-subject reader rows must be objects")
         reader_id = safe_component(row.get("reader_id"), "between-subject reader_id")
@@ -4927,7 +4938,18 @@ def validate_between_subject_readers(
         require(imported["evidence_type"] == "human", "between-subject imported reader cannot be an LLM proxy")
         require(imported["blind_code"] == blind_code and imported["persona_id"] == persona_id and imported["persona_profile_sha256"] == row["persona_profile_sha256"], "between-subject reader identity/profile differs from its import")
         require(imported["raw_observations"] == expected_raw and imported["raw_observation_sha256"] == sha_json(expected_raw), "between-subject observations differ from the immutable human import")
-        human_receipt_times.append(parse_utc_timestamp(human_record["recorded_by_lifecycle_at"], "between-subject human import lifecycle receipt"))
+        human_receipt = parse_utc_timestamp(human_record["recorded_by_lifecycle_at"], "between-subject human import lifecycle receipt")
+        human_collected = parse_utc_timestamp(human_bundle["collected_at"], "between-subject human evidence collected_at")
+        require(
+            max(arm_receipt_times) <= human_collected,
+            "between-subject human observations were collected before both arms were frozen",
+        )
+        require(
+            human_collected <= human_receipt,
+            "between-subject human observations were collected after their lifecycle import",
+        )
+        human_collection_times.append(human_collected)
+        human_receipt_times.append(human_receipt)
         results.append({
             "reader_id": reader_id,
             "assignment": assignment,
@@ -4937,6 +4959,7 @@ def validate_between_subject_readers(
         })
     require(all(count == planned // 2 for count in arm_counts.values()), "between-subject readers must be equally allocated across arms")
     validate_between_subject_enrollment(experiment, preregistration, readers)
+    require(human_collection_times, "between-subject experiment lacks human collection timestamps")
     require(max(arm_receipt_times) <= min(human_receipt_times), "between-subject human observations were imported before both arms were frozen")
     completed_at = parse_utc_timestamp(experiment.get("observations_completed_at"), "between-subject observations_completed_at")
     require(completed_at == max(human_receipt_times) and completed_at <= datetime.now(timezone.utc), "between-subject observations_completed_at must equal the latest non-future human import receipt")

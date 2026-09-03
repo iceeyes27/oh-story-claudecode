@@ -10,6 +10,9 @@ import sys
 import tempfile
 from pathlib import Path
 
+sys.path.insert(0, str((Path(__file__).resolve().parents[1] / "skills" / "story-write" / "scripts")))
+from project_lock import project_lock
+
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOL = ROOT / "skills" / "story-write" / "scripts" / "author_voice_profile.py"
@@ -235,6 +238,19 @@ def test_short_evidence_and_digest_change(root: Path) -> None:
     require(stale_payload["sample_sha256"] != first_payload["sample_sha256"], "sample digest did not change")
 
 
+def test_update_respects_project_lock(root: Path) -> None:
+    project, style = make_project(root / "locked")
+    add_adopted_prose(project)
+    (project / "追踪").mkdir()
+    before = style.read_bytes()
+    with project_lock(project):
+        result = run(project, "update")
+    payload = output_json(result)
+    require(result.returncode == 2, "update must fail while candidate/tracking operations hold the project lock")
+    require("project lock" in str(payload["error"]), "lock failure must identify the shared project lock")
+    require(style.read_bytes() == before, "rejected locked update changed the style file")
+
+
 def main() -> int:
     tests = [
         test_update_scope_preservation_and_idempotence,
@@ -242,6 +258,7 @@ def main() -> int:
         test_marker_failures_are_non_destructive,
         test_empty_invalid_and_duplicate_samples,
         test_short_evidence_and_digest_change,
+        test_update_respects_project_lock,
     ]
     passed = 0
     with tempfile.TemporaryDirectory(prefix="author-voice-profile-") as temporary:

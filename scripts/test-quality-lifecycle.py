@@ -588,14 +588,22 @@ class QualityLifecycleTests(unittest.TestCase):
         path.write_text(json.dumps(value, ensure_ascii=False), encoding="utf-8")
         return path
 
-    def record_evidence(self, name: str, *, kind: str, source_kind: str, artifact: dict[str, object]) -> str:
+    def record_evidence(
+        self,
+        name: str,
+        *,
+        kind: str,
+        source_kind: str,
+        artifact: dict[str, object],
+        collected_at: str = "2026-01-01T00:00:00Z",
+    ) -> str:
         bundle = {
             "schema": quality.EVIDENCE_BUNDLE_SCHEMA,
             "evidence_id": name,
             "kind": kind,
             "source_kind": source_kind,
             "synthetic": source_kind == "synthetic_fixture",
-            "collected_at": "2026-01-01T00:00:00Z",
+            "collected_at": collected_at,
             "producer_run_id": f"producer-{name}",
             "artifact": artifact,
             "artifact_sha256": quality.sha_json(artifact),
@@ -3495,6 +3503,7 @@ class QualityLifecycleTests(unittest.TestCase):
         human_hash = self.record_evidence(
             "revision-human-import", kind="human_reader_import", source_kind="human_blind_import",
             artifact={"story_package_ids": [study_id], "reader_count": 2, "readers": imported},
+            collected_at=quality.now(),
         )
         for row in readers:
             row["human_evidence"] = {"evidence_bundle_sha256": human_hash, "imported_reader_id": row["reader_id"]}
@@ -3573,12 +3582,33 @@ class QualityLifecycleTests(unittest.TestCase):
         synthetic_human_hash = self.record_evidence(
             "revision-synthetic-human", kind="human_reader_import", source_kind="synthetic_fixture",
             artifact={"story_package_ids": [study_id], "reader_count": 2, "readers": imported},
+            collected_at=quality.now(),
         )
         synthetic_humans = copy.deepcopy(experiment)
         for row in synthetic_humans["human_readers"]:
             row["human_evidence"]["evidence_bundle_sha256"] = synthetic_human_hash
         with self.assertRaisesRegex(quality.QualityError, "non-synthetic human import"):
             quality.validate_revision_appeal_experiment_document(synthetic_humans, self.project)
+
+        early_human_hash = self.record_evidence(
+            "revision-human-before-freeze", kind="human_reader_import", source_kind="human_blind_import",
+            artifact={"story_package_ids": [study_id], "reader_count": 2, "readers": imported},
+        )
+        early_observation = copy.deepcopy(experiment)
+        for row in early_observation["human_readers"]:
+            row["human_evidence"]["evidence_bundle_sha256"] = early_human_hash
+        early_observation["observations_completed_at"] = quality.evidence_record_by_hash(
+            self.project, early_human_hash,
+        )["recorded_by_lifecycle_at"]
+        with self.assertRaisesRegex(quality.QualityError, "collected before both arms were frozen"):
+            quality.validate_revision_appeal_experiment_document(early_observation, self.project)
+
+        with self.assertRaisesRegex(quality.QualityError, "later than its lifecycle receipt"):
+            self.record_evidence(
+                "revision-human-future", kind="human_reader_import", source_kind="human_blind_import",
+                artifact={"story_package_ids": [study_id], "reader_count": 2, "readers": imported},
+                collected_at="2999-01-01T00:00:00Z",
+            )
 
         powered_without_power = copy.deepcopy(preregistration)
         powered_without_power["stage"] = "powered"
@@ -3723,6 +3753,7 @@ class QualityLifecycleTests(unittest.TestCase):
         voice_human_hash = self.record_evidence(
             "voice-human-import", kind="human_reader_import", source_kind="human_blind_import",
             artifact={"story_package_ids": [study_id], "reader_count": 2, "readers": imported_readers},
+            collected_at=quality.now(),
         )
         for row in human_readers:
             row["human_evidence"] = {"evidence_bundle_sha256": voice_human_hash, "imported_reader_id": row["reader_id"]}

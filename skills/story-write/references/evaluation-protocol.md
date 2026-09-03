@@ -40,6 +40,26 @@ v2 在任何正文冻结和读者观察之前，先单独记录不可变 preregi
 
 v1 实验 JSON 用 `quality_lifecycle.py check-experiment --input ...` 验结构。v2 则用 `quality_lifecycle.py check-experiment --project {项目根} --input ...`：两臂各提交 15 个 `{chapter, body, revision}` 正文产物，revision 由 body 重算，顺序严格为 1..15，两臂互斥，arm hash 绑定章节与 revision；真人 ID/盲码唯一；每人提交包含两臂的 `arm_order`、独立随机 nonce、两套 1-15 章逐章记录、最终偏好与理由；allocation hash 与预注册精确样本量一致，所有排除都引用预注册 rule ID 并留证据。全部观察完成后才提交 baseline/candidate 盲标映射。outcome fingerprint 绑定两臂 hash、每位读者的两臂逐章观察/偏好/理由 hash、揭盲映射和决策规则；winner 必须对全部纳入 reader 做严格多数推导，2:1:1 仍是 tie，独立 judge 只能解释结果，不能把基线多数改写成 candidate 胜。`llm_retention_role: proxy_only`。正式实验至少四名 held-out 真人；n=4 persona 子组的 3/4 反向偏好只触发复审，不作硬否决。不能因 token 或费用在已经预注册后偷偷减少读者数、章节跨度或 held-out/control/mutant；资源不足时应停在探索性结论，而不是降格冒充 formal。
 
+## 旧书修订与作者声纹效果
+
+旧章是否可采用仍由 revision 生命周期判断：finding 必须独立确认已修复，新版盲评输或平局就保留旧版。该证书只证明修订正确，不能作为留存收益证据。旧书吸引力另用 `story-revision-appeal-between-subject/v1`；它与 `story-quality-longitudinal/v2` 相互独立，不改变 P0/P1 生成实验的被试内语义。
+
+旧书实验先用 `story-revision-appeal-preregistration/v1` 通过现有 `record-experiment-preregistration` 保存不可变预注册，再用 `between_subject_arm` evidence 保存两份正文：
+
+- 两臂必须是同一段连续 15 章；未列入 `revised_chapters` 的章必须逐字节同 hash，且至少有一章发生预注册修改。
+- `assignment` 固定为 `between_subject`，同一 reader ID 只能读取一个盲码 arm。逐章观察仍使用 Reader Evidence v3；真人记录必须引用非 synthetic 的 `human_blind_import`，LLM 仅可作代理。
+- 主要终点固定为 `first_quit_chapter`。第一摩擦点、最强续读点、累计混乱、累计疲劳、谜语疲劳和 voice loss 只能作 secondary，不能事后替换主要终点。
+- `pilot` 无论样本结果如何都只能返回 `UNDERPOWERED_PILOT` 且 `winner=null`。`powered` 必须事前登记功效假设、每臂人数和可重算的判定规则；结果仍只证明该作品，不能直接推广为系统收益。
+
+作者声纹效果使用 `story-author-voice-effect-preregistration/v1` 与 `story-author-voice-effect/v1`。两臂的剧情、模型、上下文、预算和停止规则必须在不可变 arm evidence 中完全相同；treatment 只允许 `{voice_enabled, voice_profile_sha256}`。没有非 synthetic 真人导入时，校验结果固定为 `PENDING_HUMAN_EVIDENCE`、`effect_pass=false`。其中 `treatment_conditions_pass` 只表示实验条件冻结有效，不表示声纹分析工具本身通过工程验收；正式正文采样、作者手写区保护、幂等与损坏标记仍由声纹工具测试独立证明。
+
+```bash
+{PYTHON} scripts/quality_lifecycle.py record-experiment-preregistration --project {项目根} --input revision-preregistration.json
+{PYTHON} scripts/quality_lifecycle.py check-revision-appeal-experiment --project {项目根} --input revision-experiment.json
+{PYTHON} scripts/quality_lifecycle.py record-experiment-preregistration --project {项目根} --input voice-preregistration.json
+{PYTHON} scripts/quality_lifecycle.py check-author-voice-effect --project {项目根} --input voice-effect.json
+```
+
 最终比较至少报告：
 
 - 正确性门失败数（任何一项都不能被均分掩盖）；

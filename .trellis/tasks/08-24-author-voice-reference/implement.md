@@ -27,17 +27,25 @@
 
 ## 5. 作者声纹
 
-- [ ] 实现正式正文发现、统计分析和受保护标记区更新。
-- [ ] 接入 `story-write`，确保不读取候选、骨架、对标和归档。
-- [ ] 增加作者区域保护、幂等、空样本和损坏标记测试。
+- [x] 实现正式正文发现、统计分析和受保护标记区更新。
+- [x] 接入 `story-write`，确保不读取候选、骨架、对标和归档。
+- [x] 增加作者区域保护、幂等、空样本和损坏标记测试。
 
-## 6. 验证
+## 6. 分层效果协议
 
-- [ ] 运行相关 Python/Node 单测和 Dashboard 测试。
-- [ ] 运行 `bash scripts/static-check.sh`、共享资产、当前契约、统一 Skill 漂移和 adapter 检查。
-- [ ] 运行 `npm test`；浏览器不可用时明确记录未验证范围。
-- [ ] 运行 `git diff --check`，只审查本任务文件，不纳入无关工作区改动。
-- [ ] 更新 `.trellis/spec/skills/` 中的候选、追踪和上下文契约。
+- [x] 为旧书局部修订新增独立的被试间 15 章实验 schema 与 CLI 校验，不改现有 P1 生成实验语义。
+- [x] 复用现有摘要、预注册和真人 evidence 校验 helper，禁止再写一套宽松解析。
+- [x] 覆盖同 reader 跨 arm、未声明章节变化、主要终点漂移、pilot 冒充结论、powered 缺功效字段等负例。
+- [x] 为声纹 treatment 增加相同创作条件冻结与 `PENDING_HUMAN_EVIDENCE` 状态契约；不得生成 synthetic 真人结果。
+- [x] 更新 `evaluation-protocol.md`，明确修订正确性、旧书吸引力和声纹效果三种证据不可互换。
+
+## 7. 验证
+
+- [x] 运行相关 Python/Node 单测和 Dashboard 测试。
+- [x] 运行 `bash scripts/static-check.sh`、共享资产、当前契约、统一 Skill 漂移和 adapter 检查。
+- [x] 运行 `npm test`；结果为 30/33 PASS、0 FAIL，Dashboard Chromium、Codex CLI、OpenCode CLI 因本机缺依赖记为环境阻断。
+- [x] 运行 `git diff --check`，只审查本任务文件，不纳入无关工作区改动。
+- [x] 更新 `.trellis/spec/skills/` 中的作者声纹与分层效果实验契约。
 
 ## 回退点
 

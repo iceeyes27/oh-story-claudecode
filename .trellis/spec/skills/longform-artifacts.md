@@ -19,6 +19,9 @@
 - 候选采用：`python skills/story-write/scripts/candidate-commit.py promote --project DIR --chapter N [--no-scan --reason "<理由>"]`（兼容 `--all` 只接受单候选）
 - 候选预检：`python skills/story-write/scripts/candidate-commit.py check --project DIR --chapter N [--json]`
 - 候选恢复：`python skills/story-write/scripts/candidate-commit.py recover --project DIR (--chapter N|--all)`
+- 作者声纹：`python skills/story-write/scripts/author_voice_profile.py (check|update) --project DIR [--json] [--dry-run]`（`--dry-run` 仅用于 `update`）
+- 旧书修订实验：先运行 `python skills/story-write/scripts/quality_lifecycle.py record-experiment-preregistration --project DIR --input FILE` 记录 `story-revision-appeal-preregistration/v1`，再运行同脚本的 `check-revision-appeal-experiment --project DIR --input FILE` 校验 `story-revision-appeal-between-subject/v1`
+- 声纹效果实验：先运行 `python skills/story-write/scripts/quality_lifecycle.py record-experiment-preregistration --project DIR --input FILE` 记录 `story-author-voice-effect-preregistration/v1`，再运行同脚本的 `check-author-voice-effect --project DIR --input FILE` 校验 `story-author-voice-effect/v1`
 
 ## 3. Contracts
 
@@ -37,6 +40,10 @@
 - tracking schema 保持 4：旧 state 可缺 `metrics` 且 `check` 不改写；新事务必须提交结构化全量 metrics。每条记录保存原文名目、当前值、事实章号和可在正文定位的来源短语。上下文仍为 7 栏，只在 `## 当前位置` 显示按事实章倒序的前 12 项，超出时报告隐藏数量。
 - 候选正文命中共享结算句式而 metrics 无变化时阻断，只有非空 `metrics_unchanged_reason` 可说明本章为何不改数值。变更记录的来源短语必须能在正文定位；数值按“正文直接值”或“前值 + 本章增量”验证，非数值状态只验证来源锚点。
 - 确定性扫描通过只表示未发现已登记 blocking 模式，不能表述为文风自然或没有 AI 痕迹。
+- 作者声纹工具只递归采样书根 `正文/` 下章号唯一的 UTF-8 正式章节，拒绝符号链接并排除候选、骨架、对标和归档目录。工具只能替换 `设定/文风.md` 中唯一一组 `author-voice:machine` 标记区；标记外作者内容保持原字节，机器统计不得表述为读者偏好提升。
+- 旧书局部修订不复用生成实验的被试内 `story-quality-longitudinal/v2`。A/B 必须绑定同一连续 15 章，B 只能修改预注册章，每名真人只读取一个盲码 arm；主要终点固定为 `first_quit_chapter`，secondary 不得事后替换主要终点。
+- 旧书 pilot 只能返回 `UNDERPOWERED_PILOT`；powered 结果必须由事前功效设计和固定判定规则推导，且只证明该作品。作者声纹效果实验冻结剧情、模型、上下文、预算和停止规则，只改变 voice treatment；没有非 synthetic 真人证据时只能返回 `PENDING_HUMAN_EVIDENCE`。
+- 证据等级不可互换：revision 证书证明修订正确性；单书 pilot 证明流程可行；单书 powered 提供该书效果证据；系统层效果仍要求多个全新 held-out 故事包和功效审计。
 
 ## 4. Validation & Error Matrix
 
@@ -63,12 +70,20 @@
 | 第 15 章 arc-02 为 blocking 且没有绑定当前结果的作者批准 | `promote` 退出 2；旧结果或正文变化会使批准失效 |
 | `--all` 匹配多个候选 | `promote` 退出 2，任何候选均不移动 |
 | 采用在任一持久化阶段中断 | 保留采用日志；`recover` 验证摘要和修订号后继续或确认已完成 |
+| 声纹标记缺失/重复/倒置，正文空白、重复章号、非法 UTF-8 或含符号链接 | `author_voice_profile.py` 退出 2，`文风.md` 不变 |
+| 声纹机器区与当前正式正文不一致 | `check` 退出 1；`update --dry-run` 退出 0 且不写文件 |
+| 旧书实验同一 reader 跨 arm、非预注册章变化、主要终点漂移或 synthetic 冒充真人 | 实验校验退出 2，不产生效果结论 |
+| pilot 声称 winner，或 powered 缺功效字段/低于自身功效假设 | 实验校验退出 2 |
+| 声纹 treatment 条件漂移或缺少真人数据却声称效果通过 | 实验校验退出 2；合法的无真人状态为 `PENDING_HUMAN_EVIDENCE` |
 
 ## 5. Good / Base / Bad Cases
 
 - Good：细纲生成书根骨架，作者扩写到书根候选，采用后正文与追踪同时推进。
 - Base：写完候选先跑 `check`，通过后仍等待作者决定；普通章节的 v2 绑定只包含三个 rc receipt，第 15 章才增加两个 arc receipt。
 - Bad：把候选写入 `正文/候选/`，用未来细纲阻断当前章，或用空 evidence、旧 prose 摘要与 v1 绑定绕过采用检查。
+- Good：从正式正文幂等更新声纹机器区；按预注册的被试间 15 章协议导入不可变真人 evidence，再由校验器推导结果。
+- Base：声纹工程检查通过但尚无真人数据，效果状态保持 `PENDING_HUMAN_EVIDENCE`；旧书 pilot 只报告可行性与观测分布。
+- Bad：采样候选正文生成声纹、把 revision 证书写成留存提升、让同一 reader 读旧书实验两臂，或用 LLM/synthetic 数据替代真人结论。
 
 ## 6. Tests Required
 
@@ -84,10 +99,15 @@
 - `python scripts/test-tracking-commit.py`：schema 4 旧 state 兼容、事务必填、结构化记录、7 栏渲染与 12 项显示上限。
 - `python scripts/test-candidate-commit.py`：结算无更新阻断、显式理由、直接值与累计增量、来源锚点和采用后上下文。
 - `bash scripts/static-check.sh`：Skill 链接、frontmatter 和自包含边界。
+- `python scripts/test-author-voice-profile.py`：正式正文限定、作者区字节保护、幂等、只读/dry-run、损坏标记、空样本、非法 UTF-8、重复章号、短证据和符号链接。
+- `python scripts/test-quality-lifecycle.py`：旧书被试间实验与声纹效果实验的 preregistration、不可变 arm/human evidence、15 章、单 reader 单 arm、端点冻结、pilot 非结论、powered 功效字段、条件漂移和 `PENDING_HUMAN_EVIDENCE`。
 
 ## 7. Wrong vs Correct
 
 ```text
 Wrong:  候选写入 正文/候选/，用 N+1 之后的细纲计算第 N 章连排，或只在设定文档维护会过期的当前数值。
 Correct: 候选写入书根 候选/；第 N 章只检查截至 N 的情绪序列；活数字由 tracking metrics 维护，采用前绑定正文来源，作者明确采用后才同时推进正文与 tracking。
+
+Wrong:  把声纹统计当作吸引力证据，或让旧书局部修订沿用同一读者重复阅读两臂的生成实验。
+Correct: 声纹工程结果与真人效果分开；旧书使用预注册的被试间单臂阅读，pilot 不判胜负，缺真人声纹数据时明确保持待验证状态。
 ```

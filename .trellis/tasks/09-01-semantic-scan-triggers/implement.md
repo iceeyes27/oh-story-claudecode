@@ -27,7 +27,16 @@ for n in $(seq 1 20); do python skills/story-write/scripts/candidate-commit.py c
 
 ## 触发率记录
 
-> 待填：demo 20 章各谓词命中统计 / 最终阈值
+2026-09-03 demo 20 章基线：
+
+| advisory 类型 | 数量 |
+|---|---:|
+| `english-residue` | 30 |
+| `em-dash` | 5 |
+| `period-stutter` | 2 |
+| `metaphor-density-tic` | 1 |
+
+总计 38；其中 `english-residue` 占 78.9%，大量为题材合法的 `MV/BGM/MCN`。总密度触发会系统性误报；对话占比和黑话词根也不具备语义风险的充分性。本轮不设阈值、不接入代码，等待新的高精度谓词设计。
 
 ## 回滚
 
@@ -35,4 +44,4 @@ for n in $(seq 1 20); do python skills/story-write/scripts/candidate-commit.py c
 
 ## 当前状态
 
-2026-09-02：按父任务已评审的执行顺序延期到下一迭代。原谓词设计需基于恢复 blocking 后的剩余 advisory 分布重新研究；本批没有代码实现。
+2026-09-03：已完成剩余 advisory 分布复测，原三个谓词均判定 NO-GO；任务继续保持 planning，不把研究否决误报为实现完成。

@@ -12,7 +12,7 @@
   "assignee": "nat.yu",
   "createdAt": "2026-08-24",
   "completedAt": null,
-  "branch": null,
+  "branch": "feat/quality-first-gates",
   "base_branch": "main",
   "worktree_path": null,
   "commit": null,

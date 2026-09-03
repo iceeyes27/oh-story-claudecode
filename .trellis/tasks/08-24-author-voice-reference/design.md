@@ -76,6 +76,28 @@
 4. 标记缺失或损坏时拒绝写入，作者区域保持原字节；
 5. 相同样本重复运行不产生差异。
 
+工程工具只回答“声纹资料是否从合法样本安全、稳定地产生”，不自行声称更吸引读者。效果证据使用独立 treatment：冻结剧情包、模型、上下文、预算和停止规则，只切换声纹提示；缺少非 synthetic 真人输入时状态固定为 `PENDING_HUMAN_EVIDENCE`。
+
+## 旧书吸引力实验
+
+在 `quality_lifecycle.py` 增加独立于 `story-quality-longitudinal/v2` 的旧书修订协议。它不复用生成 treatment 的被试内双臂读取：
+
+- A/B 各提交同一连续 15 章，章号和未修订正文摘要必须一致；
+- `revised_chapters` 在读者接触文本前冻结，B 只允许这些章与 A 不同；
+- `assignment = between_subject`，每名 reader 只读取一个盲码 arm；
+- `primary_endpoint = first_quit_chapter` 固定；其他阅读观察为 secondary；
+- `pilot` 只返回 `UNDERPOWERED_PILOT`，不得选 winner；`powered` 必须提交功效设计和预注册判定规则；
+- 输入与结果使用不可变摘要绑定，真人数据不得由 synthetic/LLM 记录冒充。
+
+局部修订是否可采用仍由 revision 生命周期判断；旧书实验只研究修订对目标读者阅读行为的影响，两者不能互相替代。
+
+## 证据等级
+
+- 单章 revision 证书：修订正确性。
+- 单书 pilot：流程可行与方差估计。
+- 单书 powered：该作品上的效果证据。
+- 多个全新 held-out 故事包及功效审计：系统层效果证据。
+
 ## 兼容与恢复
 
 - 所有 schema 扩展向后兼容旧 state；不提供反向降级写入。

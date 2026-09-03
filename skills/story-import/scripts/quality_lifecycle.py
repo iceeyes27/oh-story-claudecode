@@ -14,6 +14,7 @@ import copy
 import hashlib
 import importlib.util
 import json
+import math
 import os
 import re
 import shutil
@@ -23,6 +24,7 @@ import time
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
+from statistics import NormalDist
 from typing import Any, Iterator
 
 if os.name == "nt":
@@ -48,6 +50,10 @@ STRUCTURAL_BENCHMARK_SCHEMA = "story-structural-benchmark/v1"
 GOLDEN_THREE_SCHEMA = "story-golden-three-plan/v1"
 EXPERIMENT_PREREG_SCHEMA = "story-quality-experiment-preregistration/v1"
 EXPERIMENT_PREREG_RECORD_SCHEMA = "story-quality-experiment-preregistration-record/v1"
+REVISION_APPEAL_PREREG_SCHEMA = "story-revision-appeal-preregistration/v1"
+REVISION_APPEAL_EXPERIMENT_SCHEMA = "story-revision-appeal-between-subject/v1"
+AUTHOR_VOICE_EFFECT_PREREG_SCHEMA = "story-author-voice-effect-preregistration/v1"
+AUTHOR_VOICE_EFFECT_SCHEMA = "story-author-voice-effect/v1"
 EVIDENCE_BUNDLE_SCHEMA = "story-quality-evidence-bundle/v1"
 EVIDENCE_RECORD_SCHEMA = "story-quality-evidence-record/v1"
 TREATMENT_RUN_SCHEMA = "story-quality-treatment-run/v1"
@@ -78,7 +84,16 @@ CALIBRATION_PURPOSES = {"reference_instrument", "development_thresholds", "held_
 EVIDENCE_KINDS = {
     "story_package", "human_reader_import", "misfire_control",
     "reopen_validation", "threshold_derivation", "workflow_run",
+    "between_subject_arm",
 }
+REVISION_SECONDARY_ENDPOINTS = frozenset({
+    "first_friction", "strongest_read_on", "cumulative_confusion",
+    "cumulative_fatigue", "mystery_fatigue", "voice_loss",
+})
+VOICE_SECONDARY_ENDPOINTS = frozenset({"comprehension", "continuity", "voice_loss"})
+VOICE_FROZEN_CONDITION_KEYS = frozenset({
+    "plot_sha256", "model_sha256", "context_sha256", "budget_sha256", "stop_rule_sha256",
+})
 CHAPTER_RE = re.compile(r"^第0*(\d+)章(?:_|\b).+\.md$")
 SAFE_COMPONENT_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 WINDOWS_RESERVED = {"CON", "PRN", "AUX", "NUL", *(f"COM{number}" for number in range(1, 10)), *(f"LPT{number}" for number in range(1, 10))}
@@ -771,7 +786,7 @@ def validate_evidence_bundle(document: dict[str, Any], project: Path | None = No
     kind = document.get("kind")
     require(kind in EVIDENCE_KINDS, "evidence bundle kind is invalid")
     source_kind = document.get("source_kind")
-    require(source_kind in {"development_original", "held_out_original", "human_blind_import", "accepted_lifecycle", "reference_instrument", "synthetic_fixture"}, "evidence source_kind is invalid")
+    require(source_kind in {"development_original", "held_out_original", "human_blind_import", "accepted_lifecycle", "reference_instrument", "synthetic_fixture", "frozen_study_artifact"}, "evidence source_kind is invalid")
     synthetic = document.get("synthetic")
     require(isinstance(synthetic, bool), "evidence bundle synthetic flag must be boolean")
     require(synthetic is (source_kind == "synthetic_fixture"), "synthetic evidence must be explicitly marked synthetic_fixture")
@@ -792,6 +807,42 @@ def validate_evidence_bundle(document: dict[str, Any], project: Path | None = No
         creative_package = artifact.get("creative_package")
         require(isinstance(creative_package, dict) and creative_package, "story package evidence requires the frozen creative package")
         require(artifact.get("creative_package_sha256") == sha_json(creative_package), "story package creative package hash mismatch")
+    elif kind == "between_subject_arm":
+        require(source_kind == "frozen_study_artifact" and synthetic is False, "between-subject arms must be frozen non-synthetic study artifacts")
+        safe_component(artifact.get("study_id"), "between-subject arm study_id")
+        study_kind = artifact.get("study_kind")
+        require(study_kind in {"revision_appeal", "author_voice_effect"}, "between-subject arm study_kind is invalid")
+        safe_component(artifact.get("blind_label"), "between-subject arm blind_label")
+        chapters = artifact.get("chapter_artifacts")
+        require(isinstance(chapters, list) and len(chapters) == 15, "between-subject arm requires exactly 15 chapter artifacts")
+        chapter_numbers = [row.get("chapter") for row in chapters if isinstance(row, dict)]
+        require(
+            len(chapter_numbers) == 15
+            and all(isinstance(chapter, int) and not isinstance(chapter, bool) for chapter in chapter_numbers)
+            and chapter_numbers == list(range(chapter_numbers[0], chapter_numbers[0] + 15))
+            and chapter_numbers[0] >= 1,
+            "between-subject arm chapters must be 15 consecutive positive chapter numbers",
+        )
+        for row in chapters:
+            require_bound_text_artifact(row, text_key="body", hash_key="revision", label="between-subject arm chapter body")
+        arm_binding: dict[str, Any] = {
+            "chapters": [{"chapter": row["chapter"], "revision": row["revision"]} for row in chapters],
+        }
+        if study_kind == "author_voice_effect":
+            common_conditions = artifact.get("common_conditions")
+            require(isinstance(common_conditions, dict) and set(common_conditions) == VOICE_FROZEN_CONDITION_KEYS, "voice arm must freeze plot, model, context, budget, and stop rule")
+            require(all(is_sha256(value) for value in common_conditions.values()), "voice arm frozen conditions must be SHA-256 values")
+            treatment = artifact.get("treatment")
+            require(isinstance(treatment, dict) and set(treatment) == {"voice_enabled", "voice_profile_sha256"}, "voice arm treatment may contain only voice_enabled and voice_profile_sha256")
+            require(isinstance(treatment["voice_enabled"], bool), "voice arm voice_enabled must be boolean")
+            if treatment["voice_enabled"]:
+                require(is_sha256(treatment["voice_profile_sha256"]), "enabled voice treatment requires a voice profile SHA-256")
+            else:
+                require(treatment["voice_profile_sha256"] is None, "disabled voice treatment cannot carry a voice profile")
+            arm_binding.update({"common_conditions": common_conditions, "treatment": treatment})
+        else:
+            require("common_conditions" not in artifact and "treatment" not in artifact, "revision appeal arms cannot add unregistered treatment fields")
+        require(artifact.get("arm_sha256") == sha_json(arm_binding), "between-subject arm hash mismatch")
     elif kind == "human_reader_import":
         require(source_kind in {"human_blind_import", "synthetic_fixture"}, "human reader evidence source is invalid")
         story_ids = artifact.get("story_package_ids")
@@ -4137,7 +4188,124 @@ def record_golden_three_plan(project: Path, input_path: Path) -> dict[str, Any]:
     return {"schema": SCHEMA, "status": "golden_three_plan_recorded", "plan_sha256": digest, "plan_only": True, "execution_ready": False}
 
 
+def validate_between_subject_power_plan(
+    document: dict[str, Any],
+    *,
+    sample_size: int,
+    effect_key: str,
+    maximum_effect: float,
+) -> None:
+    plan = document.get("power_analysis")
+    require(isinstance(plan, dict), "powered between-subject study requires a preregistered power_analysis")
+    require(plan.get("method") == "two-sample-normal-approximation-v1", "between-subject power method is unsupported")
+    alpha = number(plan.get("two_sided_alpha"), "power_analysis.two_sided_alpha", minimum=0.001, maximum=0.1)
+    target_power = number(plan.get("target_power"), "power_analysis.target_power", minimum=0.8, maximum=0.99)
+    assumed_sd = number(plan.get("assumed_standard_deviation"), "power_analysis.assumed_standard_deviation", minimum=0.01)
+    minimum_effect = number(plan.get(effect_key), f"power_analysis.{effect_key}", minimum=0.01, maximum=maximum_effect)
+    require(all(math.isfinite(value) for value in (alpha, target_power, assumed_sd, minimum_effect)), "between-subject power assumptions must be finite")
+    planned_per_arm = integer(plan.get("planned_per_arm"), "power_analysis.planned_per_arm", minimum=2)
+    require(sample_size == planned_per_arm * 2, "powered sample size must equal two preregistered arm sizes")
+    z_alpha = NormalDist().inv_cdf(1 - alpha / 2)
+    z_power = NormalDist().inv_cdf(target_power)
+    required_per_arm = math.ceil(2 * ((z_alpha + z_power) * assumed_sd / minimum_effect) ** 2)
+    require(planned_per_arm >= required_per_arm, "powered sample size is below its own preregistered power assumptions")
+
+
+def require_exact_unique_list(value: object, expected: frozenset[str], label: str) -> list[str]:
+    require(
+        isinstance(value, list)
+        and all(isinstance(item, str) for item in value)
+        and len(value) == len(expected)
+        and len(value) == len(set(value))
+        and set(value) == expected,
+        f"{label} must contain each closed-vocabulary value exactly once",
+    )
+    return value
+
+
+def validate_between_subject_preregistration(document: dict[str, Any]) -> dict[str, Any]:
+    schema = document.get("schema")
+    expected_kind = {
+        REVISION_APPEAL_PREREG_SCHEMA: "revision_appeal",
+        AUTHOR_VOICE_EFFECT_PREREG_SCHEMA: "author_voice_effect",
+    }.get(schema)
+    require(expected_kind is not None, "between-subject preregistration schema is unsupported")
+    safe_component(document.get("preregistration_id"), "between-subject preregistration_id")
+    safe_component(document.get("study_id"), "between-subject study_id")
+    require(document.get("study_kind") == expected_kind, "between-subject preregistration study_kind does not match its schema")
+    parse_utc_timestamp(document.get("registered_at"), "between-subject preregistration registered_at")
+    require(document.get("synthetic") is False, "between-subject human study preregistration cannot be synthetic")
+    stage = document.get("stage")
+    require(stage in {"pilot", "powered"}, "between-subject study stage must be pilot/powered")
+    require(document.get("assignment") == "between_subject", "between-subject study cannot assign one reader to both arms")
+    span = document.get("chapter_span")
+    require(isinstance(span, dict) and set(span) == {"start", "end"}, "between-subject study requires an exact chapter_span")
+    start = integer(span.get("start"), "chapter_span.start", minimum=1)
+    end = integer(span.get("end"), "chapter_span.end", minimum=start)
+    require(end - start == 14, "between-subject study must preregister exactly 15 consecutive chapters")
+    labels = document.get("arm_labels")
+    require(isinstance(labels, list) and len(labels) == 2, "between-subject study requires two blind arm labels")
+    normalized_labels = [safe_component(label, "between-subject arm label") for label in labels]
+    require(len(set(normalized_labels)) == 2, "between-subject arm labels must be distinct")
+    sample = document.get("sample_size_rule")
+    require(isinstance(sample, dict), "between-subject preregistration requires sample_size_rule")
+    planned = integer(sample.get("planned"), "preregistered reader count", minimum=2)
+    require(planned % 2 == 0, "between-subject study requires equal preregistered arm sizes")
+    require(sample.get("unit") == "reader" and sample.get("exact_completed_required") is True, "between-subject study requires exact reader completion")
+    expansion = document.get("expansion_rule")
+    require(isinstance(expansion, dict) and expansion.get("allowed") is False, "between-subject study cannot expand its sample after registration")
+    for key in ("inclusion_rules", "exclusion_rules"):
+        rows = document.get(key)
+        require(isinstance(rows, list) and rows, f"between-subject preregistration {key} must contain named rules")
+        rule_ids = []
+        for row in rows:
+            require(isinstance(row, dict), f"between-subject preregistration {key} entries must be objects")
+            rule_ids.append(safe_component(row.get("rule_id"), f"{key} rule_id"))
+            nonempty_text(row.get("criterion"), f"{key} criterion")
+        require(len(rule_ids) == len(set(rule_ids)), f"between-subject preregistration {key} rule IDs must be unique")
+    for key in ("allocation_algorithm", "random_seed_commitment", "stop_rule"):
+        nonempty_text(document.get(key), f"between-subject preregistration {key}")
+    require(document.get("secondary_cannot_replace_primary") is True, "secondary endpoints cannot replace the preregistered primary endpoint")
+
+    if expected_kind == "revision_appeal":
+        require(document.get("primary_endpoint") == "first_quit_chapter", "revision appeal primary_endpoint must remain first_quit_chapter")
+        require_exact_unique_list(document.get("secondary_endpoints"), REVISION_SECONDARY_ENDPOINTS, "revision appeal secondary_endpoints")
+        revised = document.get("revised_chapters")
+        require(isinstance(revised, list) and revised, "revision appeal must preregister revised_chapters")
+        for chapter in revised:
+            integer(chapter, "revision appeal revised_chapter", minimum=start, maximum=end)
+        require(revised == sorted(set(revised)), "revision appeal revised_chapters must be sorted and unique")
+        effect_key = "minimum_detectable_chapter_gain"
+        maximum_effect = 15
+    else:
+        require(document.get("primary_endpoint") == "target_reader_preference", "author voice primary_endpoint must remain target_reader_preference")
+        require_exact_unique_list(document.get("secondary_endpoints"), VOICE_SECONDARY_ENDPOINTS, "author voice secondary_endpoints")
+        require(document.get("guardrail_rule") == "no-higher-comprehension-or-continuity-regression-rate", "author voice study must protect comprehension and continuity")
+        profile_sha256 = document.get("voice_profile_sha256")
+        require(is_sha256(profile_sha256), "author voice study requires a frozen voice_profile_sha256")
+        require_exact_unique_list(document.get("frozen_condition_keys"), VOICE_FROZEN_CONDITION_KEYS, "author voice frozen_condition_keys")
+        effect_key = "minimum_detectable_preference_gain"
+        maximum_effect = 4
+
+    decision = document.get("decision_rule")
+    require(isinstance(decision, dict), "between-subject preregistration requires decision_rule")
+    if stage == "pilot":
+        require(document.get("power_analysis") is None, "pilot cannot carry a powered-study claim")
+        require(decision == {"algorithm": "underpowered-pilot-no-winner-v1"}, "pilot decision rule must prohibit a winner")
+    else:
+        expected_algorithm = "restricted-mean-first-quit-chapter-v1" if expected_kind == "revision_appeal" else "mean-target-reader-preference-v1"
+        require(set(decision) == {"algorithm", "tie_rule", effect_key}, "powered between-subject decision rule has missing or unsupported fields")
+        require(decision.get("algorithm") == expected_algorithm, "powered between-subject decision algorithm is unsupported")
+        require(decision.get("tie_rule") == "NO_WINNER", "powered between-subject ties must not select a winner")
+        minimum_effect = number(decision.get(effect_key), f"decision_rule.{effect_key}", minimum=0.01, maximum=maximum_effect)
+        validate_between_subject_power_plan(document, sample_size=planned, effect_key=effect_key, maximum_effect=maximum_effect)
+        require(document["power_analysis"][effect_key] == minimum_effect, "power assumptions and decision rule use different minimum effects")
+    return copy.deepcopy(document)
+
+
 def validate_experiment_preregistration(document: dict[str, Any]) -> dict[str, Any]:
+    if document.get("schema") in {REVISION_APPEAL_PREREG_SCHEMA, AUTHOR_VOICE_EFFECT_PREREG_SCHEMA}:
+        return validate_between_subject_preregistration(document)
     require(document.get("schema") == EXPERIMENT_PREREG_SCHEMA, f"experiment preregistration schema must be {EXPERIMENT_PREREG_SCHEMA}")
     safe_component(document.get("preregistration_id"), "experiment preregistration_id")
     scope = document.get("scope")
@@ -4186,7 +4354,7 @@ def record_experiment_preregistration(project: Path, input_path: Path) -> dict[s
     project = project.resolve()
     require(check(project)["status"] in {"pass", "replay_required"}, "quality project must be internally consistent")
     document = validate_experiment_preregistration(read_json(input_path, "experiment preregistration"))
-    if document["scope"] == "story":
+    if document.get("schema") == EXPERIMENT_PREREG_SCHEMA and document["scope"] == "story":
         evidence = evidence_by_hash(project, document["story_package_evidence_sha256"])
         require(evidence["kind"] == "story_package" and evidence["artifact"]["story_package_id"] == document["story_package_id"], "experiment preregistration does not match its story package artifact")
         require(evidence["source_kind"] == document["source_kind"] and evidence["synthetic"] is document["synthetic"], "experiment preregistration source differs from story package evidence")
@@ -4208,7 +4376,7 @@ def record_experiment_preregistration(project: Path, input_path: Path) -> dict[s
         "status": "experiment_preregistration_recorded",
         "preregistration_sha256": digest,
         "recorded_by_lifecycle_at": record["recorded_by_lifecycle_at"],
-        "scope": document["scope"],
+        "scope": document.get("scope", document.get("study_kind")),
         "synthetic": document["synthetic"],
     }
 
@@ -4597,6 +4765,406 @@ def validate_experiment_v2(path: Path, project: Path) -> dict[str, Any]:
     return validate_experiment_v2_document(read_json(path, "P1 longitudinal experiment"), project)
 
 
+def resolve_between_subject_preregistration(
+    experiment: dict[str, Any],
+    project: Path | None,
+    expected_schema: str,
+) -> tuple[Path, dict[str, Any], str, datetime]:
+    require(project is not None, "between-subject experiment must resolve its immutable preregistration from a quality project")
+    project = project.resolve()
+    preregistration = experiment.get("preregistration")
+    require(isinstance(preregistration, dict) and preregistration.get("schema") == expected_schema, "between-subject experiment preregistration schema mismatch")
+    preregistration_sha256 = experiment.get("preregistration_sha256")
+    record = experiment_preregistration_record_by_hash(project, preregistration_sha256)
+    recorded = record["preregistration"]
+    require(preregistration == recorded and sha_json(preregistration) == preregistration_sha256, "between-subject preregistration differs from its immutable record")
+    require(experiment.get("study_id") == preregistration["study_id"], "between-subject experiment study_id differs from preregistration")
+    require(experiment.get("stage") == preregistration["stage"], "between-subject experiment stage differs from preregistration")
+    require(experiment.get("primary_endpoint") == preregistration["primary_endpoint"], "between-subject primary endpoint differs from preregistration")
+    require(experiment.get("secondary_endpoints") == preregistration["secondary_endpoints"], "between-subject secondary endpoints differ from preregistration")
+    recorded_at = parse_utc_timestamp(record["recorded_by_lifecycle_at"], "between-subject preregistration lifecycle receipt")
+    registered_at = parse_utc_timestamp(preregistration["registered_at"], "between-subject preregistration registered_at")
+    require(registered_at <= recorded_at, "between-subject preregistration claims a future registration time")
+    return project, preregistration, str(preregistration_sha256), recorded_at
+
+
+def load_between_subject_arms(
+    project: Path,
+    experiment: dict[str, Any],
+    preregistration: dict[str, Any],
+    preregistered_at: datetime,
+) -> tuple[dict[str, dict[str, Any]], dict[str, str], list[datetime]]:
+    rows = experiment.get("arms")
+    require(isinstance(rows, list) and len(rows) == 2, "between-subject experiment requires exactly two arms")
+    artifacts: dict[str, dict[str, Any]] = {}
+    evidence_hashes: dict[str, str] = {}
+    receipt_times: list[datetime] = []
+    for row in rows:
+        require(isinstance(row, dict) and set(row) == {"label", "evidence_sha256"}, "between-subject arm references must contain only label and evidence_sha256")
+        label = safe_component(row.get("label"), "between-subject experiment arm label")
+        require(label not in artifacts, "between-subject experiment arm labels must be distinct")
+        record = evidence_record_by_hash(project, row.get("evidence_sha256"))
+        evidence = record["evidence"]
+        require(evidence["kind"] == "between_subject_arm" and evidence["source_kind"] == "frozen_study_artifact" and evidence["synthetic"] is False, "between-subject experiment arm must cite frozen non-synthetic evidence")
+        artifact = evidence["artifact"]
+        require(artifact["study_id"] == preregistration["study_id"] and artifact["study_kind"] == preregistration["study_kind"], "between-subject arm study identity mismatch")
+        require(artifact["blind_label"] == label, "between-subject arm label differs from immutable evidence")
+        artifacts[label] = artifact
+        evidence_hashes[label] = str(row["evidence_sha256"])
+        receipt_times.append(parse_utc_timestamp(record["recorded_by_lifecycle_at"], "between-subject arm lifecycle receipt"))
+    require(set(artifacts) == set(preregistration["arm_labels"]), "between-subject arms differ from preregistered blind labels")
+    require(preregistered_at <= min(receipt_times), "between-subject arms were frozen before preregistration")
+    frozen_at = parse_utc_timestamp(experiment.get("artifacts_frozen_at"), "between-subject artifacts_frozen_at")
+    require(frozen_at == max(receipt_times), "between-subject artifacts_frozen_at must equal the latest arm evidence receipt")
+    return artifacts, evidence_hashes, receipt_times
+
+
+def validate_between_subject_enrollment(
+    experiment: dict[str, Any],
+    preregistration: dict[str, Any],
+    readers: list[dict[str, Any]],
+) -> None:
+    enrollment = experiment.get("enrollment")
+    require(isinstance(enrollment, dict), "between-subject experiment requires enrollment accounting")
+    included = enrollment.get("included_reader_ids")
+    excluded = enrollment.get("excluded")
+    require(isinstance(included, list) and included == [row["reader_id"] for row in readers], "between-subject included reader IDs must equal the analyzed cohort in order")
+    require(isinstance(excluded, list), "between-subject excluded readers must be a list")
+    allowed_rules = {row["rule_id"] for row in preregistration["exclusion_rules"]}
+    for row in excluded:
+        require(isinstance(row, dict), "between-subject excluded reader record must be an object")
+        safe_component(row.get("reader_id"), "between-subject excluded reader_id")
+        require(row.get("rule_id") in allowed_rules, "between-subject excluded reader does not match a preregistered rule")
+        nonempty_text(row.get("evidence"), "between-subject excluded reader evidence")
+    require(enrollment.get("screened") == len(readers) + len(excluded), "between-subject screened count is not derived from enrollment")
+
+
+def validate_between_subject_readers(
+    project: Path,
+    experiment: dict[str, Any],
+    preregistration: dict[str, Any],
+    artifacts: dict[str, dict[str, Any]],
+    arm_receipt_times: list[datetime],
+    *,
+    require_humans: bool,
+    voice_effect: bool,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[datetime]]:
+    readers = experiment.get("human_readers")
+    require(isinstance(readers, list), "between-subject human_readers must be a list")
+    if not readers:
+        require(not require_humans, "revision appeal experiment requires human readers")
+        return [], [], []
+    planned = preregistration["sample_size_rule"]["planned"]
+    require(len(readers) == planned, "between-subject completed readers do not match the exact preregistered sample")
+    labels = set(artifacts)
+    expected_chapters = list(range(preregistration["chapter_span"]["start"], preregistration["chapter_span"]["end"] + 1))
+    reader_ids: set[str] = set()
+    blind_codes: set[str] = set()
+    arm_counts = {label: 0 for label in labels}
+    results: list[dict[str, Any]] = []
+    human_receipt_times: list[datetime] = []
+    for row in readers:
+        require(isinstance(row, dict), "between-subject reader rows must be objects")
+        reader_id = safe_component(row.get("reader_id"), "between-subject reader_id")
+        blind_code = safe_component(row.get("blind_code"), "between-subject blind_code")
+        require(reader_id not in reader_ids and blind_code not in blind_codes, "between-subject reader IDs and blind codes must be unique")
+        reader_ids.add(reader_id)
+        blind_codes.add(blind_code)
+        assignment = safe_component(row.get("assignment"), "between-subject reader assignment")
+        require(assignment in labels, "between-subject reader assignment is not a preregistered arm")
+        arm_counts[assignment] += 1
+        profile = row.get("persona_profile")
+        require(isinstance(profile, dict), "between-subject reader requires persona_profile")
+        persona_id = safe_component(row.get("persona_id"), "between-subject persona_id")
+        require(row.get("persona_profile_sha256") == sha_json(profile), "between-subject reader persona profile hash mismatch")
+        observations = row.get("chapter_observations")
+        require(isinstance(observations, list) and len(observations) == 15, "between-subject reader must report all 15 assigned-arm chapters in order")
+        observation_chapters = []
+        for item in observations:
+            require(isinstance(item, dict), "between-subject chapter observation must be an object")
+            observation_chapters.append(integer(item.get("chapter"), "between-subject observation chapter", minimum=1))
+        require(observation_chapters == expected_chapters, "between-subject reader must report all 15 assigned-arm chapters in order")
+        previous_measurements: dict[str, Any] | None = None
+        for observation in observations:
+            chapter = integer(observation["chapter"], "between-subject observation chapter", minimum=1)
+            measurement_row = {
+                "reader_schema": READER_SCHEMA_V3,
+                "persona_id": persona_id,
+                "persona_profile": profile,
+                "persona_profile_sha256": row["persona_profile_sha256"],
+                "evidence_type": "human",
+                "measurements": observation.get("measurements"),
+            }
+            body = artifacts[assignment]["chapter_artifacts"][chapter - expected_chapters[0]]["body"]
+            measurements = validate_reader_measurements(measurement_row, candidate_visible_chars=len(re.sub(r"\s+", "", body)))
+            first_quit = measurements.get("first_quit_chapter")
+            require(first_quit is None or expected_chapters[0] <= first_quit <= expected_chapters[-1], "between-subject first_quit_chapter must stay within the assigned 15-chapter span")
+            if previous_measurements is not None:
+                validate_reader_measurement_transition(previous_measurements, measurements, chapter)
+            if first_quit is None:
+                require(measurements["continued_by_choice"] is True and measurements["continued_for_study"] is False, "pre-quit reading must remain natural rather than study-forced")
+            elif chapter == first_quit:
+                require(measurements["continued_by_choice"] is False and measurements["continued_for_study"] is False, "natural quit chapter cannot be marked as study continuation")
+            else:
+                require(measurements["continued_by_choice"] is False and measurements["continued_for_study"] is True, "post-quit observations must be marked study continuation")
+            previous_measurements = measurements
+        source = row.get("human_evidence")
+        require(isinstance(source, dict), "between-subject reader requires immutable human evidence")
+        human_record = evidence_record_by_hash(project, source.get("evidence_bundle_sha256"))
+        human_bundle = human_record["evidence"]
+        require(human_bundle["kind"] == "human_reader_import" and human_bundle["source_kind"] == "human_blind_import" and human_bundle["synthetic"] is False, "between-subject reader evidence must be a non-synthetic human import")
+        require(human_bundle["artifact"]["story_package_ids"] == [preregistration["study_id"]], "between-subject human import study identity mismatch")
+        imported_id = safe_component(source.get("imported_reader_id"), "between-subject imported reader_id")
+        imported = next((item for item in human_bundle["artifact"]["readers"] if item["reader_id"] == imported_id), None)
+        require(isinstance(imported, dict) and imported_id == reader_id, "between-subject reader is absent from its human import")
+        expected_raw: dict[str, Any] = {"assignment": assignment, "chapter_observations": observations}
+        if voice_effect:
+            voice_evaluation = row.get("voice_evaluation")
+            require(isinstance(voice_evaluation, dict) and set(voice_evaluation) == {"target_reader_preference", "comprehension_regression", "continuity_regression", "voice_loss"}, "author voice reader evaluation is incomplete")
+            integer(voice_evaluation.get("target_reader_preference"), "target_reader_preference", minimum=1, maximum=5)
+            require(all(isinstance(voice_evaluation.get(key), bool) for key in ("comprehension_regression", "continuity_regression", "voice_loss")), "author voice regression observations must be boolean")
+            expected_raw["voice_evaluation"] = voice_evaluation
+        require(imported["evidence_type"] == "human", "between-subject imported reader cannot be an LLM proxy")
+        require(imported["blind_code"] == blind_code and imported["persona_id"] == persona_id and imported["persona_profile_sha256"] == row["persona_profile_sha256"], "between-subject reader identity/profile differs from its import")
+        require(imported["raw_observations"] == expected_raw and imported["raw_observation_sha256"] == sha_json(expected_raw), "between-subject observations differ from the immutable human import")
+        human_receipt_times.append(parse_utc_timestamp(human_record["recorded_by_lifecycle_at"], "between-subject human import lifecycle receipt"))
+        results.append({
+            "reader_id": reader_id,
+            "assignment": assignment,
+            "first_quit_chapter": previous_measurements.get("first_quit_chapter") if previous_measurements else None,
+            "raw_observation_sha256": imported["raw_observation_sha256"],
+            **({"voice_evaluation": row["voice_evaluation"]} if voice_effect else {}),
+        })
+    require(all(count == planned // 2 for count in arm_counts.values()), "between-subject readers must be equally allocated across arms")
+    validate_between_subject_enrollment(experiment, preregistration, readers)
+    require(max(arm_receipt_times) <= min(human_receipt_times), "between-subject human observations were imported before both arms were frozen")
+    completed_at = parse_utc_timestamp(experiment.get("observations_completed_at"), "between-subject observations_completed_at")
+    require(completed_at == max(human_receipt_times) and completed_at <= datetime.now(timezone.utc), "between-subject observations_completed_at must equal the latest non-future human import receipt")
+    return readers, results, human_receipt_times
+
+
+def between_subject_outcome_fingerprint(
+    preregistration_sha256: str,
+    arm_evidence_hashes: dict[str, str],
+    reader_results: list[dict[str, Any]],
+    blind_mapping: dict[str, Any],
+    decision_rule: dict[str, Any],
+) -> str:
+    return sha_json({
+        "preregistration_sha256": preregistration_sha256,
+        "arm_evidence_sha256s": arm_evidence_hashes,
+        "reader_result_sha256s": [sha_json(row) for row in reader_results],
+        "blind_mapping": blind_mapping,
+        "decision_rule": decision_rule,
+    })
+
+
+def first_quit_effect_report(
+    results: list[dict[str, Any]],
+    labels: tuple[str, str],
+    chapter_end: int,
+) -> dict[str, Any]:
+    summaries: dict[str, dict[str, Any]] = {}
+    for label in labels:
+        rows = [row for row in results if row["assignment"] == label]
+        quit_chapters = [row["first_quit_chapter"] for row in rows]
+        scores = [chapter_end + 1 if chapter is None else chapter for chapter in quit_chapters]
+        summaries[label] = {
+            "reader_count": len(rows),
+            "first_quit_chapters": quit_chapters,
+            "censored_no_quit": sum(chapter is None for chapter in quit_chapters),
+            "restricted_mean_first_quit_chapter": round(sum(scores) / len(scores), 6),
+        }
+    return {"unit": "reader", "arms": summaries}
+
+
+def validate_revision_appeal_experiment_document(
+    experiment: dict[str, Any],
+    project: Path | None,
+) -> dict[str, Any]:
+    require(experiment.get("schema") == REVISION_APPEAL_EXPERIMENT_SCHEMA, f"revision appeal schema must be {REVISION_APPEAL_EXPERIMENT_SCHEMA}")
+    project, preregistration, prereg_sha256, preregistered_at = resolve_between_subject_preregistration(
+        experiment, project, REVISION_APPEAL_PREREG_SCHEMA,
+    )
+    require(experiment.get("blind") is True and experiment.get("mapping_revealed_after_observations") is True, "revision appeal experiment must remain blind through observation completion")
+    require(experiment.get("llm_reader_role") == "proxy_only", "LLM readers cannot replace revision appeal human evidence")
+    artifacts, arm_hashes, arm_receipts = load_between_subject_arms(project, experiment, preregistration, preregistered_at)
+    mapping = experiment.get("blind_mapping")
+    require(isinstance(mapping, dict) and set(mapping) == {"baseline_label", "candidate_label"}, "revision appeal blind_mapping is invalid")
+    baseline_label = safe_component(mapping.get("baseline_label"), "revision appeal baseline_label")
+    candidate_label = safe_component(mapping.get("candidate_label"), "revision appeal candidate_label")
+    require({baseline_label, candidate_label} == set(artifacts), "revision appeal blind mapping must identify both arms")
+    baseline = artifacts[baseline_label]["chapter_artifacts"]
+    candidate = artifacts[candidate_label]["chapter_artifacts"]
+    expected_chapters = list(range(preregistration["chapter_span"]["start"], preregistration["chapter_span"]["end"] + 1))
+    require([row["chapter"] for row in baseline] == expected_chapters and [row["chapter"] for row in candidate] == expected_chapters, "revision appeal arms must match the preregistered continuous chapter span")
+    changed = [
+        chapter
+        for chapter, left, right in zip(expected_chapters, baseline, candidate)
+        if left["revision"] != right["revision"]
+    ]
+    require(changed, "revision appeal candidate must change at least one preregistered chapter")
+    require(set(changed) <= set(preregistration["revised_chapters"]), "revision appeal candidate changes an unregistered chapter")
+    readers, reader_results, _ = validate_between_subject_readers(
+        project, experiment, preregistration, artifacts, arm_receipts,
+        require_humans=True, voice_effect=False,
+    )
+    allocation = [
+        {key: row[key] for key in ("reader_id", "blind_code", "assignment", "persona_id", "persona_profile_sha256")}
+        for row in readers
+    ]
+    require(experiment.get("allocation_sha256") == sha_json(allocation), "revision appeal allocation hash mismatch")
+    effect_report = first_quit_effect_report(reader_results, (baseline_label, candidate_label), expected_chapters[-1])
+    decision = preregistration["decision_rule"]
+    fingerprint = between_subject_outcome_fingerprint(prereg_sha256, arm_hashes, reader_results, mapping, decision)
+    if preregistration["stage"] == "pilot":
+        expected_outcome = {
+            "status": "UNDERPOWERED_PILOT",
+            "winner": None,
+            "conclusion_allowed": False,
+            "input_fingerprint": fingerprint,
+        }
+    else:
+        baseline_mean = effect_report["arms"][baseline_label]["restricted_mean_first_quit_chapter"]
+        candidate_mean = effect_report["arms"][candidate_label]["restricted_mean_first_quit_chapter"]
+        gain = round(candidate_mean - baseline_mean, 6)
+        threshold = decision["minimum_detectable_chapter_gain"]
+        winner = "candidate" if gain >= threshold else "baseline" if gain <= -threshold else None
+        expected_outcome = {
+            "status": "POWERED_RESULT",
+            "winner": winner,
+            "conclusion_allowed": True,
+            "observed_chapter_gain": gain,
+            "single_book_only": True,
+            "input_fingerprint": fingerprint,
+        }
+    require(experiment.get("outcome") == expected_outcome, "revision appeal outcome is not derived from the preregistered primary endpoint")
+    return {
+        "schema": SCHEMA,
+        "status": expected_outcome["status"],
+        "winner": expected_outcome["winner"],
+        "human_readers": len(readers),
+        "changed_chapters": changed,
+        "primary_endpoint": "first_quit_chapter",
+        "effect_report": effect_report,
+        "experiment_sha256": sha_json(experiment),
+    }
+
+
+def voice_effect_report(results: list[dict[str, Any]], labels: tuple[str, str]) -> dict[str, Any]:
+    summaries: dict[str, dict[str, Any]] = {}
+    for label in labels:
+        rows = [row["voice_evaluation"] for row in results if row["assignment"] == label]
+        summaries[label] = {
+            "reader_count": len(rows),
+            "mean_target_reader_preference": round(sum(row["target_reader_preference"] for row in rows) / len(rows), 6),
+            "comprehension_regressions": sum(row["comprehension_regression"] for row in rows),
+            "continuity_regressions": sum(row["continuity_regression"] for row in rows),
+            "voice_loss_reports": sum(row["voice_loss"] for row in rows),
+        }
+    return {"unit": "reader", "arms": summaries}
+
+
+def validate_author_voice_effect_document(
+    experiment: dict[str, Any],
+    project: Path | None,
+) -> dict[str, Any]:
+    require(experiment.get("schema") == AUTHOR_VOICE_EFFECT_SCHEMA, f"author voice effect schema must be {AUTHOR_VOICE_EFFECT_SCHEMA}")
+    project, preregistration, prereg_sha256, preregistered_at = resolve_between_subject_preregistration(
+        experiment, project, AUTHOR_VOICE_EFFECT_PREREG_SCHEMA,
+    )
+    require(experiment.get("blind") is True, "author voice effect study must remain blind")
+    require(experiment.get("llm_reader_role") == "proxy_only", "LLM readers cannot replace author voice human evidence")
+    artifacts, arm_hashes, arm_receipts = load_between_subject_arms(project, experiment, preregistration, preregistered_at)
+    mapping = experiment.get("blind_mapping")
+    require(isinstance(mapping, dict) and set(mapping) == {"control_label", "voice_label"}, "author voice blind_mapping is invalid")
+    control_label = safe_component(mapping.get("control_label"), "author voice control_label")
+    voice_label = safe_component(mapping.get("voice_label"), "author voice voice_label")
+    require({control_label, voice_label} == set(artifacts), "author voice blind mapping must identify both arms")
+    control = artifacts[control_label]
+    treatment = artifacts[voice_label]
+    require(control["common_conditions"] == treatment["common_conditions"], "author voice arms must share plot, model, context, budget, and stop rule")
+    require(control["treatment"] == {"voice_enabled": False, "voice_profile_sha256": None}, "author voice control arm must disable only the voice treatment")
+    require(treatment["treatment"] == {"voice_enabled": True, "voice_profile_sha256": preregistration["voice_profile_sha256"]}, "author voice candidate arm must use the preregistered voice profile")
+    expected_chapters = list(range(preregistration["chapter_span"]["start"], preregistration["chapter_span"]["end"] + 1))
+    require(all([row["chapter"] for row in artifact["chapter_artifacts"]] == expected_chapters for artifact in artifacts.values()), "author voice arms must match the same preregistered chapter span")
+    readers, reader_results, _ = validate_between_subject_readers(
+        project, experiment, preregistration, artifacts, arm_receipts,
+        require_humans=False, voice_effect=True,
+    )
+    decision = preregistration["decision_rule"]
+    fingerprint = between_subject_outcome_fingerprint(prereg_sha256, arm_hashes, reader_results, mapping, decision)
+    if not readers:
+        require(experiment.get("observations_completed_at") is None, "author voice study without human evidence cannot claim observation completion")
+        require(experiment.get("enrollment") is None, "author voice study without human evidence cannot claim enrollment")
+        require(experiment.get("allocation_sha256") is None, "author voice study without human evidence cannot claim reader allocation")
+        expected_outcome = {
+            "status": "PENDING_HUMAN_EVIDENCE",
+            "winner": None,
+            "effect_pass": False,
+            "input_fingerprint": fingerprint,
+        }
+        require(experiment.get("outcome") == expected_outcome, "author voice study without humans must remain PENDING_HUMAN_EVIDENCE")
+        return {
+            "schema": SCHEMA,
+            "status": "PENDING_HUMAN_EVIDENCE",
+            "treatment_conditions_pass": True,
+            "effect_pass": False,
+            "experiment_sha256": sha_json(experiment),
+        }
+    require(experiment.get("mapping_revealed_after_observations") is True, "author voice mapping can be revealed only after observations")
+    allocation = [
+        {key: row[key] for key in ("reader_id", "blind_code", "assignment", "persona_id", "persona_profile_sha256")}
+        for row in readers
+    ]
+    require(experiment.get("allocation_sha256") == sha_json(allocation), "author voice allocation hash mismatch")
+    effect_report = voice_effect_report(reader_results, (control_label, voice_label))
+    if preregistration["stage"] == "pilot":
+        expected_outcome = {
+            "status": "UNDERPOWERED_PILOT",
+            "winner": None,
+            "effect_pass": False,
+            "input_fingerprint": fingerprint,
+        }
+    else:
+        control_report = effect_report["arms"][control_label]
+        voice_report = effect_report["arms"][voice_label]
+        gain = round(voice_report["mean_target_reader_preference"] - control_report["mean_target_reader_preference"], 6)
+        guardrails_pass = (
+            voice_report["comprehension_regressions"] <= control_report["comprehension_regressions"]
+            and voice_report["continuity_regressions"] <= control_report["continuity_regressions"]
+        )
+        threshold = decision["minimum_detectable_preference_gain"]
+        winner = "voice" if gain >= threshold and guardrails_pass else "control" if gain <= -threshold else None
+        expected_outcome = {
+            "status": "POWERED_RESULT",
+            "winner": winner,
+            "effect_pass": winner == "voice",
+            "guardrails_pass": guardrails_pass,
+            "observed_preference_gain": gain,
+            "single_book_only": True,
+            "input_fingerprint": fingerprint,
+        }
+    require(experiment.get("outcome") == expected_outcome, "author voice outcome is not derived from preregistered preference and guardrails")
+    return {
+        "schema": SCHEMA,
+        "status": expected_outcome["status"],
+        "winner": expected_outcome["winner"],
+        "effect_pass": expected_outcome["effect_pass"],
+        "human_readers": len(readers),
+        "effect_report": effect_report,
+        "experiment_sha256": sha_json(experiment),
+    }
+
+
+def validate_revision_appeal_experiment(path: Path, project: Path | None) -> dict[str, Any]:
+    return validate_revision_appeal_experiment_document(read_json(path, "revision appeal experiment"), project)
+
+
+def validate_author_voice_effect(path: Path, project: Path | None) -> dict[str, Any]:
+    return validate_author_voice_effect_document(read_json(path, "author voice effect experiment"), project)
+
+
 def validate_experiment(path: Path, project: Path | None = None) -> dict[str, Any]:
     document = read_json(path, "longitudinal experiment")
     if document.get("schema") == EXPERIMENT_SCHEMA:
@@ -4706,6 +5274,12 @@ def build_parser() -> argparse.ArgumentParser:
     experiment = commands.add_parser("check-experiment")
     experiment.add_argument("--project", type=Path)
     experiment.add_argument("--input", type=Path, required=True)
+    revision_appeal = commands.add_parser("check-revision-appeal-experiment")
+    revision_appeal.add_argument("--project", type=Path, required=True)
+    revision_appeal.add_argument("--input", type=Path, required=True)
+    voice_effect = commands.add_parser("check-author-voice-effect")
+    voice_effect.add_argument("--project", type=Path, required=True)
+    voice_effect.add_argument("--input", type=Path, required=True)
     system_experiment = commands.add_parser("check-system-experiment")
     system_experiment.add_argument("--project", type=Path, required=True)
     system_experiment.add_argument("--input", type=Path, required=True)
@@ -4839,6 +5413,10 @@ def main() -> int:
                 result = record_golden_three_plan(args.project, args.input)
         elif args.command == "check-system-experiment":
             result = validate_system_experiment(args.input, args.project)
+        elif args.command == "check-revision-appeal-experiment":
+            result = validate_revision_appeal_experiment(args.input, args.project)
+        elif args.command == "check-author-voice-effect":
+            result = validate_author_voice_effect(args.input, args.project)
         else:
             result = validate_experiment(args.input, args.project)
     except (QualityError, OSError, UnicodeError) as exc:

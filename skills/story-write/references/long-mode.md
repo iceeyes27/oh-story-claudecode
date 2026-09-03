@@ -162,7 +162,7 @@
 | 设定/题材定位.md（含 `主对标书` 字段，多对标时必填） | 全书 | Phase 2 | Phase 3 大纲、每卷开始前、Phase 4 写前召回 |
 | 设定/题材正文提示卡.md | 全书/题材 | Phase 2（缺失则 Phase 4 写前即时生成） | Phase 4 每章写作前：按 `genre-prose-cards.md` 索引匹配后读取 `genre-prose-cards/` 目录对应单题材卡优先、`style-genre-modules.md` 通用模块兜底，与通用正文要求、情绪/节奏召回和文风一起组装 prompt |
 | 设定/角色/{角色名}.md、设定/势力/{名}.md | 角色/势力 | Phase 3 细纲后增量补全（首批含主角/主要角色） | Phase 4 状态筛选/写作 |
-| 设定/文风.md（自定义文风·优先级最高） | 本书 | 用户自写（Claude Code 可代写）；导入/拆解不覆盖 | Phase 4 每章写作前：含实质内容则取代对标文风作权威风格基 |
+| 设定/文风.md（自定义文风·优先级最高） | 本书 | 用户自写（Claude Code 可代写）；导入/拆解不覆盖；可在固定标记区保存已采用正文的机器声纹统计 | Phase 4 每章写作前：作者区始终是权威风格基，机器区只提供可复现的句长、段落和标点统计 |
 | 对标/{书名}/文风.md | 对标书 | analyze Stage 6 输出 → story-import 显式绑定或本 skill 首次引用时同步 | Phase 4 每章写作前（文风召回；有自定义文风时降为参考/句长兜底） |
 | 大纲/卷纲_第X卷.md | 卷 | Phase 3 | Phase 4 写卷首章前 |
 | 追踪/写作流程状态.json | 书/流程 | Phase 1 推断后创建或更新 | 每轮开始按 `references/progressive-disclosure.md` 读取；只用于判断阶段和资料范围，不进正文 prompt |
@@ -356,6 +356,17 @@ advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界�
 - 核心角色状态变化同时提交该角色截至当前章的完整快照；
 - 事务失败后保留原事务 JSON，修正写入环境并重跑同一 `commit`；成功后执行 `check`，确认 state 与全部派生视图一致再继续写作。
 
+#### 已采用正文的作者声纹
+
+`设定/文风.md` 的作者手写区不得改写；机器统计只替换唯一一组固定标记区：
+
+```markdown
+<!-- author-voice:machine:start -->
+<!-- author-voice:machine:end -->
+```
+
+候选采用后运行 `python skills/story-write/scripts/author_voice_profile.py update --project "{书目录}"`；只读检查改用 `check`，写入预览加 `--dry-run`。工具只采样 `正文/` 中章号唯一的 UTF-8 正式章节，排除候选、骨架、对标、归档和符号链接；标记或样本非法时退出 2 且不写文件。机器区仅是派生统计，不代替真人声纹效果证据。
+
 ---
 
 ## 流程衔接
@@ -432,6 +443,7 @@ advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界�
 | 写作流程状态工具 | `scripts/flow-state.js` |
 | 章节骨架（长篇默认） | `references/chapter-skeleton-workflow.md` + `scripts/check-chapter-skeleton.js` |
 | 候选模式（作者拍板/采用/重写） | `references/candidate-workflow.md` + `scripts/candidate-commit.py` |
+| 已采用正文声纹统计 | `scripts/author_voice_profile.py` |
 | 结构化状态库（实验性旁路） | `references/state-store.md` |
 | 当前剧情单元与契约校准 | `references/reader-contract-and-progression.md` |
 

@@ -181,6 +181,52 @@ def reader_v2(
     return row
 
 
+def between_subject_observations(start: int, *, quit_chapter: int | None = None) -> list[dict[str, object]]:
+    rows = []
+    for chapter in range(start, start + 15):
+        measurements = reader_v2(
+            "between-subject", None, chapter=chapter,
+            revision=quality.sha_bytes(f"reader-{chapter}".encode()),
+            input_fingerprint="unused", expectation_id=f"EX-{chapter}",
+        )["measurements"]
+        if quit_chapter is not None and chapter >= quit_chapter:
+            measurements["first_quit_chapter"] = quit_chapter
+            measurements["continued_by_choice"] = False
+            measurements["continued_for_study"] = chapter > quit_chapter
+        rows.append({"chapter": chapter, "measurements": measurements})
+    return rows
+
+
+def between_subject_arm_artifact(
+    study_id: str,
+    study_kind: str,
+    label: str,
+    start: int,
+    variants: dict[int, str],
+    *,
+    common_conditions: dict[str, str] | None = None,
+    treatment: dict[str, object] | None = None,
+) -> dict[str, object]:
+    chapters = []
+    for chapter in range(start, start + 15):
+        body = f"# 第{chapter}章\n{variants.get(chapter, 'baseline')}-{chapter}-" + "字" * 80
+        chapters.append({"chapter": chapter, "body": body, "revision": quality.sha_bytes(body.encode())})
+    binding: dict[str, object] = {
+        "chapters": [{"chapter": row["chapter"], "revision": row["revision"]} for row in chapters],
+    }
+    artifact: dict[str, object] = {
+        "study_id": study_id,
+        "study_kind": study_kind,
+        "blind_label": label,
+        "chapter_artifacts": chapters,
+    }
+    if common_conditions is not None and treatment is not None:
+        artifact.update({"common_conditions": common_conditions, "treatment": treatment})
+        binding.update({"common_conditions": common_conditions, "treatment": treatment})
+    artifact["arm_sha256"] = quality.sha_json(binding)
+    return artifact
+
+
 def p1_contract(chapter: int) -> dict[str, object]:
     return {
         "chapter_function": "推进",
@@ -3391,6 +3437,345 @@ class QualityLifecycleTests(unittest.TestCase):
                 "formal-self-report", candidate_wins=True, stage="formal", reader_count=4,
                 planned=formal_plan,
             )
+
+    def test_revision_appeal_between_subject_contract_and_negative_boundaries(self) -> None:
+        study_id = "revision-study-1"
+        start = 3
+        preregistration = {
+            "schema": quality.REVISION_APPEAL_PREREG_SCHEMA,
+            "preregistration_id": "revision-prereg-1",
+            "study_id": study_id,
+            "study_kind": "revision_appeal",
+            "registered_at": "2026-01-01T00:00:00Z",
+            "synthetic": False,
+            "stage": "pilot",
+            "assignment": "between_subject",
+            "chapter_span": {"start": start, "end": start + 14},
+            "arm_labels": ["X7", "Q2"],
+            "sample_size_rule": {"planned": 2, "unit": "reader", "exact_completed_required": True},
+            "expansion_rule": {"allowed": False, "rule": "none-after-registration"},
+            "inclusion_rules": [{"rule_id": "completed-assigned-arm", "criterion": "reader completed the assigned blind arm"}],
+            "exclusion_rules": [{"rule_id": "identity-leak", "criterion": "reader learned the arm identity"}],
+            "allocation_algorithm": "balanced-random-between-subject",
+            "random_seed_commitment": "revision-seed-1",
+            "stop_rule": "exact-preregistered-sample",
+            "primary_endpoint": "first_quit_chapter",
+            "secondary_endpoints": sorted(quality.REVISION_SECONDARY_ENDPOINTS),
+            "secondary_cannot_replace_primary": True,
+            "revised_chapters": [7],
+            "power_analysis": None,
+            "decision_rule": {"algorithm": "underpowered-pilot-no-winner-v1"},
+        }
+        prereg_result = quality.record_experiment_preregistration(
+            self.project, self.write_json("revision-prereg.json", preregistration),
+        )
+        baseline = between_subject_arm_artifact(study_id, "revision_appeal", "X7", start, {})
+        candidate = between_subject_arm_artifact(study_id, "revision_appeal", "Q2", start, {7: "revised"})
+        baseline_hash = self.record_evidence("revision-arm-x7", kind="between_subject_arm", source_kind="frozen_study_artifact", artifact=baseline)
+        candidate_hash = self.record_evidence("revision-arm-q2", kind="between_subject_arm", source_kind="frozen_study_artifact", artifact=candidate)
+        profile = {"genre_familiarity": "medium", "reading_history": "fresh"}
+        reader_specs = [("R1", "B1", "X7", 10), ("R2", "B2", "Q2", None)]
+        readers = []
+        imported = []
+        for reader_id, blind_code, assignment, quit_chapter in reader_specs:
+            observations = between_subject_observations(start, quit_chapter=quit_chapter)
+            raw = {"assignment": assignment, "chapter_observations": observations}
+            readers.append({
+                "reader_id": reader_id, "blind_code": blind_code, "assignment": assignment,
+                "persona_id": "target-reader", "persona_profile": profile,
+                "persona_profile_sha256": quality.sha_json(profile),
+                "chapter_observations": observations,
+            })
+            imported.append({
+                "reader_id": reader_id, "blind_code": blind_code, "evidence_type": "human",
+                "raw_observations": raw, "raw_observation_sha256": quality.sha_json(raw),
+                "persona_id": "target-reader", "persona_profile": profile,
+                "persona_profile_sha256": quality.sha_json(profile),
+            })
+        human_hash = self.record_evidence(
+            "revision-human-import", kind="human_reader_import", source_kind="human_blind_import",
+            artifact={"story_package_ids": [study_id], "reader_count": 2, "readers": imported},
+        )
+        for row in readers:
+            row["human_evidence"] = {"evidence_bundle_sha256": human_hash, "imported_reader_id": row["reader_id"]}
+        arm_hashes = {"X7": baseline_hash, "Q2": candidate_hash}
+        mapping = {"baseline_label": "X7", "candidate_label": "Q2"}
+        results = [
+            {"reader_id": "R1", "assignment": "X7", "first_quit_chapter": 10, "raw_observation_sha256": imported[0]["raw_observation_sha256"]},
+            {"reader_id": "R2", "assignment": "Q2", "first_quit_chapter": None, "raw_observation_sha256": imported[1]["raw_observation_sha256"]},
+        ]
+        allocation = [
+            {key: row[key] for key in ("reader_id", "blind_code", "assignment", "persona_id", "persona_profile_sha256")}
+            for row in readers
+        ]
+        experiment = {
+            "schema": quality.REVISION_APPEAL_EXPERIMENT_SCHEMA,
+            "study_id": study_id,
+            "stage": "pilot",
+            "preregistration": preregistration,
+            "preregistration_sha256": prereg_result["preregistration_sha256"],
+            "primary_endpoint": "first_quit_chapter",
+            "secondary_endpoints": preregistration["secondary_endpoints"],
+            "blind": True,
+            "mapping_revealed_after_observations": True,
+            "llm_reader_role": "proxy_only",
+            "arms": [{"label": label, "evidence_sha256": digest} for label, digest in arm_hashes.items()],
+            "artifacts_frozen_at": max(
+                quality.evidence_record_by_hash(self.project, digest)["recorded_by_lifecycle_at"] for digest in arm_hashes.values()
+            ),
+            "blind_mapping": mapping,
+            "human_readers": readers,
+            "allocation_sha256": quality.sha_json(allocation),
+            "enrollment": {"included_reader_ids": ["R1", "R2"], "excluded": [], "screened": 2},
+            "observations_completed_at": quality.evidence_record_by_hash(self.project, human_hash)["recorded_by_lifecycle_at"],
+            "outcome": {
+                "status": "UNDERPOWERED_PILOT", "winner": None, "conclusion_allowed": False,
+                "input_fingerprint": quality.between_subject_outcome_fingerprint(
+                    str(prereg_result["preregistration_sha256"]), arm_hashes, results, mapping,
+                    preregistration["decision_rule"],
+                ),
+            },
+        }
+        result = self.run_cli(
+            "check-revision-appeal-experiment", "--project", self.project,
+            "--input", self.write_json("revision-experiment.json", experiment),
+        )
+        self.assertEqual((result["status"], result["winner"], result["changed_chapters"]), ("UNDERPOWERED_PILOT", None, [7]))
+
+        endpoint_drift = copy.deepcopy(experiment)
+        endpoint_drift["primary_endpoint"] = "strongest_read_on"
+        with self.assertRaisesRegex(quality.QualityError, "primary endpoint differs"):
+            quality.validate_revision_appeal_experiment_document(endpoint_drift, self.project)
+
+        false_winner = copy.deepcopy(experiment)
+        false_winner["outcome"]["winner"] = "candidate"
+        with self.assertRaisesRegex(quality.QualityError, "outcome is not derived"):
+            quality.validate_revision_appeal_experiment_document(false_winner, self.project)
+
+        duplicate_reader = copy.deepcopy(experiment)
+        duplicate_reader["human_readers"][1]["reader_id"] = "R1"
+        with self.assertRaisesRegex(quality.QualityError, "reader IDs and blind codes must be unique"):
+            quality.validate_revision_appeal_experiment_document(duplicate_reader, self.project)
+
+        boolean_chapter = copy.deepcopy(experiment)
+        boolean_chapter["human_readers"][0]["chapter_observations"][0]["chapter"] = True
+        with self.assertRaisesRegex(quality.QualityError, "observation chapter must be an integer"):
+            quality.validate_revision_appeal_experiment_document(boolean_chapter, self.project)
+
+        undeclared_artifact = between_subject_arm_artifact(study_id, "revision_appeal", "Q2", start, {6: "undeclared", 7: "revised"})
+        undeclared_hash = self.record_evidence("revision-arm-undeclared", kind="between_subject_arm", source_kind="frozen_study_artifact", artifact=undeclared_artifact)
+        undeclared = copy.deepcopy(experiment)
+        undeclared["arms"][1]["evidence_sha256"] = undeclared_hash
+        undeclared["artifacts_frozen_at"] = quality.evidence_record_by_hash(self.project, undeclared_hash)["recorded_by_lifecycle_at"]
+        with self.assertRaisesRegex(quality.QualityError, "changes an unregistered chapter"):
+            quality.validate_revision_appeal_experiment_document(undeclared, self.project)
+
+        synthetic_human_hash = self.record_evidence(
+            "revision-synthetic-human", kind="human_reader_import", source_kind="synthetic_fixture",
+            artifact={"story_package_ids": [study_id], "reader_count": 2, "readers": imported},
+        )
+        synthetic_humans = copy.deepcopy(experiment)
+        for row in synthetic_humans["human_readers"]:
+            row["human_evidence"]["evidence_bundle_sha256"] = synthetic_human_hash
+        with self.assertRaisesRegex(quality.QualityError, "non-synthetic human import"):
+            quality.validate_revision_appeal_experiment_document(synthetic_humans, self.project)
+
+        powered_without_power = copy.deepcopy(preregistration)
+        powered_without_power["stage"] = "powered"
+        powered_without_power["decision_rule"] = {
+            "algorithm": "restricted-mean-first-quit-chapter-v1",
+            "tie_rule": "NO_WINNER",
+            "minimum_detectable_chapter_gain": 2,
+        }
+        with self.assertRaisesRegex(quality.QualityError, "requires a preregistered power_analysis"):
+            quality.validate_between_subject_preregistration(powered_without_power)
+
+        powered = copy.deepcopy(powered_without_power)
+        powered["sample_size_rule"]["planned"] = 4
+        powered["power_analysis"] = {
+            "method": "two-sample-normal-approximation-v1",
+            "two_sided_alpha": 0.05,
+            "target_power": 0.8,
+            "assumed_standard_deviation": 0.1,
+            "minimum_detectable_chapter_gain": 2,
+            "planned_per_arm": 2,
+        }
+        self.assertEqual(quality.validate_between_subject_preregistration(powered)["stage"], "powered")
+
+        posthoc_threshold = copy.deepcopy(powered)
+        posthoc_threshold["decision_rule"]["minimum_detectable_chapter_gain"] = 1
+        with self.assertRaisesRegex(quality.QualityError, "different minimum effects"):
+            quality.validate_between_subject_preregistration(posthoc_threshold)
+
+    def test_author_voice_effect_freezes_conditions_and_waits_for_humans(self) -> None:
+        study_id = "voice-study-1"
+        start = 1
+        profile_hash = quality.sha_bytes(b"voice-profile")
+        preregistration = {
+            "schema": quality.AUTHOR_VOICE_EFFECT_PREREG_SCHEMA,
+            "preregistration_id": "voice-prereg-1",
+            "study_id": study_id,
+            "study_kind": "author_voice_effect",
+            "registered_at": "2026-01-01T00:00:00Z",
+            "synthetic": False,
+            "stage": "pilot",
+            "assignment": "between_subject",
+            "chapter_span": {"start": start, "end": start + 14},
+            "arm_labels": ["M4", "T9"],
+            "sample_size_rule": {"planned": 2, "unit": "reader", "exact_completed_required": True},
+            "expansion_rule": {"allowed": False, "rule": "none-after-registration"},
+            "inclusion_rules": [{"rule_id": "completed-assigned-arm", "criterion": "reader completed the assigned blind arm"}],
+            "exclusion_rules": [{"rule_id": "identity-leak", "criterion": "reader learned the arm identity"}],
+            "allocation_algorithm": "balanced-random-between-subject",
+            "random_seed_commitment": "voice-seed-1",
+            "stop_rule": "exact-preregistered-sample",
+            "primary_endpoint": "target_reader_preference",
+            "secondary_endpoints": sorted(quality.VOICE_SECONDARY_ENDPOINTS),
+            "secondary_cannot_replace_primary": True,
+            "guardrail_rule": "no-higher-comprehension-or-continuity-regression-rate",
+            "voice_profile_sha256": profile_hash,
+            "frozen_condition_keys": sorted(quality.VOICE_FROZEN_CONDITION_KEYS),
+            "power_analysis": None,
+            "decision_rule": {"algorithm": "underpowered-pilot-no-winner-v1"},
+        }
+        prereg_result = quality.record_experiment_preregistration(
+            self.project, self.write_json("voice-prereg.json", preregistration),
+        )
+        conditions = {key: quality.sha_bytes(key.encode()) for key in quality.VOICE_FROZEN_CONDITION_KEYS}
+        control = between_subject_arm_artifact(
+            study_id, "author_voice_effect", "M4", start, {}, common_conditions=conditions,
+            treatment={"voice_enabled": False, "voice_profile_sha256": None},
+        )
+        voice = between_subject_arm_artifact(
+            study_id, "author_voice_effect", "T9", start,
+            {chapter: "voice" for chapter in range(start, start + 15)}, common_conditions=conditions,
+            treatment={"voice_enabled": True, "voice_profile_sha256": profile_hash},
+        )
+        control_hash = self.record_evidence("voice-arm-control", kind="between_subject_arm", source_kind="frozen_study_artifact", artifact=control)
+        voice_hash = self.record_evidence("voice-arm-enabled", kind="between_subject_arm", source_kind="frozen_study_artifact", artifact=voice)
+        arm_hashes = {"M4": control_hash, "T9": voice_hash}
+        mapping = {"control_label": "M4", "voice_label": "T9"}
+        experiment = {
+            "schema": quality.AUTHOR_VOICE_EFFECT_SCHEMA,
+            "study_id": study_id,
+            "stage": "pilot",
+            "preregistration": preregistration,
+            "preregistration_sha256": prereg_result["preregistration_sha256"],
+            "primary_endpoint": "target_reader_preference",
+            "secondary_endpoints": preregistration["secondary_endpoints"],
+            "blind": True,
+            "llm_reader_role": "proxy_only",
+            "arms": [{"label": label, "evidence_sha256": digest} for label, digest in arm_hashes.items()],
+            "artifacts_frozen_at": max(
+                quality.evidence_record_by_hash(self.project, digest)["recorded_by_lifecycle_at"] for digest in arm_hashes.values()
+            ),
+            "blind_mapping": mapping,
+            "human_readers": [],
+            "allocation_sha256": None,
+            "enrollment": None,
+            "observations_completed_at": None,
+            "outcome": {
+                "status": "PENDING_HUMAN_EVIDENCE", "winner": None, "effect_pass": False,
+                "input_fingerprint": quality.between_subject_outcome_fingerprint(
+                    str(prereg_result["preregistration_sha256"]), arm_hashes, [], mapping,
+                    preregistration["decision_rule"],
+                ),
+            },
+        }
+        result = self.run_cli(
+            "check-author-voice-effect", "--project", self.project,
+            "--input", self.write_json("voice-effect-pending.json", experiment),
+        )
+        self.assertEqual((result["status"], result["treatment_conditions_pass"], result["effect_pass"]), ("PENDING_HUMAN_EVIDENCE", True, False))
+
+        duplicate_secondary = copy.deepcopy(preregistration)
+        duplicate_secondary["secondary_endpoints"].append(duplicate_secondary["secondary_endpoints"][0])
+        with self.assertRaisesRegex(quality.QualityError, "each closed-vocabulary value exactly once"):
+            quality.validate_between_subject_preregistration(duplicate_secondary)
+
+        duplicate_condition = copy.deepcopy(preregistration)
+        duplicate_condition["frozen_condition_keys"].append(duplicate_condition["frozen_condition_keys"][0])
+        with self.assertRaisesRegex(quality.QualityError, "each closed-vocabulary value exactly once"):
+            quality.validate_between_subject_preregistration(duplicate_condition)
+
+        reader_profile = {"genre_familiarity": "high", "reading_history": "fresh"}
+        human_readers = []
+        imported_readers = []
+        voice_specs = [
+            ("V1", "VB1", "M4", {"target_reader_preference": 3, "comprehension_regression": False, "continuity_regression": False, "voice_loss": False}),
+            ("V2", "VB2", "T9", {"target_reader_preference": 4, "comprehension_regression": False, "continuity_regression": False, "voice_loss": False}),
+        ]
+        for reader_id, blind_code, assignment, evaluation in voice_specs:
+            observations = between_subject_observations(start)
+            raw = {"assignment": assignment, "chapter_observations": observations, "voice_evaluation": evaluation}
+            human_readers.append({
+                "reader_id": reader_id, "blind_code": blind_code, "assignment": assignment,
+                "persona_id": "voice-target-reader", "persona_profile": reader_profile,
+                "persona_profile_sha256": quality.sha_json(reader_profile),
+                "chapter_observations": observations, "voice_evaluation": evaluation,
+            })
+            imported_readers.append({
+                "reader_id": reader_id, "blind_code": blind_code, "evidence_type": "human",
+                "raw_observations": raw, "raw_observation_sha256": quality.sha_json(raw),
+                "persona_id": "voice-target-reader", "persona_profile": reader_profile,
+                "persona_profile_sha256": quality.sha_json(reader_profile),
+            })
+        voice_human_hash = self.record_evidence(
+            "voice-human-import", kind="human_reader_import", source_kind="human_blind_import",
+            artifact={"story_package_ids": [study_id], "reader_count": 2, "readers": imported_readers},
+        )
+        for row in human_readers:
+            row["human_evidence"] = {"evidence_bundle_sha256": voice_human_hash, "imported_reader_id": row["reader_id"]}
+        voice_results = [
+            {
+                "reader_id": row["reader_id"], "assignment": row["assignment"], "first_quit_chapter": None,
+                "raw_observation_sha256": imported["raw_observation_sha256"], "voice_evaluation": row["voice_evaluation"],
+            }
+            for row, imported in zip(human_readers, imported_readers)
+        ]
+        human_experiment = copy.deepcopy(experiment)
+        human_experiment["mapping_revealed_after_observations"] = True
+        human_experiment["human_readers"] = human_readers
+        human_experiment["allocation_sha256"] = quality.sha_json([
+            {key: row[key] for key in ("reader_id", "blind_code", "assignment", "persona_id", "persona_profile_sha256")}
+            for row in human_readers
+        ])
+        human_experiment["enrollment"] = {"included_reader_ids": ["V1", "V2"], "excluded": [], "screened": 2}
+        human_experiment["observations_completed_at"] = quality.evidence_record_by_hash(self.project, voice_human_hash)["recorded_by_lifecycle_at"]
+        human_experiment["outcome"] = {
+            "status": "UNDERPOWERED_PILOT", "winner": None, "effect_pass": False,
+            "input_fingerprint": quality.between_subject_outcome_fingerprint(
+                str(prereg_result["preregistration_sha256"]), arm_hashes, voice_results, mapping,
+                preregistration["decision_rule"],
+            ),
+        }
+        human_result = quality.validate_author_voice_effect_document(human_experiment, self.project)
+        self.assertEqual((human_result["status"], human_result["winner"], human_result["human_readers"]), ("UNDERPOWERED_PILOT", None, 2))
+
+        false_claim = copy.deepcopy(experiment)
+        false_claim["outcome"]["status"] = "POWERED_RESULT"
+        false_claim["outcome"]["effect_pass"] = True
+        with self.assertRaisesRegex(quality.QualityError, "must remain PENDING_HUMAN_EVIDENCE"):
+            quality.validate_author_voice_effect_document(false_claim, self.project)
+
+        false_enrollment = copy.deepcopy(experiment)
+        false_enrollment["enrollment"] = {"included_reader_ids": [], "excluded": [], "screened": 0}
+        with self.assertRaisesRegex(quality.QualityError, "cannot claim enrollment"):
+            quality.validate_author_voice_effect_document(false_enrollment, self.project)
+
+        changed_conditions = copy.deepcopy(conditions)
+        changed_conditions["model_sha256"] = quality.sha_bytes(b"different-model")
+        invalid_voice = between_subject_arm_artifact(
+            study_id, "author_voice_effect", "T9", start,
+            {chapter: "voice" for chapter in range(start, start + 15)}, common_conditions=changed_conditions,
+            treatment={"voice_enabled": True, "voice_profile_sha256": profile_hash},
+        )
+        invalid_hash = self.record_evidence("voice-arm-condition-drift", kind="between_subject_arm", source_kind="frozen_study_artifact", artifact=invalid_voice)
+        condition_drift = copy.deepcopy(experiment)
+        condition_drift["arms"][1]["evidence_sha256"] = invalid_hash
+        condition_drift["artifacts_frozen_at"] = quality.evidence_record_by_hash(self.project, invalid_hash)["recorded_by_lifecycle_at"]
+        with self.assertRaisesRegex(quality.QualityError, "must share plot, model, context, budget, and stop rule"):
+            quality.validate_author_voice_effect_document(condition_drift, self.project)
 
     def test_fresh_reader_checkpoint_requires_replay_evidence(self) -> None:
         candidate = quality.sha_bytes(b"candidate-15")

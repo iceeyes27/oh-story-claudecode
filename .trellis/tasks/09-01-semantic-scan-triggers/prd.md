@@ -52,3 +52,15 @@
 ## 延期记录（2026-09-02）
 
 恢复 AI pattern blocking 后，原先以 advisory 总密度为核心的触发前提已变化。继续实现需要重新统计剩余 advisory 类别，并重新评审阈值与误报率。本批不实现、不归档为完成。
+
+## 重新研究结果（2026-09-03）
+
+对 demo 20 章逐章运行 `check-ai-patterns.js --json`：共 38 条 advisory，其中 `english-residue` 30 条、`em-dash` 5 条、`period-stutter` 2 条、`metaphor-density-tic` 1 条。`english-residue` 占 78.9%，主要是军宣/短视频题材中的 `MV`、`BGM`、`MCN` 等合法术语。
+
+因此当前三个候选谓词均未达到接入条件：
+
+- advisory 总密度主要测到题材英文术语，不能作为 `ai-flavor-scan` 触发器；
+- 对话占比只表示场景形式，不表示台词不自然；
+- 黑话词根命中只表示术语出现，不表示“行业名词硬作动词”。
+
+本轮研究结论为 **NO-GO**：在没有更高精度、可解释的确定性前置信号前，不把三项纯 LLM 扫描接入 `candidate-commit.py check`。该结论避免增加稳定误报，不代表三个语义扫描本身无价值；它们继续保留在显式复合检查中。

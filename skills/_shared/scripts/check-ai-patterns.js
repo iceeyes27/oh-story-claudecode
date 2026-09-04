@@ -263,6 +263,12 @@ const CROSS_NEGATION_START = /^不是[^。！？!?\n]{1,24}[。！？!?]?$/;
 const CROSS_NEGATION_MIDDLE = /^(?:也|还)不是[^。！？!?\n]{1,24}[。！？!?]?$/;
 const CROSS_NEGATION_END = /^只是[^。！？!?\n]{1,32}[。！？!?]?$/;
 
+// 跨段肯定排比定论（实战漏网）：三段连续以「是/真」开头的极短单句段落（如「是真寡妇。/是真怕。/也真缺那口钱。」）
+// 拿三句抽象标签替代场景展开，属于典型的欠写作电报体与工整对仗。
+const CROSS_AFFIRMATION_START = /^(?:是|真)[^。！？!?\n]{1,24}[。！？!?]?$/;
+const CROSS_AFFIRMATION_MIDDLE = /^(?:是|真)[^。！？!?\n]{1,24}[。！？!?]?$/;
+const CROSS_AFFIRMATION_END = /^(?:也|还|又|更)?(?:是|真)[^。！？!?\n]{1,24}[。！？!?]?$/;
+
 // 两类常见但不能直接判错的工整框架，只做 advisory。与 blocking 规则不同，这里故意扫描
 // 台词：自然点单「不放辣，不放葱」靠对象最短长度排除；更长的同动词清单交语义审查判断功能。
 const DECISION_FRAME_PATTERN = /至于([\u3400-\u9fff]{1,3})不\1[，,]\s*怎么\1/g;
@@ -681,17 +687,46 @@ function findFormulaicParallelism(proseLines) {
     window.push({ text: maskQuoted(trimmed), original: trimmed, lineNo });
     if (window.length > 3) window.shift();
     if (window.length !== 3) continue;
-    if (!CROSS_NEGATION_START.test(window[0].text)
-      || !CROSS_NEGATION_MIDDLE.test(window[1].text)
-      || !CROSS_NEGATION_END.test(window[2].text)) continue;
-    findings.push({
-      line: window[0].lineNo,
-      column: 1,
-      type: 'formulaic-parallelism',
-      severity: 'advisory',
-      message: '跨段「不是… / 也不是… / 只是…」可能是工整否定铺排，也可能承担辩解或悬念排除；通读语境，只在重复细纲或拖慢画面时改写。',
-      excerpt: compact(window.map((entry) => entry.original).join(' / ')),
-    });
+    if (CROSS_NEGATION_START.test(window[0].text)
+      && CROSS_NEGATION_MIDDLE.test(window[1].text)
+      && CROSS_NEGATION_END.test(window[2].text)) {
+      findings.push({
+        line: window[0].lineNo,
+        column: 1,
+        type: 'formulaic-parallelism',
+        severity: 'advisory',
+        message: '跨段「不是… / 也不是… / 只是…」可能是工整否定铺排，也可能承担辩解或悬念排除；通读语境，只在重复细纲或拖慢画面时改写。',
+        excerpt: compact(window.map((entry) => entry.original).join(' / ')),
+      });
+    } else if (CROSS_AFFIRMATION_START.test(window[0].text)
+      && CROSS_AFFIRMATION_MIDDLE.test(window[1].text)
+      && CROSS_AFFIRMATION_END.test(window[2].text)) {
+      findings.push({
+        line: window[0].lineNo,
+        column: 1,
+        type: 'formulaic-parallelism',
+        severity: 'advisory',
+        message: '跨段肯定排比定论：「是… / 是… / 也…」是典型的三段式工整对仗与欠写作电报体；严禁拿三句抽象标签替代场景展开，必须还原为现场动作、物证与感官细节（Show Don\'t Tell）。',
+        excerpt: compact(window.map((entry) => entry.original).join(' / ')),
+      });
+    } else {
+      const vMatch = window[0].text.match(/^([看听等等想想找问走])(?!不)[^。！？!?\n]{1,35}[。！？!?]?$/);
+      if (vMatch) {
+        const v = vMatch[1];
+        const reMid = new RegExp(`^${v}[^。！？!?\\n]{1,35}[。！？!?]?$`);
+        const reEnd = new RegExp(`^(?:再|还|又)?${v}[^。！？!?\\n]{1,35}[。！？!?]?$`);
+        if (reMid.test(window[1].text) && reEnd.test(window[2].text)) {
+          findings.push({
+            line: window[0].lineNo,
+            column: 1,
+            type: 'formulaic-parallelism',
+            severity: 'advisory',
+            message: `跨段动词三排比：「${v}… / ${v}… / 再${v}…」是模板化视线/动作清单；建议合并为连贯的长短句观察视角，避免机械并列。`,
+            excerpt: compact(window.map((entry) => entry.original).join(' / ')),
+          });
+        }
+      }
+    }
   }
 
   return findings;

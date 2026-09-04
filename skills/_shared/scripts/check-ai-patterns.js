@@ -2244,7 +2244,7 @@ function findReferentialCountMismatch(proseLines) {
           line: lineNo,
           column: match.index + 1,
           type: 'referential-count-mismatch',
-          severity: 'blocking',
+          severity: 'advisory',
           message: `台词与指代字数不符[${match[0]}]：引号内实际有 ${actual} 个字，但后文声明为“这${match[2]}个字”；数错字数属于低级逻辑硬伤，请核正字数或改用“这话/这个数/这个价码”。`,
           excerpt: compact(match[0]),
         });
@@ -2270,7 +2270,7 @@ function findReferentialCountMismatch(proseLines) {
               line: proseLines[nextIdx].lineNo,
               column: 1,
               type: 'referential-count-mismatch',
-              severity: 'blocking',
+              severity: 'advisory',
               message: `台词与指代字数不符[${quoteMatch[0]} ... ${crossMatch[0]}]：上一行引号内实际有 ${actual} 个字，但本行声明为“这${crossMatch[1]}个字”；数错字数属于低级逻辑硬伤，请核正字数或改用“这话/这个数/这个价码”。`,
               excerpt: compact(`${quoteMatch[0]} -> ${crossMatch[0]}`),
             });
@@ -2282,7 +2282,7 @@ function findReferentialCountMismatch(proseLines) {
   return findings;
 }
 
-// 空间引荐与在场人物冲突：前文刚交代“去/找某人”，后文同一封闭场景却写“某人的伙计/手下一直站在”，blocking。
+// 空间引荐与在场人物冲突：前文刚交代“去/找某人”，后文同一封闭场景却写“某人的伙计/手下一直站在”，advisory。
 function findSpatialPresenceCollision(proseLines) {
   const introPattern = /(?:去|找|联络)(?:西平码头|后街|铺子|栈|店|码头)?[^，。！？\n]{0,10}找?([^\s，。！？\n]{1,4}(?:掌柜|老板|东家|爷|叔))/g;
   const findings = [];
@@ -2302,7 +2302,7 @@ function findSpatialPresenceCollision(proseLines) {
         line: lineNo,
         column: 1,
         type: 'spatial-presence-collision',
-        severity: 'blocking',
+        severity: 'advisory',
         message: `空间在场与引荐冲突[${match[0]} ... ${subMatch[0]}]：前文刚通过纸条/口头交代“${match[0]}”（将该人物作为未来新联络点），后文却突然出现“${subMatch[0]}”已在场；空间逻辑断裂、角色瞬移穿帮，请将换钱/跟班角色替换为茶楼掌柜、跑堂或随行人员。`,
         excerpt: compact(`${match[0]} -> ${subMatch[0]}`)
       });

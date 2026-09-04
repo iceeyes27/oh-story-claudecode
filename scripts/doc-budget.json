@@ -47,8 +47,8 @@
     },
     {
       "path": "skills/_shared/references/banned-words.md",
-      "budget": 15200,
-      "why": "跨 skill 共享禁用词表，写作/审查/去AI味都读，持续「发现即注册」增长（新增说明文式感官对仗与反知觉状态词包），需要显式预算刹车"
+      "budget": 15500,
+      "why": "跨 skill 共享禁用词表，写作/审查/去AI味都读；新增跨段肯定排比与语流身份匹配规则后显式调整预算"
     },
     {
       "path": "skills/_shared/references/anti-ai-writing.md",

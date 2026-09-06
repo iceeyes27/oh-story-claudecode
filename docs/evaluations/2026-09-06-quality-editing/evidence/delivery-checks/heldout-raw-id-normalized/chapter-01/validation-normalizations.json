@@ -1,0 +1,17 @@
+{
+  "source": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/metadata/chapter-01.postwrite.json",
+  "source_sha256": "85b1a35c9e21e77ef12641388982f65ee48dacf7b19a92e01a3830821e0880f1",
+  "coverage_ids_before": [
+    "O-01",
+    "O-02",
+    "O-03",
+    "O-04"
+  ],
+  "coverage_ids_after": [
+    "O1",
+    "O2",
+    "O3",
+    "O4"
+  ],
+  "meaning": "O-01 spelling mapped to skeleton O1; production gate unchanged; original extraction and prose preserved"
+}

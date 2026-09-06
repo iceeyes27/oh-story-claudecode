@@ -1,0 +1,8 @@
+{
+  "reader_type": "model",
+  "reader_report": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/blind/reviews/reader-a-R31-chapter-02.json",
+  "reader_report_sha256": "22741d8f749861f3e7ad69e9165f2ed11cb8e834935e276b6ac89f23babde90c",
+  "postwrite_extraction": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/fixed/metadata/chapter-02.postwrite.json",
+  "prior_context": "generated prior chapters imported only for isolated preflight; no author adoption",
+  "actual_author_adoption": false
+}

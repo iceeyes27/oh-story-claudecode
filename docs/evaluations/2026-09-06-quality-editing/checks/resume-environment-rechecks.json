@@ -1,0 +1,31 @@
+{
+  "generated_at": "2026-09-06T08:27:01.790032+00:00",
+  "results": [
+    {
+      "name": "sync-unit",
+      "command": [
+        "node",
+        "--test",
+        "scripts/sync-upstream.test.js"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout": "Preparing worktree (new branch 'codex/sync-upstream-dcb5ac43dcfe-mtpjt1mx')\nHEAD is now at 557c936 base\nAutomatic merge went well; stopped before committing as requested\n✔ policy priority preserves fork boundaries and unified targets (5.365709ms)\n✔ CLI defaults to a read-only status command (0.496375ms)\n✔ ancestor check distinguishes forward and reverse baselines (245.428958ms)\n✔ prepare uses a dedicated worktree and leaves dirty caller files untouched (734.17575ms)\nℹ tests 4\nℹ suites 0\nℹ pass 4\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1297.645\n",
+      "stderr": "",
+      "environment_note": "per-process init.defaultBranch=master"
+    },
+    {
+      "name": "author-voice-profile",
+      "command": [
+        "/Users/yolandahao/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "scripts/test-author-voice-profile.py"
+      ],
+      "exit_code": 0,
+      "status": "PASS",
+      "stdout": "PASS: test_update_scope_preservation_and_idempotence\nPASS: test_check_and_dry_run_are_read_only\nPASS: test_marker_failures_are_non_destructive\nPASS: test_empty_invalid_and_duplicate_samples\nPASS: test_short_evidence_and_digest_change\nPASS: test_update_respects_project_lock\nPASS: test_symlink_escape_is_rejected\nauthor voice profile tests: 7/7 passed\n",
+      "stderr": "",
+      "environment_note": "bundled Python 3.12.14"
+    }
+  ],
+  "global_configuration_modified": false
+}

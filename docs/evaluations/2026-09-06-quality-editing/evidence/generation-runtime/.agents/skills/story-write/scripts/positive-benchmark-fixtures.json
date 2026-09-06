@@ -1,0 +1,39 @@
+{
+  "schema": "story-positive-benchmark-fixtures/v1",
+  "version": "2026-08-30.1",
+  "evaluator_protocol": "clarity-function-v1",
+  "sets": {
+    "development": [
+      {
+        "id": "dev-clear-causality-v1",
+        "artifact_text": "阿宁看见门锁断了，先去值班室借钥匙，回来后才把药箱取出。",
+        "artifact_sha256": "0b088af0ba0ef5f894b387dee0c38a472554895138a020a72941f373d7699300",
+        "expected": "clean"
+      }
+    ],
+    "held_out": [
+      {
+        "id": "heldout-direct-emotion-v1",
+        "artifact_text": "老周低头看着辞退信。他很难过，但还是把明天要交接的账本理好了。",
+        "artifact_sha256": "35f1bac57bcb9355610a52d371d09001a530a3547cf08dec0f00d49c57b473ad",
+        "expected": "clean"
+      }
+    ],
+    "controls": [
+      {
+        "id": "control-functional-dash-v1",
+        "artifact_text": "“你再往前一步——”她把刀抵住他的袖口，“我就喊人。”",
+        "artifact_sha256": "70002b528a44e71fbc5ae6b6d383cf87fe91c2938f40cd74d56e1df719a145d1",
+        "expected": "clean"
+      }
+    ],
+    "mutants": [
+      {
+        "id": "mutant-missing-cause-v1",
+        "artifact_text": "阿宁还在走廊，下一句已经抱着只能从锁门后取出的药箱站在街上，中间没有任何行动或时间交代。",
+        "artifact_sha256": "a97bff67ef6284b9a73bc6bed37e8ee5ffdb8faf3b3c138d8ac29422a9779232",
+        "expected": "defect"
+      }
+    ]
+  }
+}

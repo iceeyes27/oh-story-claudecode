@@ -1,0 +1,182 @@
+{
+  "schema_version": 1,
+  "mode": "append",
+  "chapter": 1,
+  "chapter_title": "空着的位置",
+  "expected_state_revision": 0,
+  "delta": {
+    "result": "宋棠收到完整合影，发现墙图裁去边缘半个人。四名职工与五人照片对不上，齐叔不敢认人，她留空姓名，借背面编号及包装电话约到程雪。",
+    "character_changes": [
+      {
+        "name": "宋棠",
+        "change": "暂留姓名空行，等待程雪带另一照片来"
+      }
+    ],
+    "foreshadow_changes": [],
+    "timeline_events": [],
+    "constraints": [],
+    "next_chapter_commitments": [
+      "程雪答应上午带另一张照片来展厅"
+    ]
+  },
+  "context": {
+    "position": {
+      "volume": "照片展",
+      "volume_start_chapter": 1,
+      "story_time": "当天",
+      "scene": "青平码头旧站照片展展厅"
+    },
+    "long_term_constraints": [],
+    "active_character_names": [
+      "宋棠"
+    ],
+    "continuity_risks": []
+  },
+  "character_snapshots": {
+    "宋棠": {
+      "identity": "社区旧站照片展整理者",
+      "location": "青平码头旧站照片展展厅",
+      "goal": "认出合影中第五人，写准说明牌",
+      "state": "暂留姓名空行，等待程雪带另一照片来",
+      "abilities_resources": [
+        "完整合影及提醒纸条",
+        "四名职工旧名单",
+        "照片背面的相邻编号",
+        "程雪的联系电话"
+      ],
+      "relationships": [
+        "齐叔协助认人，承认记不准",
+        "已联系程雪，约她上午来"
+      ],
+      "knowledge": [
+        "完整合影有五人，墙图裁去右边缘",
+        "旧名单对应四名职工",
+        "第五人穿站员外套，身份未定",
+        "程雪持有编号相邻的同日照片"
+      ],
+      "open_threads": [
+        "第五人身份待核对",
+        "程雪尚未到场"
+      ]
+    }
+  },
+  "metrics": {},
+  "candidate_binding": {
+    "schema_version": 2,
+    "quality_profile": "fanqie-long-v2",
+    "prose": {
+      "path": "候选/第001章_空着的位置.md",
+      "sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7"
+    },
+    "outline": {
+      "path": "大纲/细纲_第001章.md",
+      "sha256": "7896b988d717096a9ceade79d4159b724b883a6395ee0b4f7b827f4738084050"
+    },
+    "skeleton": {
+      "path": "骨架/第001章_空着的位置.md",
+      "sha256": "bb6e8e3adfbe9a2b6791ccaac1d218aae3da4f666363e278491a88995f5dea13"
+    },
+    "coverage": [
+      {
+        "id": "O1",
+        "evidence": "随照片掉出来的纸条很短，上面写着：请别再少写一个名字。"
+      },
+      {
+        "id": "O2",
+        "evidence": "可信封里这张，站着五个人。"
+      },
+      {
+        "id": "O3",
+        "evidence": "宋棠翻过说明牌，在背面重新排人名。这一回，她依照片从左到右写，写完第四个，在下面留了一行。"
+      },
+      {
+        "id": "O4",
+        "evidence": "\"我姓程，程雪。另一张在我这里。\""
+      }
+    ],
+    "logic_checks": {
+      "rc-01": {
+        "run_id": "native-heldout-reader-H74-1-rc-01",
+        "status": "pass",
+        "findings": [],
+        "evidence": [
+          {
+            "path": "候选/第001章_空着的位置.md",
+            "anchor": "青平码头旧站的照片展下午开放。她刚接手这份整理工作，早上还在庆幸，齐叔带来的旧名单帮她省了不少事。"
+          },
+          {
+            "path": "候选/第001章_空着的位置.md",
+            "anchor": "齐叔正在窗边给展架垫纸片。他退休以前在旧站上班，今天一早就来了，嫌桌脚晃，非要把它垫平才肯摆照片。"
+          },
+          {
+            "path": "候选/第001章_空着的位置.md",
+            "anchor": "背面右下角有个旧编号十八，旁边用铅笔写着十七同日。"
+          }
+        ],
+        "candidate_sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7",
+        "prose_files": [
+          {
+            "path": "候选/第001章_空着的位置.md",
+            "sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7"
+          }
+        ],
+        "prose_set_sha256": "58ea6e93f1541b3ba7496abdce470aa348e60001babae62e3c466eff2f33a8c9",
+        "result_sha256": "355aa9fbe3839aa0093ba6b21e28b9d8f2a9e4eb122c90351967b4202068e470"
+      },
+      "rc-02": {
+        "run_id": "native-heldout-reader-H74-1-rc-02",
+        "status": "pass",
+        "findings": [],
+        "evidence": [
+          {
+            "path": "候选/第001章_空着的位置.md",
+            "anchor": "墙图在那里只留下一小片灰蓝色。宋棠早先隔着桌子看，还以为那是堆在旁边的衣物。原片上，这件衣服有袖子，有领口，领口上方是一个侧过来的脸。"
+          },
+          {
+            "path": "候选/第001章_空着的位置.md",
+            "anchor": "寄件人一栏没写姓名，联系电话却还在，下面印着本市的收寄信息。"
+          },
+          {
+            "path": "候选/第001章_空着的位置.md",
+            "anchor": "对方听到齐叔的称呼，问是不是当年在站里搬书的那位，得到肯定的答复后，才说自己上午可以过来。"
+          }
+        ],
+        "candidate_sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7",
+        "prose_files": [
+          {
+            "path": "候选/第001章_空着的位置.md",
+            "sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7"
+          }
+        ],
+        "prose_set_sha256": "58ea6e93f1541b3ba7496abdce470aa348e60001babae62e3c466eff2f33a8c9"
+      },
+      "rc-03": {
+        "run_id": "native-heldout-reader-H74-1-rc-03",
+        "status": "pass",
+        "findings": [],
+        "evidence": [
+          {
+            "path": "候选/第001章_空着的位置.md",
+            "anchor": "上头写着职工合影。谁整理的这页我不记得了，你等我想想。"
+          },
+          {
+            "path": "候选/第001章_空着的位置.md",
+            "anchor": "你别照我刚才那句写路过。万一她搬了半天的书，我给说成凑热闹了。"
+          },
+          {
+            "path": "候选/第001章_空着的位置.md",
+            "anchor": "也可能。但衣服谁都能穿，我不敢凭这个认。"
+          }
+        ],
+        "candidate_sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7",
+        "prose_files": [
+          {
+            "path": "候选/第001章_空着的位置.md",
+            "sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7"
+          }
+        ],
+        "prose_set_sha256": "58ea6e93f1541b3ba7496abdce470aa348e60001babae62e3c466eff2f33a8c9"
+      }
+    }
+  }
+}

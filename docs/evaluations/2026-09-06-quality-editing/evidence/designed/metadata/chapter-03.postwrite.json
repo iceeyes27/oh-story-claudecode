@@ -1,0 +1,175 @@
+{
+  "schema": "postwrite-extraction/v1",
+  "chapter": 3,
+  "extraction_phase": "after_all_three_raw_drafts_and_scans; not generation input",
+  "extracted_at": "2026-09-06T06:49:48.675936+00:00",
+  "candidate_path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/候选/第003章_等凉了再收钱.md",
+  "candidate_sha256": "29cbf0518e010ce7675daa1bf9d7b796fc52d5dd597c27f60f83c8458634156f",
+  "summary": "小满取件修柜，坚持降温并验证后才搬鱼。三人搬回四箱货、清理归还借位，何桂香付二百尾款并愿介绍生意。陈望约明早查看排风扇，小满未保证修好。",
+  "coverage": [
+    {
+      "o_id": "O1",
+      "evidence": [
+        {
+          "evidence": "小满下午回到鱼摊，何桂香先看她的手。",
+          "line": 2
+        },
+        {
+          "evidence": "她在断电的情况下完成更换，检查妥当，把该装回去的地方收好，才让冷柜重新通电。",
+          "line": 7
+        },
+        {
+          "evidence": "\"修的地方弄好了，柜里还不够凉。鱼从陈望那边拿出来，总不能搬回一个暖柜子里。温度降到能存鱼，我再看看它能不能稳住。\"",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "o_id": "O2",
+      "evidence": [
+        {
+          "evidence": "\"剩下二百，给你。咱们去搬？\"",
+          "line": 12
+        },
+        {
+          "evidence": "\"想收啊。\"她笑了笑，\"早上就在等你这二百了。可咱们说好确认能用再付，现在还差这一会儿。\"",
+          "line": 21
+        },
+        {
+          "evidence": "\"早上我那句练手，说得不好听。\"",
+          "line": 33
+        }
+      ]
+    },
+    {
+      "o_id": "O3",
+      "evidence": [
+        {
+          "evidence": "温度终于落到适合存这批鱼的范围，小满仍留着检查了一段时间。冷柜照常启停，温度也稳得住，她才把包扣上。",
+          "line": 42
+        },
+        {
+          "evidence": "小满扶住箱底，三个人照来时的位置把箱子一只只取出。",
+          "line": 51
+        },
+        {
+          "evidence": "箱外擦得干净，里面没留下鱼水，她们还是把两层都清理了一遍，把走动时带进去的水迹也擦干。",
+          "line": 54
+        },
+        {
+          "evidence": "\"行，我接着用了。\"",
+          "line": 55
+        }
+      ]
+    },
+    {
+      "o_id": "O4",
+      "evidence": [
+        {
+          "evidence": "小满接过钱，数清，和早上的定金合在一起。三百元服务费，一分没少，也没多收。",
+          "line": 59
+        },
+        {
+          "evidence": "\"以后有人问修东西，我把你号码给他。就说找周小满，在老铺子里。\"",
+          "line": 64
+        }
+      ]
+    },
+    {
+      "o_id": "O5",
+      "evidence": [
+        {
+          "evidence": "\"小满，你明天有空，看看我后间那个排风扇。时转时不转，我开门的时候它倒像还想睡。\"",
+          "line": 69
+        },
+        {
+          "evidence": "\"得看现场，查清哪里有问题再跟你说怎么修、多少钱。现在问，我也只能答应过去。\"",
+          "line": 72
+        },
+        {
+          "evidence": "小满在旁边另记下陈望的排风扇，时间写明早，后面添上看现场。",
+          "line": 76
+        }
+      ]
+    }
+  ],
+  "protagonist": {
+    "identity": "周小满，已独立完成当天冷柜维修与保货安排的维修工。",
+    "location": "自己的修理铺工作台旁。",
+    "goal": "明早去陈望后间看排风扇现场，再判断怎么修和报价。",
+    "state": "冷柜稳定、鱼货已回柜、临存位置归还、三百元服务费全结清；已记下明早查看预约。",
+    "abilities_resources": [
+      "工具包、带回的旧组件",
+      "记有三百元结清与明早预约的单据本",
+      "已收服务费三百元"
+    ],
+    "relationships": [
+      "何桂香承认早上说话不好听，愿按小满名字介绍生意",
+      "陈望愿请她看自己的排风扇"
+    ],
+    "knowledge": [
+      "鱼摊冷柜经正常启停与温度验证可以使用",
+      "四箱鱼货全部回到何桂香柜内",
+      "陈望排风扇时转时不转，具体故障尚不知"
+    ],
+    "open_threads": [
+      "明早查看陈望排风扇，未承诺必修好且未报价"
+    ]
+  },
+  "commitments": [
+    {
+      "promise": "何桂香遇到有人问修理时，介绍周小满并给她的电话。",
+      "state": "条件性口头承诺，未写成已有转介绍客户",
+      "evidence": "\"以后有人问修东西，我把你号码给他。就说找周小满，在老铺子里。\""
+    },
+    {
+      "promise": "小满明早去陈望后间看排风扇现场，查清后再说修法与费用。",
+      "state": "未来预约，未修理未报价",
+      "evidence": "\"明天你开门后我过去看。\""
+    }
+  ],
+  "metrics": [
+    {
+      "name": "service_fee_received",
+      "value": 300,
+      "as_of_chapter": 3,
+      "source_chapter": 3,
+      "source_phrase": "三百元服务费，一分没少，也没多收",
+      "unit": "元"
+    },
+    {
+      "name": "service_fee_final_payment",
+      "value": 200,
+      "as_of_chapter": 3,
+      "source_chapter": 3,
+      "source_phrase": "何桂香已经把二百元拿出来",
+      "unit": "元"
+    },
+    {
+      "name": "service_fee_outstanding",
+      "value": 0,
+      "as_of_chapter": 3,
+      "source_chapter": 3,
+      "source_phrase": "又写上结清",
+      "unit": "元"
+    },
+    {
+      "name": "temporary_storage_fee_paid_to_chen",
+      "value": 30,
+      "as_of_chapter": 3,
+      "source_chapter": 3,
+      "source_phrase": "借位置的三十，你上午给陈望了",
+      "unit": "元"
+    },
+    {
+      "name": "returned_empty_boxes",
+      "value": 4,
+      "as_of_chapter": 3,
+      "source_chapter": 3,
+      "source_phrase": "何桂香把四只空箱叠在一起",
+      "unit": "只"
+    }
+  ],
+  "not_a_reader_receipt": true,
+  "adopted": false
+}

@@ -1,0 +1,14 @@
+{
+  "time": "2026-09-06T06:42:17.977008+00:00",
+  "stage": "raw_saved_candidate_copied_no_edit",
+  "command": [
+    "node",
+    "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/scripts/check-outline-copy.js",
+    "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/候选/第002章_这边放鱼.md"
+  ],
+  "exit_code": 0,
+  "stdout": "",
+  "stderr": "",
+  "raw_sha256": "ee4a5209878e555013a0b2c16d9ea5b4a7e5fab64ab3fb94b03bb773df3381db",
+  "candidate_sha256": "ee4a5209878e555013a0b2c16d9ea5b4a7e5fab64ab3fb94b03bb773df3381db"
+}

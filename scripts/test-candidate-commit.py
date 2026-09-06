@@ -839,20 +839,85 @@ class CandidateCommitTests(unittest.TestCase):
         completed = self._candidate(["check", "--chapter", "2"])
         self.assertTrue(json.loads(completed.stdout)["ok"])
 
-    def test_new_chapter_fourth_same_emotion_is_blocked(self) -> None:
+    def test_four_same_emotion_distinct_events_check_and_promote(self) -> None:
         self.temporary.cleanup()
         self._reset_project(last_chapter=3)
         outline_dir = self.project / "大纲"
         outline_dir.mkdir(exist_ok=True)
-        for chapter in range(1, 4):
+        events = (
+            "夜里仓库失火，守夜人喊醒邻居，大家搬出了粮袋。",
+            "渡口只剩一条船，船主拒绝超载，两家人决定先送孩子。",
+            "船桨断在河中，岸上的人拉紧绳索，把小船拖回浅滩。",
+            "最后一个孩子迟迟没上岸，父亲沿着河滩找到他，背着他回村。",
+        )
+        for chapter, event in enumerate(events[:3], 1):
             (outline_dir / f"细纲_第{chapter:03d}章.md").write_text(
-                "- 目标情绪：紧张\n",
+                f"- 情节点：{event}\n- 目标情绪：紧张\n",
                 encoding="utf-8",
             )
-        self.make_candidate(4)
+            accepted = next((self.project / "正文").glob(f"第{chapter:03d}章_*.md"))
+            accepted.write_text(f"# 第{chapter}章\n{event}\n", encoding="utf-8")
+        prose = self.make_candidate(4, body=f"# 第4章\n{events[3]}\n")
+        outline = outline_dir / "细纲_第004章.md"
+        self._rewrite_outline(
+            4,
+            outline.read_text(encoding="utf-8").replace(
+                "本章完成一次可验证推进。", "父亲在河滩找回落单的孩子，背着他回到村里。"
+            ),
+        )
+        before = {
+            path.relative_to(self.project): path.read_bytes()
+            for path in self.project.rglob("*") if path.is_file()
+        }
 
-        blocked = self._candidate(["check", "--chapter", "4"], expect=1)
-        self.assertIn("目标情绪连排过长", blocked.stderr)
+        checked = self._candidate(["check", "--chapter", "4"])
+        self.assertTrue(json.loads(checked.stdout)["ok"])
+        self.assertIn("目标情绪连排 advisory", checked.stderr)
+        self.assertIn("第1–4章连续 4 章", checked.stderr)
+        self.assertEqual(
+            {path.relative_to(self.project): path.read_bytes()
+             for path in self.project.rglob("*") if path.is_file()},
+            before,
+        )
+        self.assertEqual(self.read_state()["state_revision"], 0)
+        self.assertEqual(len(self.final_files()), 3)
+        promoted = self._candidate(["promote", "--chapter", "4"])
+        self.assertEqual(json.loads(promoted.stdout)["action"], "promote")
+        self.assertIn("目标情绪连排 advisory", promoted.stderr)
+        self.assertFalse(prose.exists())
+        self.assertEqual((self.project / "正文" / prose.name).read_bytes(), before[prose.relative_to(self.project)])
+        self.assertEqual(self.read_state()["last_committed_chapter"], 4)
+        self.assertEqual(self.read_state()["state_revision"], 1)
+        run(TRACKING_TOOL, ["check", "--project", str(self.project)])
+
+    def test_future_emotion_outline_does_not_extend_current_advisory(self) -> None:
+        self.temporary.cleanup()
+        self._reset_project(last_chapter=2)
+        self.make_candidate(3)
+        outline_dir = self.project / "大纲"
+        for chapter in (1, 2, 4):
+            (outline_dir / f"细纲_第{chapter:03d}章.md").write_text(
+                "- 目标情绪：紧张\n", encoding="utf-8"
+            )
+
+        completed = self._candidate(["check", "--chapter", "3"])
+        self.assertTrue(json.loads(completed.stdout)["ok"])
+        self.assertIn("第1–3章连续 3 章", completed.stderr)
+        self.assertNotIn("第1–4章", completed.stderr)
+        self.assertEqual(self.read_state()["state_revision"], 0)
+
+    def test_emotion_run_input_failure_still_rejects_before_writes(self) -> None:
+        self.temporary.cleanup()
+        self._reset_project(last_chapter=3)
+        prose = self.make_candidate(4)
+        # A directory with an outline filename is a deterministic unreadable input.
+        (self.project / "大纲" / "细纲_第003章.md").mkdir()
+
+        checked = self._candidate(["check", "--chapter", "4"], expect=1)
+        self.assertIn("目标情绪连排检查无法执行", checked.stderr)
+        promoted = self._candidate(["promote", "--chapter", "4"], expect=2)
+        self.assertIn("目标情绪连排检查无法执行", promoted.stderr)
+        self.assertTrue(prose.is_file())
         self.assertEqual(self.read_state()["state_revision"], 0)
         self.assertEqual(len(self.final_files()), 3)
 
@@ -886,5 +951,223 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertEqual(self.final_files(), [])
 
 
+class OrdinaryRevisionTests(unittest.TestCase):
+    """Synthetic transaction fixtures: never represented as real reader feedback."""
+    REVISION = ROOT / "skills/story-write/scripts/revision-commit.py"
+
+    def setUp(self):
+        self.fixture = CandidateCommitTests()
+        self.fixture._reset_project(last_chapter=4)
+        self.project = self.fixture.project
+        self.original = sorted((self.project / "正文").glob("*.md"))[1]
+        fill = "".join(chr(0x6000 + n) for n in range(2300))
+        self.original.write_text("# 第2章 手套\n她把手套递给弟弟。\n" + fill + "。\n", encoding="utf-8")
+        self.source = self.project / "候选/修订稿.md"
+        self.source.write_text(self.original.read_text(encoding="utf-8").replace("她把手套递给弟弟。", "她将手套递给弟弟。"), encoding="utf-8")
+
+    def tearDown(self):
+        self.fixture.temporary.cleanup()
+
+    def cli(self, *args, expect=0, env=None):
+        return run(self.REVISION, [*args, "--project", str(self.project)], expect=expect, env=env)
+
+    def prepare(self, kind="wording"):
+        result = json.loads(self.cli("prepare", "--chapter", "2", "--candidate", str(self.source), "--kind", kind,
+                                     "--summary", "synthetic test editing").stdout)
+        self.operation = result["operation"]
+        self.directory = Path(result["directory"])
+        self.review_path = self.project / "test-review.json"
+        review = json.loads((self.directory / "review-template.json").read_text(encoding="utf-8"))
+        review.update(reviewer="synthetic test fixture", status="pass", facts_unchanged=kind != "facts",
+                      original_anchor=(self.directory / "original.md").read_text(encoding="utf-8").splitlines()[1],
+                      candidate_anchor=(self.directory / "candidate.md").read_text(encoding="utf-8").splitlines()[1])
+        for row in review["context"]:
+            row["anchor"] = (self.project / row["path"]).read_text(encoding="utf-8").splitlines()[-1]
+            row["assessment"] = "synthetic unaffected context"
+        self.review_path.write_text(json.dumps(review, ensure_ascii=False), encoding="utf-8")
+        return result
+
+    def action(self, name, *extra, expect=0, env=None):
+        args = [name, "--operation", self.operation]
+        if name != "recover":
+            args.extend(["--review", str(self.review_path)])
+        if name == "accept":
+            args.extend(["--author-approval", "synthetic test authorization"])
+        return self.cli(*args, *extra, expect=expect, env=env)
+
+    def snapshot(self):
+        return {p.relative_to(self.project).as_posix(): p.read_bytes() for p in self.project.rglob("*") if p.is_file()}
+
+    def test_prepare_and_check_leave_adopted_prose_and_state_unchanged(self):
+        old = self.original.read_bytes()
+        state = (self.project / "追踪/_tracking-state.json").read_bytes()
+        result = self.prepare()
+        self.assertEqual(len(result["review_scope"]), 2)
+        before = self.snapshot()
+        self.assertTrue(json.loads(self.action("check").stdout)["ok"])
+        self.assertEqual(before, self.snapshot())
+        self.assertEqual(self.original.read_bytes(), old)
+        self.assertEqual((self.project / "追踪/_tracking-state.json").read_bytes(), state)
+
+    def test_wording_and_rhythm_preserve_tracking_facts_and_original(self):
+        for kind in ("wording", "rhythm"):
+            with self.subTest(kind=kind):
+                if kind == "rhythm":
+                    self.source.write_text(self.source.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+                before = self.fixture.read_state()
+                old = self.original.read_bytes()
+                self.prepare(kind)
+                self.action("accept")
+                after = self.fixture.read_state()
+                self.assertEqual(after["state_revision"], before["state_revision"] + 1)
+                after["state_revision"] = before["state_revision"]
+                self.assertEqual(after, before)
+                self.assertEqual((self.directory / "original.md").read_bytes(), old)
+                self.assertEqual(self.original.read_bytes(), self.source.read_bytes())
+                self.fixture._tracking("check")
+
+    def test_fact_revision_requires_transaction_and_all_later_context(self):
+        result = self.prepare("facts")
+        self.assertEqual(len(result["review_scope"]), 3)
+        self.assertIn("tracking transaction", self.action("check", expect=1).stderr)
+        tx = transaction(2, mode="revision")
+        tx["expected_state_revision"] = 0
+        path = self.project / "test-transaction.json"
+        path.write_text(json.dumps(tx, ensure_ascii=False), encoding="utf-8")
+        self.action("check", "--transaction", str(path))
+        self.action("accept", "--transaction", str(path))
+        state = self.fixture.read_state()
+        self.assertEqual(state["last_committed_chapter"], 4)
+        self.assertEqual(state["state_revision"], 1)
+        self.assertIn(tx["delta"]["result"], (self.project / "追踪/逐章记录/第002章.md").read_text(encoding="utf-8"))
+        self.fixture._tracking("check")
+
+    def test_fact_revision_cannot_omit_downstream_reading(self):
+        self.prepare("facts")
+        review = json.loads(self.review_path.read_text(encoding="utf-8"))
+        review["context"].pop()
+        self.review_path.write_text(json.dumps(review), encoding="utf-8")
+        self.assertIn("bound context", self.action("check", expect=1).stderr)
+
+    def test_wording_requires_explicit_unchanged_facts_review(self):
+        self.prepare()
+        review = json.loads(self.review_path.read_text(encoding="utf-8"))
+        review["facts_unchanged"] = False
+        self.review_path.write_text(json.dumps(review), encoding="utf-8")
+        self.assertIn("unchanged story facts", self.action("check", expect=1).stderr)
+
+    def test_stale_original_context_inventory_and_review_fail_before_writes(self):
+        for change in ("original", "context", "inventory", "review", "candidate", "state"):
+            with self.subTest(change=change):
+                self.prepare()
+                path = {"original": self.original,
+                        "context": sorted((self.project / "正文").glob("*.md"))[0],
+                        "inventory": self.project / "正文/第005章_后来.md",
+                        "review": self.review_path,
+                        "candidate": self.directory / "candidate.md",
+                        "state": self.project / "追踪/_tracking-state.json"}[change]
+                old = path.read_bytes() if path.exists() else None
+                if change == "review":
+                    data = json.loads(old)
+                    data["candidate_sha256"] = "0" * 64
+                    path.write_text(json.dumps(data), encoding="utf-8")
+                else:
+                    path.write_bytes((old or b"") + b"\nchanged")
+                before = self.snapshot()
+                self.action("accept", expect=2)
+                self.assertEqual(self.snapshot(), before)
+                if old is None:
+                    path.unlink()
+                else:
+                    path.write_bytes(old)
+
+    def test_faults_recover_idempotently_and_block_other_writers(self):
+        for phase in ("prepared", "prose_written", "views_written", "state_written"):
+            with self.subTest(phase=phase):
+                if hasattr(self, "operation"):
+                    self.source.write_text(self.source.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+                self.prepare()
+                env = dict(os.environ, STORY_REVISION_FAIL_AFTER=phase)
+                self.action("accept", expect=97, env=env)
+                tx = transaction(5)
+                tx["expected_state_revision"] = self.fixture.read_state()["state_revision"]
+                self.assertIn("recover", self.fixture._tracking("commit", tx, expect=2).stderr)
+                self.action("recover")
+                before = self.snapshot()
+                self.action("recover")
+                self.assertEqual(before, self.snapshot())
+                self.fixture._tracking("check")
+
+    def test_recover_refuses_unrelated_edit(self):
+        self.prepare()
+        self.action("accept", expect=97, env=dict(os.environ, STORY_REVISION_FAIL_AFTER="prose_written"))
+        self.original.write_text("Someone changed the manuscript", encoding="utf-8")
+        before = self.snapshot()
+        self.action("recover", expect=2)
+        self.assertEqual(before, self.snapshot())
+
+    def test_lifecycle_head_cannot_be_bypassed(self):
+        self.prepare()
+        path = self.project / ".story-quality/HEAD.json"
+        path.parent.mkdir()
+        path.write_text("{}", encoding="utf-8")
+        self.assertIn("quality lifecycle", self.action("check", expect=1).stderr)
+        self.assertIn("quality lifecycle", self.action("accept", expect=2).stderr)
+
+    def test_symlink_parent_rejected(self):
+        self.prepare()
+        other = Path(self.fixture.temporary.name) / "outside"
+        other.mkdir()
+        (self.project / "候选/_历史").symlink_to(other, target_is_directory=True)
+        self.assertIn("symlink", self.action("accept", expect=2).stderr)
+        self.assertEqual(list(other.iterdir()), [])
+
+    def test_volume_directories_and_restoring_original(self):
+        volume = self.project / "正文/第一卷"
+        volume.mkdir()
+        moved = volume / self.original.name
+        self.original.replace(moved)
+        self.original = moved
+        old = self.original.read_bytes()
+        self.prepare()
+        self.action("accept")
+        self.source.write_bytes(old)
+        self.prepare()
+        review = json.loads(self.review_path.read_text(encoding="utf-8"))
+        review.update(original_anchor="她将手套递给弟弟。", candidate_anchor="她把手套递给弟弟。")
+        self.review_path.write_text(json.dumps(review), encoding="utf-8")
+        self.action("accept")
+        self.assertEqual(self.original.read_bytes(), old)
+        self.assertEqual(self.fixture.read_state()["state_revision"], 2)
+
+    def test_wording_can_refresh_evidence_without_changing_metric_value(self):
+        state = self.fixture.read_state()
+        state["metrics"] = {"手套归属": {"value": "弟弟", "as_of_chapter": 2, "source_phrase": "她把手套递给弟弟。"}}
+        import sys
+        sys.path.insert(0, str(self.REVISION.parent))
+        spec = importlib.util.spec_from_file_location("source_refresh_tracking", TRACKING_TOOL)
+        tracking = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(tracking)
+        tracking.write_views(self.project / "追踪", tracking.render_views(state))
+        tracking.atomic_write_text(self.project / "追踪/_tracking-state.json", tracking.json_payload(state))
+        self.prepare()
+        self.assertIn("anchor disappeared", self.action("check", expect=1).stderr)
+        review = json.loads(self.review_path.read_text(encoding="utf-8"))
+        review["metric_source_updates"] = {"手套归属": "她将手套递给弟弟。"}
+        self.review_path.write_text(json.dumps(review), encoding="utf-8")
+        self.action("check")
+        self.action("accept")
+        actual = self.fixture.read_state()["metrics"]["手套归属"]
+        self.assertEqual(actual, {"value": "弟弟", "as_of_chapter": 2, "source_phrase": "她将手套递给弟弟。"})
+
+
 if __name__ == "__main__":
+    if len(sys.argv) == 1:
+        independent_spec = importlib.util.spec_from_file_location("revision_review_tests", ROOT / "scripts/test-revision-review.py")
+        independent = importlib.util.module_from_spec(independent_spec)
+        independent_spec.loader.exec_module(independent)
+        for name, value in vars(independent).items():
+            if isinstance(value, type) and issubclass(value, unittest.TestCase) and value is not unittest.TestCase:
+                globals()[name] = value
+        del name, value  # unittest must not discover the loop variable as a second class.
     unittest.main(verbosity=2)

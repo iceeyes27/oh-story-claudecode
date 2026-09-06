@@ -278,6 +278,13 @@
         "skills/story-import/references/tracking-transaction.md",
         "skills/story-review/references/tracking-transaction.md"
       ]
+    },
+    {
+      "name": "reader-first-writing",
+      "source": "skills/story-write/references/reader-first-writing.md",
+      "targets": [
+        "skills/story-setup/references/agent-references/reader-first-writing.md"
+      ]
     }
   ],
   "derived_groups": [

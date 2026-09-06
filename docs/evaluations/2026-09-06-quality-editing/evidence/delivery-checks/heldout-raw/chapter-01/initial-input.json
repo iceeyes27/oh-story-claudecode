@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "book_title": "第五个人（隔离流程模拟）",
+  "last_chapter": 0,
+  "context": {
+    "position": {
+      "volume": "照片展",
+      "volume_start_chapter": 1,
+      "story_time": "开篇前",
+      "scene": "展厅"
+    },
+    "long_term_constraints": [],
+    "active_character_names": [],
+    "continuity_risks": [],
+    "recent_chapters": [],
+    "next_chapter_commitments": []
+  },
+  "character_snapshots": {},
+  "foreshadow": [],
+  "timeline_events": [],
+  "metrics": {}
+}

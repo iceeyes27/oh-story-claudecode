@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "mode": "revision",
+  "chapter": 3,
+  "chapter_title": "林琴",
+  "expected_state_revision": 0,
+  "delta": {
+    "result": "林琴到场，齐叔明确纠正早上把新箱记为漏底旧箱的错误；双方通过搬书、借衣及归还细节相认。林琴确认邮递员身份、实际帮忙范围并同意署名。宋棠补全说明牌，观众循姓名找到合影第五人。",
+    "character_changes": [
+      {
+        "name": "宋棠",
+        "change": "已听齐叔明确纠正箱子记混，完成署名"
+      }
+    ],
+    "foreshadow_changes": [],
+    "timeline_events": [],
+    "constraints": [],
+    "next_chapter_commitments": []
+  },
+  "context": {
+    "position": {
+      "volume": "照片展",
+      "volume_start_chapter": 1,
+      "story_time": "当天",
+      "scene": "开放后的旧站照片展展厅"
+    },
+    "long_term_constraints": [],
+    "active_character_names": [
+      "宋棠"
+    ],
+    "continuity_risks": []
+  },
+  "character_snapshots": {
+    "宋棠": {
+      "identity": "社区旧站照片展整理者",
+      "location": "开放后的旧站照片展展厅",
+      "goal": "继续听其他照片里普通人的经历，再落笔记录",
+      "state": "填满姓名空行，已完成第五人的核对与署名",
+      "abilities_resources": [
+        "完整合影和同日另一照片已展出",
+        "林琴署名与搬书事实说明牌",
+        "现场笔记"
+      ],
+      "relationships": [
+        "林琴同意写明姓名和实际帮忙事实",
+        "程雪同意并列展出两张照片",
+        "齐叔与林琴通过旧事认出彼此"
+      ],
+      "knowledge": [
+        "第五人姓名林琴，当年为邮递员",
+        "林琴只是路过搭手，未独自救下所有书",
+        "外套由站员借出",
+        "旧名单只列职工，无需推断恶意抹名",
+        "齐叔已承认早上记混了旧箱与最终合影的新箱"
+      ],
+      "open_threads": []
+    }
+  },
+  "metrics": {},
+  "metrics_unchanged_reason": "照片展修订不涉及收支或数值结算"
+}

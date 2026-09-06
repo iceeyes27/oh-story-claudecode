@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "book_title": "空着的位置（隔离流程模拟）",
+  "last_chapter": 1,
+  "context": {
+    "position": {
+      "volume": "照片展",
+      "volume_start_chapter": 1,
+      "story_time": "当天",
+      "scene": "青平码头旧站照片展展厅"
+    },
+    "long_term_constraints": [],
+    "active_character_names": [
+      "宋棠"
+    ],
+    "continuity_risks": [],
+    "recent_chapters": [
+      {
+        "chapter": 1,
+        "summary": "宋棠收到完整合影，发现墙图裁去边缘半个人。四名职工与五人照片对不上，齐叔不敢认人，她留空姓名，借背面编号及包装电话约到程雪。"
+      }
+    ],
+    "next_chapter_commitments": [
+      "程雪答应上午带另一张照片来展厅"
+    ]
+  },
+  "character_snapshots": {
+    "宋棠": {
+      "identity": "社区旧站照片展整理者",
+      "location": "青平码头旧站照片展展厅",
+      "goal": "认出合影中第五人，写准说明牌",
+      "state": "暂留姓名空行，等待程雪带另一照片来",
+      "abilities_resources": [
+        "完整合影及提醒纸条",
+        "四名职工旧名单",
+        "照片背面的相邻编号",
+        "程雪的联系电话"
+      ],
+      "relationships": [
+        "齐叔协助认人，承认记不准",
+        "已联系程雪，约她上午来"
+      ],
+      "knowledge": [
+        "完整合影有五人，墙图裁去右边缘",
+        "旧名单对应四名职工",
+        "第五人穿站员外套，身份未定",
+        "程雪持有编号相邻的同日照片"
+      ],
+      "open_threads": [
+        "第五人身份待核对",
+        "程雪尚未到场"
+      ]
+    }
+  },
+  "foreshadow": [],
+  "timeline_events": [],
+  "metrics": {}
+}

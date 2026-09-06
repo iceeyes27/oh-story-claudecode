@@ -1,0 +1,16 @@
+{
+  "findings": [
+    {
+      "file": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/fixed/候选/第001章_一百块定金.md",
+      "line": 35,
+      "column": 17,
+      "type": "formulaic-parallelism",
+      "severity": "advisory",
+      "message": "同动词「不V A，不V B」容易写成否定清单；含台词也要按语境复核，保留真正有功能的一项即可。",
+      "excerpt": "不能稳稳降温，不能听见响了就算完",
+      "category": "contextual",
+      "source": "shared-system",
+      "scope": "prose"
+    }
+  ]
+}

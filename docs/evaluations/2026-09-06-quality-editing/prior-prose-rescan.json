@@ -1,0 +1,117 @@
+[
+  {
+    "file": "docs/evaluations/2026-09-06-reader-first/evidence/baseline/chapter-01.md",
+    "exit_code": 0,
+    "result": {
+      "findings": []
+    }
+  },
+  {
+    "file": "docs/evaluations/2026-09-06-reader-first/evidence/baseline/chapter-02.md",
+    "exit_code": 0,
+    "result": {
+      "findings": []
+    }
+  },
+  {
+    "file": "docs/evaluations/2026-09-06-reader-first/evidence/baseline/chapter-03.md",
+    "exit_code": 0,
+    "result": {
+      "findings": []
+    }
+  },
+  {
+    "file": "docs/evaluations/2026-09-06-reader-first/evidence/cleanup/chapter-01.md",
+    "exit_code": 0,
+    "result": {
+      "findings": []
+    }
+  },
+  {
+    "file": "docs/evaluations/2026-09-06-reader-first/evidence/cleanup/chapter-02.md",
+    "exit_code": 0,
+    "result": {
+      "findings": [
+        {
+          "file": "/Users/yolandahao/code/oh-story-claudecode/docs/evaluations/2026-09-06-reader-first/evidence/cleanup/chapter-02.md",
+          "line": 2,
+          "column": 1,
+          "type": "micro-action-tic",
+          "severity": "advisory",
+          "message": "微动作复读：「了下/了一下」式轻量补语 10 处（6.4/千字）；同一反应模板高密度复现是机械指纹，合并动作 beat、换具体细节，别每个动作都补一个轻反应尾巴。",
+          "excerpt": "了两下 了一眼 了一下 了声 了一阵 了一声",
+          "category": "density",
+          "source": "shared-system",
+          "scope": "prose"
+        }
+      ]
+    }
+  },
+  {
+    "file": "docs/evaluations/2026-09-06-reader-first/evidence/cleanup/chapter-03.md",
+    "exit_code": 0,
+    "result": {
+      "findings": [
+        {
+          "file": "/Users/yolandahao/code/oh-story-claudecode/docs/evaluations/2026-09-06-reader-first/evidence/cleanup/chapter-03.md",
+          "line": 4,
+          "column": 1,
+          "type": "micro-action-tic",
+          "severity": "advisory",
+          "message": "微动作复读：「了下/了一下」式轻量补语 12 处（7.3/千字）；同一反应模板高密度复现是机械指纹，合并动作 beat、换具体细节，别每个动作都补一个轻反应尾巴。",
+          "excerpt": "了一眼 了半圈 了一下 了一会 了一阵 了一声",
+          "category": "density",
+          "source": "shared-system",
+          "scope": "prose"
+        }
+      ]
+    }
+  },
+  {
+    "file": "docs/evaluations/2026-09-06-reader-first/evidence/combined/chapter-01.md",
+    "exit_code": 0,
+    "result": {
+      "findings": [
+        {
+          "file": "/Users/yolandahao/code/oh-story-claudecode/docs/evaluations/2026-09-06-reader-first/evidence/combined/chapter-01.md",
+          "line": 45,
+          "column": 54,
+          "type": "not-is-comparison",
+          "severity": "advisory",
+          "message": "高频 AI 对比句式；删掉否定铺垫，直接写后项，或改成动作/细节呈现。",
+          "excerpt": "不是没现成配件，而是来之前那句挺有底气的“我去看看”，现在听着像给自己挖的坑",
+          "category": "contextual",
+          "source": "shared-system",
+          "scope": "prose"
+        }
+      ]
+    }
+  },
+  {
+    "file": "docs/evaluations/2026-09-06-reader-first/evidence/combined/chapter-02.md",
+    "exit_code": 0,
+    "result": {
+      "findings": [
+        {
+          "file": "/Users/yolandahao/code/oh-story-claudecode/docs/evaluations/2026-09-06-reader-first/evidence/combined/chapter-02.md",
+          "line": 74,
+          "column": 37,
+          "type": "em-dash",
+          "severity": "advisory",
+          "message": "破折号按功能改写：打断→动作 beat/短句，拖长音→省略或动作，插入说明→逗号/冒号；勿一律改句号。",
+          "excerpt": "问他，不过他那人——\"",
+          "category": "contextual",
+          "source": "shared-system",
+          "scope": "prose"
+        }
+      ]
+    }
+  },
+  {
+    "file": "docs/evaluations/2026-09-06-reader-first/evidence/combined/chapter-03.md",
+    "exit_code": 0,
+    "result": {
+      "findings": []
+    }
+  }
+]

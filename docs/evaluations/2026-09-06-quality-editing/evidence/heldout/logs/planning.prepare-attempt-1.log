@@ -1,0 +1,2 @@
+Captured from tool output; original execution exit 1:
+SyntaxError: Non-UTF-8 code starting with '\xe6' in prepare_planning.py on line 9, but no encoding declared.

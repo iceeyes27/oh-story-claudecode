@@ -1,0 +1,26 @@
+热路径文档预算
+------------------------------------------------------------------------------
+  用量 /   预算  余量  文件
+    3769 /   3800     31  skills/story-write/SKILL.md  [ok]
+   27398 /  27500    102  skills/story-write/references/long-mode.md  [ok]
+   21496 /  22200    704  skills/story-write/references/short-mode.md  [ok]
+   16404 /  17500   1096  skills/story-write/references/workflow-daily.md  [ok]
+   12514 /  13000    486  skills/story-write/references/workflow-setup.md  [ok]
+    9059 /   9100     41  skills/story-write/references/writing-craft.md  [ok]
+   15472 /  15500     28  skills/_shared/references/banned-words.md  [ok]
+   14023 /  14100     77  skills/_shared/references/anti-ai-writing.md  [ok]
+   12944 /  14000   1056  skills/story-setup/references/templates/agents/narrative-writer.md  [ok]
+    2068 /   2600    532  skills/story-write/references/reader-first-writing.md  [ok]
+
+路径合计（一次会话真正付的量）
+------------------------------------------------------------------------------
+   47571 /  48500    929  长篇日更主会话  [ok]
+   43681 /  44000    319  长篇开书  [ok]
+   16409 /  18500   2091  普通长篇正文 agent 固定参考  [ok]
+
+提示（不阻断）：
+  - skills/story-write/references/workflow-daily.md 比预算低 1096 字，可把 budget 降到 16500 锁住这次精简
+  - skills/story-setup/references/templates/agents/narrative-writer.md 比预算低 1056 字，可把 budget 降到 13000 锁住这次精简
+  - skills/story-write/references/reader-first-writing.md 比预算低 532 字，可把 budget 降到 2100 锁住这次精简
+
+Result: 热路径文档预算检查通过

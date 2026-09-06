@@ -1,0 +1,8 @@
+{
+  "chapter": 1,
+  "exit_code": 0,
+  "stdout": "{\n  \"action\": \"check\",\n  \"ok\": true,\n  \"operation\": \"r1-4547ce43d3525263268b\",\n  \"adopted\": false,\n  \"length\": {\n    \"metric\": \"visible_chars_v1\",\n    \"min\": 2200,\n    \"max\": 2800,\n    \"actual\": 2268,\n    \"status\": \"pass\"\n  },\n  \"state_revision\": 1,\n  \"invalidated\": [\n    \"previous reading receipts for changed prose/context\",\n    \"previous candidate bindings\",\n    \"chapter wordcount record\"\n  ],\n  \"reader_type\": \"model\",\n  \"review_scope\": [\n    \"正文/第002章_鱼要有盖.md\"\n  ]\n}\n",
+  "stderr": "",
+  "adopted": false,
+  "formal_files_unchanged": true
+}

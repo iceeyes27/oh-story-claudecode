@@ -52,13 +52,11 @@ FORBIDDEN = {
     "optional-per-chapter-review": re.compile(r"本章写作完成。如需一致性检查|批量写作模式跳过此步骤，全部写完后再统一审查"),
 }
 
-# check-ai-patterns.js 内联 blocking 的唯一合法形态：免语境词表族
-# （banned-words.md 加载的封闭词表类 + 规则加载失败本身）。风格类判定需要
-# 作者语境裁决，只能 advisory——「是否需要语境」两分是 5007cb8 恢复的作者
-# 裁意，取代 2026-08-31 的「检测器一律 advisory」方针。
+# 共享词形是系统语境提示，不因名字以 banned-word 开头而取得作者授权。
+# blocking 仅限有来源/范围的作者禁令和明确可核算/执行的数据错误。
 DETECTOR_BLOCKING_LINE = re.compile(r"severity\s*:\s*['\"]blocking['\"]")
 DETECTOR_TYPE_LINE = re.compile(r"type\s*:\s*['\"]([a-z0-9-]+)['\"]")
-ALLOWED_BLOCKING_TYPES = {"rule-load-error"}
+ALLOWED_BLOCKING_TYPES = {"rule-load-error", "input-read-error", "author-ban", "referential-count-mismatch"}
 BLOCKING_TYPE_WINDOW = 6
 
 
@@ -66,7 +64,7 @@ def detector_blocking_allowed(last_type: str | None, distance: int) -> bool:
     return (
         last_type is not None
         and 0 < distance <= BLOCKING_TYPE_WINDOW
-        and (last_type in ALLOWED_BLOCKING_TYPES or last_type.startswith("banned-word-"))
+        and last_type in ALLOWED_BLOCKING_TYPES
     )
 
 

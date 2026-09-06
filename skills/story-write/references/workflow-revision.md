@@ -1,102 +1,78 @@
-# workflow-revision.md：大修工作流
+# workflow-revision.md：日常修改与结构修订
 
-本文件为"大修/回炉"场景的完整指引。SKILL.md 路由到本文件后，按以下流程执行。
+修改、回炉或重写已采用章时使用。章节和范围能从上下文确定就执行；只在缺必要信息时询问。先交候选，作者采用后才替换正稿。
 
----
+## 定位与分类
 
-## 适用条件
+递归定位 `正文/` 中章号唯一的文件，兼容卷目录和补零章号。读取整章、相关前后章、细纲与角色档案；运行 `tracking_commit.py check` 验证唯一 state 和派生视图。缺 state 的旧书先路由 `story-import`，不能手写替代追踪。
 
-- 用户说"修改第X章""回炉第X章""重写第X章"
-- 目标：修改已写好的章节内容
+| 修改 | 普通模式 | 阅读范围 |
+|---|---|---|
+| 台词、措辞、必要解释 | `wording` | 原稿、新稿、实际差异、相邻已采用章 |
+| 压重复、调篇幅、不改变故事事实 | `rhythm` | 同上，核对保留的关系与回报 |
+| 改事件、知识、资源、关系结果或后续义务 | `facts` | 前一章及全部已采用后文，逐章判定受影响/不受影响，重算当前追踪 |
 
-> 用户必须指定章节号或章节名。无法自动推断需要修改哪一章。
+末章还绑定下一章细纲（如有）。分类由阅读证据支持，脚本不声称能自动证明事实未变。发现越出措辞/节奏范围时重新准备 facts 候选。存在 `.story-quality/HEAD.json` 时转本文件最后一节，普通入口拒绝绕过研究 HEAD。
 
----
+## 一次针对性编辑
 
-## Step 1：定位章节
+先用 `{PYTHON} {本 skill 根}/scripts/storyctl.py wordcount measure --file {正稿}` 记录实际字数。按用户范围找最影响理解、人物表现或兴趣的 1～2 处：重复验收/收费、旁白与对白重复归纳、关键选择迟迟不到等。不凭心理词、对白标签、段落长度启动全文重写。
 
-1. 根据"第X章"找到文件：`正文/第{X}章_*.md`
-2. 如果用户说的是章节名而非编号，用 `find 正文/ -name "*{关键词}*"` 搜索
-3. 找不到时让用户确认具体章节
-4. 如果用户指定段落范围（"第3-5段"/"那场打斗"/"对话部分"），记录为局部修改目标
+完整新稿写到书根 `候选/`；有效心理、停顿和生活互动不因词形一律改成动作。未改善则保留原文并重新诊断，不反复清洗。专业事实按需研究。普通长篇仍使用 fanqie-long-v2 的 2200～2800 字；显著增减报告原因，不自动补写或删除重要结果。超出当前档位的篇幅要求先明确交付限制。
 
----
+## 准备与只读预检
 
-## Step 2：加载上下文
+本 skill 的 `scripts/revision-commit.py` 与新章 `candidate-commit.py promote` 分开，不给新章采用偷偷加覆盖行为。
 
-加载比日常写作更多的上下文（因为修改需要理解前后衔接）：
-
-| 序号 | 文件 | 用途 | 如果不存在 |
-|------|------|------|-----------|
-| 1 | `正文/第{X}章_*.md` | 待修改章节 | 必须存在 |
-| 2 | `大纲/细纲_第{X}章.md` | 原始写作计划 | 跳过 |
-| 3 | `正文/第{X-1}章_*.md` | 前一章（衔接） | 第1章时加载 `设定/世界观/背景设定.md` 替代 |
-| 4 | `正文/第{X+1}章_*.md` | 后一章（衔接） | 末章时检查 `大纲/细纲_第{X+1}章.md`（如有）确保连续性 |
-| 5 | `tracking_commit.py check` + `追踪/上下文.md` | 用工具确认唯一 state 与派生视图一致；续写状态卡提供当前连续性，不把完整 state 加入 prompt | 缺 state 时停止；已有正文项目必须经 `story-import` 生成标准追踪状态 |
-| 6 | `设定/角色/{相关角色}.md` + `追踪/角色状态/{相关角色}.md` | 静态人设 + 动态当前快照 | 动态快照缺失时从相关增量重算 |
-
-**相关角色判定**：从 `大纲/细纲_第{X}章.md` 中提取角色名。如果细纲不存在，从待修改章节正文中搜索 `设定/角色/` 目录下的角色名关键词。将角色名映射为文件名：`设定/角色/{角色名}.md`。
-
----
-
-## Step 3：修改
-
-1. **阅读原文**：读完整章内容，用 `{PYTHON} {story-long-write skill 根}/scripts/storyctl.py wordcount check` 记录原始 `visible_chars_v1` 结果
-2. **定位不可变父版本**：运行 `quality_lifecycle.py check`，从 HEAD 取得第 X 章 revision hash。禁止在 `正文/` 放 `_原稿_日期` 备份；旧版已由 `.story-quality/revisions/` 冷存，日期文件会碰撞并污染章节扫描。
-3. **确认修改范围**：问用户是"全文重写"还是"修改特定段落"
-   - 全文重写：基于细纲重新写，保留备份
-   - 局部修改：只改指定段落（按场景序号或关键词定位），保持其他部分不变
-4. **执行修改**：把完整可读的修订候选写到 `草稿/待验收/第{X}章_章名.md`，不覆盖 `正文/`。默认只改 finding 和直接相连的因果上下游；同一 finding 重现先重新诊断。结构/全文重写必须记录作者授权。
-5. **字数对比**：修改后重跑同一计数器；与原文差异 >30% 或 >800 字时提醒用户（取较大值），并报告 `internal_pass / borderline / under / over / invalid`。测量状态不触发静默覆盖或二次改写正文
-
-**资料研究（按需）**：如果修改涉及需要验证的外部事实（历史年代、地理方位、职业细节等），spawn `story-researcher` agent 搜索验证。
-
----
-
-## Step 4：级联检查
-
-修改完成后，用一次 `mode=revision` 追踪事务完成级联更新，协议见 [tracking-transaction.md](tracking-transaction.md)：
-
-1. **重算修订章增量**：对比旧正文/旧增量与新正文，只保留新版本对未来仍有效的 `result / 角色变化 / 伏笔变化 / 时间与揭示 / 约束 / 下一章承诺`。事务工具整份重写 `追踪/逐章记录/第{X}章.md`，不保留被新正文推翻的结论。
-2. **伏笔当前值**：对受影响 ID 从第 X 章检查到最后已写章 M，提交修订后的**截至 M 章当前状态**。若修订删除了埋设，但后文仍引用该 ID，先列为正文冲突，不能简单删除；确定整条线不存在时才用 `action=delete`。`伏笔.md` 始终每 ID 一行，不追加修订历史。
-3. **时间与读者认知**：为受影响事件提交客观事实、读者截至 M 章的当前认知、实际揭示状态/章节；删掉的事件用 `action=delete`。未来揭示计划仍留大纲。工具把事件合并进 `_tracking-state.json` 并重建作者/读者视图，禁止分别手改。
-4. **角色当前快照**：对受影响核心角色从 X 检查到 M，按身份、位置、目标、能力资源、关系对象、已知信息、未结事项分别重算，提交一份截至 M 的完整快照；不得用最后一条单维度变化覆盖其它维度。
-5. **导入截止范围**：若 X ≤ `_tracking-state.json.imported_through_chapter`，事务为第 X 章新增覆盖记录；导入截止章不变，当前结构化状态按修订结果更新。
-6. **提交与重试**：把修订开始时 `tracking_commit.py check` 返回的 `state_revision` 写入 `expected_state_revision`，但不直接 commit。按 `quality-lifecycle.md` 用 `--kind revision` stage，metadata 写 finding IDs、影响区、修复范围与必要的作者授权；六视角审查、盲 A/B、读者 cohort、写后抽取通过后才 certify/accept。任一步失败保留 pending 与不可变 revision，不覆盖原记录。
-7. **后续影响与顺序重放**：第 X 章新 revision 接受后，X..M 旧的 reader chain、质量证书、事实/知识/关系/弧线重放和累积证书全部失效。新 X 已由本轮证书恢复；X+1..M 必须按顺序 `quality_lifecycle.py replay`。重放不授权改写后文；只有确认出的新问题才另建 revision candidate：
-
-```
-⚠️ 修改第{X}章后，以下章节证书需要顺序重放（正文保持只读）：
-- 第{X+1}章：{原因}（建议检查）
-- 第{X+3}章：{原因}（建议检查）
+```text
+{PYTHON} {本 skill 根}/scripts/revision-commit.py prepare --project {书目录} --chapter {N} --candidate {完整新稿} --kind wording --summary "本次阅读问题"
 ```
 
-8. **正文元信息扫描**：检查标题行以外是否混入 `第[一二三四五六七八九十百千万两0-9]+章|上一章|上章|前一章|本章|这一章|前文|后文|伏笔|细纲|读者` 这类写作工程词，命中即改成角色当下可感知的事件锚点或相对时间；故事内真实阅读/讨论“第X章”或真实读者身份语境除外
-9. **禁用词扫描**：对照 `../_shared/references/banned-words.md` 检查修改后的内容，并运行 `tracking_commit.py check` 验证 state 与全部派生视图一致
+返回 operation 和 `候选/_修订/{operation}/`，保存原始字节、新稿、差异、摘要和未填写的 review-template.json。准备不改正文或追踪，不生成通过意见。
 
----
+阅读者核对原稿、新稿、实际差异及模板所列上下文，另存阅读结果：填写真实 reviewer、`reader_type=model|human`、status、原稿/新稿可定位锚点、逐文件上下文判断和 findings。措辞/节奏须明确 `facts_unchanged=true`。blocking 未解决不能 pass；模型不能冒充真人。hash 沿用本次模板，改稿须重新准备，不能刷新旧意见伪装重读。
 
-## Step 5：质量检查
+措辞改动使本章数值引用原句消失、但事实未变时，在本次新阅读结果的 `metric_source_updates` 中给出同一名目的新原句。运行器只允许更新来源锚点，数值与事实章号不变；其他章的引用不能借此重写。改变数值或事实仍走 facts，不能用更新引用掩盖。
 
-对修改后的章节执行 Phase 5 质量检查（至少包含）：
+```text
+{PYTHON} {本 skill 根}/scripts/revision-commit.py check --project {书目录} --operation {operation} --review {实际阅读结果.json}
+```
 
-1. **禁用词扫描**：如 Step 4 未覆盖全章，再次扫描
-2. **正文元信息扫描**：同「级联检查」中的「正文元信息扫描」，确认覆盖全章。
-3. **人物一致性**：修改后的角色行为是否与角色设定一致
-4. **节奏检查**：修改是否破坏了章节节奏
-5. **读者理解与留存分审**：reader-comprehension 只查能否读懂；reader-retention cohort 查首个摩擦点、最强续读点、章尾期待、目标情绪与累计疲劳
-6. **区分修复与重开**：有 finding 的修订用 `revision_intent: defect_repair`；正确性通过但 P1 强度为 FLAT 时用不可变 `strength_reopen`，绑定原证书与 reopen case，不得虚构 finding。L2 要在授权边界内，L3 必须作者逐案批准。
-7. **盲评选择**：修订版未胜或 tie 时保留上一版，登记修复失败并重新诊断
+check 只读，验证字数、标题、确定性扫描、作者禁令、原始 state、正文集合与阅读绑定。语境/密度 advisory 不自动阻断，没有阅读结果就是未评估。
 
-> 完整检查清单见 [Phase 5：质量检查](long-mode.md#phase-5质量检查)。
+facts 的 check/accept 还需 `--transaction {修订追踪事务.json}`。按 [tracking-transaction.md](tracking-transaction.md) 使用 `mode=revision` 和准备时的 `expected_state_revision`：
 
----
+- 根据新旧正文重算本章增量；伏笔、时间、角色快照和 metrics 提交截至最后已采用章 M 的当前有效结果，不能把旧章修订误写成现在退役。
+- 后文还引用被删除事实时先处理正文冲突，不能删除追踪掩盖；扩大检查范围不自动授权改写后文。
+- 保留 `imported_through_chapter`；导入范围内修订只新增覆盖记录。
+- 不提交旧 wordcount 记录；采用时移除该章旧测量，避免过期摘要继续有效。
 
-## 常见问题
+## 采用、恢复与撤销待办
 
-| 问题 | 处理 |
-|------|------|
-| 用户没说改哪里 | 问"你想改哪一章？哪方面？情节/节奏/对话/描写？" |
-| 修改后字数暴增/暴减 | 提醒用户，由用户决定是否调整；不因此静默全文重写 |
-| 连续改多章 | 逐章修改，每章独立执行 Step 2-5 |
-| 改完发现后续不一致 | 先顺序重放并列证据；只对确认问题建候选，不自动改后续正文 |
+展示候选、修改目的、阅读结果和事实影响。有作者明确采用授权就执行，否则等待选择。新版不更好可保留原稿。
+
+```text
+{PYTHON} {本 skill 根}/scripts/revision-commit.py accept --project {书目录} --operation {operation} --review {实际阅读结果.json} --author-approval "作者实际采用指令"
+```
+
+不得编造批准原话。facts 追加同一份 transaction。运行器复用项目锁及 tracking 规范化/渲染逻辑：先保存可恢复日志，再写正文和派生视图，最后写唯一 `_tracking-state.json`。纯文字修订保留经复核的事实并递增 state_revision，事实修订重算事务；不建立第二个事实权威。
+
+旧阅读凭证、候选绑定和受影响测量因正文或 state 摘要变化而过期，回执列出失效项；不能复用旧 PASS。研究证书由研究生命周期管理。
+
+```text
+{PYTHON} {本 skill 根}/scripts/revision-commit.py recover --project {书目录} --operation {operation}
+```
+
+中断后原稿仍保存。recover 检查各文件处于事务前或预期后版本，拒绝覆盖第三方修改，可幂等重跑。未完成修订阻止其他采用与追踪写入。若仍为 prepared 且全部正式文件未变，可取消待办，保留证据重新准备：
+
+```text
+{PYTHON} {本 skill 根}/scripts/revision-commit.py abort --project {书目录} --operation {operation} --reason "候选需重新准备"
+```
+
+采用后想恢复原文：用保存的 original.md 重新 prepare，按最新上下文复核采用。不倒退 state_revision，也不让旧凭证重新生效；备份禁止放入 `正文/` 污染章号发现。
+
+## 显式研究生命周期
+
+仅已有研究 HEAD 或用户明确要求研究协议时，按 [quality-lifecycle.md](quality-lifecycle.md) 执行：先 `quality_lifecycle.py check` 定位父 revision，再 stage `--kind revision`，保留 finding、影响区和授权。该模式的六视角、盲 A/B、cohort、写后抽取和 certify/accept 不被普通入口弱化。
+
+接受第 X 章后，X..M 旧研究证书和 reader chain 按原协议失效；X+1..M 顺序 replay，重放不授权改文。正确性通过但强度不足时用显式 strength_reopen，不伪造 defect。未满足实际证据要求就保留 pending，模型意见不能写成真人认可。

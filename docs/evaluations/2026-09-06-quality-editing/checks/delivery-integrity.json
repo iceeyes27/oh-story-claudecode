@@ -1,0 +1,19 @@
+{
+  "status": "PASS",
+  "verified_at": "2026-09-06T08:36:19.057444+00:00",
+  "checks": {
+    "trial_files_archived_byte_exact": 804,
+    "frozen_runtime_files": 571,
+    "readable_versions": 5,
+    "chapter_texts": 15,
+    "new_reader_anchors_verified": 57,
+    "landing_page_local_links": 15,
+    "preexisting_code_and_first_round_files_unchanged": 724,
+    "git_diff_whitespace": "PASS with existing CRLF treated as line endings; user configuration unchanged"
+  },
+  "issues": [],
+  "scope": "artifact integrity and current source preservation; not human reading quality",
+  "model_reading": "completed",
+  "human_acceptance": "pending",
+  "author_adoption": false
+}

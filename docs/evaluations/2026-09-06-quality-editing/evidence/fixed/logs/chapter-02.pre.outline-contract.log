@@ -1,0 +1,140 @@
+{
+  "schema_version": 1,
+  "verifier": "story-long-write.outline-contract",
+  "file": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/fixed/大纲/细纲_第2章.md",
+  "ok": true,
+  "checks": [
+    {
+      "id": "outline.readable",
+      "ok": true,
+      "severity": "blocking",
+      "file": "细纲_第2章.md",
+      "evidence": "文件存在且非空",
+      "expected": "细纲文件存在且非空",
+      "references": [
+        "references/workflow-setup.md",
+        "references/artifact-protocols.md"
+      ],
+      "repair": "只补建缺失的细纲文件，不改动同批其他章。"
+    },
+    {
+      "id": "outline.required-fields",
+      "ok": true,
+      "severity": "blocking",
+      "file": "细纲_第2章.md",
+      "evidence": "16 个字段齐全",
+      "expected": "按权威模板列出全部字段：核心事件、字数目标、字数口径、阶段位置、单元ID/位置、目标情绪、主角目标/关键选择、结尾拍ID/类型、期待ID/类型、读者验收预期、章节定位、本章结构公式、章首钩子、爽点、本章禁止提前释放、契约风险；值未知时写 [待补充]，不杜撰剧情",
+      "references": [
+        "references/workflow-setup.md",
+        "references/artifact-protocols.md"
+      ],
+      "repair": "只补报告里缺的字段行；确实还定不下来的写 [待补充]，不为补字段新增副线或人物关系。"
+    },
+    {
+      "id": "outline.intent-fields-substantive",
+      "ok": true,
+      "severity": "blocking",
+      "file": "细纲_第2章.md",
+      "evidence": "写作意图、结尾拍、期待与读者验收都写了实际内容",
+      "expected": "目标情绪与主角选择写实际变化；结尾拍/期待写 ID、类型与落点；读者验收写 must_know / may_believe / must_not_know / open_ids。这五项不接受 [待补充]",
+      "references": [
+        "references/workflow-setup.md",
+        "references/artifact-protocols.md"
+      ],
+      "repair": "只把报告点名字段替换成本章实际内容；其余字段不动。"
+    },
+    {
+      "id": "outline.emotion-vocab",
+      "ok": true,
+      "severity": "blocking",
+      "file": "细纲_第2章.md",
+      "evidence": "目标情绪词「日常」在闭合词表内",
+      "expected": "目标情绪必须取自 skills/_shared/references/target-emotion-vocab.md，可在词后追加说明",
+      "references": [
+        "references/workflow-setup.md",
+        "references/artifact-protocols.md"
+      ],
+      "repair": "只把目标情绪改成词表中的词；不要新增字段。"
+    },
+    {
+      "id": "outline.reader-contract",
+      "ok": true,
+      "severity": "blocking",
+      "file": "细纲_第2章.md",
+      "evidence": "ending_beat=true；expectation=true；reader_oracle=true",
+      "expected": "结尾拍使用 EB-* + 七类之一；期待使用 EX-* + 七类之一；读者验收列全四个 oracle 集合",
+      "references": [
+        "references/workflow-setup.md",
+        "references/artifact-protocols.md"
+      ],
+      "repair": "只修结尾拍、期待或读者验收字段；不为满足检查新增剧情或强悬念。"
+    },
+    {
+      "id": "outline.subsections",
+      "ok": true,
+      "severity": "blocking",
+      "file": "细纲_第2章.md",
+      "evidence": "四个小节齐全",
+      "expected": "包含 内容概括 / 情节安排 / 人物关系和出场顺序 / 情节细化 四个小节",
+      "references": [
+        "references/workflow-setup.md",
+        "references/artifact-protocols.md"
+      ],
+      "repair": "只补缺失的小节标题及其条目，不重写已成立的内容。"
+    },
+    {
+      "id": "outline.five-act",
+      "ok": true,
+      "severity": "blocking",
+      "file": "细纲_第2章.md",
+      "evidence": "五段式齐全",
+      "expected": "内容概括写全 起因 / 发展 / 转折 / 高潮 / 结尾",
+      "references": [
+        "references/workflow-setup.md",
+        "references/artifact-protocols.md"
+      ],
+      "repair": "只补缺的那一段，不改其余四段。"
+    },
+    {
+      "id": "outline.plotpoint-table",
+      "ok": true,
+      "severity": "blocking",
+      "file": "细纲_第2章.md",
+      "evidence": "表头：# | 情节点（谁做了什么） | 功能标签 | 执行边界",
+      "expected": "情节细化使用四列表格：# / 情节点（谁做了什么） / 功能标签 / 执行边界",
+      "references": [
+        "references/workflow-setup.md",
+        "references/artifact-protocols.md"
+      ],
+      "repair": "只把情节点序列改成四列表格，逐点补功能标签与执行边界；不增删情节点本身。"
+    },
+    {
+      "id": "outline.p1-required",
+      "ok": true,
+      "severity": "blocking",
+      "file": "细纲_第2章.md",
+      "evidence": "legacy 细纲未启用 P1；按兼容模式跳过",
+      "expected": "P1 模式下质量契约为合法 JSON，scene_catalog 按情节点表实际编号生成，ID 唯一、index 连续且数量/顺序一致；legacy 模式允许整行不存在",
+      "references": [
+        "references/workflow-setup.md",
+        "references/artifact-protocols.md"
+      ],
+      "repair": "不要虚构固定场景；按情节点表第 N 行生成 {\"scene_id\":\"scene-N\",\"scene_index\":N}。旧纲未启用 P1 时不要只补空壳字段。"
+    },
+    {
+      "id": "outline.wordcount-target",
+      "ok": true,
+      "severity": "blocking",
+      "file": "细纲_第2章.md",
+      "evidence": "字数目标：2500；字数口径 visible_chars_v1：true",
+      "expected": "字数目标为 500-20000 的正整数，并声明 字数口径：visible_chars_v1",
+      "references": [
+        "references/workflow-setup.md",
+        "references/artifact-protocols.md"
+      ],
+      "repair": "只补字数目标或字数口径行，不调整情节安排。"
+    }
+  ],
+  "failures": [],
+  "repair_scope": []
+}

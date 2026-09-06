@@ -1,0 +1,24 @@
+{
+  "outlines": 1,
+  "blocking": 3,
+  "findings": [
+    {
+      "chapter": 1,
+      "severity": "blocking",
+      "code": "missing-field",
+      "msg": "缺少「前因」因果字段（建议补建）"
+    },
+    {
+      "chapter": 1,
+      "severity": "blocking",
+      "code": "missing-field",
+      "msg": "缺少「后果指向」因果字段（建议补建）"
+    },
+    {
+      "chapter": 1,
+      "severity": "blocking",
+      "code": "missing-field",
+      "msg": "缺少「读者已知」因果字段（建议补建）"
+    }
+  ]
+}

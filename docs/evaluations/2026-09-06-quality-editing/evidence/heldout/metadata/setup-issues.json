@@ -1,0 +1,21 @@
+{
+  "resolved": [
+    {
+      "issue": "runtime/.codex/agents/narrative-writer.toml not deployed",
+      "resolution": "Parent directed actual full frozen generated template in runtime/.agents/skills/story-setup/references/codex/agents/narrative-writer.toml; used full instructions as direct narrative writer."
+    },
+    {
+      "issue": "Requested current project .codex/agents/narrative-writer.toml did not exist",
+      "attempts": "wc and sed failed, exit 1; no current-source instructions consumed."
+    },
+    {
+      "issue": "anti-ai-core.md filename absent",
+      "resolution": "Parent corrected to runtime/_shared/references/anti-ai-writing.md core. Read lines 1-180 covering core rules and their context."
+    },
+    {
+      "issue": "Planning helper Python UTF-8 source parse error despite UTF-8 bytes",
+      "resolution": "Added explicit UTF-8 coding header before planning generation; failed output retained in logs/planning.prepare-attempt-1.log and attempt-2.log; no prose existed at this stage."
+    }
+  ],
+  "caliber_clarification": "Parent clarified 汉字 was colloquial chapter wordcount. Sole delivery range is visible_chars_v1 2200-2800; pure Han statistics are descriptive and not a failure."
+}

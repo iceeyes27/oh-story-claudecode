@@ -1,0 +1,13 @@
+{
+  "source": "Python execution; split body on 。！？!?; strip surrounding dialogue quotes; exclude title and whitespace; sentence-ending separator not counted",
+  "sentence_count": 132,
+  "short_lt15_percent": 52.27,
+  "medium_15to30_percent": 39.39,
+  "long_gt30_percent": 8.33,
+  "mean_sentence_length": 15.54,
+  "raw_sha256": "b3e59f45fe5af914ece19ed6b7c589f9db8feab7a45f214e0dad56acb53f6e58",
+  "candidate_sha256": "b3e59f45fe5af914ece19ed6b7c589f9db8feab7a45f214e0dad56acb53f6e58",
+  "blank_body_lines": [],
+  "dialogue_quote_count": 98,
+  "raw_preserved": true
+}

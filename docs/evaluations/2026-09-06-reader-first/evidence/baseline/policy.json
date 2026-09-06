@@ -1,0 +1,40 @@
+{
+  "arm": "baseline",
+  "created_at": "2026-09-06T04:06:14.169558+00:00",
+  "source_sha256": [
+    {
+      "path": "skills/story-write/references/long-mode.md",
+      "sha256": "31cbcdd7724add8c5103e88f05708dbe7d68e0f10ea723730b72f5249bcd8156"
+    },
+    {
+      "path": "skills/story-write/references/candidate-workflow.md",
+      "sha256": "f2def5d65fecddf1b1c3d5c4fe09351f19f6b1d991bff27c41db65adaf36a0b3"
+    },
+    {
+      "path": "skills/story-write/references/writing-craft.md",
+      "sha256": "07db641b88e4d627842931dcc79517fa61f115292fa092d8dcd31576b43dc083"
+    },
+    {
+      "path": "skills/story-write/references/long-format.md",
+      "sha256": "202a9636b563d63d80a9bb93292c5a749b75959868098670db2f1515c9e51207"
+    },
+    {
+      "path": "skills/story-write/references/long-chapter-quality.md",
+      "sha256": "2bb483051e7338a6d7dd20ffdae9338aa45872185deb85498213908e4e45989b"
+    },
+    {
+      "path": "skills/story-write/references/long-chapter-hooks.md",
+      "sha256": "0d492f0b0d64017fa8ad4cb5232a7a1b7857bf3a8c8e21eac5fde5b50d890848"
+    },
+    {
+      "path": "skills/story-write/references/long-suspense.md",
+      "sha256": "8ae3e1d654dd149abad22bd2be906bc92ad5a0bb9b2afa6376187a8f9b8d1de7"
+    },
+    {
+      "path": "skills/story-write/references/long-reversal.md",
+      "sha256": "98e78968f204b5945d0a11e38f8eeee677b8e4386052e72e4082ecb539de0365"
+    }
+  ],
+  "chars": 67860,
+  "sha256": "e94daa4d423730259b96282ac9b9de4eb9c2bdc1f19440c406e1208a65a566a2"
+}

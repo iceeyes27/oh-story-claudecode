@@ -1,0 +1,26 @@
+{
+  "book_title": "第五个人（隔离流程模拟）",
+  "chapter_gaps": [],
+  "characters": {},
+  "context": {
+    "active_character_names": [],
+    "continuity_risks": [],
+    "long_term_constraints": [],
+    "next_chapter_commitments": [],
+    "position": {
+      "scene": "展厅",
+      "story_time": "开篇前",
+      "volume": "照片展",
+      "volume_start_chapter": 1
+    },
+    "recent_chapters": []
+  },
+  "foreshadow": {},
+  "imported_through_chapter": 0,
+  "last_committed_chapter": 0,
+  "metrics": {},
+  "schema_version": 4,
+  "state_revision": 0,
+  "timeline": {},
+  "wordcount_records": {}
+}

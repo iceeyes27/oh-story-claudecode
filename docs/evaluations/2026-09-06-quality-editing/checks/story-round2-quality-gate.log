@@ -1,0 +1,740 @@
+
+[quality] sync-unit
+Preparing worktree (new branch 'codex/sync-upstream-7917d0b6b1fe-mtpfi885')
+HEAD is now at f91ab3c base
+Automatic merge went well; stopped before committing as requested
+✔ policy priority preserves fork boundaries and unified targets (2.943375ms)
+✔ CLI defaults to a read-only status command (0.246334ms)
+✔ ancestor check distinguishes forward and reverse baselines (210.333792ms)
+✔ prepare uses a dedicated worktree and leaves dirty caller files untouched (712.067833ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1071.715709
+
+[quality] sync-drift
+PASS: unified upstream checker reports source-to-target migration paths
+
+[quality] platform-capabilities
+PASS: 7 platform contracts; 18 public skills
+
+[quality] release-manifest
+PASS: release identity 0.8.1; upstream 5de060f9a47e
+
+[quality] doc-budget
+热路径文档预算
+------------------------------------------------------------------------------
+  用量 /   预算  余量  文件
+    3769 /   3800     31  skills/story-write/SKILL.md  [ok]
+   26646 /  27500    854  skills/story-write/references/long-mode.md  [ok]
+   21496 /  22200    704  skills/story-write/references/short-mode.md  [ok]
+   16404 /  17500   1096  skills/story-write/references/workflow-daily.md  [ok]
+   12686 /  13000    314  skills/story-write/references/workflow-setup.md  [ok]
+    9059 /   9100     41  skills/story-write/references/writing-craft.md  [ok]
+   15408 /  15500     92  skills/_shared/references/banned-words.md  [ok]
+   11599 /  14100   2501  skills/_shared/references/anti-ai-writing.md  [ok]
+   13229 /  14000    771  skills/story-setup/references/templates/agents/narrative-writer.md  [ok]
+    2398 /   2600    202  skills/story-write/references/reader-first-writing.md  [ok]
+
+路径合计（一次会话真正付的量）
+------------------------------------------------------------------------------
+   46819 /  48500   1681  长篇日更主会话  [ok]
+   43101 /  44000    899  长篇开书  [ok]
+   17087 /  18500   1413  普通长篇正文 agent 固定参考  [ok]
+
+提示（不阻断）：
+  - skills/story-write/references/workflow-daily.md 比预算低 1096 字，可把 budget 降到 16500 锁住这次精简
+  - skills/_shared/references/anti-ai-writing.md 比预算低 2501 字，可把 budget 降到 11600 锁住这次精简
+  - skills/story-setup/references/templates/agents/narrative-writer.md 比预算低 771 字，可把 budget 降到 13300 锁住这次精简
+  - skills/story-write/references/reader-first-writing.md 比预算低 202 字，可把 budget 降到 2400 锁住这次精简
+
+Result: 热路径文档预算检查通过
+
+[quality] candidate-transaction
+test_arc02_blocking_requires_exact_author_approval (__main__.CandidateCommitTests.test_arc02_blocking_requires_exact_author_approval) ... ok
+test_candidate_does_not_touch_body_or_tracking (__main__.CandidateCommitTests.test_candidate_does_not_touch_body_or_tracking) ... ok
+test_candidate_workflow_documents_v2_logic_contract (__main__.CandidateCommitTests.test_candidate_workflow_documents_v2_logic_contract) ... ok
+test_chapter_14_and_16_do_not_require_arc_receipts (__main__.CandidateCommitTests.test_chapter_14_and_16_do_not_require_arc_receipts) ... ok
+test_chapter_15_requires_ledger_and_valid_arc02 (__main__.CandidateCommitTests.test_chapter_15_requires_ledger_and_valid_arc02) ... ok
+test_check_passes_on_new_chapter_with_intent_fields (__main__.CandidateCommitTests.test_check_passes_on_new_chapter_with_intent_fields) ... ok
+test_emotion_run_input_failure_still_rejects_before_writes (__main__.CandidateCommitTests.test_emotion_run_input_failure_still_rejects_before_writes) ... ok
+test_four_same_emotion_distinct_events_check_and_promote (__main__.CandidateCommitTests.test_four_same_emotion_distinct_events_check_and_promote) ... ok
+test_future_emotion_outline_does_not_extend_current_advisory (__main__.CandidateCommitTests.test_future_emotion_outline_does_not_extend_current_advisory) ... ok
+test_historical_chapter_missing_intent_fields_is_advisory (__main__.CandidateCommitTests.test_historical_chapter_missing_intent_fields_is_advisory) ... ok
+test_historical_chapter_real_world_name_is_advisory (__main__.CandidateCommitTests.test_historical_chapter_real_world_name_is_advisory) ... ok
+test_list_reports_pending (__main__.CandidateCommitTests.test_list_reports_pending) ... ok
+test_metrics_cumulative_value_accepts_prose_delta (__main__.CandidateCommitTests.test_metrics_cumulative_value_accepts_prose_delta) ... ok
+test_metrics_update_binds_value_and_source_then_promotes (__main__.CandidateCommitTests.test_metrics_update_binds_value_and_source_then_promotes) ... ok
+test_metrics_value_must_match_source_phrase (__main__.CandidateCommitTests.test_metrics_value_must_match_source_phrase) ... ok
+test_new_chapter_character_near_name_is_advisory (__main__.CandidateCommitTests.test_new_chapter_character_near_name_is_advisory) ... ok
+test_new_chapter_invalid_emotion_value_is_blocked (__main__.CandidateCommitTests.test_new_chapter_invalid_emotion_value_is_blocked) ... ok
+test_new_chapter_missing_causal_fields_is_blocked (__main__.CandidateCommitTests.test_new_chapter_missing_causal_fields_is_blocked) ... ok
+test_new_chapter_missing_intent_fields_is_blocked (__main__.CandidateCommitTests.test_new_chapter_missing_intent_fields_is_blocked) ... ok
+test_new_chapter_undeclared_real_world_name_is_blocked (__main__.CandidateCommitTests.test_new_chapter_undeclared_real_world_name_is_blocked) ... ok
+test_no_scan_cannot_bypass_logic_receipts (__main__.CandidateCommitTests.test_no_scan_cannot_bypass_logic_receipts) ... ok
+test_promote_all_rejects_multiple_candidates_before_writes (__main__.CandidateCommitTests.test_promote_all_rejects_multiple_candidates_before_writes) ... ok
+test_promote_all_with_current_serial_candidate (__main__.CandidateCommitTests.test_promote_all_with_current_serial_candidate) ... ok
+test_promote_honors_explicit_terse_title_profile (__main__.CandidateCommitTests.test_promote_honors_explicit_terse_title_profile) ... ok
+test_promote_ignores_in_prose_exemption_marker (__main__.CandidateCommitTests.test_promote_ignores_in_prose_exemption_marker) ... ok
+test_promote_missing_transaction_aborts (__main__.CandidateCommitTests.test_promote_missing_transaction_aborts) ... ok
+test_promote_moves_prose_and_advances_tracking (__main__.CandidateCommitTests.test_promote_moves_prose_and_advances_tracking) ... ok
+test_promote_no_scan_bypasses_ai_gate_only (__main__.CandidateCommitTests.test_promote_no_scan_bypasses_ai_gate_only) ... ok
+test_promote_no_scan_requires_reason (__main__.CandidateCommitTests.test_promote_no_scan_requires_reason) ... ok
+test_promote_quality_gate_fails_when_node_is_unavailable (__main__.CandidateCommitTests.test_promote_quality_gate_fails_when_node_is_unavailable) ... ok
+test_promote_records_scan_skip_reason (__main__.CandidateCommitTests.test_promote_records_scan_skip_reason) ... ok
+test_promote_refuses_to_overwrite_final (__main__.CandidateCommitTests.test_promote_refuses_to_overwrite_final) ... ok
+test_promote_rejects_duplicate_logic_id_in_json (__main__.CandidateCommitTests.test_promote_rejects_duplicate_logic_id_in_json) ... ok
+test_promote_rejects_empty_or_unbound_semantic_evidence (__main__.CandidateCommitTests.test_promote_rejects_empty_or_unbound_semantic_evidence) ... ok
+test_promote_rejects_missing_or_unknown_logic_id (__main__.CandidateCommitTests.test_promote_rejects_missing_or_unknown_logic_id) ... ok
+test_promote_rejects_stale_expected_revision_before_writes (__main__.CandidateCommitTests.test_promote_rejects_stale_expected_revision_before_writes) ... ok
+test_promote_rejects_stale_reader_file_hash (__main__.CandidateCommitTests.test_promote_rejects_stale_reader_file_hash) ... ok
+test_promote_rejects_v1_binding_with_regeneration_message (__main__.CandidateCommitTests.test_promote_rejects_v1_binding_with_regeneration_message) ... ok
+test_promote_reruns_rc01_even_with_no_scan (__main__.CandidateCommitTests.test_promote_reruns_rc01_even_with_no_scan) ... ok
+test_promote_rolls_back_on_tracking_failure (__main__.CandidateCommitTests.test_promote_rolls_back_on_tracking_failure) ... ok
+test_promote_treats_style_pattern_as_review_finding (__main__.CandidateCommitTests.test_promote_treats_style_pattern_as_review_finding) ... ok
+test_recover_is_idempotent_after_each_persisted_phase (__main__.CandidateCommitTests.test_recover_is_idempotent_after_each_persisted_phase) ... ok
+test_recover_rejects_changed_reader_view_before_move_or_tracking (__main__.CandidateCommitTests.test_recover_rejects_changed_reader_view_before_move_or_tracking) ... ok
+test_recover_validates_transaction_digest_before_moving_prose (__main__.CandidateCommitTests.test_recover_validates_transaction_digest_before_moving_prose) ... ok
+test_reject_archives_without_touching_body (__main__.CandidateCommitTests.test_reject_archives_without_touching_body) ... ok
+test_rewrite_flag_marks_action (__main__.CandidateCommitTests.test_rewrite_flag_marks_action) ... ok
+test_settlement_phrase_without_metrics_change_is_blocked (__main__.CandidateCommitTests.test_settlement_phrase_without_metrics_change_is_blocked) ... ok
+test_settlement_reason_explicitly_allows_unchanged_metrics (__main__.CandidateCommitTests.test_settlement_reason_explicitly_allows_unchanged_metrics) ... ok
+test_fact_revision_cannot_omit_downstream_reading (__main__.OrdinaryRevisionTests.test_fact_revision_cannot_omit_downstream_reading) ... ok
+test_fact_revision_requires_transaction_and_all_later_context (__main__.OrdinaryRevisionTests.test_fact_revision_requires_transaction_and_all_later_context) ... ok
+test_faults_recover_idempotently_and_block_other_writers (__main__.OrdinaryRevisionTests.test_faults_recover_idempotently_and_block_other_writers) ... ok
+test_lifecycle_head_cannot_be_bypassed (__main__.OrdinaryRevisionTests.test_lifecycle_head_cannot_be_bypassed) ... ok
+test_prepare_and_check_leave_adopted_prose_and_state_unchanged (__main__.OrdinaryRevisionTests.test_prepare_and_check_leave_adopted_prose_and_state_unchanged) ... ok
+test_recover_refuses_unrelated_edit (__main__.OrdinaryRevisionTests.test_recover_refuses_unrelated_edit) ... ok
+test_stale_original_context_inventory_and_review_fail_before_writes (__main__.OrdinaryRevisionTests.test_stale_original_context_inventory_and_review_fail_before_writes) ... ok
+test_symlink_parent_rejected (__main__.OrdinaryRevisionTests.test_symlink_parent_rejected) ... ok
+test_volume_directories_and_restoring_original (__main__.OrdinaryRevisionTests.test_volume_directories_and_restoring_original) ... ok
+test_wording_and_rhythm_preserve_tracking_facts_and_original (__main__.OrdinaryRevisionTests.test_wording_and_rhythm_preserve_tracking_facts_and_original) ... ok
+test_wording_requires_explicit_unchanged_facts_review (__main__.OrdinaryRevisionTests.test_wording_requires_explicit_unchanged_facts_review) ... ok
+
+----------------------------------------------------------------------
+Ran 59 tests in 59.810s
+
+OK
+
+[quality] tracking
+test_a_character_can_die_and_retire_in_one_transaction (__main__.TrackingCommitTests.test_a_character_can_die_and_retire_in_one_transaction) ... ok
+test_an_interrupted_archive_can_be_resumed (__main__.TrackingCommitTests.test_an_interrupted_archive_can_be_resumed) ... ok
+test_append_can_atomically_declare_an_exact_chapter_gap (__main__.TrackingCommitTests.test_append_can_atomically_declare_an_exact_chapter_gap) ... ok
+test_archive_never_clobbers_an_already_archived_file (__main__.TrackingCommitTests.test_archive_never_clobbers_an_already_archived_file) ... ok
+test_chapter_gap_requires_exact_boundaries_and_append_mode (__main__.TrackingCommitTests.test_chapter_gap_requires_exact_boundaries_and_append_mode) ... ok
+test_character_snapshot_lists_are_not_limited_to_eight_items (__main__.TrackingCommitTests.test_character_snapshot_lists_are_not_limited_to_eight_items) ... ok
+test_check_compares_derived_views_to_state_without_parsing_markdown (__main__.TrackingCommitTests.test_check_compares_derived_views_to_state_without_parsing_markdown) ... ok
+test_check_rejects_a_delta_inside_a_declared_gap (__main__.TrackingCommitTests.test_check_rejects_a_delta_inside_a_declared_gap) ... ok
+test_check_rejects_orphan_character_file (__main__.TrackingCommitTests.test_check_rejects_orphan_character_file) ... ok
+test_commit_and_check_still_refuse_a_retired_layout (__main__.TrackingCommitTests.test_commit_and_check_still_refuse_a_retired_layout) ... ok
+test_commit_updates_state_and_all_demo_derived_views (__main__.TrackingCommitTests.test_commit_updates_state_and_all_demo_derived_views) ... ok
+test_declared_context_retirement_is_recorded_in_the_chapter_delta (__main__.TrackingCommitTests.test_declared_context_retirement_is_recorded_in_the_chapter_delta) ... ok
+test_dropping_a_context_item_without_declaring_it_is_rejected (__main__.TrackingCommitTests.test_dropping_a_context_item_without_declaring_it_is_rejected) ... ok
+test_failed_init_leaves_the_old_tracking_directory_untouched (__main__.TrackingCommitTests.test_failed_init_leaves_the_old_tracking_directory_untouched) ... ok
+test_imported_chapter_revision_creates_an_overlay_record (__main__.TrackingCommitTests.test_imported_chapter_revision_creates_an_overlay_record) ... ok
+test_imported_cutoff_requires_only_new_daily_records (__main__.TrackingCommitTests.test_imported_cutoff_requires_only_new_daily_records) ... ok
+test_init_archives_a_pre_transaction_tracking_directory (__main__.TrackingCommitTests.test_init_archives_a_pre_transaction_tracking_directory) ... ok
+test_init_creates_one_structured_authority_and_only_derived_views (__main__.TrackingCommitTests.test_init_creates_one_structured_authority_and_only_derived_views) ... ok
+test_legacy_state_without_chapter_gaps_accepts_first_gap_append (__main__.TrackingCommitTests.test_legacy_state_without_chapter_gaps_accepts_first_gap_append) ... ok
+test_metrics_default_empty_and_render_stays_seven_headings (__main__.TrackingCommitTests.test_metrics_default_empty_and_render_stays_seven_headings) ... ok
+test_metrics_render_as_position_bullet (__main__.TrackingCommitTests.test_metrics_render_as_position_bullet) ... ok
+test_metrics_render_twelve_most_recent_and_report_hidden_count (__main__.TrackingCommitTests.test_metrics_render_twelve_most_recent_and_report_hidden_count) ... ok
+test_metrics_require_structured_record_and_changed_chapter (__main__.TrackingCommitTests.test_metrics_require_structured_record_and_changed_chapter) ... ok
+test_missing_active_snapshot_is_rejected_before_any_write (__main__.TrackingCommitTests.test_missing_active_snapshot_is_rejected_before_any_write) ... ok
+test_old_revision_applies_current_rows_without_moving_update_chapter_back (__main__.TrackingCommitTests.test_old_revision_applies_current_rows_without_moving_update_chapter_back) ... ok
+test_old_revision_preserves_current_next_chapter_commitment (__main__.TrackingCommitTests.test_old_revision_preserves_current_next_chapter_commitment) ... ok
+test_overlapping_persisted_chapter_gaps_are_rejected (__main__.TrackingCommitTests.test_overlapping_persisted_chapter_gaps_are_rejected) ... ok
+test_partial_view_write_keeps_old_authority_and_same_transaction_can_retry (__main__.TrackingCommitTests.test_partial_view_write_keeps_old_authority_and_same_transaction_can_retry) ... ok
+test_retirement_is_rejected_in_a_revision (__main__.TrackingCommitTests.test_retirement_is_rejected_in_a_revision) ... ok
+test_retiring_a_core_character_removes_its_derived_view (__main__.TrackingCommitTests.test_retiring_a_core_character_removes_its_derived_view) ... ok
+test_retiring_a_still_active_character_is_rejected (__main__.TrackingCommitTests.test_retiring_a_still_active_character_is_rejected) ... ok
+test_snapshot_target_warns_and_hard_cap_rejects_before_any_write (__main__.TrackingCommitTests.test_snapshot_target_warns_and_hard_cap_rejects_before_any_write) ... ok
+test_stale_revision_cannot_overwrite_newer_state (__main__.TrackingCommitTests.test_stale_revision_cannot_overwrite_newer_state) ... ok
+test_transaction_missing_metrics_is_rejected (__main__.TrackingCommitTests.test_transaction_missing_metrics_is_rejected) ... ok
+test_unknown_fields_are_rejected (__main__.TrackingCommitTests.test_unknown_fields_are_rejected) ... ok
+test_windows_reserved_character_name_is_rejected (__main__.TrackingCommitTests.test_windows_reserved_character_name_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 36 tests in 7.082s
+
+OK
+
+[quality] author-voice-profile
+PASS: test_update_scope_preservation_and_idempotence
+PASS: test_check_and_dry_run_are_read_only
+PASS: test_marker_failures_are_non_destructive
+PASS: test_empty_invalid_and_duplicate_samples
+PASS: test_short_evidence_and_digest_change
+PASS: test_update_respects_project_lock
+PASS: test_symlink_escape_is_rejected
+author voice profile tests: 7/7 passed
+
+[quality] tracking-workflow
+Tracking workflow contract tests passed (15 tests).
+
+[quality] chapter-skeleton
+OK: chapter skeleton validator regressions passed
+
+[quality] contracts
+✔ question titles distinguish market questions from slogan questions by profile (464.016583ms)
+✔ fanqie relaxes length and common role overlap but terse keeps the legacy gate (245.418334ms)
+✔ AI summary clauses and exact repeats remain blocking in every profile (220.213792ms)
+✔ demo baseline is 0 blocking in fanqie and 13 in terse (197.624208ms)
+✔ 逾期伏笔拦住首建新章 (13.798959ms)
+✔ 悬空（从没排回收章）不拦日更 (4.198375ms)
+✔ 回收章还没到、以及已回收/放弃的伏笔都不拦 (24.663417ms)
+✔ 正好写到计划回收章那一章不算逾期 (14.000084ms)
+✔ 细纲头部的 <!-- 伏笔:跳过 --> 豁免，超出头 6 行则无效 (7.791459ms)
+✔ 伏笔欠账门排在毒句式欠账门之前 (6.374833ms)
+✔ 正文已存在（续写/改稿/回炉）不触发本门 (4.094541ms)
+✔ 状态损坏一律 fail-open，不因解析失败误伤写作 (8.37625ms)
+✔ 多条逾期只列前 6 条并给出完整体检出口 (6.240291ms)
+✔ CLI 子命令 foreshadow-debt 与核逐字一致 (256.647667ms)
+✔ js ↔ codex py 文案 parity (329.5385ms)
+✔ 热卡复刻 tracking_commit.py 的排序：重要度 → 计划回收章 → id，未排期排最后 (5.46975ms)
+✔ 热卡只保留前 8 条，同重要度内旧伏笔（id 小）优先 (0.365792ms)
+✔ 逾期是 blocking：定了回收章又错过 (1.1225ms)
+✔ 正好写到计划回收章那一章不算逾期，过了才算 (0.206583ms)
+✔ 悬空默认 advisory，--strict 下变 blocking (0.865792ms)
+✔ 悬空阈值按重要度分档 (0.408333ms)
+✔ 冷藏点名掉出热卡且埋了很久的伏笔 (0.500958ms)
+✔ 已回收 / 放弃 / 已过期的伏笔不再计入活跃债务 (0.279875ms)
+✔ 非 schema_version 4 与损坏字段被拒绝，不猜测 (0.329625ms)
+✔ CLI 退出码：0 干净 / 1 有逾期 / 2 参数或状态错误 (782.525667ms)
+✔ --json 输出可解析且字段稳定 (106.562042ms)
+✔ demo 书：热卡与已渲染的 追踪/上下文.md 逐条一致 (2.315458ms)
+✔ new books default to plain narrative while legacy books remain regular (2.775041ms)
+✔ plain mode writes causality directly and does not require a hidden ending (0.657041ms)
+✔ title profile keeps pathological forms blocking in both modes (0.734292ms)
+✖ first necessary explanation is preserved before deletion gates (7.658875ms)
+✔ dialogue keeps causal information while rejecting exposition monologues (0.330375ms)
+✔ general mode exposes one explicit route for rewrite, review, and translation (2.2725ms)
+✔ general route boundaries stay consistent and load only task-relevant references (0.831ms)
+✔ review is ranked and contextual instead of a mandatory-clear scanner (0.472ms)
+✔ every guide fragment in the index resolves to an actual heading (1.953583ms)
+✔ translation preserves protected values, information, and document structure (0.237583ms)
+✔ novel mode and shared scanner contracts remain present (0.209959ms)
+✔ the repository contract suite includes the general-mode test (0.466417ms)
+✔ novel editor and all reviewer entry points reject retired global policies (5.390917ms)
+✔ the consumer guard detects representative old rules instead of silently passing (0.327375ms)
+✔ ordinary editing preserves context and stops after a bounded reading-driven pass (0.632833ms)
+✔ platform and generic rubrics require applicability before judging chapter shape (0.312ms)
+✔ generic novel check requires all ten stages and the manifest contract (7.975125ms)
+✔ pure Chinese prose profile gives logic checks at least one quarter of applicable budget (2.39475ms)
+✔ validation spec stays synchronized with the composite manifest (1.050708ms)
+✔ AI flavor manifest preserves all ten layers and five semantic mismatch checks (0.447167ms)
+✔ every composite-check dependency is in the installable public skill set (1.286208ms)
+✔ story-deslop file-mode pollution dependency is publicly installable and counted (2.347083ms)
+✔ a finding does not stop later filters, but a missing or blocked item cannot complete (1.054375ms)
+✔ skip requires a reason and trigger precedence keeps version checks separate (0.829ms)
+✔ runtime hooks use the unified story-write entry and expose the post-event route (3.668083ms)
+ℹ tests 52
+ℹ suites 0
+ℹ pass 51
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1316.575833
+
+✖ failing tests:
+
+test at skills/story-deslop/tests/first-mention-protection.test.js:12:1
+✖ first necessary explanation is preserved before deletion gates (7.658875ms)
+  AssertionError [ERR_ASSERTION]: The input did not match the regular expression /首次说明人物动机、关系、能力来历或事件因果[\s\S]*不得删除/. Input:
+  
+  '---\n' +
+    'name: story-deslop\n' +
+    'version: 2.1.0\n' +
+    'description: "去AI味/说人话（小说正文+通用中文统一入口）。mode=novel 走网文去AI味 7 Gate 系统（禁用词/句式/心理/节奏/对话/结尾/解释腔），配合脚本和禁用词表；mode=general 处理 chat/status/docs/public-writing 的改写、审稿与显式触发的结构保真翻译。触发方式：/story-deslop、/去AI味、「去AI味」「说人话」「太AI了」「别像模板」「自然一点」——按输入类型自动路由。"\n' +
+    'metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}\n' +
+    'disable: true\n' +
+    '---\n' +
+    '\n' +
+    '# story-deslop：去 AI 味 / 说人话（统一入口）\n' +
+    '\n' +
+    '把文本从「像模型在表演写作」拉回「像具体人在当前场景下表达」。本 skill 提供两种模式，按输入类型自动路由，也可由用户显式指定。\n' +
+    '\n' +
+    '- **`mode = novel`**：网文小说正文去 AI 味。走 7 Gate 系统（禁用词 / 句式 / 心理 / 节奏 / 对话 / 结尾 / 解释腔），配合本地脚本、禁用词表与白名单。\n' +
+    '- **`mode = general`**：通用文本处理。支持非小说正文的中英文改写、审稿，以及用户明确要求的结构保真翻译。\n' +
+    '\n' +
+    '> Agent 兼容性：检查专业 agent 是否可用时，按 `.claude/agents/{agent}.md` → `.opencode/agents/{agent}.md` → `.codex/agents/{agent}.toml` 的顺序查找。Codex 原生子代理调用优先使用同名 `agent_type`；如果当前 Codex 运行时返回 `unknown agent_type` 或未暴露 custom-agent registry，必须降级为 solo/direct。检测到 `.zcode/` 时同样直接 solo/direct，因为 ZCode 3.3.4 不执行项目 custom agents；报告 `Fallback: project custom agents unavailable -> solo`。Claude/OpenCode 兼容面保留 `subagent_type`。\n' +
+    '>\n' +
+    '> Spawn 版本提示（不阻断 spawn）：先读取项目根 `.story-deployed` 的 `agents_version`。与本版 `agents_version: 29` 不一致时（标记缺失、字段缺失/非整数、小于或大于 29）**照常按文件存在性检查并 spawn**，同时报告 `Notice: agents bundle 版本不匹配（项目 {N}，本版 29）` 并提示重新运行 `/story-setup` 后新开会话；大于 29 时额外提示先更新 oh-story-claudecode，不要用本地旧版 setup 降级覆盖。只有 agent 文件缺失、或运行时不暴露 custom agent 时才降级 solo/direct，报告 `Fallback: ... -> solo`。\n' +
+    '\n' +
+    '---\n' +
+    '\n' +
+    '## 模式路由（Mode routing）\n' +
+    '\n' +
+    '### 自动检测规则\n' +
+    '\n' +
+    '按下列优先级判断 `mode`：\n' +
+    '\n' +
+    '1. **用户显式指定优先**：用户在 prompt 中写明 `mode=novel` / `mode=general`、或明确说「按小说处理」「按通用文本处理」「走 7 Gate」「走场景分级」时，按指定模式执行。\n' +
+    '2. **输入是文件路径**：\n' +
+    '   - 路径位于 `正文/` 或 `拆文库/` 下 → `mode = novel`\n' +
+    '   - 路径位于 `正文/`、`拆文库/` 之外的目录（如 `docs/`、`notes/`、根目录散文件）→ `mode = general`\n' +
+    '   - 文件名含「章节」「第 X 章」「卷」等小说正文信号 → `mode = novel`\n' +
+    '3. **输入是粘贴文本**（无文件路径）：\n' +
+    '   - 文本以小说正文特征为主（叙事段落、对话密集、章节体）→ `mode = novel`\n' +
+    '   - 文本是 chat / status / docs / 公开写作 / 中英混排技术文本 → `mode = general`\n' +
+    '4. **默认**：当前项目默认 `mode = novel`，除非用户明确表示处理的是非小说文本。\n' +
+    '\n' +
+    '### 路由后行为\n' +
+    '\n' +
+    '- 选定 `mode = novel` → 进入「小说去 AI 味模式」章节，按 7 Gate + 脚本 + 禁用词表流程执行。\n' +
+    '- 选定 `mode = general` → 进入「通用说人话模式」章节，再按用户请求选择 `rewrite / review / translation` 子任务。\n' +
+    '- 用户可在任何时候切换模式：明示 `切到 novel / 切到 general` 或重新指定 `mode=` 即可。\n' +
+    '\n' +
+    '### 共享判断（两种模式都适用）\n' +
+    '\n' +
+    '如果文本主要是代码、日志、命令、配置、接口名、报错，默认不进入任何模式；用户明确要求翻译其中的自然语言说明时，只翻译说明文字并保护技术内容。仿官方模板、仿特定品牌 voice 或事实校对不属于本 skill。\n' +
+    '\n' +
+    '翻译只由「翻译」「译成某语言」「结构保真翻译」等明确请求触发。外文、中英混排或代码片段本身都不能自动触发翻译。\n' +
+    '\n' +
+    '---\n' +
+    '\n' +
+    '## 共享核心原则\n' +
+    '\n' +
+    '以下原则两种模式都必须遵守，发生冲突时以本节为准。\n' +
+    '\n' +
+    '### 原则 1：改味优先，别当改错\n' +
+    '\n' +
+    'AI 味不按语法错误处理，也不需要「修正」。它属于风格问题：过于书面化、过于对仗工整、过于面面俱到。去 AI 味的本质，是把文字从过度工整拉回具体、自然、可读。\n' +
+    '\n' +
+    '### 原则 2：改最少，效果最大\n' +
+    '\n' +
+    '去 AI 味不等于重写。目标是改最少的字，让整段文字的「味」变过来。能改一个词就不改一句，能删一句就不重写一段。没有问题的句子尽量保留原句；人名、地名、数字、章节名、专有名词优先保留。\n' +
+    '\n' +
+    '**过度去 AI 味保护**（novel 模式强制，general 模式 `in-place` / `bounded` scope 同样强制）：\n' +
+    '- **novel 模式**不得删掉唯一的剧情、人物或阅读功能；整段只重复已知信息且删除无损时可以删并，先核对前后承接。**general 模式**不得整段删除正文内容；如果某段被标记为多处 AI 味，应逐句修改而非删除整段。\n' +
+    '- 删除前必须确认：被删除的内容是否包含伏笔、钩子、角色特征、情节推进、人物记忆、情绪承接、因果锚点等关键信息。\n' +
+    '- 如果删除会破坏情节连贯性，改为「降 AI 重写」而非删除。\n' +
+    '- **novel 模式**按授权范围和阅读损失决定局部修改，记录实际字数变化，不按 AI 味等级确定删除比例；不得删除剧情功能。**general 模式**沿用删除比例上限：轻度 ≤15%，中度 ≤25%，重度 ≤35%。重度文本可通过「合并重复描写 + 重写降 AI」产生更大字符差，但仍不得整段删除或删掉剧情功能。超过对应比例应在报告中标记超限风险，并输出分段处理方案。\n' +
+    '- 如果逐句修改后某段仍不满意，在报告中标注 `[需复核]`，不以不满意为由继续删除；general 模式仍不计入当前等级的删除比例上限。\n' +
+    '- 对于「疑似 AI 味但不确定」的内容，在报告中标注 `[需复核]`，而非插入正文。\n' +
+    '\n' +
+    '### 原则 3：保留创作意图 / 保留信息\n' +
+    '\n' +
+    '去 AI 味只改「怎么说」，不改「说什么」。\n' +
+    '\n' +
+    '- **novel 模式**：剧情、人设、情节走向一概不动；不新增原文没有的情节、设定、关系或时间线。如果原文有逻辑问题，那不是去 AI 味的活。\n' +
+    '- **general 模式**：任何改写都不能新增事实、删核心事实或改变责任主体。优先保信息，再谈风格。\n' +
+    '\n' +
+    '### 原则 4：保留有功能的语气\n' +
+    '\n' +
+    '去 AI 味不是把文字全部磨成句号。\n' +
+    '\n' +
+    '- **novel 模式**：标点服从本书声线与语义；`？`、`！`、`……`、`——` 承担疑问、爆发、犹豫、未尽或打断时可以保留。只处理无功能堆砌，不统一换成动作或句号；作者明确标点约定按作用域执行。\n' +
+    '- **general 模式**：保留有功能的标点（命令、报错、引用里的原始标点）；删除模板化收尾的 `！` 堆砌与表演性 `——`。\n' +
+    '\n' +
+    '### 边界：去 AI 味只处理读感与叙事功能\n' +
+    '\n' +
+    '去 AI 味治读感，不承诺任何分数结果。若用户贴出工具报告，只把能对应到正文的问题转成具体修改点；不写「0% AI / 100% 真人」，不注水、故意错字或打乱标点。去 AI 味仍以原文剧情边界为准，不把表达修复变成新增情节或新增事件链。\n' +
+    '\n' +
+    '**去 AI 味补充判断**（两种模式都适用）：\n' +
+    '- 首次交代优先：处理解释总结前，先判它是否首次说明动机、关系、能力来历或因果；首次必要信息只改写成场内白话，不删。前文已交代的重复总结才删除或合并。\n' +
+    '- 场内载体优先：原文已有手机、屏幕、公告、门牌、表单、账单、物证、规则行时，保留为角色看见 / 读错 / 处理的文本或物件；不要改写成叙述者解释规则。\n' +
+    '- 白话但不注水：少用连续精致戏剧反应短语（头皮发紧、眼皮一跳、心口一沉、胃里翻涌）；能写普通动作 / 普通感觉就写普通动作 / 普通感觉，并保留自然的「的 / 了 / 就 / 但是 / 已经 / 之后 / 没有」等连接。\n' +
+    '- 番茄优先校准（novel 模式）：默认优先参考番茄高分正文的手机端短段、自然虚词和场内动作 / 对话推进；不要把 50-60 字行宽、50%-60% 对话占比、`地/得` 全改 `的`、全禁顿号 /「很」/「像」当成硬规则。\n' +
+    '- 题材文风优先（novel 模式）：文风对标要来自目标题材 / 本书文风指纹；不要把盘龙腔、旧网文腔、第一人称声口等当跨题材万能修法。\n' +
+    '- 不要当通用修法：单纯加标题、补物件、补动作尾巴、拉长 / 压短句子、增加排队 / 门禁 / 记录体，不能替代具体的情节、视角和语言问题处理。\n' +
+    '- 保留技术性（general 模式）：专业词、系统主语、事故复盘用语、PRD / 发布说明中的术语默认可保留。\n' +
+    '- 不用机械同义词替换表（general 模式）：默认可以删句、并句、降调、换主语、去总结式收尾；如果进入 `in-place` scope，就只做句内改写。\n' +
+    '\n' +
+    '### 作者习惯\n' +
+    '\n' +
+    '若作者记忆 state 已存在，改写前用 `.agents/skills/_shared/scripts/author_memory_commit.py query --kind prose_style` 获取匹配的 active 文风条目（总输出 ≤2KB），并交给 inline/spawn 执行者作为自然倾向，不逐条展示或最大化命中，不牺牲连贯、节奏和字数；当前请求、原文剧情功能和本 skill 保护规则优先。用户明确声明长期文风习惯时，改写后按 [.agents/skills/_shared/references/author-memory.md](../_shared/references/author-memory.md) 用 `record` 写入并回传回执；重复修正/推断先待确认，一次性要求、检测器 findings 和助手自己的结果不记录。\n' +
+    '\n' +
+    '---\n' +
+    '\n' +
+    '## 小说去 AI 味模式（mode = novel）\n' +
+    '\n' +
+    '> 适用：小说正文、章节文件和已授权范围内的批量编辑。7 Gate 是定位问题的方法目录，按本轮具体问题选用；不按词频或题材标签默认全章清洗。\n' +
+    '\n' +
+    '### 自然文本基准\n' +
+    '\n' +
+    '先读正文，再查看检测结果。用本书认可样例、题材和当前章节功能判断：日常相处、休息、回收、高潮可以有不同的句长、视角距离和情绪强度。\n' +
+    '\n' +
+    '| 维度 | 有功能时保留 | 需要复核的阅读损失 |\n' +
+    '|------|--------------|------------------|\n' +
+    '| 主体与因果 | 必要的主语、连接、解释和直写心理 | 读者不知道谁为什么行动，或同一原因被多次复述 |\n' +
+    '| 情绪与动作 | 直写、动作、台词、感官或留白均可 | 同一情绪换词复述，无功能小动作延迟结果 |\n' +
+    '| 对话 | 符合人物身份和当下意图；必要说话标签保留 | 人人同腔、重复已知信息、说话人难辨 |\n' +
+    '| 句长与段落 | 按信息、动作与语气自然组织 | 主干丢失、机械碎句、为了长度强拆或强并 |\n' +
+    '| 修辞与标点 | 角色化比喻、反讽、停顿、打断与未尽 | 无功能重复、误导或抹平声线；词形本身不证明问题 |\n' +
+    '| 章尾 | 行动、关系、后果、明确下一步、内心或余韵 | 重复空话、越界剧透、未兑现本书承诺 |\n' +
+    '\n' +
+    '### 检测流程\n' +
+    '\n' +
+    '#### Phase 1：阅读与只读预检\n' +
+    '\n' +
+    '1. 确定授权范围、原文版本、本书声线和当前章节功能；只读必要前后文。先记第一处读不懂、想跳过或人物失真的位置，以及一处值得保留的表达。没有损害证据可以报告“未发现需改项”。\n' +
+    '2. 文件模式运行共享预检，保留扫描器实际输出的 `severity`、来源、作用域和命中位置，不在本 skill 硬编码类别与严重度对应表：\n' +
+    '   ```bash\n' +
+    '   node .agents/skills/_shared/scripts/check-ai-patterns.js --check --fail-on=blocking <正文文件...>\n' +
+    '   ```\n' +
+    '3. `blocking` 按实际原因处理：确定性错误定点修；作者明确禁令遵守已验证的来源与作用域；规则加载失败先排查规则输入，不能把它当正文缺陷。语境和密度 findings 只作候选线索，不因词类命中升级。需要解释作者规则时读共享规范，不复制其 schema。\n' +
+    '4. 对 advisory 连同前后文记录“修复 / 有功能保留 / 误报 / 证据不足”；有功能保留可记 `PRESERVED_WITH_FUNCTION` 并写清作用。普通编辑不为保留一个原句启动研究 A/B。\n' +
+    '\n' +
+    '**脚本插入污染预检（文件模式）**：当输入是本地正文文件路径、且正文可能是批量生成或插入过的（多章节、刚补人物/内心/动作），调用 `batch-pollution-detector` Skill，只报告重复长句和引号/括号异常，不读取其文件路径。污染证据与语言建议分别记录，不把正常复沓当成批量污染；修复遵守该专项的边界。\n' +
+    '\n' +
+    '输出问题表：`位置 / 原文 / 阅读损失 / scanner severity 与来源（如有）/ 语境判定 / 建议范围 / 必须保留的信息`。不从词数估算作者身份或 AIGC 概率，不给无校准依据的市场等级与留存保证。\n' +
+    '\n' +
+    '#### Phase 2：选择本轮编辑目标\n' +
+    '\n' +
+    '- **首轮只选 1～2 个最高阅读损失**，例如关键因果不清、同一功能反复确认、人物在关键处失真、回报被操作步骤拖住；先给证据与预期改善，再选择相关 Gate。确定性 blocking 另按明确位置修正或如实报告，不能用这个数量限制掩盖未解决的阻断。\n' +
+    '- 字词密度、心理词数、对白标签比例、段落句数只帮助定位窗口，不定轻中重、不自动触发重写，也不要求降到某个比例。对同一段落改排版不应改变修复力度。\n' +
+    '- 普通编辑是一轮局部修订加一轮回读，范围为问题句/段及直接承接处。批量任务逐批照此执行；用户明确要求全篇重写时，另按授权范围处理，不从扫描档位推导重写许可。\n' +
+    '- 记录原文与准备修改的范围。如果问题在细纲设计、信息顺序或未给足必要事实，报告根因与上游修改方向，不用补动作掩盖，也不擅自新增剧情。\n' +
+    '\n' +
+    '#### Phase 3：按问题定向编辑\n' +
+    '\n' +
+    '已在子代理内则直接执行，不再派代理；外层具备可用的 narrative-writer 时可交给写手，否则主会话直接编辑。传递的任务至少包含：\n' +
+    '\n' +
+    '```text\n' +
+    '项目目录：{dir}\n' +
+    '检查范围：{已授权正文及必要前后文}\n' +
+    '作者偏好：{query 命中的 prose_style 项}\n' +
+    '当前章节功能与声线：{本书已有约定}\n' +
+    '本轮目标：{1～2 个最高阅读损失、原文证据与预期改善}\n' +
+    '扫描结果：{实际 severity、来源、作用域；不要重造类别分级}\n' +
+    '编辑范围：{问题句段及直接承接处}\n' +
+    '保护内容：{事实、人物意图、因果、信息首现、声线与有效原句}\n' +
+    '只做一轮定向编辑；不按词类通篇清洗，不新增剧情或补动作凑字。\n' +
+    '```\n' +
+    '\n' +
+    '**删除前检查**：首次必要动机、关系、能力来历、因果锚点，以及伏笔、钩子、人物记忆、情绪承接和后果必须保留。信息正确且表达清楚时保留原句；重复已知信息才删或并。不能为了省字改成读者要猜的代词、速记和电报体。原文功能 > Gate 技法；修复超出当前授权就报告缺口。\n' +
+    '\n' +
+    '##### Gate A：规则命中复核\n' +
+    '\n' +
+    '读取 [.agents/skills/_shared/references/banned-words.md](../_shared/references/banned-words.md) 的相关条目，遵守扫描器当前分级。普通词、有后果的动作、真实气味和温度不能只因子串命中就换写；作者明确禁令按来源和作用域执行，不由写手自行取消。项目规则和白名单的格式、校验与例外以共享实现为准。\n' +
+    '\n' +
+    '修法由问题决定：可保留、删重复、补清指向或重组句子，不设“禁词 → 动作”的转换表。普通“看了一眼”与“轻轻”要看此处在做什么；“深吸一口气”承担运动换气时可保留，无功能地反复插在对白前才处理。不能把“眼中闪过悲伤”统一改成“垂下眼”。\n' +
+    '\n' +
+    '##### Gate B：句式与修辞复核\n' +
+    '\n' +
+    '否定翻转、排比、比喻、因果句、认知句都先判断功能。承担辩解、排除、反讽、角色声线或首次因果时可保留；只重复前后项、给角色贴空标签或遮住主体时再删并或改清。修饰语不按个数删除；颜色、速度、数量、指代影响判断时保留。\n' +
+    '\n' +
+    '##### Gate C：情绪与重复信息\n' +
+    '\n' +
+    '直写情绪不是默认缺陷。判断、犹豫、羞耻或偏见改变选择、关系、策略或读者理解时可以直写；身体细节只在承担伤势、动作失败、人物习惯或情节后果时补。不得把“很愤怒”改成原文没有的掀桌，也不把所有心理换成手抖、攥衣角。\n' +
+    '\n' +
+    '复核同一意思是否已由对白、动作与旁白重复兑现；压掉无新增作用的重复，保留最有角色特点的一处。连续动作本来需要跟读时保留，不能为“反动作清单”删掉操作结果；反过来也不因为每步真实就逐项展开。\n' +
+    '\n' +
+    '##### Gate D：节奏与标点\n' +
+    '\n' +
+    '只处理有证据的主干丢失、理解跳接、重复拖延或机械切段。句长、段落长短服从本书声线和当前场面，不为了自然感故意碎句或长短交替。`……`、`——`、问号和感叹号按迟疑、打断、未尽、强调或人物声线判断；本书允许且有功能时保留，无功能堆砌才处理，不设统一替代形式。\n' +
+    '\n' +
+    '##### Gate E：人物对话\n' +
+    '\n' +
+    '按人物此刻要什么、愿说什么、能知道什么核对台词；必要说明、正常说话标签和清楚的逻辑可以保留。只处理不合身份的声口、说明书式重复、指向不明或无意同腔。口头禅、粗话、答非所问、停顿和动作穿插都不是必须添加的“真人感”。\n' +
+    '\n' +
+    '##### Gate F：章尾与回报\n' +
+    '\n' +
+    '先核对本章批准的落点和读者回报。动作、对话、判断、反思、明确后果或余韵均可；只处理空泛复述、无依据拔高、越界剧透和实际未兑现的问题。不统一改成安静物件，不因没有强悬念另造事故。\n' +
+    '\n' +
+    '##### Gate G：必要解释与视角\n' +
+    '\n' +
+    '核对本书批准的 POV 和信息边界；第一人称主观判断、必要因果、名词锚点和已经批准的前瞻可成立。只处理越界信息、替读者重复盖章或与场面脱节的解释。不按“他知道／因为／多年以后”等起句一律删除，不以补动作替代缺失的知识来源。\n' +
+    '\n' +
+    '#### Phase 3.5：局部验证与停止\n' +
+    '\n' +
+    '文件模式编辑后运行：\n' +
+    '\n' +
+    '```bash\n' +
+    'node .agents/skills/_shared/scripts/check-ai-patterns.js --check --fail-on=blocking <已修改正文文件...>\n' +
+    'node .agents/skills/_shared/scripts/check-degeneration.js --check <已修改正文文件...>\n' +
+    'node .agents/skills/_shared/scripts/normalize-punctuation.js --check <已修改正文文件...>\n' +
+    '```\n' +
+    '\n' +
+    '- 只按实际 `blocking` 修确定性问题或明确作者禁令；advisory 可带功能保留，扫描通过只表示未发现已登记阻断项。格式工具只检查，不把功能标点机械改写。\n' +
+    '- 读改动段和直接前后文：原问题是否缓解，人物意图、事实、信息首现、语气和余韵是否仍成立，有无新增重复或理解负担。没有改善或造成新损害时恢复该处原文并标明原因，不为证明编辑有效保留较差改法。\n' +
+    '- 复查“省略速记”：必须结合上下文判断主体、对象、意图是否可恢复；自然承接的省略保留，不要求每句脱离上下文独立成立。\n' +
+    '- 比较实际字数与原文，不用改写比例证明质量。已有正文保留原有篇幅约定；改后不满足约定时报告影响，不擅自加剧情或补废话。\n' +
+    '- **停止规则**：本轮目标已解决即停止，即使还有低收益建议也保留；同一问题回读后仍存在，重新判断根因并报告待办，不自动进入第二轮全章改写。额外编辑由新证据或用户授权驱动，不以全篇清零或连续无改动作为完成条件。\n' +
+    '\n' +
+    '#### Phase 4：输出编辑结果\n' +
+    '\n' +
+    '报告包含：本轮 1～2 个目标及原文证据、实际修改范围与前后对比、保留表达及理由、原文/修订字数、实际 blocking/advisory、回读结果、剩余问题和证据不足项。检测范围与修改范围分别写清，不把模型审读当真人评价。\n' +
+    '\n' +
+    '文件模式只回简短代表片段和文件路径，不复制全文；粘贴文本且无文件路径时可输出完整修订文本。只检测请求只做 Phase 1–2，不修改任何正文或项目文件。无需修改时明确说明，不制造修改数。\n' +
+    '\n' +
+    '### 小说模式参考资料\n' +
+    '\n' +
+    '| 资料 | 用途 |\n' +
+    '|------|------|\n' +
+    '| [.agents/skills/_shared/references/anti-ai-writing.md](../_shared/references/anti-ai-writing.md) | 按具体阅读问题查询技法；不默认加载整章三遍法 |\n' +
+    '| [.agents/skills/_shared/references/banned-words.md](../_shared/references/banned-words.md) | 规则来源、适用范围与例外 |\n' +
+    '| [.agents/skills/_shared/scripts/check-ai-patterns.js](../_shared/scripts/check-ai-patterns.js) | 实际分级的只读扫描 |\n' +
+    '| [.agents/skills/_shared/scripts/check-degeneration.js](../_shared/scripts/check-degeneration.js) | 退化、重复、截断和工程词线索 |\n' +
+    '\n' +
+    '---\n' +
+    '\n' +
+    '## 通用说人话模式（mode = general）\n' +
+    '\n' +
+    '> 适用：非小说正文的中英文 chat / status / docs / public-writing 改写、审稿与显式触发的结构保真翻译。AI 痕迹索引、审稿指南和翻译保护规则随本 skill 分发，并按子任务渐进读取。\n' +
+    '\n' +
+    '### When to use\n' +
+    '\n' +
+    '在下面这些需求里使用：\n' +
+    '\n' +
+    '- 用户明确说「去 AI 味」「说人话」「自然一点」「别像模板」「别太像 ChatGPT」\n' +
+    '- 需要改写中文或英文 `chat`、`status`、`docs`、`public-writing`\n' +
+    '- 需要先判断文本该轻改、中改还是重改\n' +
+    '-'... 10076 more characters
+  
+      at TestContext.<anonymous> (/Users/yolandahao/code/oh-story-claudecode/skills/story-deslop/tests/first-mention-protection.test.js:13:10)
+      at Test.runInAsyncScope (node:async_hooks:213:14)
+      at Test.run (node:internal/test_runner/test:1106:25)
+      at Test.start (node:internal/test_runner/test:1003:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:358:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: '---\nname: story-deslop\nversion: 2.1.0\ndescription: "去AI味/说人话（小说正文+通用中文统一入口）。mode=novel 走网文去AI味 7 Gate 系统（禁用词/句式/心理/节奏/对话/结尾/解释腔），配合脚本和禁用词表；mode=general 处理 chat/status/docs/public-writing 的改写、审稿与显式触发的结构保真翻译。触发方式：/story-deslop、/去AI味、「去AI味」「说人话」「太AI了」「别像模板」「自然一点」——按输入类型自动路由。"\nmetadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecode"}}\ndisable: true\n---\n\n# story-deslop：去 AI 味 / 说人话（统一入口）\n\n把文本从「像模型在表演写作」拉回「像具体人在当前场景下表达」。本 skill 提供两种模式，按输入类型自动路由，也可由用户显式指定。\n\n- **`mode = novel`**：网文小说正文去 AI 味。走 7 Gate 系统（禁用词 / 句式 / 心理 / 节奏 / 对话 / 结尾 / 解释腔），配合本地脚本、禁用词表与白名单。\n- **`mode = general`**：通用文本处理。支持非小说正文的中英文改写、审稿，以及用户明确要求的结构保真翻译。\n\n> Agent 兼容性：检查专业 agent 是否可用时，按 `.claude/agents/{agent}.md` → `.opencode/agents/{agent}.md` → `.codex/agents/{agent}.toml` 的顺序查找。Codex 原生子代理调用优先使用同名 `agent_type`；如果当前 Codex 运行时返回 `unknown agent_type` 或未暴露 custom-agent registry，必须降级为 solo/direct。检测到 `.zcode/` 时同样直接 solo/direct，因为 ZCode 3.3.4 不执行项目 custom agents；报告 `Fallback: project custom agents unavailable -> solo`。Claude/OpenCode 兼容面保留 `subagent_type`。\n>\n> Spawn 版本提示（不阻断 spawn）：先读取项目根 `.story-deployed` 的 `agents_version`。与本版 `agents_version: 29` 不一致时（标记缺失、字段缺失/非整数、小于或大于 29）**照常按文件存在性检查并 spawn**，同时报告 `Notice: agents bundle 版本不匹配（项目 {N}，本版 29）` 并提示重新运行 `/story-setup` 后新开会话；大于 29 时额外提示先更新 oh-story-claudecode，不要用本地旧版 setup 降级覆盖。只有 agent 文件缺失、或运行时不暴露 custom agent 时才降级 solo/direct，报告 `Fallback: ... -> solo`。\n\n---\n\n## 模式路由（Mode routing）\n\n### 自动检测规则\n\n按下列优先级判断 `mode`：\n\n1. **用户显式指定优先**：用户在 prompt 中写明 `mode=novel` / `mode=general`、或明确说「按小说处理」「按通用文本处理」「走 7 Gate」「走场景分级」时，按指定模式执行。\n2. **输入是文件路径**：\n   - 路径位于 `正文/` 或 `拆文库/` 下 → `mode = novel`\n   - 路径位于 `正文/`、`拆文库/` 之外的目录（如 `docs/`、`notes/`、根目录散文件）→ `mode = general`\n   - 文件名含「章节」「第 X 章」「卷」等小说正文信号 → `mode = novel`\n3. **输入是粘贴文本**（无文件路径）：\n   - 文本以小说正文特征为主（叙事段落、对话密集、章节体）→ `mode = novel`\n   - 文本是 chat / status / docs / 公开写作 / 中英混排技术文本 → `mode = general`\n4. **默认**：当前项目默认 `mode = novel`，除非用户明确表示处理的是非小说文本。\n\n### 路由后行为\n\n- 选定 `mode = novel` → 进入「小说去 AI 味模式」章节，按 7 Gate + 脚本 + 禁用词表流程执行。\n- 选定 `mode = general` → 进入「通用说人话模式」章节，再按用户请求选择 `rewrite / review / translation` 子任务。\n- 用户可在任何时候切换模式：明示 `切到 novel / 切到 general` 或重新指定 `mode=` 即可。\n\n### 共享判断（两种模式都适用）\n\n如果文本主要是代码、日志、命令、配置、接口名、报错，默认不进入任何模式；用户明确要求翻译其中的自然语言说明时，只翻译说明文字并保护技术内容。仿官方模板、仿特定品牌 voice 或事实校对不属于本 skill。\n\n翻译只由「翻译」「译成某语言」「结构保真翻译」等明确请求触发。外文、中英混排或代码片段本身都不能自动触发翻译。\n\n---\n\n## 共享核心原则\n\n以下原则两种模式都必须遵守，发生冲突时以本节为准。\n\n### 原则 1：改味优先，别当改错\n\nAI 味不按语法错误处理，也不需要「修正」。它属于风格问题：过于书面化、过于对仗工整、过于面面俱到。去 AI 味的本质，是把文字从过度工整拉回具体、自然、可读。\n\n### 原则 2：改最少，效果最大\n\n去 AI 味不等于重写。目标是改最少的字，让整段文字的「味」变过来。能改一个词就不改一句，能删一句就不重写一段。没有问题的句子尽量保留原句；人名、地名、数字、章节名、专有名词优先保留。\n\n**过度去 AI 味保护**（novel 模式强制，general 模式 `in-place` / `bounded` scope 同样强制）：\n- **novel 模式**不得删掉唯一的剧情、人物或阅读功能；整段只重复已知信息且删除无损时可以删并，先核对前后承接。**general 模式**不得整段删除正文内容；如果某段被标记为多处 AI 味，应逐句修改而非删除整段。\n- 删除前必须确认：被删除的内容是否包含伏笔、钩子、角色特征、情节推进、人物记忆、情绪承接、因果锚点等关键信息。\n- 如果删除会破坏情节连贯性，改为「降 AI 重写」而非删除。\n- **novel 模式**按授权范围和阅读损失决定局部修改，记录实际字数变化，不按 AI 味等级确定删除比例；不得删除剧情功能。**general 模式**沿用删除比例上限：轻度 ≤15%，中度 ≤25%，重度 ≤35%。重度文本可通过「合并重复描写 + 重写降 AI」产生更大字符差，但仍不得整段删除或删掉剧情功能。超过对应比例应在报告中标记超限风险，并输出分段处理方案。\n- 如果逐句修改后某段仍不满意，在报告中标注 `[需复核]`，不以不满意为由继续删除；general 模式仍不计入当前等级的删除比例上限。\n- 对于「疑似 AI 味但不确定」的内容，在报告中标注 `[需复核]`，而非插入正文。\n\n### 原则 3：保留创作意图 / 保留信息\n\n去 AI 味只改「怎么说」，不改「说什么」。\n\n- **novel 模式**：剧情、人设、情节走向一概不动；不新增原文没有的情节、设定、关系或时间线。如果原文有逻辑问题，那不是去 AI 味的活。\n- **general 模式**：任何改写都不能新增事实、删核心事实或改变责任主体。优先保信息，再谈风格。\n\n### 原则 4：保留有功能的语气\n\n去 AI 味不是把文字全部磨成句号。\n\n- **novel 模式**：标点服从本书声线与语义；`？`、`！`、`……`、`——` 承担疑问、爆发、犹豫、未尽或打断时可以保留。只处理无功能堆砌，不统一换成动作或句号；作者明确标点约定按作用域执行。\n- **general 模式**：保留有功能的标点（命令、报错、引用里的原始标点）；删除模板化收尾的 `！` 堆砌与表演性 `——`。\n\n### 边界：去 AI 味只处理读感与叙事功能\n\n去 AI 味治读感，不承诺任何分数结果。若用户贴出工具报告，只把能对应到正文的问题转成具体修改点；不写「0% AI / 100% 真人」，不注水、故意错字或打乱标点。去 AI 味仍以原文剧情边界为准，不把表达修复变成新增情节或新增事件链。\n\n**去 AI 味补充判断**（两种模式都适用）：\n- 首次交代优先：处理解释总结前，先判它是否首次说明动机、关系、能力来历或因果；首次必要信息只改写成场内白话，不删。前文已交代的重复总结才删除或合并。\n- 场内载体优先：原文已有手机、屏幕、公告、门牌、表单、账单、物证、规则行时，保留为角色看见 / 读错 / 处理的文本或物件；不要改写成叙述者解释规则。\n- 白话但不注水：少用连续精致戏剧反应短语（头皮发紧、眼皮一跳、心口一沉、胃里翻涌）；能写普通动作 / 普通感觉就写普通动作 / 普通感觉，并保留自然的「的 / 了 / 就 / 但是 / 已经 / 之后 / 没有」等连接。\n- 番茄优先校准（novel 模式）：默认优先参考番茄高分正文的手机端短段、自然虚词和场内动作 / 对话推进；不要把 50-60 字行宽、50%-60% 对话占比、`地/得` 全改 `的`、全禁顿号 /「很」/「像」当成硬规则。\n- 题材文风优先（novel 模式）：文风对标要来自目标题材 / 本书文风指纹；不要把盘龙腔、旧网文腔、第一人称声口等当跨题材万能修法。\n- 不要当通用修法：单纯加标题、补物件、补动作尾巴、拉长 / 压短句子、增加排队 / 门禁 / 记录体，不能替代具体的情节、视角和语言问题处理。\n- 保留技术性（general 模式）：专业词、系统主语、事故复盘用语、PRD / 发布说明中的术语默认可保留。\n- 不用机械同义词替换表（general 模式）：默认可以删句、并句、降调、换主语、去总结式收尾；如果进入 `in-place` scope，就只做句内改写。\n\n### 作者习惯\n\n若作者记忆 state 已存在，改写前用 `.agents/skills/_shared/scripts/author_memory_commit.py query --kind prose_style` 获取匹配的 active 文风条目（总输出 ≤2KB），并交给 inline/spawn 执行者作为自然倾向，不逐条展示或最大化命中，不牺牲连贯、节奏和字数；当前请求、原文剧情功能和本 skill 保护规则优先。用户明确声明长期文风习惯时，改写后按 [.agents/skills/_shared/references/author-memory.md](../_shared/references/author-memory.md) 用 `record` 写入并回传回执；重复修正/推断先待确认，一次性要求、检测器 findings 和助手自己的结果不记录。\n\n---\n\n## 小说去 AI 味模式（mode = novel）\n\n> 适用：小说正文、章节文件和已授权范围内的批量编辑。7 Gate 是定位问题的方法目录，按本轮具体问题选用；不按词频或题材标签默认全章清洗。\n\n### 自然文本基准\n\n先读正文，再查看检测结果。用本书认可样例、题材和当前章节功能判断：日常相处、休息、回收、高潮可以有不同的句长、视角距离和情绪强度。\n\n| 维度 | 有功能时保留 | 需要复核的阅读损失 |\n|------|--------------|------------------|\n| 主体与因果 | 必要的主语、连接、解释和直写心理 | 读者不知道谁为什么行动，或同一原因被多次复述 |\n| 情绪与动作 | 直写、动作、台词、感官或留白均可 | 同一情绪换词复述，无功能小动作延迟结果 |\n| 对话 | 符合人物身份和当下意图；必要说话标签保留 | 人人同腔、重复已知信息、说话人难辨 |\n| 句长与段落 | 按信息、动作与语气自然组织 | 主干丢失、机械碎句、为了长度强拆或强并 |\n| 修辞与标点 | 角色化比喻、反讽、停顿、打断与未尽 | 无功能重复、误导或抹平声线；词形本身不证明问题 |\n| 章尾 | 行动、关系、后果、明确下一步、内心或余韵 | 重复空话、越界剧透、未兑现本书承诺 |\n\n### 检测流程\n\n#### Phase 1：阅读与只读预检\n\n1. 确定授权范围、原文版本、本书声线和当前章节功能；只读必要前后文。先记第一处读不懂、想跳过或人物失真的位置，以及一处值得保留的表达。没有损害证据可以报告“未发现需改项”。\n2. 文件模式运行共享预检，保留扫描器实际输出的 `severity`、来源、作用域和命中位置，不在本 skill 硬编码类别与严重度对应表：\n   ```bash\n   node .agents/skills/_shared/scripts/check-ai-patterns.js --check --fail-on=blocking <正文文件...>\n   ```\n3. `blocking` 按实际原因处理：确定性错误定点修；作者明确禁令遵守已验证的来源与作用域；规则加载失败先排查规则输入，不能把它当正文缺陷。语境和密度 findings 只作候选线索，不因词类命中升级。需要解释作者规则时读共享规范，不复制其 schema。\n4. 对 advisory 连同前后文记录“修复 / 有功能保留 / 误报 / 证据不足”；有功能保留可记 `PRESERVED_WITH_FUNCTION` 并写清作用。普通编辑不为保留一个原句启动研究 A/B。\n\n**脚本插入污染预检（文件模式）**：当输入是本地正文文件路径、且正文可能是批量生成或插入过的（多章节、刚补人物/内心/动作），调用 `batch-pollution-detector` Skill，只报告重复长句和引号/括号异常，不读取其文件路径。污染证据与语言建议分别记录，不把正常复沓当成批量污染；修复遵守该专项的边界。\n\n输出问题表：`位置 / 原文 / 阅读损失 / scanner severity 与来源（如有）/ 语境判定 / 建议范围 / 必须保留的信息`。不从词数估算作者身份或 AIGC 概率，不给无校准依据的市场等级与留存保证。\n\n#### Phase 2：选择本轮编辑目标\n\n- **首轮只选 1～2 个最高阅读损失**，例如关键因果不清、同一功能反复确认、人物在关键处失真、回报被操作步骤拖住；先给证据与预期改善，再选择相关 Gate。确定性 blocking 另按明确位置修正或如实报告，不能用这个数量限制掩盖未解决的阻断。\n- 字词密度、心理词数、对白标签比例、段落句数只帮助定位窗口，不定轻中重、不自动触发重写，也不要求降到某个比例。对同一段落改排版不应改变修复力度。\n- 普通编辑是一轮局部修订加一轮回读，范围为问题句/段及直接承接处。批量任务逐批照此执行；用户明确要求全篇重写时，另按授权范围处理，不从扫描档位推导重写许可。\n- 记录原文与准备修改的范围。如果问题在细纲设计、信息顺序或未给足必要事实，报告根因与上游修改方向，不用补动作掩盖，也不擅自新增剧情。\n\n#### Phase 3：按问题定向编辑\n\n已在子代理内则直接执行，不再派代理；外层具备可用的 narrative-writer 时可交给写手，否则主会话直接编辑。传递的任务至少包含：\n\n```text\n项目目录：{dir}\n检查范围：{已授权正文及必要前后文}\n作者偏好：{query 命中的 prose_style 项}\n当前章节功能与声线：{本书已有约定}\n本轮目标：{1～2 个最高阅读损失、原文证据与预期改善}\n扫描结果：{实际 severity、来源、作用域；不要重造类别分级}\n编辑范围：{问题句段及直接承接处}\n保护内容：{事实、人物意图、因果、信息首现、声线与有效原句}\n只做一轮定向编辑；不按词类通篇清洗，不新增剧情或补动作凑字。\n```\n\n**删除前检查**：首次必要动机、关系、能力来历、因果锚点，以及伏笔、钩子、人物记忆、情绪承接和后果必须保留。信息正确且表达清楚时保留原句；重复已知信息才删或并。不能为了省字改成读者要猜的代词、速记和电报体。原文功能 > Gate 技法；修复超出当前授权就报告缺口。\n\n##### Gate A：规则命中复核\n\n读取 [.agents/skills/_shared/references/banned-words.md](../_shared/references/banned-words.md) 的相关条目，遵守扫描器当前分级。普通词、有后果的动作、真实气味和温度不能只因子串命中就换写；作者明确禁令按来源和作用域执行，不由写手自行取消。项目规则和白名单的格式、校验与例外以共享实现为准。\n\n修法由问题决定：可保留、删重复、补清指向或重组句子，不设“禁词 → 动作”的转换表。普通“看了一眼”与“轻轻”要看此处在做什么；“深吸一口气”承担运动换气时可保留，无功能地反复插在对白前才处理。不能把“眼中闪过悲伤”统一改成“垂下眼”。\n\n##### Gate B：句式与修辞复核\n\n否定翻转、排比、比喻、因果句、认知句都先判断功能。承担辩解、排除、反讽、角色声线或首次因果时可保留；只重复前后项、给角色贴空标签或遮住主体时再删并或改清。修饰语不按个数删除；颜色、速度、数量、指代影响判断时保留。\n\n##### Gate C：情绪与重复信息\n\n直写情绪不是默认缺陷。判断、犹豫、羞耻或偏见改变选择、关系、策略或读者理解时可以直写；身体细节只在承担伤势、动作失败、人物习惯或情节后果时补。不得把“很愤怒”改成原文没有的掀桌，也不把所有心理换成手抖、攥衣角。\n\n复核同一意思是否已由对白、动作与旁白重复兑现；压掉无新增作用的重复，保留最有角色特点的一处。连续动作本来需要跟读时保留，不能为“反动作清单”删掉操作结果；反过来也不因为每步真实就逐项展开。\n\n##### Gate D：节奏与标点\n\n只处理有证据的主干丢失、理解跳接、重复拖延或机械切段。句长、段落长短服从本书声线和当前场面，不为了自然感故意碎句或长短交替。`……`、`——`、问号和感叹号按迟疑、打断、未尽、强调或人物声线判断；本书允许且有功能时保留，无功能堆砌才处理，不设统一替代形式。\n\n##### Gate E：人物对话\n\n按人物此刻要什么、愿说什么、能知道什么核对台词；必要说明、正常说话标签和清楚的逻辑可以保留。只处理不合身份的声口、说明书式重复、指向不明或无意同腔。口头禅、粗话、答非所问、停顿和动作穿插都不是必须添加的“真人感”。\n\n##### Gate F：章尾与回报\n\n先核对本章批准的落点和读者回报。动作、对话、判断、反思、明确后果或余韵均可；只处理空泛复述、无依据拔高、越界剧透和实际未兑现的问题。不统一改成安静物件，不因没有强悬念另造事故。\n\n##### Gate G：必要解释与视角\n\n核对本书批准的 POV 和信息边界；第一人称主观判断、必要因果、名词锚点和已经批准的前瞻可成立。只处理越界信息、替读者重复盖章或与场面脱节的解释。不按“他知道／因为／多年以后”等起句一律删除，不以补动作替代缺失的知识来源。\n\n#### Phase 3.5：局部验证与停止\n\n文件模式编辑后运行：\n\n```bash\nnode .agents/skills/_shared/scripts/check-ai-patterns.js --check --fail-on=blocking <已修改正文文件...>\nnode .agents/skills/_shared/scripts/check-degeneration.js --check <已修改正文文件...>\nnode .agents/skills/_shared/scripts/normalize-punctuation.js --check <已修改正文文件...>\n```\n\n- 只按实际 `blocking` 修确定性问题或明确作者禁令；advisory 可带功能保留，扫描通过只表示未发现已登记阻断项。格式工具只检查，不把功能标点机械改写。\n- 读改动段和直接前后文：原问题是否缓解，人物意图、事实、信息首现、语气和余韵是否仍成立，有无新增重复或理解负担。没有改善或造成新损害时恢复该处原文并标明原因，不为证明编辑有效保留较差改法。\n- 复查“省略速记”：必须结合上下文判断主体、对象、意图是否可恢复；自然承接的省略保留，不要求每句脱离上下文独立成立。\n- 比较实际字数与原文，不用改写比例证明质量。已有正文保留原有篇幅约定；改后不满足约定时报告影响，不擅自加剧情或补废话。\n- **停止规则**：本轮目标已解决即停止，即使还有低收益建议也保留；同一问题回读后仍存在，重新判断根因并报告待办，不自动进入第二轮全章改写。额外编辑由新证据或用户授权驱动，不以全篇清零或连续无改动作为完成条件。\n\n#### Phase 4：输出编辑结果\n\n报告包含：本轮 1～2 个目标及原文证据、实际修改范围与前后对比、保留表达及理由、原文/修订字数、实际 blocking/advisory、回读结果、剩余问题和证据不足项。检测范围与修改范围分别写清，不把模型审读当真人评价。\n\n文件模式只回简短代表片段和文件路径，不复制全文；粘贴文本且无文件路径时可输出完整修订文本。只检测请求只做 Phase 1–2，不修改任何正文或项目文件。无需修改时明确说明，不制造修改数。\n\n### 小说模式参考资料\n\n| 资料 | 用途 |\n|------|------|\n| [.agents/skills/_shared/references/anti-ai-writing.md](../_shared/references/anti-ai-writing.md) | 按具体阅读问题查询技法；不默认加载整章三遍法 |\n| [.agents/skills/_shared/references/banned-words.md](../_shared/references/banned-words.md) | 规则来源、适用范围与例外 |\n| [.agents/skills/_shared/scripts/check-ai-patterns.js](../_shared/scripts/check-ai-patterns.js) | 实际分级的只读扫描 |\n| [.agents/skills/_shared/scripts/check-degeneration.js](../_shared/scripts/check-degeneration.js) | 退化、重复、截断和工程词线索 |\n\n---\n\n## 通用说人话模式（mode = general）\n\n> 适用：非小说正文的中英文 chat / status / docs / public-writing 改写、审稿与显式触发的结构保真翻译。AI 痕迹索引、审稿指南和翻译保护规则随本 skill 分发，并按子任务渐进读取。\n\n### When to use\n\n在下面这些需求里使用：\n\n- 用户明确说「去 AI 味」「说人话」「自然一点」「别像模板」「别太像 ChatGPT」\n- 需要改写中文或英文 `chat`、`status`、`docs`、`public-writing`\n- 需要先判断文本该轻改、中改还是重改\n-'... 10076 more characters,
+    expected: /首次说明人物动机、关系、能力来历或事件因果[\s\S]*不得删除/,
+    operator: 'match',
+    diff: 'simple'
+  }
+
+[quality] publication
+✔ every repository skill is explicitly public or local-only (4.05325ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 134.376667
+
+[quality] shared-assets
+Shared File Governance Check
+============================
+OK: 14 canonical groups manage 31 synchronized copies
+Shared references: 71 groups / 83 synchronized copies
+Reference similarity: no undeclared candidates at J>=85% or containment>=95%; 10 derived groups declared
+Agent reference consumers: 68 deployed Markdown files reachable from 30 direct agent roots; profile contract 4 common / 12 long / 7 short
+Short analysis scope: 5 observational rubrics; no legacy long-form playbook tokens
+All declared shared files are consistent; no unmanaged exact or near-identical reference copies found.
+
+[quality] static
+Skill Static Check
+==================
+Repo: /Users/yolandahao/code/oh-story-claudecode
+
+--- ai-flavor-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- batch-pollution-detector ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- browser-cdp ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- chinese-novelist ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- deslop-register ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- dialogue-naturalness-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- fanqie-chapter-publish ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- humanizer ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- jargon-verb-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- legal-domain-veracity-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- opening-arc-audit ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- reader-comprehension-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-analyze ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-cover ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-deslop ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-import ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-review ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-setup ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-write ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-before-dev ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-brainstorm ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-break-loop ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-channel ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-check ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-continue ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-finish-work ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-meta ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-session-insight ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-spec-bootstrap ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-start ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-update-spec ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+==================
+Total: 33 | Pass: 33 | Fail: 0 | Warn: 0
+
+[quality] language-gates
+---- test-ai-patterns.sh
+AI pattern detector regression tests passed.
+Prose pattern (碎句号/长段落/破折号) regression tests passed.
+issue #205 (跨空行翻转命中 / 引号内台词豁免 / 未闭合引号不吞叙述) regression tests passed.
+micro-action-tic (电报体微动作复读) regression tests passed.
+stock-reaction-tic (套式反应细节) regression tests passed.
+abstract-summary-tic (抽象总结复读) regression tests passed.
+action-list-tic (监控摄像头式动作清单) regression tests passed.
+cliche-density-tic (套词密度过高) regression tests passed.
+metaphor-density-tic (比喻密度过高) regression tests passed.
+reasoning-chain-tic (解释链密度过高) regression tests passed.
+system-notice-formality-tic (系统公告公文腔过密) regression tests passed.
+overcompressed-prose-tic (过度精炼短段) regression tests passed.
+low-connective-density-tic (低连接密度 + 缺中长句) regression tests passed.
+voice-contrast (音量反差腔) regression tests passed.
+negation-parade (否定排比) regression tests passed.
+chapter-21 AI-flavor gap regression tests passed.
+reverse-not-is (反序对比腔) regression tests passed.
+trailer-ending (预告式总结收尾) regression tests passed.
+quote-emphasis-tic (引号强调滥用) regression tests passed.
+trailer-summary (章尾状态总结体) regression tests passed.
+PASS ordinary literal actions, temperature, smell, cleaning, and time have no findings
+PASS isolated contextual patterns retain evidence, not automatic rejection
+PASS all four weak adverbs contribute to density while isolated use is safe
+PASS repeated micro actions still identify a review window
+PASS quoted count mismatch blocks and matched count passes
+PASS prose explanations and parenthetical examples are never parsed as tokens
+PASS explicit malformed literal field fails rather than parsing parentheses
+PASS missing, duplicate, invalid, and unsupported rule data fail closed
+PASS invalid or unterminated regex fences fail instead of silently skipping
+PASS author rule inherits from book, reports source, and respects narration surface
+PASS author bans do not leak across books and cannot be waived by shared whitelist
+PASS external candidate uses explicit book and planned chapter scope
+PASS source mismatch, missing scope, wrong category, and path escape fail closed
+PASS symlink escape in planned target and registry cannot broaden author authority
+PASS unreadable input and broken UTF-8 return a machine-readable blocking error
+15 rule classification and scope tests passed.
+---- test-degeneration.sh
+Degeneration detector regression tests passed.
+---- test-prose-policy.py
+test_detector_blocking_requires_author_scope_or_deterministic_error (__main__.ProsePolicyInventoryTests.test_detector_blocking_requires_author_scope_or_deterministic_error) ... ok
+test_forbidden_patterns_cover_the_rejected_global_rules (__main__.ProsePolicyInventoryTests.test_forbidden_patterns_cover_the_rejected_global_rules) ... ok
+test_p1_treatment_and_suspense_priority_remain_explicit (__main__.ProsePolicyInventoryTests.test_p1_treatment_and_suspense_priority_remain_explicit) ... ok
+test_repository_has_one_priority_and_no_known_global_conflict (__main__.ProsePolicyInventoryTests.test_repository_has_one_priority_and_no_known_global_conflict) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 6.653s
+
+OK
+---- test-normalize-punctuation.js
+OK: structural punctuation cleanup preserves voice, fences, CRLF, quote modes, and errors
+✔ scripts/test-normalize-punctuation.js (1675.62175ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1685.514916
+---- test-charcount-portable.sh
+selected interpreter: python3
+char count: 12 (expect 12)
+PASS
+---- test-prose-backstop-hook.sh
+Prose backstop hook regression tests passed.
+---- test-prose-net-parity.sh
+功能 parity：codex python 网 == opencode TS 网 == zcode JS 网（44 fixtures + CRLF 字数边界，含毒句式正反例/AI 自指/截断收尾与豁免标记）。
+命令函数 parity：codex python == zcode JS（扩展 fixtures：正文抽取/apply-patch/git commit 侦测逐字相等，含包装器/命令替换/多 heredoc/转义引号、apply_patch 搬家与 ReDoS 预算）。
+未归核面 parity：codex python == JS core（staged warnings 大小写变体/文案 + 大纲阻断 9 组判定含毒句式欠账门/无脚手架 fail-closed/文案逐字相等）。
+写正文守卫 parity：Claude bash guard == JS core（13 组工程场景：无 state/缺细纲/导入窗口/跳章/续写/显式缺口/嵌套分卷/派生修订不一致/坏 schema/回炉备份，含 node 缺席 fail-open）。
+Prose net parity tests passed.
+Language gate regressions passed.
+
+[quality] affected: FAIL (14/15 PASS)

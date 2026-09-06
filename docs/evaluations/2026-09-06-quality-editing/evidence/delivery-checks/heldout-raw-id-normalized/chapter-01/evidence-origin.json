@@ -1,0 +1,8 @@
+{
+  "reader_type": "model",
+  "reader_report": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/blind/reviews/heldout-reader-H74-chapter-01.json",
+  "reader_report_sha256": "59aee50485b4328621a155f17485ddde849f9542e7923f007693a1ad744572eb",
+  "postwrite_extraction": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/metadata/chapter-01.postwrite.json",
+  "prior_context": "generated prior chapters imported only for isolated preflight; no author adoption",
+  "actual_author_adoption": false
+}

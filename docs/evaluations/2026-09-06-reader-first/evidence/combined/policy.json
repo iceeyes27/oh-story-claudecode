@@ -1,0 +1,16 @@
+{
+  "arm": "combined",
+  "created_at": "2026-09-06T04:13:53.620035+00:00",
+  "source_sha256": [
+    {
+      "path": "skills/story-write/references/reader-first-writing.md",
+      "sha256": "f395774d3ff6f9e948b998a3e34b60fe307ba27a228a760c4333705f123e5a3d"
+    },
+    {
+      "path": "skills/story-write/references/long-format.md",
+      "sha256": "a7df1dcd8e89b30dc8ff4556581241069f0c8091110e0fa8fa3539c3da571afa"
+    }
+  ],
+  "chars": 3456,
+  "sha256": "f8ed074474714abd58a77595868024ea7511f4c2c4ca8d66c02c9f8c31d52dfc"
+}

@@ -1,0 +1,19 @@
+{
+  "chapter": 1,
+  "raw_sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7",
+  "candidate_sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7",
+  "han_chars": 2055,
+  "visible_chars_v1": 2385,
+  "han_in_range": false,
+  "visible_in_range": true,
+  "sentences": 132,
+  "sentence_distribution": {
+    "short_lt_15": 0.4621212121212121,
+    "medium_15_30": 0.4393939393939394,
+    "long_gt_30": 0.09848484848484848,
+    "mean": 17.068181818181817
+  },
+  "raw_attempts": 1,
+  "reading_edit_passes": 0,
+  "han_in_range_applicability": "not_a_gate; parent clarification"
+}

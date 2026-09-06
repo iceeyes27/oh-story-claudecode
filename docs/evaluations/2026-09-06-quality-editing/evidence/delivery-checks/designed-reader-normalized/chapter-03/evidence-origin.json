@@ -1,0 +1,8 @@
+{
+  "reader_type": "model",
+  "reader_report": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/blind/reviews/reader-b-R58-chapter-03.json",
+  "reader_report_sha256": "5400ff550db527f4054c90a11feee6b6944718958d6694f5b5607f2620dd94aa",
+  "postwrite_extraction": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/metadata/chapter-03.postwrite.json",
+  "prior_context": "generated prior chapters imported only for isolated preflight; no author adoption",
+  "actual_author_adoption": false
+}

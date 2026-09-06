@@ -1,0 +1,42 @@
+{
+  "stage": "after_draft",
+  "files": [
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/raw/第002章_借来的外套.md",
+      "sha256": "4c1c53dd528e46c5817580fbcd05ae50844d0bb32dc179a576a4352af8e123c0",
+      "purpose": "事实抽取与计数，非生成前输入",
+      "range": "full"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/tracking_commit.py",
+      "sha256": "2b099f35c693a9ed70e649b53e7f88a49659dfedaaa891e573f6aaab041a898d",
+      "purpose": "写后normalize_snapshot字段结构确认",
+      "range": "270-301 plus module read-only import"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/logs/chapter-02.post.wordcount.log",
+      "sha256": "7ff28cef5d46532e22e4257f3de0c07f93cb55354d09a08bf73a614b7c6f77d9",
+      "purpose": "写后检查结果",
+      "range": "full"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/logs/chapter-02.post.scan.log",
+      "sha256": "0e12f20afa6fce97b5699d8419a6fcc6cde8f44c3ad41c537c55d4d1d140b302",
+      "purpose": "写后检查结果",
+      "range": "full"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/logs/chapter-02.post.degeneration.log",
+      "sha256": "8aa973100a15bf817985395637131e838cf84e427be4792583def923f020f5fa",
+      "purpose": "写后检查结果",
+      "range": "full"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/logs/chapter-02.post.outline-copy.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "purpose": "写后检查结果",
+      "range": "full"
+    }
+  ],
+  "no_reader_inputs": true
+}

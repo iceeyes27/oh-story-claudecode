@@ -1,0 +1,21 @@
+{
+  "schema": "ordinary-revision/v1",
+  "chapter": 3,
+  "kind": "facts",
+  "summary": "实际一次局部编辑：删原则复述、调整母女披露与推断、明确纠正箱子记忆",
+  "final": "正文/第003章_林琴.md",
+  "inventory": {
+    "正文/第001章_空着的位置.md": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7",
+    "正文/第002章_借来的外套.md": "4c1c53dd528e46c5817580fbcd05ae50844d0bb32dc179a576a4352af8e123c0",
+    "正文/第003章_林琴.md": "1d6fc41fb79441cb1ac221037e1ba63e50d7853e69d0b05283551d76bbf4bc36"
+  },
+  "context": {
+    "正文/第002章_借来的外套.md": "4c1c53dd528e46c5817580fbcd05ae50844d0bb32dc179a576a4352af8e123c0"
+  },
+  "state_sha256": "0ab96b8894a5cddeb3988005b5efa4c3e711f7fabdcdfd32dd53a7b3d795bbcb",
+  "expected_state_revision": 0,
+  "original_sha256": "1d6fc41fb79441cb1ac221037e1ba63e50d7853e69d0b05283551d76bbf4bc36",
+  "candidate_sha256": "007895da5b8462dbf3cc27fc9c4e930966cc51f280a3ef9d77a8b18b7807578e",
+  "diff_sha256": "2e05fa0c24370541fa736281ac5a9f00fde8d061f5c3f153c167a738f6fbd084",
+  "operation": "r3-bfad673879c62199013e"
+}

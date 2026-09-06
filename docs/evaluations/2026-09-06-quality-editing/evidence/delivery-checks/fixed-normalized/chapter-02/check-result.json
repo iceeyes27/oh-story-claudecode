@@ -1,0 +1,8 @@
+{
+  "chapter": 2,
+  "project": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/delivery-checks/fixed-normalized/chapter-02",
+  "exit_code": 0,
+  "stdout": "{\n  \"action\": \"check\",\n  \"chapter\": 2,\n  \"ok\": true,\n  \"outline\": \"大纲/细纲_第2章.md\",\n  \"skeleton\": \"骨架/第002章_鱼要有盖.md\",\n  \"expected_revision\": 0\n}\n",
+  "stderr": "",
+  "adopted": false
+}

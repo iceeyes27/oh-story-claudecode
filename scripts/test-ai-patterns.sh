@@ -229,7 +229,7 @@ NODE
 [ "$adv_blk" -eq 0 ] || { echo "FAIL: advisory-only --fail-on=blocking 应退出 0，实际 $adv_blk" >&2; exit 1; }
 
 # 风格类（em-dash）：severity=advisory，--fail-on=blocking 退出 0。
-# severity 只分两档：词表类（banned-word-* / rule-load-error）blocking，其余风格/密度规则 advisory。
+# 共享词形与风格/密度规则 advisory；作者明确禁令与确定性错误 blocking。
 FIXTURE7="$TMP_DIR/fixture-style.md"
 printf '%s\n' '她停住——没说话。' > "$FIXTURE7"
 set +e
@@ -249,10 +249,9 @@ if (r.findings.some((f) => f.severity === 'blocking')) {
 NODE
 [ "$style_blk" -eq 0 ] || { echo "FAIL: 纯风格 fixture --fail-on=blocking 应退出 0，实际 $style_blk" >&2; exit 1; }
 
-# 词表类（banned-word-exact）：severity=blocking，--fail-on=blocking 退出 1。
-# 词表运行时读 references/banned-words.md，判定不需要语境，出现即替换。
+# 共享词形提示保持检测能力但不伪称作者禁令；明确禁令/错误见 scope 行为回归。
 FIXTURE7B="$TMP_DIR/fixture-blocking.md"
-printf '%s\n' '他脸上浮现出一丝笑意。' > "$FIXTURE7B"
+printf '%s\n' '他心头一震。' > "$FIXTURE7B"
 set +e
 node "$SCRIPT" --json "$FIXTURE7B" > "$OUT"
 node "$SCRIPT" --fail-on=blocking "$FIXTURE7B" >/dev/null 2>&1
@@ -262,10 +261,10 @@ node - "$OUT" <<'NODE'
 const fs = require('fs');
 const r = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const banned = r.findings.find((f) => f.type === 'banned-word-exact');
-if (!banned) throw new Error('一级禁用词「一丝」应被检出（词表加载是否失效？）: ' + JSON.stringify(r.findings.map((f) => f.type)));
-if (banned.severity !== 'blocking') throw new Error('banned-word-exact 应为 blocking: ' + JSON.stringify(banned));
+if (!banned) throw new Error('共享词形「心头一震」应被检出（词表加载是否失效？）: ' + JSON.stringify(r.findings.map((f) => f.type)));
+if (banned.severity !== 'advisory' || banned.category !== 'contextual') throw new Error('共享 banned-word-exact 应为 contextual advisory: ' + JSON.stringify(banned));
 NODE
-[ "$blk_blk" -eq 1 ] || { echo "FAIL: banned-word-exact --fail-on=blocking 应退出 1，实际 $blk_blk" >&2; exit 1; }
+[ "$blk_blk" -eq 0 ] || { echo "FAIL: 共享词形 --fail-on=blocking 应退出 0，实际 $blk_blk" >&2; exit 1; }
 
 echo "Prose pattern (碎句号/长段落/破折号) regression tests passed."
 
@@ -551,12 +550,12 @@ if (!cd[0].excerpt.includes('仿佛') || !cd[0].excerpt.includes('眼中闪过')
 NODE
 
 # cliche-density-tic 本身是 advisory；但 fixture16 的套词（眼中闪过/嘴角勾起/淡淡等）
-# 同时命中一级禁用词精确匹配（banned-word-exact，blocking），所以 --fail-on=blocking 应退出 1。
+# 共享词形/密度只定位复核窗口，不能仅因词形拒绝候选。
 set +e
 node "$SCRIPT" --fail-on=blocking "$FIXTURE16" > /dev/null 2>&1
 cliche_blk=$?
 set -e
-[ "$cliche_blk" -eq 1 ] || { echo "FAIL: fixture16 含一级禁用词，--fail-on=blocking 应退出 1，实际 $cliche_blk" >&2; exit 1; }
+[ "$cliche_blk" -eq 0 ] || { echo "FAIL: fixture16 仅共享词形/密度，--fail-on=blocking 应退出 0，实际 $cliche_blk" >&2; exit 1; }
 
 FIXTURE17="$TMP_DIR/fixture-cliche-density-normal.md"
 printf '%s\n' \
@@ -599,13 +598,12 @@ if (!md[0].excerpt.includes('路灯像') || !md[0].excerpt.includes('玻璃好�
 }
 NODE
 
-# metaphor-density-tic 本身是 advisory；但 fixture 中「仿佛」「如同」同时命中一级禁用词
-# 精确匹配（banned-word-exact，blocking），所以 --fail-on=blocking 应退出 1。
+# metaphor-density-tic 与共享比喻词形均为 advisory，正常比喻不自动拒绝。
 set +e
 node "$SCRIPT" --fail-on=blocking "$FIXTURE_METAPHOR" > /dev/null 2>&1
 metaphor_blk=$?
 set -e
-[ "$metaphor_blk" -eq 1 ] || { echo "FAIL: fixture 含一级禁用词，--fail-on=blocking 应退出 1，实际 $metaphor_blk" >&2; exit 1; }
+[ "$metaphor_blk" -eq 0 ] || { echo "FAIL: fixture 仅共享比喻提示，--fail-on=blocking 应退出 0，实际 $metaphor_blk" >&2; exit 1; }
 
 FIXTURE_METAPHOR_NORMAL="$TMP_DIR/fixture-metaphor-density-normal.md"
 printf '%s\n' \
@@ -1140,9 +1138,8 @@ const r = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const te = r.findings.filter((f) => f.type === 'trailer-ending');
 if (te.length !== 3) throw new Error('章尾预告腔应命中 3 处 trailer-ending: ' + JSON.stringify(r.findings.map((f) => `${f.type}@${f.line}:${f.excerpt}`)));
 if (!te.every((f) => f.severity === 'advisory')) throw new Error('trailer-ending 应为 advisory（风格类）');
-// 契约：blocking 只给词表类。本 fixture 含一级禁用词「缓缓」，整体退出码会是 1，
-// 所以不能断言退出 0——要断言的是「没有任何风格类规则是 blocking」。
-const styleBlocking = r.findings.filter((f) => f.severity === 'blocking' && !/^banned-word-|^rule-load-error$/.test(f.type));
+// 契约：共享词形与风格规则都不能假冒作者明确禁令。
+const styleBlocking = r.findings.filter((f) => f.severity === 'blocking' && !['author-ban', 'rule-load-error', 'input-read-error', 'referential-count-mismatch'].includes(f.type));
 if (styleBlocking.length) throw new Error('风格类规则不得为 blocking: ' + JSON.stringify(styleBlocking.map((f) => f.type)));
 if (te.some((f) => f.line === 1)) throw new Error('窗口外（文首）的「没人知道」不应命中 trailer-ending');
 if (te.some((f) => f.excerpt.includes('下一场'))) throw new Error('对话里的「没人知道」不应命中 trailer-ending');
@@ -1214,7 +1211,7 @@ const r = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
 const ts = r.findings.filter((f) => f.type === 'trailer-summary');
 if (ts.length < 2) throw new Error('章尾「这一切都结束了」+「这一夜注定」应各报一条: ' + JSON.stringify(ts));
 if (ts.some((f) => f.severity !== 'advisory')) throw new Error('trailer-summary 应为 advisory: ' + JSON.stringify(ts));
-const styleBlocking = r.findings.filter((f) => f.severity === 'blocking' && !/^banned-word-|^rule-load-error$/.test(f.type));
+const styleBlocking = r.findings.filter((f) => f.severity === 'blocking' && !['author-ban', 'rule-load-error', 'input-read-error', 'referential-count-mismatch'].includes(f.type));
 if (styleBlocking.length) throw new Error('风格类规则不得为 blocking: ' + JSON.stringify(styleBlocking.map((f) => f.type)));
 NODE
 
@@ -1249,3 +1246,6 @@ if (ts.length !== 0) throw new Error('裸认知句/时间跳转不应报 trailer
 NODE
 
 echo "trailer-summary (章尾状态总结体) regression tests passed."
+
+# Typed rules and author scope are part of the normal scanner regression, not an optional probe.
+node "$REPO_ROOT/scripts/test-ai-rule-scope.js"

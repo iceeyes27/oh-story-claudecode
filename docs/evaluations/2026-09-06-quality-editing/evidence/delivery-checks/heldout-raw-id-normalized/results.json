@@ -1,0 +1,26 @@
+[
+  {
+    "chapter": 1,
+    "project": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/delivery-checks/heldout-raw-id-normalized/chapter-01",
+    "exit_code": 0,
+    "stdout": "{\n  \"action\": \"check\",\n  \"chapter\": 1,\n  \"ok\": true,\n  \"outline\": \"大纲/细纲_第001章.md\",\n  \"skeleton\": \"骨架/第001章_空着的位置.md\",\n  \"expected_revision\": 0\n}\n",
+    "stderr": "",
+    "adopted": false
+  },
+  {
+    "chapter": 2,
+    "project": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/delivery-checks/heldout-raw-id-normalized/chapter-02",
+    "exit_code": 0,
+    "stdout": "{\n  \"action\": \"check\",\n  \"chapter\": 2,\n  \"ok\": true,\n  \"outline\": \"大纲/细纲_第002章.md\",\n  \"skeleton\": \"骨架/第002章_借来的外套.md\",\n  \"expected_revision\": 0\n}\n",
+    "stderr": "",
+    "adopted": false
+  },
+  {
+    "chapter": 3,
+    "project": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/delivery-checks/heldout-raw-id-normalized/chapter-03",
+    "exit_code": 0,
+    "stdout": "{\n  \"action\": \"check\",\n  \"chapter\": 3,\n  \"ok\": true,\n  \"outline\": \"大纲/细纲_第003章.md\",\n  \"skeleton\": \"骨架/第003章_林琴.md\",\n  \"expected_revision\": 0\n}\n",
+    "stderr": "",
+    "adopted": false
+  }
+]

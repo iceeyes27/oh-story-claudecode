@@ -1,0 +1,45 @@
+{
+  "aggregate": {
+    "status": "PASS",
+    "passed": 15,
+    "total": 15,
+    "generated_at": "2026-09-06T04:29:19.699Z"
+  },
+  "initial_environment_failures": [
+    "sync-unit",
+    "author-voice-profile"
+  ],
+  "runtime": "Python 3.12.14, temporary per-process init.defaultBranch=master for old fixture. User global configuration unchanged.",
+  "initial_failures_explanation": {
+    "sync-unit": "Existing fixture assumes git init creates master; user default is main.",
+    "author-voice-profile": "Existing fixture uses Path.write_text(newline=), absent from system Python 3.9."
+  },
+  "final_document_checks": {
+    "status": "PASS",
+    "note": "After final documentation corrections, static, shared-copy governance, Codex generator/deployment, reference gate, budgets and whitespace checks passed. Aggregate remains the prior complete run; executable runtime hashes are unchanged.",
+    "logs": {
+      "static": {
+        "path": "/Users/yolandahao/code/oh-story-claudecode/.trellis/tasks/09-06-reader-first-writing/static-final.log",
+        "sha256": "e8e908a890c44cc8d1dad0a1aaed8202bec90f276c425926f4b6832f7233baa9"
+      },
+      "shared": {
+        "path": "/Users/yolandahao/code/oh-story-claudecode/.trellis/tasks/09-06-reader-first-writing/shared-final.log",
+        "sha256": "deca724220911244bebef22134c502958657f1c97edaae70c269fbb90bf1e3f7"
+      },
+      "codex": {
+        "path": "/Users/yolandahao/code/oh-story-claudecode/.trellis/tasks/09-06-reader-first-writing/codex-final.log",
+        "sha256": "b574d91c6d1a24fbaed0305f859887419d105460133c40bd5de0340b3572191d"
+      },
+      "budget": {
+        "path": "/Users/yolandahao/code/oh-story-claudecode/.trellis/tasks/09-06-reader-first-writing/budget-final.log",
+        "sha256": "451cf0d6a74ae3fb3c7ec6d22aded4a8bca1ebe91ea64c0fb53ce73d5517ae60"
+      }
+    }
+  },
+  "source_sha256": {
+    "skills/_shared/scripts/check-emotion-run.js": "e38f91cd8b7200bee88d8c62249e134526f950e48db2e14904f57c5030fac648",
+    "skills/story-write/scripts/candidate-commit.py": "a0b53bf1fc057f1b0194357a10ed649ef99dceae3cce6c91f3faf399398490eb"
+  },
+  "full_report": "/Users/yolandahao/code/oh-story-claudecode/.trellis/tasks/09-06-reader-first-writing/quality-gate.json",
+  "reviewed_at": "2026-09-06T05:14:30.063207+00:00"
+}

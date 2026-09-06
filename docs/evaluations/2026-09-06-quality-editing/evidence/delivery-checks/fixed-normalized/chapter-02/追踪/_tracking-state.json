@@ -1,0 +1,78 @@
+{
+  "book_title": "小满修理铺（隔离流程模拟）",
+  "chapter_gaps": [],
+  "characters": {
+    "周小满": {
+      "abilities_resources": [
+        "具备实际冷柜维修经验并能判断需更换配件",
+        "带有工具包和记事本",
+        "本单已收100元定金"
+      ],
+      "goal": "先给鱼货找临时冷藏处，下午取件完成冷柜维修，挣到约定的三百元。",
+      "identity": "周小满，29岁，有维修经验，接下父亲修理铺独立接单。",
+      "knowledge": [
+        "该冷柜无法立即恢复，需要合适配件，下午才能取到",
+        "鱼货不能继续等修，须先安排临时冷藏",
+        "总服务费300元；先付100元；修复验证后付200元；临时存放费另谈"
+      ],
+      "location": "陈望包子铺门口，正准备和何桂香一起谈临时存鱼条件。",
+      "open_threads": [
+        "和陈望商量鱼货临时冷藏空间与条件",
+        "下午取配件并返回维修",
+        "维修验证完成后收200元尾款"
+      ],
+      "relationships": [
+        "何桂香起初要找老周，对小满独立维修有疑虑，现接受明确收费与验证条件",
+        "知道隔壁陈望店内可能有冷藏空间，尚未谈妥"
+      ],
+      "state": "已检查冷柜并收一百元定金，冷柜未修好，尚未得到陈望的存放许可。"
+    }
+  },
+  "context": {
+    "active_character_names": [
+      "周小满"
+    ],
+    "continuity_risks": [],
+    "long_term_constraints": [],
+    "next_chapter_commitments": [
+      "小满拿到配件就回鱼摊，维修后验证冷柜稳定运行再结束本单。",
+      "双方约定总服务费300元，已付100元定金，修复验证后再付200元。"
+    ],
+    "position": {
+      "scene": "陈望包子铺门口，正准备和何桂香一起谈临时存鱼条件。",
+      "story_time": "当天",
+      "volume": "第一单",
+      "volume_start_chapter": 1
+    },
+    "recent_chapters": [
+      {
+        "chapter": 1,
+        "summary": "何桂香找老周修冷柜，小满检查后说明下午才有配件。双方约定总费300元，先收100元，验证后付200元；两人到陈望店里准备谈临时冷藏。"
+      }
+    ]
+  },
+  "foreshadow": {},
+  "imported_through_chapter": 1,
+  "last_committed_chapter": 1,
+  "metrics": {
+    "已收服务费": {
+      "as_of_chapter": 1,
+      "source_phrase": "小满收好，在本子上写明已收一百，把金额又指给何桂香确认。",
+      "value": "100元"
+    },
+    "未收服务费": {
+      "as_of_chapter": 1,
+      "source_phrase": "两百待修复验证后付。",
+      "value": "200元"
+    },
+    "约定服务费": {
+      "as_of_chapter": 1,
+      "source_phrase": "这一单总共三百，配件和这次维修都在里头。",
+      "value": "300元"
+    }
+  },
+  "schema_version": 4,
+  "state_revision": 0,
+  "timeline": {},
+  "wordcount_records": {}
+}

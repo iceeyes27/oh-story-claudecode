@@ -1,0 +1,6 @@
+{
+  "original_input_preserved": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/fixed/大纲/细纲_第1章.md",
+  "added_fields": "\n- 目标情绪：日常\n- 结尾拍ID/类型：EB-01 goal；到陈望店里谈条件\n- 期待ID/类型：EX-01 goal；能否谈妥临时存鱼\n- 读者验收预期：must_know=缺配件及先保鱼，已付100元；may_believe=她能完成维修；must_not_know=借柜条件和维修结果；open_ids=EX-01\n- 前因：开篇无前因\n- 后果指向：双方到包子铺商量临存\n- 读者已知：小满接单，已说明需要下午配件，陈望尚未同意\n",
+  "story_events_changed": false,
+  "not_a_claim_of_prewrite_validation": true
+}

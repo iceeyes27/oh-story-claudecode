@@ -1,0 +1,42 @@
+{
+  "stage": "after_draft",
+  "files": [
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/raw/第003章_林琴.md",
+      "sha256": "1d6fc41fb79441cb1ac221037e1ba63e50d7853e69d0b05283551d76bbf4bc36",
+      "purpose": "事实抽取与计数，非生成前输入",
+      "range": "full"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/tracking_commit.py",
+      "sha256": "2b099f35c693a9ed70e649b53e7f88a49659dfedaaa891e573f6aaab041a898d",
+      "purpose": "写后normalize_snapshot字段结构确认",
+      "range": "270-301 plus module read-only import"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/logs/chapter-03.post.wordcount.log",
+      "sha256": "63e5a3b3da84625981c40dea49d0f581659d21b98c5addbb0fdea992f48fb3da",
+      "purpose": "写后检查结果",
+      "range": "full"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/logs/chapter-03.post.scan.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "purpose": "写后检查结果",
+      "range": "full"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/logs/chapter-03.post.degeneration.log",
+      "sha256": "8aa973100a15bf817985395637131e838cf84e427be4792583def923f020f5fa",
+      "purpose": "写后检查结果",
+      "range": "full"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/logs/chapter-03.post.outline-copy.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "purpose": "写后检查结果",
+      "range": "full"
+    }
+  ],
+  "no_reader_inputs": true
+}

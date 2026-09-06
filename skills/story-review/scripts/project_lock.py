@@ -92,7 +92,21 @@ def unfinished_adoptions(project: Path) -> list[Path]:
 
 
 def assert_no_unfinished_adoption(project: Path) -> None:
-    pending = unfinished_adoptions(project)
+    pending = unfinished_adoptions(project) + unfinished_revisions(project)
     if pending:
         names = ", ".join(path.name for path in pending)
         raise ProjectLockError(f"unfinished candidate adoption requires recover: {names}")
+
+
+def unfinished_revisions(project: Path) -> list[Path]:
+    history = project.resolve() / "候选" / "_历史"
+    pending = []
+    for path in sorted(history.glob("修订事务-*.json")):
+        try:
+            document = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            pending.append(path)
+            continue
+        if document.get("phase") not in {"done", "aborted"}:
+            pending.append(path)
+    return pending

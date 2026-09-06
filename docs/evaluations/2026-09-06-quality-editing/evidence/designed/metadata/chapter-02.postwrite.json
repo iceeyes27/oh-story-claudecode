@@ -1,0 +1,187 @@
+{
+  "schema": "postwrite-extraction/v1",
+  "chapter": 2,
+  "extraction_phase": "after_all_three_raw_drafts_and_scans; not generation input",
+  "extracted_at": "2026-09-06T06:49:48.674920+00:00",
+  "candidate_path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/候选/第002章_这边放鱼.md",
+  "candidate_sha256": "ee4a5209878e555013a0b2c16d9ea5b4a7e5fab64ab3fb94b03bb773df3381db",
+  "summary": "陈望拒绝混放鱼货。三人看箱与空间后议定密闭分放、三十元及傍晚前取走，搬好四箱鱼。小满确认下午可取配件，父亲电话尊重她已做好的安排。",
+  "coverage": [
+    {
+      "o_id": "O1",
+      "evidence": [
+        {
+          "evidence": "\"鱼不行。\"",
+          "line": 4
+        },
+        {
+          "evidence": "\"鲜鱼也有鱼味。我的馅不能跟鱼混着放。\"",
+          "line": 8
+        },
+        {
+          "evidence": "\"行，你的包子金贵。\"",
+          "line": 9
+        }
+      ]
+    },
+    {
+      "o_id": "O2",
+      "evidence": [
+        {
+          "evidence": "\"你后面空哪块？能让我看看吗？不合适再说。\"",
+          "line": 15
+        },
+        {
+          "evidence": "\"你下午取哪盆？\"",
+          "line": 19
+        },
+        {
+          "evidence": "\"左边下面那盆。\"",
+          "line": 20
+        }
+      ]
+    },
+    {
+      "o_id": "O3",
+      "evidence": [
+        {
+          "evidence": "\"那就四只。右边这两层，跟馅料分开。装的时候外边擦干净，箱盖扣严，不在他柜子里开盖。陈望，你看行不行？\"",
+          "line": 36
+        },
+        {
+          "evidence": "\"行。傍晚前得搬走，我自己的地方还要用。\"",
+          "line": 38
+        },
+        {
+          "evidence": "\"三十。\"",
+          "line": 40
+        },
+        {
+          "evidence": "小满已经准备好再问一句哪些东西需要挪，何桂香却从口袋里掏出钱来，数出三十元，放在外头的干燥柜台上。",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "o_id": "O4",
+      "evidence": [
+        {
+          "evidence": "\"等会儿，这么放，他那盆馅拿不出来。\"",
+          "line": 53
+        },
+        {
+          "evidence": "陈望从旁边托住，三个人把箱子转过来。",
+          "line": 56
+        },
+        {
+          "evidence": "\"行。它要是不出来，我明天就只能卖皮了。\"",
+          "line": 58
+        },
+        {
+          "evidence": "剩下两只搬过来，小满照着位置放好，一只只点过去。何桂香把鱼的种类对了一遍，陈望看了箱外和空出的取物位置，把柜门关上。",
+          "line": 62
+        }
+      ]
+    },
+    {
+      "o_id": "O5",
+      "evidence": [
+        {
+          "evidence": "小满回到修理铺门口，先给供货方拨电话，对了一遍配件型号，确认下午能拿到，才把记下的号码收好。",
+          "line": 68
+        },
+        {
+          "evidence": "\"我先按我看的做，真有拿不准的再问你。\"",
+          "line": 75
+        },
+        {
+          "evidence": "\"行。\"父亲说，\"你都安排好了，就照你判断的弄。\"",
+          "line": 76
+        }
+      ]
+    }
+  ],
+  "protagonist": {
+    "identity": "周小满，独立负责何桂香冷柜维修及当日保货安排的维修工。",
+    "location": "修理铺工作台旁，刚挂断父亲电话后提起工具包。",
+    "goal": "按自己的诊断取到匹配配件并修好冷柜。",
+    "state": "四箱鱼已在陈望指定位置临存；配件下午可取已电话确认；冷柜尚未修好。",
+    "abilities_resources": [
+      "工具包",
+      "会检查故障并确认匹配配件型号",
+      "已收的一百元定金",
+      "陈望获偿三十元后同意临存四箱鱼"
+    ],
+    "relationships": [
+      "何桂香、陈望通过看箱与搬箱达成合作",
+      "父亲接受她先按自己判断处理，不替她决定"
+    ],
+    "knowledge": [
+      "陈望需分开食材且下午能取到左侧馅料",
+      "密闭四箱已在右侧两层存妥",
+      "临存三十元已付，傍晚前必须搬走",
+      "供货方确认下午能取得配件"
+    ],
+    "open_threads": [
+      "取配件修柜",
+      "傍晚前搬回鱼货归还位置",
+      "修复验证后收二百元尾款"
+    ]
+  },
+  "commitments": [
+    {
+      "promise": "四只密闭鱼箱在指定位置分开存放，傍晚前搬走。",
+      "state": "临存已落实，搬走待履行",
+      "evidence": "\"行。傍晚前得搬走，我自己的地方还要用。\""
+    },
+    {
+      "promise": "小满先照自己的判断做，有拿不准的再问父亲。",
+      "state": "当前决定",
+      "evidence": "\"我先按我看的做，真有拿不准的再问你。\""
+    }
+  ],
+  "metrics": [
+    {
+      "name": "service_fee_agreed",
+      "value": 300,
+      "as_of_chapter": 2,
+      "source_chapter": 1,
+      "source_phrase": "我这边总共三百",
+      "unit": "元"
+    },
+    {
+      "name": "service_fee_received",
+      "value": 100,
+      "as_of_chapter": 2,
+      "source_chapter": 1,
+      "source_phrase": "小满收好定金",
+      "unit": "元"
+    },
+    {
+      "name": "service_fee_outstanding",
+      "value": 200,
+      "as_of_chapter": 2,
+      "source_chapter": 1,
+      "source_phrase": "再给剩下二百",
+      "unit": "元"
+    },
+    {
+      "name": "temporary_storage_fee_paid_to_chen",
+      "value": 30,
+      "as_of_chapter": 2,
+      "source_chapter": 2,
+      "source_phrase": "数出三十元，放在外头的干燥柜台上",
+      "unit": "元"
+    },
+    {
+      "name": "stored_fish_boxes",
+      "value": 4,
+      "as_of_chapter": 2,
+      "source_chapter": 2,
+      "source_phrase": "四只，全在你这里",
+      "unit": "只"
+    }
+  ],
+  "not_a_reader_receipt": true,
+  "adopted": false
+}

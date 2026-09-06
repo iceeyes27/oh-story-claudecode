@@ -1,0 +1,21 @@
+{
+  "reviewer": "",
+  "reader_type": "model",
+  "status": "pending",
+  "original_sha256": "1d6fc41fb79441cb1ac221037e1ba63e50d7853e69d0b05283551d76bbf4bc36",
+  "candidate_sha256": "007895da5b8462dbf3cc27fc9c4e930966cc51f280a3ef9d77a8b18b7807578e",
+  "diff_sha256": "2e05fa0c24370541fa736281ac5a9f00fde8d061f5c3f153c167a738f6fbd084",
+  "facts_unchanged": null,
+  "findings": [],
+  "original_anchor": "",
+  "candidate_anchor": "",
+  "metric_source_updates": {},
+  "context": [
+    {
+      "path": "正文/第002章_借来的外套.md",
+      "sha256": "4c1c53dd528e46c5817580fbcd05ae50844d0bb32dc179a576a4352af8e123c0",
+      "anchor": "",
+      "assessment": ""
+    }
+  ]
+}

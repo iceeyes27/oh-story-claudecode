@@ -1,0 +1,112 @@
+{
+  "reader_type": "model",
+  "reader_id": "resume-reader-c",
+  "version": "H74",
+  "chapter": 1,
+  "actual_version_order": [
+    "H82",
+    "H74"
+  ],
+  "familiarity_effect": "此前已经完整顺读 H82 三章，知道人物身份、外套来历与结局。此次不能复现首次读者的悬念或认知成本；只按 H74 本章当下已披露的正文判断信息是否足够，不把已知后文倒算为本章信息。",
+  "summary": "宋棠发现展墙合影裁掉第五人，核对旧职工名单与齐叔记忆，保留空名并承诺展示完整照片；衣服身份仍待核实，通过照片背面编号与寄件电话联系程雪，约她携另一张照片来。",
+  "rc-01": {
+    "status": "pass",
+    "findings": [],
+    "evidence": [
+      {
+        "anchor": "青平码头旧站的照片展下午开放。她刚接手这份整理工作",
+        "reason": "场景、时间与宋棠要完成的工作足够清楚。",
+        "source_chapter": 1
+      },
+      {
+        "anchor": "他退休以前在旧站上班，今天一早就来了",
+        "reason": "齐叔在场及辨认资格就地交代。",
+        "source_chapter": 1
+      },
+      {
+        "anchor": "我姓程，程雪。另一张在我这里。",
+        "reason": "新人物由有来源的电话接入，姓名和照片持有关系明确。",
+        "source_chapter": 1
+      }
+    ]
+  },
+  "rc-02": {
+    "status": "pass",
+    "findings": [],
+    "evidence": [
+      {
+        "anchor": "四名职工能对上四个人，并不能说明合影只能有四个人。",
+        "reason": "名单范围与全体合影人员的区别，是追查第五人的可追原因。",
+        "source_chapter": 1
+      },
+      {
+        "anchor": "这问题该留在她手边，不能先落进说明牌。",
+        "reason": "明确草纸上的衣服问号是待核实问题，尚未当作展览断言；没有引入新调查步骤或事实。",
+        "source_chapter": 1
+      },
+      {
+        "anchor": "寄件人一栏没写姓名，联系电话却还在",
+        "reason": "寻找寄件人的行动有号码来源，不依赖尚未知晓的身份。",
+        "source_chapter": 1
+      }
+    ]
+  },
+  "rc-03": {
+    "status": "pass",
+    "findings": [],
+    "evidence": [
+      {
+        "anchor": "齐叔嗯了一声，把照片还给她。",
+        "reason": "照片归还衔接宋棠继续观察与翻背，物件去向不丢失。",
+        "source_chapter": 1
+      },
+      {
+        "anchor": "她把旧说明牌收进抽屉，把留有空行的新牌暂放到照片旁边。",
+        "reason": "旧牌收起、新牌待补、草纸存疑的作用能区分；没有把问号贴成展牌。",
+        "source_chapter": 1
+      },
+      {
+        "anchor": "齐叔把椅子往后挪了一点，没有凑过来听。",
+        "reason": "电话时齐叔仍在场，程雪尚未到场，人物与动作关系清楚。",
+        "source_chapter": 1
+      }
+    ]
+  },
+  "interest": {
+    "reread_or_skip": [
+      {
+        "anchor": "她弯腰捡起，才发现衣袖在照片里。",
+        "type": "potential_first_read_reread",
+        "reason": "先呈现衣袖似实物、再澄清是照片，和先读版本一样需短暂视觉校正；熟悉后我实际不再需要回读，不能算本版改善。",
+        "severity": "advisory"
+      },
+      {
+        "anchor": "这问题该留在她手边，不能先落进说明牌。",
+        "type": "slight_skip_impulse",
+        "reason": "草纸与说明牌的区分更明确，但刚才的问号和不敢凭衣服认人已传达同意，读感略多一层解释。",
+        "severity": "advisory"
+      }
+    ],
+    "specific_choices": [
+      "宋棠区分记忆与猜测、留空姓名、先展示完整照片。",
+      "齐叔撤回可能误写成凑热闹的路过定性，并限制制服推断。"
+    ],
+    "emotional_payoff": "尊重被遗漏者的行动与齐叔肯承认不记得仍然成立；已知结果使本次悬念感下降，这是顺序影响。",
+    "continue_reading": "本章为后续会面提供清楚方向；无法把我已知结局后的继续意愿与 H82 首读等量比较。",
+    "money_and_practice": "无具体金额或高专业制度问题；原片辨认、旧编号、寄件电话在普通生活范围内。"
+  },
+  "confirmed_breaks": [],
+  "boundary_cases": [
+    {
+      "anchor": "先别替她写什么故事，等我到了再说。",
+      "severity": "advisory",
+      "reason": "仅本章看是身份与讲述范围的有意悬念；不因为我已从 H82 知道母女关系而要求此处提前披露。"
+    },
+    {
+      "anchor": "衣服谁都能穿，我不敢凭这个认。",
+      "severity": "advisory",
+      "reason": "衣服与职工身份的关系被主动保留为假设，尚未确证不是缺陷。"
+    }
+  ],
+  "reading_scope": "H74 只读至第 1 章；已保存 H82 三份逐章报告，未看其他读者报告。"
+}

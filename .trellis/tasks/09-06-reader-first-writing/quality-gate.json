@@ -1,0 +1,257 @@
+{
+  "schema_version": 1,
+  "profile": "affected",
+  "status": "PASS",
+  "config_sha256": "ab05e0e175bcc54bb1896f488466263641e6c75278de38b0735561769488b4b9",
+  "generated_at": "2026-09-06T04:29:19.699Z",
+  "results": [
+    {
+      "name": "sync-unit",
+      "command": [
+        "node",
+        "--test",
+        "scripts/sync-upstream.test.js"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 1142,
+      "stdout": "Preparing worktree (new branch 'codex/sync-upstream-8d50ffaa3f1f-mtpb93vw')\nHEAD is now at bc67964 base\nAutomatic merge went well; stopped before committing as requested\n✔ policy priority preserves fork boundaries and unified targets (3.069125ms)\n✔ CLI defaults to a read-only status command (0.264833ms)\n✔ ancestor check distinguishes forward and reverse baselines (196.201125ms)\n✔ prepare uses a dedicated worktree and leaves dirty caller files untouched (681.4655ms)\nℹ tests 4\nℹ suites 0\nℹ pass 4\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1022.734792\n",
+      "stderr": "",
+      "executed_command": [
+        "node",
+        "--test",
+        "scripts/sync-upstream.test.js"
+      ]
+    },
+    {
+      "name": "sync-drift",
+      "command": [
+        "python3",
+        "scripts/test-unified-skill-upstream-drift.py"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 692,
+      "stdout": "PASS: unified upstream checker reports source-to-target migration paths\n",
+      "stderr": "",
+      "executed_command": [
+        "python3",
+        "scripts/test-unified-skill-upstream-drift.py"
+      ]
+    },
+    {
+      "name": "platform-capabilities",
+      "command": [
+        "node",
+        "scripts/check-platform-capabilities.mjs"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 102,
+      "stdout": "PASS: 7 platform contracts; 18 public skills\n",
+      "stderr": "",
+      "executed_command": [
+        "node",
+        "scripts/check-platform-capabilities.mjs"
+      ]
+    },
+    {
+      "name": "release-manifest",
+      "command": [
+        "node",
+        "scripts/check-release-manifest.mjs"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 113,
+      "stdout": "PASS: release identity 0.8.1; upstream 5de060f9a47e\n",
+      "stderr": "",
+      "executed_command": [
+        "node",
+        "scripts/check-release-manifest.mjs"
+      ]
+    },
+    {
+      "name": "doc-budget",
+      "command": [
+        "bash",
+        "scripts/check-doc-budget.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 116,
+      "stdout": "热路径文档预算\n------------------------------------------------------------------------------\n  用量 /   预算  余量  文件\n    3769 /   3800     31  skills/story-write/SKILL.md  [ok]\n   27278 /  27500    222  skills/story-write/references/long-mode.md  [ok]\n   21496 /  22200    704  skills/story-write/references/short-mode.md  [ok]\n   16404 /  17500   1096  skills/story-write/references/workflow-daily.md  [ok]\n   12514 /  13000    486  skills/story-write/references/workflow-setup.md  [ok]\n    9059 /   9100     41  skills/story-write/references/writing-craft.md  [ok]\n   15472 /  15500     28  skills/_shared/references/banned-words.md  [ok]\n   14023 /  14100     77  skills/_shared/references/anti-ai-writing.md  [ok]\n   12913 /  14000   1087  skills/story-setup/references/templates/agents/narrative-writer.md  [ok]\n    2068 /   2600    532  skills/story-write/references/reader-first-writing.md  [ok]\n\n路径合计（一次会话真正付的量）\n------------------------------------------------------------------------------\n   47451 /  48500   1049  长篇日更主会话  [ok]\n   43561 /  44000    439  长篇开书  [ok]\n   16169 /  18500   2331  普通长篇正文 agent 固定参考  [ok]\n\n提示（不阻断）：\n  - skills/story-write/references/workflow-daily.md 比预算低 1096 字，可把 budget 降到 16500 锁住这次精简\n  - skills/story-setup/references/templates/agents/narrative-writer.md 比预算低 1087 字，可把 budget 降到 13000 锁住这次精简\n  - skills/story-write/references/reader-first-writing.md 比预算低 532 字，可把 budget 降到 2100 锁住这次精简\n\nResult: 热路径文档预算检查通过\n",
+      "stderr": "",
+      "executed_command": [
+        "bash",
+        "scripts/check-doc-budget.sh"
+      ]
+    },
+    {
+      "name": "candidate-transaction",
+      "command": [
+        "python3",
+        "scripts/test-candidate-commit.py"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 50335,
+      "stdout": "",
+      "stderr": "test_arc02_blocking_requires_exact_author_approval (__main__.CandidateCommitTests.test_arc02_blocking_requires_exact_author_approval) ... ok\ntest_candidate_does_not_touch_body_or_tracking (__main__.CandidateCommitTests.test_candidate_does_not_touch_body_or_tracking) ... ok\ntest_candidate_workflow_documents_v2_logic_contract (__main__.CandidateCommitTests.test_candidate_workflow_documents_v2_logic_contract) ... ok\ntest_chapter_14_and_16_do_not_require_arc_receipts (__main__.CandidateCommitTests.test_chapter_14_and_16_do_not_require_arc_receipts) ... ok\ntest_chapter_15_requires_ledger_and_valid_arc02 (__main__.CandidateCommitTests.test_chapter_15_requires_ledger_and_valid_arc02) ... ok\ntest_check_passes_on_new_chapter_with_intent_fields (__main__.CandidateCommitTests.test_check_passes_on_new_chapter_with_intent_fields) ... ok\ntest_emotion_run_input_failure_still_rejects_before_writes (__main__.CandidateCommitTests.test_emotion_run_input_failure_still_rejects_before_writes) ... ok\ntest_four_same_emotion_distinct_events_check_and_promote (__main__.CandidateCommitTests.test_four_same_emotion_distinct_events_check_and_promote) ... ok\ntest_future_emotion_outline_does_not_extend_current_advisory (__main__.CandidateCommitTests.test_future_emotion_outline_does_not_extend_current_advisory) ... ok\ntest_historical_chapter_missing_intent_fields_is_advisory (__main__.CandidateCommitTests.test_historical_chapter_missing_intent_fields_is_advisory) ... ok\ntest_historical_chapter_real_world_name_is_advisory (__main__.CandidateCommitTests.test_historical_chapter_real_world_name_is_advisory) ... ok\ntest_list_reports_pending (__main__.CandidateCommitTests.test_list_reports_pending) ... ok\ntest_metrics_cumulative_value_accepts_prose_delta (__main__.CandidateCommitTests.test_metrics_cumulative_value_accepts_prose_delta) ... ok\ntest_metrics_update_binds_value_and_source_then_promotes (__main__.CandidateCommitTests.test_metrics_update_binds_value_and_source_then_promotes) ... ok\ntest_metrics_value_must_match_source_phrase (__main__.CandidateCommitTests.test_metrics_value_must_match_source_phrase) ... ok\ntest_new_chapter_character_near_name_is_advisory (__main__.CandidateCommitTests.test_new_chapter_character_near_name_is_advisory) ... ok\ntest_new_chapter_invalid_emotion_value_is_blocked (__main__.CandidateCommitTests.test_new_chapter_invalid_emotion_value_is_blocked) ... ok\ntest_new_chapter_missing_causal_fields_is_blocked (__main__.CandidateCommitTests.test_new_chapter_missing_causal_fields_is_blocked) ... ok\ntest_new_chapter_missing_intent_fields_is_blocked (__main__.CandidateCommitTests.test_new_chapter_missing_intent_fields_is_blocked) ... ok\ntest_new_chapter_undeclared_real_world_name_is_blocked (__main__.CandidateCommitTests.test_new_chapter_undeclared_real_world_name_is_blocked) ... ok\ntest_no_scan_cannot_bypass_logic_receipts (__main__.CandidateCommitTests.test_no_scan_cannot_bypass_logic_receipts) ... ok\ntest_promote_all_rejects_multiple_candidates_before_writes (__main__.CandidateCommitTests.test_promote_all_rejects_multiple_candidates_before_writes) ... ok\ntest_promote_all_with_current_serial_candidate (__main__.CandidateCommitTests.test_promote_all_with_current_serial_candidate) ... ok\ntest_promote_honors_explicit_terse_title_profile (__main__.CandidateCommitTests.test_promote_honors_explicit_terse_title_profile) ... ok\ntest_promote_ignores_in_prose_exemption_marker (__main__.CandidateCommitTests.test_promote_ignores_in_prose_exemption_marker) ... ok\ntest_promote_missing_transaction_aborts (__main__.CandidateCommitTests.test_promote_missing_transaction_aborts) ... ok\ntest_promote_moves_prose_and_advances_tracking (__main__.CandidateCommitTests.test_promote_moves_prose_and_advances_tracking) ... ok\ntest_promote_no_scan_bypasses_ai_gate_only (__main__.CandidateCommitTests.test_promote_no_scan_bypasses_ai_gate_only) ... ok\ntest_promote_no_scan_requires_reason (__main__.CandidateCommitTests.test_promote_no_scan_requires_reason) ... ok\ntest_promote_quality_gate_fails_when_node_is_unavailable (__main__.CandidateCommitTests.test_promote_quality_gate_fails_when_node_is_unavailable) ... ok\ntest_promote_records_scan_skip_reason (__main__.CandidateCommitTests.test_promote_records_scan_skip_reason) ... ok\ntest_promote_refuses_to_overwrite_final (__main__.CandidateCommitTests.test_promote_refuses_to_overwrite_final) ... ok\ntest_promote_rejects_duplicate_logic_id_in_json (__main__.CandidateCommitTests.test_promote_rejects_duplicate_logic_id_in_json) ... ok\ntest_promote_rejects_empty_or_unbound_semantic_evidence (__main__.CandidateCommitTests.test_promote_rejects_empty_or_unbound_semantic_evidence) ... ok\ntest_promote_rejects_missing_or_unknown_logic_id (__main__.CandidateCommitTests.test_promote_rejects_missing_or_unknown_logic_id) ... ok\ntest_promote_rejects_stale_expected_revision_before_writes (__main__.CandidateCommitTests.test_promote_rejects_stale_expected_revision_before_writes) ... ok\ntest_promote_rejects_stale_reader_file_hash (__main__.CandidateCommitTests.test_promote_rejects_stale_reader_file_hash) ... ok\ntest_promote_rejects_v1_binding_with_regeneration_message (__main__.CandidateCommitTests.test_promote_rejects_v1_binding_with_regeneration_message) ... ok\ntest_promote_reruns_rc01_even_with_no_scan (__main__.CandidateCommitTests.test_promote_reruns_rc01_even_with_no_scan) ... ok\ntest_promote_rolls_back_on_tracking_failure (__main__.CandidateCommitTests.test_promote_rolls_back_on_tracking_failure) ... ok\ntest_promote_treats_style_pattern_as_review_finding (__main__.CandidateCommitTests.test_promote_treats_style_pattern_as_review_finding) ... ok\ntest_recover_is_idempotent_after_each_persisted_phase (__main__.CandidateCommitTests.test_recover_is_idempotent_after_each_persisted_phase) ... ok\ntest_recover_rejects_changed_reader_view_before_move_or_tracking (__main__.CandidateCommitTests.test_recover_rejects_changed_reader_view_before_move_or_tracking) ... ok\ntest_recover_validates_transaction_digest_before_moving_prose (__main__.CandidateCommitTests.test_recover_validates_transaction_digest_before_moving_prose) ... ok\ntest_reject_archives_without_touching_body (__main__.CandidateCommitTests.test_reject_archives_without_touching_body) ... ok\ntest_rewrite_flag_marks_action (__main__.CandidateCommitTests.test_rewrite_flag_marks_action) ... ok\ntest_settlement_phrase_without_metrics_change_is_blocked (__main__.CandidateCommitTests.test_settlement_phrase_without_metrics_change_is_blocked) ... ok\ntest_settlement_reason_explicitly_allows_unchanged_metrics (__main__.CandidateCommitTests.test_settlement_reason_explicitly_allows_unchanged_metrics) ... ok\n\n----------------------------------------------------------------------\nRan 48 tests in 50.194s\n\nOK\n",
+      "executed_command": [
+        "python3",
+        "scripts/test-candidate-commit.py"
+      ]
+    },
+    {
+      "name": "tracking",
+      "command": [
+        "python3",
+        "scripts/test-tracking-commit.py"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 7205,
+      "stdout": "",
+      "stderr": "test_a_character_can_die_and_retire_in_one_transaction (__main__.TrackingCommitTests.test_a_character_can_die_and_retire_in_one_transaction) ... ok\ntest_an_interrupted_archive_can_be_resumed (__main__.TrackingCommitTests.test_an_interrupted_archive_can_be_resumed) ... ok\ntest_append_can_atomically_declare_an_exact_chapter_gap (__main__.TrackingCommitTests.test_append_can_atomically_declare_an_exact_chapter_gap) ... ok\ntest_archive_never_clobbers_an_already_archived_file (__main__.TrackingCommitTests.test_archive_never_clobbers_an_already_archived_file) ... ok\ntest_chapter_gap_requires_exact_boundaries_and_append_mode (__main__.TrackingCommitTests.test_chapter_gap_requires_exact_boundaries_and_append_mode) ... ok\ntest_character_snapshot_lists_are_not_limited_to_eight_items (__main__.TrackingCommitTests.test_character_snapshot_lists_are_not_limited_to_eight_items) ... ok\ntest_check_compares_derived_views_to_state_without_parsing_markdown (__main__.TrackingCommitTests.test_check_compares_derived_views_to_state_without_parsing_markdown) ... ok\ntest_check_rejects_a_delta_inside_a_declared_gap (__main__.TrackingCommitTests.test_check_rejects_a_delta_inside_a_declared_gap) ... ok\ntest_check_rejects_orphan_character_file (__main__.TrackingCommitTests.test_check_rejects_orphan_character_file) ... ok\ntest_commit_and_check_still_refuse_a_retired_layout (__main__.TrackingCommitTests.test_commit_and_check_still_refuse_a_retired_layout) ... ok\ntest_commit_updates_state_and_all_demo_derived_views (__main__.TrackingCommitTests.test_commit_updates_state_and_all_demo_derived_views) ... ok\ntest_declared_context_retirement_is_recorded_in_the_chapter_delta (__main__.TrackingCommitTests.test_declared_context_retirement_is_recorded_in_the_chapter_delta) ... ok\ntest_dropping_a_context_item_without_declaring_it_is_rejected (__main__.TrackingCommitTests.test_dropping_a_context_item_without_declaring_it_is_rejected) ... ok\ntest_failed_init_leaves_the_old_tracking_directory_untouched (__main__.TrackingCommitTests.test_failed_init_leaves_the_old_tracking_directory_untouched) ... ok\ntest_imported_chapter_revision_creates_an_overlay_record (__main__.TrackingCommitTests.test_imported_chapter_revision_creates_an_overlay_record) ... ok\ntest_imported_cutoff_requires_only_new_daily_records (__main__.TrackingCommitTests.test_imported_cutoff_requires_only_new_daily_records) ... ok\ntest_init_archives_a_pre_transaction_tracking_directory (__main__.TrackingCommitTests.test_init_archives_a_pre_transaction_tracking_directory) ... ok\ntest_init_creates_one_structured_authority_and_only_derived_views (__main__.TrackingCommitTests.test_init_creates_one_structured_authority_and_only_derived_views) ... ok\ntest_legacy_state_without_chapter_gaps_accepts_first_gap_append (__main__.TrackingCommitTests.test_legacy_state_without_chapter_gaps_accepts_first_gap_append) ... ok\ntest_metrics_default_empty_and_render_stays_seven_headings (__main__.TrackingCommitTests.test_metrics_default_empty_and_render_stays_seven_headings) ... ok\ntest_metrics_render_as_position_bullet (__main__.TrackingCommitTests.test_metrics_render_as_position_bullet) ... ok\ntest_metrics_render_twelve_most_recent_and_report_hidden_count (__main__.TrackingCommitTests.test_metrics_render_twelve_most_recent_and_report_hidden_count) ... ok\ntest_metrics_require_structured_record_and_changed_chapter (__main__.TrackingCommitTests.test_metrics_require_structured_record_and_changed_chapter) ... ok\ntest_missing_active_snapshot_is_rejected_before_any_write (__main__.TrackingCommitTests.test_missing_active_snapshot_is_rejected_before_any_write) ... ok\ntest_old_revision_applies_current_rows_without_moving_update_chapter_back (__main__.TrackingCommitTests.test_old_revision_applies_current_rows_without_moving_update_chapter_back) ... ok\ntest_old_revision_preserves_current_next_chapter_commitment (__main__.TrackingCommitTests.test_old_revision_preserves_current_next_chapter_commitment) ... ok\ntest_overlapping_persisted_chapter_gaps_are_rejected (__main__.TrackingCommitTests.test_overlapping_persisted_chapter_gaps_are_rejected) ... ok\ntest_partial_view_write_keeps_old_authority_and_same_transaction_can_retry (__main__.TrackingCommitTests.test_partial_view_write_keeps_old_authority_and_same_transaction_can_retry) ... ok\ntest_retirement_is_rejected_in_a_revision (__main__.TrackingCommitTests.test_retirement_is_rejected_in_a_revision) ... ok\ntest_retiring_a_core_character_removes_its_derived_view (__main__.TrackingCommitTests.test_retiring_a_core_character_removes_its_derived_view) ... ok\ntest_retiring_a_still_active_character_is_rejected (__main__.TrackingCommitTests.test_retiring_a_still_active_character_is_rejected) ... ok\ntest_snapshot_target_warns_and_hard_cap_rejects_before_any_write (__main__.TrackingCommitTests.test_snapshot_target_warns_and_hard_cap_rejects_before_any_write) ... ok\ntest_stale_revision_cannot_overwrite_newer_state (__main__.TrackingCommitTests.test_stale_revision_cannot_overwrite_newer_state) ... ok\ntest_transaction_missing_metrics_is_rejected (__main__.TrackingCommitTests.test_transaction_missing_metrics_is_rejected) ... ok\ntest_unknown_fields_are_rejected (__main__.TrackingCommitTests.test_unknown_fields_are_rejected) ... ok\ntest_windows_reserved_character_name_is_rejected (__main__.TrackingCommitTests.test_windows_reserved_character_name_is_rejected) ... ok\n\n----------------------------------------------------------------------\nRan 36 tests in 7.133s\n\nOK\n",
+      "executed_command": [
+        "python3",
+        "scripts/test-tracking-commit.py"
+      ]
+    },
+    {
+      "name": "author-voice-profile",
+      "command": [
+        "python3",
+        "scripts/test-author-voice-profile.py"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 1208,
+      "stdout": "PASS: test_update_scope_preservation_and_idempotence\nPASS: test_check_and_dry_run_are_read_only\nPASS: test_marker_failures_are_non_destructive\nPASS: test_empty_invalid_and_duplicate_samples\nPASS: test_short_evidence_and_digest_change\nPASS: test_update_respects_project_lock\nPASS: test_symlink_escape_is_rejected\nauthor voice profile tests: 7/7 passed\n",
+      "stderr": "",
+      "executed_command": [
+        "python3",
+        "scripts/test-author-voice-profile.py"
+      ]
+    },
+    {
+      "name": "tracking-workflow",
+      "command": [
+        "python3",
+        "scripts/test-tracking-workflow-contracts.py"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 42,
+      "stdout": "Tracking workflow contract tests passed (15 tests).\n",
+      "stderr": "",
+      "executed_command": [
+        "python3",
+        "scripts/test-tracking-workflow-contracts.py"
+      ]
+    },
+    {
+      "name": "chapter-skeleton",
+      "command": [
+        "node",
+        "scripts/test-chapter-skeleton.js"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 1314,
+      "stdout": "OK: chapter skeleton validator regressions passed\n",
+      "stderr": "",
+      "executed_command": [
+        "node",
+        "scripts/test-chapter-skeleton.js"
+      ]
+    },
+    {
+      "name": "contracts",
+      "command": [
+        "npm",
+        "run",
+        "test:contracts",
+        "--silent"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 1489,
+      "stdout": "✔ question titles distinguish market questions from slogan questions by profile (292.823167ms)\n✔ fanqie relaxes length and common role overlap but terse keeps the legacy gate (248.269084ms)\n✔ AI summary clauses and exact repeats remain blocking in every profile (212.170584ms)\n✔ demo baseline is 0 blocking in fanqie and 13 in terse (192.084875ms)\n✔ 逾期伏笔拦住首建新章 (8.56475ms)\n✔ 悬空（从没排回收章）不拦日更 (5.529584ms)\n✔ 回收章还没到、以及已回收/放弃的伏笔都不拦 (12.357625ms)\n✔ 正好写到计划回收章那一章不算逾期 (7.427834ms)\n✔ 细纲头部的 <!-- 伏笔:跳过 --> 豁免，超出头 6 行则无效 (6.644375ms)\n✔ 伏笔欠账门排在毒句式欠账门之前 (3.261583ms)\n✔ 正文已存在（续写/改稿/回炉）不触发本门 (2.525416ms)\n✔ 状态损坏一律 fail-open，不因解析失败误伤写作 (5.701958ms)\n✔ 多条逾期只列前 6 条并给出完整体检出口 (3.318ms)\n✔ CLI 子命令 foreshadow-debt 与核逐字一致 (146.089417ms)\n✔ js ↔ codex py 文案 parity (313.977583ms)\n✔ 热卡复刻 tracking_commit.py 的排序：重要度 → 计划回收章 → id，未排期排最后 (2.89575ms)\n✔ 热卡只保留前 8 条，同重要度内旧伏笔（id 小）优先 (0.258875ms)\n✔ 逾期是 blocking：定了回收章又错过 (0.549917ms)\n✔ 正好写到计划回收章那一章不算逾期，过了才算 (0.175375ms)\n✔ 悬空默认 advisory，--strict 下变 blocking (0.2005ms)\n✔ 悬空阈值按重要度分档 (0.22675ms)\n✔ 冷藏点名掉出热卡且埋了很久的伏笔 (1.595ms)\n✔ 已回收 / 放弃 / 已过期的伏笔不再计入活跃债务 (0.214167ms)\n✔ 非 schema_version 4 与损坏字段被拒绝，不猜测 (0.431ms)\n✔ CLI 退出码：0 干净 / 1 有逾期 / 2 参数或状态错误 (636.325375ms)\n✔ --json 输出可解析且字段稳定 (105.419292ms)\n✔ demo 书：热卡与已渲染的 追踪/上下文.md 逐条一致 (1.823958ms)\n✔ new books default to plain narrative while legacy books remain regular (6.786125ms)\n✔ plain mode writes causality directly and does not require a hidden ending (1.122459ms)\n✔ title profile keeps pathological forms blocking in both modes (0.435ms)\n✔ first necessary explanation is preserved before deletion gates (1.822375ms)\n✔ dialogue keeps causal information while rejecting exposition monologues (0.142959ms)\n✔ general mode exposes one explicit route for rewrite, review, and translation (1.755ms)\n✔ general route boundaries stay consistent and load only task-relevant references (0.444416ms)\n✔ review is ranked and contextual instead of a mandatory-clear scanner (0.143708ms)\n✔ every guide fragment in the index resolves to an actual heading (1.447375ms)\n✔ translation preserves protected values, information, and document structure (0.173541ms)\n✔ novel mode and shared scanner contracts remain present (0.127791ms)\n✔ the repository contract suite includes the general-mode test (0.258ms)\n✔ generic novel check requires all ten stages and the manifest contract (6.829916ms)\n✔ pure Chinese prose profile gives logic checks at least one quarter of applicable budget (0.642667ms)\n✔ validation spec stays synchronized with the composite manifest (0.642333ms)\n✔ AI flavor manifest preserves all ten layers and five semantic mismatch checks (0.167292ms)\n✔ every composite-check dependency is in the installable public skill set (0.625083ms)\n✔ story-deslop file-mode pollution dependency is publicly installable and counted (0.709125ms)\n✔ a finding does not stop later filters, but a missing or blocked item cannot complete (0.493042ms)\n✔ skip requires a reason and trigger precedence keeps version checks separate (0.365709ms)\n✔ runtime hooks use the unified story-write entry and expose the post-event route (1.472125ms)\nℹ tests 48\nℹ suites 0\nℹ pass 48\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1120.57275\n",
+      "stderr": "",
+      "executed_command": [
+        "npm",
+        "run",
+        "test:contracts",
+        "--silent"
+      ]
+    },
+    {
+      "name": "publication",
+      "command": [
+        "node",
+        "--test",
+        "scripts/skill-publication-coverage.test.js"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 243,
+      "stdout": "✔ every repository skill is explicitly public or local-only (3.735042ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 137.344166\n",
+      "stderr": "",
+      "executed_command": [
+        "node",
+        "--test",
+        "scripts/skill-publication-coverage.test.js"
+      ]
+    },
+    {
+      "name": "shared-assets",
+      "command": [
+        "bash",
+        "scripts/check-shared-files.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 1035,
+      "stdout": "Shared File Governance Check\n============================\nOK: 14 canonical groups manage 31 synchronized copies\nShared references: 71 groups / 83 synchronized copies\nReference similarity: no undeclared candidates at J>=85% or containment>=95%; 10 derived groups declared\nAgent reference consumers: 68 deployed Markdown files reachable from 30 direct agent roots; profile contract 4 common / 12 long / 7 short\nShort analysis scope: 5 observational rubrics; no legacy long-form playbook tokens\nAll declared shared files are consistent; no unmanaged exact or near-identical reference copies found.\n",
+      "stderr": "",
+      "executed_command": [
+        "bash",
+        "scripts/check-shared-files.sh"
+      ]
+    },
+    {
+      "name": "static",
+      "command": [
+        "bash",
+        "scripts/static-check.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 2987,
+      "stdout": "Skill Static Check\n==================\nRepo: /Users/yolandahao/code/oh-story-claudecode\n\n--- ai-flavor-scan ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- batch-pollution-detector ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- browser-cdp ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- chinese-novelist ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- deslop-register ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- dialogue-naturalness-scan ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- fanqie-chapter-publish ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- humanizer ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- jargon-verb-scan ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- legal-domain-veracity-scan ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- opening-arc-audit ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- reader-comprehension-scan ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story-analyze ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story-cover ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story-deslop ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story-import ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story-review ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story-scan ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story-setup ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story-write ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-before-dev ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-brainstorm ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-break-loop ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-channel ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-check ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-continue ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-finish-work ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-meta ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-session-insight ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-spec-bootstrap ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-start ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-update-spec ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n==================\nTotal: 33 | Pass: 33 | Fail: 0 | Warn: 0\n",
+      "stderr": "",
+      "executed_command": [
+        "bash",
+        "scripts/static-check.sh"
+      ]
+    },
+    {
+      "name": "language-gates",
+      "command": [
+        "bash",
+        "scripts/test-language-gates.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 39523,
+      "stdout": "---- test-ai-patterns.sh\nAI pattern detector regression tests passed.\nProse pattern (碎句号/长段落/破折号) regression tests passed.\nissue #205 (跨空行翻转命中 / 引号内台词豁免 / 未闭合引号不吞叙述) regression tests passed.\nmicro-action-tic (电报体微动作复读) regression tests passed.\nstock-reaction-tic (套式反应细节) regression tests passed.\nabstract-summary-tic (抽象总结复读) regression tests passed.\naction-list-tic (监控摄像头式动作清单) regression tests passed.\ncliche-density-tic (套词密度过高) regression tests passed.\nmetaphor-density-tic (比喻密度过高) regression tests passed.\nreasoning-chain-tic (解释链密度过高) regression tests passed.\nsystem-notice-formality-tic (系统公告公文腔过密) regression tests passed.\novercompressed-prose-tic (过度精炼短段) regression tests passed.\nlow-connective-density-tic (低连接密度 + 缺中长句) regression tests passed.\nvoice-contrast (音量反差腔) regression tests passed.\nnegation-parade (否定排比) regression tests passed.\nchapter-21 AI-flavor gap regression tests passed.\nreverse-not-is (反序对比腔) regression tests passed.\ntrailer-ending (预告式总结收尾) regression tests passed.\nquote-emphasis-tic (引号强调滥用) regression tests passed.\ntrailer-summary (章尾状态总结体) regression tests passed.\n---- test-degeneration.sh\nDegeneration detector regression tests passed.\n---- test-prose-policy.py\n---- test-normalize-punctuation.js\nOK: structural punctuation cleanup preserves voice, fences, CRLF, quote modes, and errors\n✔ scripts/test-normalize-punctuation.js (1643.670791ms)\nℹ tests 1\nℹ suites 0\nℹ pass 1\nℹ fail 0\nℹ cancelled 0\nℹ skipped 0\nℹ todo 0\nℹ duration_ms 1653.794917\n---- test-charcount-portable.sh\nselected interpreter: python3\nchar count: 12 (expect 12)\nPASS\n---- test-prose-backstop-hook.sh\nProse backstop hook regression tests passed.\n---- test-prose-net-parity.sh\n功能 parity：codex python 网 == opencode TS 网 == zcode JS 网（44 fixtures + CRLF 字数边界，含毒句式正反例/AI 自指/截断收尾与豁免标记）。\n命令函数 parity：codex python == zcode JS（扩展 fixtures：正文抽取/apply-patch/git commit 侦测逐字相等，含包装器/命令替换/多 heredoc/转义引号、apply_patch 搬家与 ReDoS 预算）。\n未归核面 parity：codex python == JS core（staged warnings 大小写变体/文案 + 大纲阻断 9 组判定含毒句式欠账门/无脚手架 fail-closed/文案逐字相等）。\n写正文守卫 parity：Claude bash guard == JS core（13 组工程场景：无 state/缺细纲/导入窗口/跳章/续写/显式缺口/嵌套分卷/派生修订不一致/坏 schema/回炉备份，含 node 缺席 fail-open）。\nProse net parity tests passed.\nLanguage gate regressions passed.\n",
+      "stderr": "test_detector_blocking_is_restricted_to_context_free_wordlist_types (__main__.ProsePolicyInventoryTests.test_detector_blocking_is_restricted_to_context_free_wordlist_types) ... ok\ntest_forbidden_patterns_cover_the_rejected_global_rules (__main__.ProsePolicyInventoryTests.test_forbidden_patterns_cover_the_rejected_global_rules) ... ok\ntest_p1_treatment_and_suspense_priority_remain_explicit (__main__.ProsePolicyInventoryTests.test_p1_treatment_and_suspense_priority_remain_explicit) ... ok\ntest_repository_has_one_priority_and_no_known_global_conflict (__main__.ProsePolicyInventoryTests.test_repository_has_one_priority_and_no_known_global_conflict) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 6.604s\n\nOK\n",
+      "executed_command": [
+        "bash",
+        "scripts/test-language-gates.sh"
+      ]
+    }
+  ]
+}

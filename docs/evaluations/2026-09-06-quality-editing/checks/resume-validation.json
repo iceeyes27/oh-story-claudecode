@@ -1,0 +1,149 @@
+{
+  "generated_at": "2026-09-06T08:30:47.774189+00:00",
+  "status": "PASS",
+  "aggregate_kind": "per-check evidence consolidation, not a second aggregate runner invocation",
+  "initial_run": {
+    "status": "FAIL",
+    "passed": 13,
+    "total": 15
+  },
+  "environment_rechecks": {
+    "passed": 2,
+    "total": 2,
+    "changes": "Process-only Git default branch fixture setting and bundled Python 3.12.14; global user configuration unchanged"
+  },
+  "effective_results": [
+    {
+      "name": "sync-unit",
+      "status": "PASS",
+      "source": "resume-environment-rechecks.json"
+    },
+    {
+      "name": "sync-drift",
+      "status": "PASS",
+      "source": "resume-quality-gate.json"
+    },
+    {
+      "name": "platform-capabilities",
+      "status": "PASS",
+      "source": "resume-quality-gate.json"
+    },
+    {
+      "name": "release-manifest",
+      "status": "PASS",
+      "source": "resume-quality-gate.json"
+    },
+    {
+      "name": "doc-budget",
+      "status": "PASS",
+      "source": "resume-quality-gate.json"
+    },
+    {
+      "name": "candidate-transaction",
+      "status": "PASS",
+      "source": "resume-quality-gate.json"
+    },
+    {
+      "name": "tracking",
+      "status": "PASS",
+      "source": "resume-quality-gate.json"
+    },
+    {
+      "name": "author-voice-profile",
+      "status": "PASS",
+      "source": "resume-environment-rechecks.json"
+    },
+    {
+      "name": "tracking-workflow",
+      "status": "PASS",
+      "source": "resume-quality-gate.json"
+    },
+    {
+      "name": "chapter-skeleton",
+      "status": "PASS",
+      "source": "resume-quality-gate.json"
+    },
+    {
+      "name": "contracts",
+      "status": "PASS",
+      "source": "resume-quality-gate.json"
+    },
+    {
+      "name": "publication",
+      "status": "PASS",
+      "source": "resume-quality-gate.json"
+    },
+    {
+      "name": "shared-assets",
+      "status": "PASS",
+      "source": "resume-quality-gate.json"
+    },
+    {
+      "name": "static",
+      "status": "PASS",
+      "source": "resume-quality-gate.json"
+    },
+    {
+      "name": "language-gates",
+      "status": "PASS",
+      "source": "resume-quality-gate.json"
+    }
+  ],
+  "source_manifest": "resume-state.json",
+  "source_files_unchanged_during_verification": true,
+  "human_acceptance": "pending",
+  "author_adoption": false,
+  "heldout_candidate_runs": {
+    "heldout-raw-id-normalized": [
+      {
+        "chapter": 1,
+        "exit_code": 0
+      },
+      {
+        "chapter": 2,
+        "exit_code": 0
+      },
+      {
+        "chapter": 3,
+        "exit_code": 0
+      }
+    ],
+    "heldout-edited-existing-reader": [
+      {
+        "chapter": 1,
+        "exit_code": 0
+      },
+      {
+        "chapter": 2,
+        "exit_code": 0
+      },
+      {
+        "chapter": 3,
+        "exit_code": 0
+      }
+    ]
+  },
+  "heldout_revision_results": [
+    {
+      "chapter": 1,
+      "kind": "rhythm",
+      "exit_code": 0,
+      "formal_files_unchanged": true,
+      "adopted": false
+    },
+    {
+      "chapter": 2,
+      "kind": "facts",
+      "exit_code": 0,
+      "formal_files_unchanged": true,
+      "adopted": false
+    },
+    {
+      "chapter": 3,
+      "kind": "facts",
+      "exit_code": 0,
+      "formal_files_unchanged": true,
+      "adopted": false
+    }
+  ]
+}

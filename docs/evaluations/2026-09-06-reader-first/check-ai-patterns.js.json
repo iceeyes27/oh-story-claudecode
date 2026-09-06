@@ -1,0 +1,211 @@
+{
+  "findings": [
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/baseline/chapter-01.md",
+      "line": 55,
+      "column": 30,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「看了一眼」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "身去看，小满跟着看了一眼，把工具收回包里"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/baseline/chapter-01.md",
+      "line": 80,
+      "column": 37,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「望了一眼」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "走出几步，又回头望了一眼鱼摊。"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/baseline/chapter-02.md",
+      "line": 32,
+      "column": 37,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「几分」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "站着争，也省不出几分钟。"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/baseline/chapter-02.md",
+      "line": 47,
+      "column": 18,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「拦了一下」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "弯腰就想抱，小满拦了一下。"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/baseline/chapter-03.md",
+      "line": 77,
+      "column": 19,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「看了一眼」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "和排风扇，给陈望看了一眼。回到修理铺时，"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/cleanup/chapter-01.md",
+      "line": 18,
+      "column": 11,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「拦了一下」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "手要捞鱼，周小满拦了一下，让她把盖子合上"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/cleanup/chapter-01.md",
+      "line": 34,
+      "column": 16,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「望了一眼」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "边，往修理铺方向望了一眼。铺子在市场西口"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/cleanup/chapter-02.md",
+      "line": 2,
+      "column": 1,
+      "type": "micro-action-tic",
+      "severity": "advisory",
+      "message": "微动作复读：「了下/了一下」式轻量补语 10 处（6.4/千字）；同一反应模板高密度复现是机械指纹，合并动作 beat、换具体细节，别每个动作都补一个轻反应尾巴。",
+      "excerpt": "了两下 了一眼 了一下 了声 了一阵 了一声"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/cleanup/chapter-02.md",
+      "line": 8,
+      "column": 5,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「看了一眼」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "陈望低头看了一眼，没有伸手。"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/cleanup/chapter-02.md",
+      "line": 33,
+      "column": 4,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「看了一眼」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "何桂香看了一眼柜门，又看向小满"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/cleanup/chapter-02.md",
+      "line": 54,
+      "column": 42,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「轻轻」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "起前头一点，车才轻轻一颠进了门。陈望"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/cleanup/chapter-02.md",
+      "line": 80,
+      "column": 32,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「轻轻」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "拿出来，在柜台边轻轻磕了两下。"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/cleanup/chapter-03.md",
+      "line": 4,
+      "column": 1,
+      "type": "micro-action-tic",
+      "severity": "advisory",
+      "message": "微动作复读：「了下/了一下」式轻量补语 12 处（7.3/千字）；同一反应模板高密度复现是机械指纹，合并动作 beat、换具体细节，别每个动作都补一个轻反应尾巴。",
+      "excerpt": "了一眼 了半圈 了一下 了一会 了一阵 了一声"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/cleanup/chapter-03.md",
+      "line": 4,
+      "column": 29,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「看了一眼」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "她把工具包放下，看了一眼腾出的地方，弯腰"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/cleanup/chapter-03.md",
+      "line": 43,
+      "column": 3,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「看了一眼」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "陈望看了一眼小满记的时间："
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/cleanup/chapter-03.md",
+      "line": 55,
+      "column": 49,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「看了一眼」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "都停了半步，互相看了一眼，才一齐托起车头"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/cleanup/chapter-03.md",
+      "line": 72,
+      "column": 27,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「轻轻」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "，又按了一下，才轻轻响了一声。"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/combined/chapter-01.md",
+      "line": 9,
+      "column": 6,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「看了一眼」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "何桂香往里看了一眼。墙上的挂钟、桌"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/combined/chapter-01.md",
+      "line": 45,
+      "column": 54,
+      "type": "not-is-comparison",
+      "severity": "advisory",
+      "message": "高频 AI 对比句式；删掉否定铺垫，直接写后项，或改成动作/细节呈现。",
+      "excerpt": "不是没现成配件，而是来之前那句挺有底气的“我去看看”，现在听着像给自己挖的坑"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/combined/chapter-02.md",
+      "line": 34,
+      "column": 6,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「看了一眼」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "小满朝旁边看了一眼，才发现墙角还有"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/combined/chapter-02.md",
+      "line": 67,
+      "column": 31,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「几分」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "冷柜也不必再被隔几分钟掀一次。小满取"
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/combined/chapter-02.md",
+      "line": 74,
+      "column": 37,
+      "type": "em-dash",
+      "severity": "advisory",
+      "message": "破折号按功能改写：打断→动作 beat/短句，拖长音→省略或动作，插入说明→逗号/冒号；勿一律改句号。",
+      "excerpt": "问他，不过他那人——\""
+    },
+    {
+      "file": "docs/evaluations/2026-09-06-reader-first/evidence/combined/chapter-03.md",
+      "line": 79,
+      "column": 9,
+      "type": "banned-word-exact",
+      "severity": "blocking",
+      "message": "精确禁词「看了一眼」：banned-words.md 一级禁用词，出现即替换；改用具体动作/物件/对话/身体反应展示，不要同义词轮换。",
+      "excerpt": "她顺着他指的方向看了一眼，风扇在后间墙上"
+    }
+  ]
+}

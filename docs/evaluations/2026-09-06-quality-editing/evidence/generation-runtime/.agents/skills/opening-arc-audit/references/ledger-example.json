@@ -1,0 +1,22 @@
+{
+  "_note": "基于 demo 书《让你管账号，你高燃混剪炸全网》前 15 章正文独立连读构造。统计结果：openedQuestions=10，closedQuestions=8，netOpen=2，averageCloseDelay=2.25，mainAdvanceChapters=15。",
+  "book": "让你管账号，你高燃混剪炸全网",
+  "window": 15,
+  "chapters": [
+    {"num": 1, "opens": [{"id": "Q1", "q": "江晨能否在5天内把任一连队新媒体账号提升到100万粉丝"}], "closes": [], "mainAdvance": true},
+    {"num": 2, "opens": [{"id": "Q2", "q": "《诸君，且听龙吟》发布后能否打动观众并形成传播"}], "closes": [], "mainAdvance": true},
+    {"num": 3, "opens": [], "closes": [], "mainAdvance": true},
+    {"num": 4, "opens": [], "closes": ["Q2"], "mainAdvance": true},
+    {"num": 5, "opens": [], "closes": [], "mainAdvance": true},
+    {"num": 6, "opens": [{"id": "Q3", "q": "军报记者专程到访是追责还是采访表扬江晨"}], "closes": ["Q3"], "mainAdvance": true},
+    {"num": 7, "opens": [{"id": "Q4", "q": "钟嘉嘉是否只是普通实习记者、她为何享有特殊出行安排"}], "closes": [], "mainAdvance": true},
+    {"num": 8, "opens": [{"id": "Q5", "q": "军报采访稿能否发布并帮助江晨完成百万粉丝任务"}], "closes": ["Q4"], "mainAdvance": true},
+    {"num": 9, "opens": [], "closes": [], "mainAdvance": true},
+    {"num": 10, "opens": [{"id": "Q6", "q": "专业团队重拍的宣传片能否超过江晨的原版"}], "closes": ["Q6"], "mainAdvance": true},
+    {"num": 11, "opens": [{"id": "Q7", "q": "老兵主题视频能否达到全网话题热度300万并完成新任务"}], "closes": ["Q1", "Q5"], "mainAdvance": true},
+    {"num": 12, "opens": [{"id": "Q8", "q": "老兵主题新作预告发布后会获得怎样的公众反应"}], "closes": [], "mainAdvance": true},
+    {"num": 13, "opens": [{"id": "Q9", "q": "江晨完成并发布老兵主题作品后能否扭转质疑舆论"}], "closes": ["Q8"], "mainAdvance": true},
+    {"num": 14, "opens": [{"id": "Q10", "q": "负面舆论扩大后军方是否会停止支持江晨创作"}], "closes": [], "mainAdvance": true},
+    {"num": 15, "opens": [], "closes": ["Q10"], "mainAdvance": true}
+  ]
+}

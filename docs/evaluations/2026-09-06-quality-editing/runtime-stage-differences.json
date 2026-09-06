@@ -1,0 +1,31 @@
+{
+  "generation_runtime": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime",
+  "differences": [
+    {
+      "path": "story-deslop/SKILL.md",
+      "generation_sha256": "70d2edf0e7fb7e4f5c1af26f81065822c9a83320b55e8d7807c6dd9b0fbd1e5d",
+      "delivery_sha256": "2061c02a4e5aeb3dcdc8c84a29bf6e766e45c0130a05b5d278810b9f1409b9d9"
+    },
+    {
+      "path": "story-write/references/workflow-revision.md",
+      "generation_sha256": "a18aa74e411ed738dceb06daf8f4db06a9c26408b7964d2bcf87795a085951c3",
+      "delivery_sha256": "d01c8d4d3e226b1d6921abe545713a167a3bf185027ff7b686d0eaf94b70f5b5"
+    },
+    {
+      "path": "story-write/references/long-mode.md",
+      "generation_sha256": "25f756478e211d82cedb2241879421dd15130b824d29d96c61e115b235815dad",
+      "delivery_sha256": "a998570217ad2aac534e97bc88b2544aec369fcd67187cc4817be27260e66ecc"
+    },
+    {
+      "path": "story-write/scripts/revision-commit.py",
+      "generation_sha256": "31e6ccecfb2f3ebb44c480a71976bef01f9221b81317c8b71b5fc32f44398e5e",
+      "delivery_sha256": "a46c458c2afbff1e558efb7a57d9764494b60a1569db2be14937fff065f1e43d"
+    },
+    {
+      "path": "_shared/references/anti-ai-writing.md",
+      "generation_sha256": "35349271d34a869b9758863e93953f4b34475f918e839a0851b53a8a86d68b1b",
+      "delivery_sha256": "d5da5521b88cc30f326116eb490bda109d3a14fa6ea7218fb59d176218675d6a"
+    }
+  ],
+  "meaning": "Writing used frozen template and core inputs. Final ordinary-revision/candidate validations used current runtime after independent review fixes; no raw prose was regenerated."
+}

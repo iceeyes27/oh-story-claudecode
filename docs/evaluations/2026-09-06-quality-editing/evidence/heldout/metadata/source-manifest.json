@@ -1,0 +1,37 @@
+[
+  {
+    "source": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-setup/references/codex/agents/narrative-writer.toml",
+    "snapshot": "inputs/materials/narrative-writer.toml",
+    "sha256": "552b481f7e2fcb6f9482f6b1867e53dd5c8286e18733663854b18ef3d9b130cd",
+    "read_range": "full",
+    "snapshot_range": "full"
+  },
+  {
+    "source": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/SKILL.md",
+    "snapshot": "inputs/materials/SKILL.md",
+    "sha256": "2458fd389b62db82a0d2d85ef8c56c5b3823e29a1adc6295c8386de04baf9f44",
+    "read_range": "full",
+    "snapshot_range": "full"
+  },
+  {
+    "source": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/references/reader-first-writing.md",
+    "snapshot": "inputs/materials/reader-first-writing.md",
+    "sha256": "2cbad1006e0bc37ce053f8826f73a568c9f3da38eeca604cf804b92f6c869644",
+    "read_range": "full",
+    "snapshot_range": "full"
+  },
+  {
+    "source": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/references/long-format.md",
+    "snapshot": "inputs/materials/long-format.md",
+    "sha256": "73d102ce68086465006201a717d7ef90e6fccaaad3cc6610cc4a969c44ba43fc",
+    "read_range": "full",
+    "snapshot_range": "full"
+  },
+  {
+    "source": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/references/anti-ai-writing.md",
+    "snapshot": "inputs/materials/anti-ai-writing.md",
+    "sha256": "35349271d34a869b9758863e93953f4b34475f918e839a0851b53a8a86d68b1b",
+    "read_range": "1-180",
+    "snapshot_range": "full"
+  }
+]

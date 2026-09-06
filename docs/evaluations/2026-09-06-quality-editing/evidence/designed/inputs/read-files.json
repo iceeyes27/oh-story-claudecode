@@ -1,0 +1,425 @@
+{
+  "schema": "actual-read-files/v1",
+  "created_at": "2026-09-06T06:57:10.746390+00:00",
+  "scope_note": "This is an explicit model/tool input access inventory, not a syscall trace of imported Python/Node dependencies. Model-read files and tool-only inputs are distinguished. Generated design was authored before drafting, not an externally read story source. Postwrite extraction occurred only after all three raw drafts and scans. No other arm, old experiment, main-repository documents, memory, or full skill reference library was read.",
+  "files": [
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-setup/references/codex/agents/narrative-writer.toml",
+      "phase": "before_design_and_drafting",
+      "access": "model_read",
+      "scope": "complete",
+      "sha256_at_inventory": "552b481f7e2fcb6f9482f6b1867e53dd5c8286e18733663854b18ef3d9b130cd"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-setup/references/agent-references/reader-first-writing.md",
+      "phase": "before_design_and_drafting",
+      "access": "model_read",
+      "scope": "complete",
+      "sha256_at_inventory": "2cbad1006e0bc37ce053f8826f73a568c9f3da38eeca604cf804b92f6c869644"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-setup/references/agent-references/long-format.md",
+      "phase": "before_design_and_drafting",
+      "access": "model_read",
+      "scope": "complete",
+      "sha256_at_inventory": "73d102ce68086465006201a717d7ef90e6fccaaad3cc6610cc4a969c44ba43fc"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/inputs/story-input.json",
+      "phase": "before_design_and_drafting",
+      "access": "model_read",
+      "scope": "complete",
+      "sha256_at_inventory": "1af3490494ea159cf87052c8d4c77ce0fe27cfa79b4a95c196c11eda76dbd858"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/inputs/arm-plan.md",
+      "phase": "before_design_and_drafting",
+      "access": "model_read",
+      "scope": "complete",
+      "sha256_at_inventory": "2ac01e799d5654c13d0d3f3fc70e8174ca3a9421654eb78a288808b6e138a58a"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/references/chapter-skeleton-workflow.md",
+      "phase": "before_drafting; schema clarification",
+      "access": "model_read",
+      "scope": "complete",
+      "sha256_at_inventory": "8f2ec0a72194739426f2f233cf1138739dac4046784e116ff7b0eed93e5b2426"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-outline-contract.js",
+      "phase": "before_drafting; parent required preflight",
+      "access": "model_read",
+      "scope": "rg matching fields, then lines 1–350",
+      "sha256_at_inventory": "26d51390119d83a936dd67e55a69869c3b808728ef6210ab28043a0a4ff06e29"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-outline-causal.py",
+      "phase": "before_drafting; parent required preflight",
+      "access": "model_read",
+      "scope": "lines 1–240",
+      "sha256_at_inventory": "0aba71f91fc78964798a93c824b5bfe673e73ab9c2db1a3ea5eebc8e0d755da1"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/references/target-emotion-vocab.md",
+      "phase": "before_drafting; exact current closed vocabulary",
+      "access": "model_read",
+      "scope": "complete",
+      "sha256_at_inventory": "710bb749cfce164e7f0c6c7694ba0406bcb5c34e269f821f82c58872eb4340cf"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/inputs/chapter-01.packet.md",
+      "phase": "before_chapter_1_draft",
+      "access": "model_read",
+      "scope": "complete",
+      "sha256_at_inventory": "2b84fac856c2e4e17100110d0c9ae5d71768497c76da0ca9f05c7877ef487db6"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/大纲/细纲_第001章.md",
+      "phase": "before_chapter_1_draft",
+      "access": "packet_builder_and_preflight_read; content_seen_in_packet",
+      "scope": "complete",
+      "sha256_at_inventory": "026b333bdba82160891ba2d52efeb8b7f9290548743184949bb9ace3a27b74a6"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/骨架/第001章_先把话说清楚.md",
+      "phase": "before_chapter_1_draft",
+      "access": "packet_builder_and_preflight_read; content_seen_in_packet",
+      "scope": "complete",
+      "sha256_at_inventory": "fedbdf35fc0b1f2826b956c77afc71aaa7991744fdfd04b257ebc5a2e3bfdfda"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/raw/第001章_先把话说清楚.md",
+      "phase": "after_chapter_1_draft",
+      "access": "measurement_statistics_hash_copy; previous_body_seen_in_next_packet",
+      "scope": "complete",
+      "sha256_at_inventory": "b3e59f45fe5af914ece19ed6b7c589f9db8feab7a45f214e0dad56acb53f6e58"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/候选/第001章_先把话说清楚.md",
+      "phase": "after_raw_draft; later_postwrite_extraction",
+      "access": "scanner_input_and_exact_evidence_extraction",
+      "scope": "complete",
+      "sha256_at_inventory": "b3e59f45fe5af914ece19ed6b7c589f9db8feab7a45f214e0dad56acb53f6e58"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-01.skeleton.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "1c37a1aeebe9ec8158cef9620f313925a614e91d22b1bd09e11c007cc53a3509"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-01.outline-contract.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "9820b32e1e296d9f58609b948c6404403cda67311d49dfc49e1974af80c5ee59"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-01.outline-causal.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "b2187f0c41a6d3c6fd910484df9f56625de64fe1c64f6b2b8056b0d7b672bb42"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-01.wordcount.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "010de3c0c2394fec690784f569ac69a1f4be965a1a9b41c301665ef65b660813"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-01.ai-patterns.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "b6e04d99b1eed9d48e3b3357718eb64bd1da9ab5de5f0241c55bfe2f6a3c7343"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-01.degeneration.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "b460d1df639b9c857d622eec6b280e292337bde7688b299a08fa49b75ac56a6d"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-01.outline-copy.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "40eb82bff2e37c3d6282766be9857ada0327fb1988b2d2d36f6555e181369f1e"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-01.statistics.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "5e87d144429d10c8b26f0e9ea5ef8e4cf606d640b90843165fba487fd14579d0"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/inputs/chapter-02.packet.md",
+      "phase": "before_chapter_2_draft",
+      "access": "model_read",
+      "scope": "complete",
+      "sha256_at_inventory": "f8d8d63b7c54315a0d4587343a7736f5d66404fa438b92d14b53b6b12f22ebec"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/大纲/细纲_第002章.md",
+      "phase": "before_chapter_2_draft",
+      "access": "packet_builder_and_preflight_read; content_seen_in_packet",
+      "scope": "complete",
+      "sha256_at_inventory": "05bb228a2ddc821cce338d95240d994df25ee51d11ebe6ba16a084f887e09090"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/骨架/第002章_这边放鱼.md",
+      "phase": "before_chapter_2_draft",
+      "access": "packet_builder_and_preflight_read; content_seen_in_packet",
+      "scope": "complete",
+      "sha256_at_inventory": "c5bb995c2c20cea1c2fc3d8529b8c66fb2f14061eba1c0f0d44a0034d0673ab0"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/raw/第002章_这边放鱼.md",
+      "phase": "after_chapter_2_draft",
+      "access": "measurement_statistics_hash_copy; previous_body_seen_in_next_packet",
+      "scope": "complete",
+      "sha256_at_inventory": "ee4a5209878e555013a0b2c16d9ea5b4a7e5fab64ab3fb94b03bb773df3381db"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/候选/第002章_这边放鱼.md",
+      "phase": "after_raw_draft; later_postwrite_extraction",
+      "access": "scanner_input_and_exact_evidence_extraction",
+      "scope": "complete",
+      "sha256_at_inventory": "ee4a5209878e555013a0b2c16d9ea5b4a7e5fab64ab3fb94b03bb773df3381db"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-02.skeleton.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "4ec630b174ad8133ee77b0bd67c2fc4211aa6aa7b8ed86baf82df27788899b7c"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-02.outline-contract.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "5f6874461596b3a38500a63b5cd7e902606efae96d6e6832bd0d8b71afdee2c2"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-02.outline-causal.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "0c19db5a6e3fcad6b4491e96b5ef7e78120bf11cb3fa71f9b235cbf472b06b0a"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-02.wordcount.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "df060c1e3e60c2f4dd66316a2c1da391897e4796335a21ba287fd432eb04ff59"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-02.ai-patterns.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "8fb72fd9e270f643568d039c6714fc0c346f2df0882afc9b80aeff37faf18e23"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-02.degeneration.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "48bfa2c5a6efedf5c2e8eb46d6511bb3076db93cea0efcdb4619d86ae1dc50e6"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-02.outline-copy.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "34d96034819d5d14537f77c3cf7d5161a2ef7cd7652541f4616346f689321a0e"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-02.statistics.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "cc2e058f018bc18151df351eb00158858ec7a92d0dbc023b837b0e2223770717"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/inputs/chapter-03.packet.md",
+      "phase": "before_chapter_3_draft",
+      "access": "model_read",
+      "scope": "complete",
+      "sha256_at_inventory": "a8d617cc3236eaa05df1d81c1a8382610bb9f0585e6a1346a33ffd32273a356a"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/大纲/细纲_第003章.md",
+      "phase": "before_chapter_3_draft",
+      "access": "packet_builder_and_preflight_read; content_seen_in_packet",
+      "scope": "complete",
+      "sha256_at_inventory": "b351c304918504bde261bdaaa8f941b3244e78499d8392ea04c338daf2f3b1f4"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/骨架/第003章_等凉了再收钱.md",
+      "phase": "before_chapter_3_draft",
+      "access": "packet_builder_and_preflight_read; content_seen_in_packet",
+      "scope": "complete",
+      "sha256_at_inventory": "b42362f743ed7f14ef30a82d86460b2edab3031b06fc4ac063e4344661d0f681"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/raw/第003章_等凉了再收钱.md",
+      "phase": "after_chapter_3_draft",
+      "access": "measurement_statistics_hash_copy",
+      "scope": "complete",
+      "sha256_at_inventory": "29cbf0518e010ce7675daa1bf9d7b796fc52d5dd597c27f60f83c8458634156f"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/候选/第003章_等凉了再收钱.md",
+      "phase": "after_raw_draft; later_postwrite_extraction",
+      "access": "scanner_input_and_exact_evidence_extraction",
+      "scope": "complete",
+      "sha256_at_inventory": "29cbf0518e010ce7675daa1bf9d7b796fc52d5dd597c27f60f83c8458634156f"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-03.skeleton.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "45c4f07ad7134cd2b017ab434de782ee9c552c12100b57a1a4c56e78d39c15b0"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-03.outline-contract.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "40594c030fd6809559017efdf5671c5f1a4a9189607043540bcb5deb80c04e7d"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-03.outline-causal.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "8060737f5b29e7b6597accf37f36a1feeedcda2a682091d26c703b1cf885ac62"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-03.wordcount.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "b483c65b6b03c9606368006bb4c947e7887c7167f597a75ab17be916154bedc8"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-03.ai-patterns.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "46a31b0685a9aa26825772f5c7ad062653aa08c3d8a110ebd84b10e05eb3da3c"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-03.degeneration.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "5defdb8780178f7cf85b88143c6aafbef5bd021fa37de0feca7f8e291225a649"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-03.outline-copy.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "c0923473429e4fe266895f08bcfd4c4397fbbae1be12c6735db1aaa9f7495e1e"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/chapter-03.statistics.json",
+      "phase": "after_checks",
+      "access": "aggregate_reader; tool_stdout_seen_in_generation_phase",
+      "scope": "complete",
+      "sha256_at_inventory": "924a9327c4979c43b8111e5eb9a88f8aadc79cddda6547b5cc7d52802ee0e866"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/inputs/prepare.py",
+      "phase": "local_process_support; exact script commands recorded in task",
+      "access": "python_read; not_external_story_authority",
+      "scope": "complete",
+      "sha256_at_inventory": "ea09d5f9ea8faee109c0268380bb15ff8855edd7548d997c8c1788a86d9a1ac9"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/inputs/chapter_prepare.py",
+      "phase": "local_process_support; exact script commands recorded in task",
+      "access": "python_read; not_external_story_authority",
+      "scope": "complete",
+      "sha256_at_inventory": "449af1edb640ad89950cd163d7773be2548e510b84547faba98ce1b56a9fd4f6"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/inputs/chapter_check.py",
+      "phase": "local_process_support; exact script commands recorded in task",
+      "access": "python_read; not_external_story_authority",
+      "scope": "complete",
+      "sha256_at_inventory": "5e357ba6cb9c11c5931b02557c455cf9419b1f184fabbac6d7ec8f73f9627a1e"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/inputs/postwrite_extract.py",
+      "phase": "local_process_support; exact script commands recorded in task",
+      "access": "python_read; not_external_story_authority",
+      "scope": "complete",
+      "sha256_at_inventory": "83f6f73ac71b86836b7691493094aa719dbd2fa911b0782307af5899fb67e725"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/inputs/plan-data.json",
+      "phase": "local_process_support; exact script commands recorded in task",
+      "access": "python_read; not_external_story_authority",
+      "scope": "complete",
+      "sha256_at_inventory": "a07c9752b37281d0891dcba6cd368f880702dad2fb0823549889fc912d739ad3"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/metadata/chapter-01.postwrite.json",
+      "phase": "final_postwrite_hash_and_inventory_check; not_generation_input",
+      "access": "tool_read",
+      "scope": "complete",
+      "sha256_at_inventory": "5790c7c0e864f48855df6dd2b5f3d807581777f00b0bc0071a188365ecb7a3a2"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/metadata/chapter-02.postwrite.json",
+      "phase": "final_postwrite_hash_and_inventory_check; not_generation_input",
+      "access": "tool_read",
+      "scope": "complete",
+      "sha256_at_inventory": "82936df1b02a44ead6c1488b491b14a4459003fb91903ca935b797dba004def6"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/metadata/chapter-03.postwrite.json",
+      "phase": "final_postwrite_hash_and_inventory_check; not_generation_input",
+      "access": "tool_read",
+      "scope": "complete",
+      "sha256_at_inventory": "73f83f5baa0162d376f62d9ddf58c153360cf34e60af1ae55f4eb29669ec881e"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/checks/summary.json",
+      "phase": "final_postwrite_hash_and_inventory_check; not_generation_input",
+      "access": "tool_read",
+      "scope": "complete",
+      "sha256_at_inventory": "451cb48755d50519163507ee7863c7abf2449a81b9b8a1f333c69162dada7a47"
+    }
+  ],
+  "executed_runtime_entrypoints": [
+    "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/storyctl.py",
+    "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-chapter-skeleton.js",
+    "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-outline-contract.js",
+    "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-outline-causal.py",
+    "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/scripts/check-ai-patterns.js",
+    "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/scripts/check-degeneration.js",
+    "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/scripts/check-outline-copy.js"
+  ],
+  "filesystem_listing_only": [
+    "designed directory entries",
+    "runtime skill paths filtered to locate requested tools"
+  ],
+  "source_authority": [
+    "inputs/story-input.json",
+    "inputs/arm-plan.md"
+  ],
+  "generation_configuration": "Frozen generated Codex narrative-writer configuration applied in native collaboration; inherited model/effort; CLI launcher not used; ordinary long entry, no quality_treatment_mode.",
+  "bookkeeping_note": "The read inventory itself is read and rewritten for this final update; its self-access is recorded here without a recursively changing hash."
+}

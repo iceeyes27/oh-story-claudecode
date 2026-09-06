@@ -1,0 +1,60 @@
+{
+  "stage": "post",
+  "preflight_before_draft": false,
+  "tracking_state_present": false,
+  "records": [
+    {
+      "check": "wordcount",
+      "command": [
+        "python3",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/storyctl.py",
+        "wordcount",
+        "measure",
+        "--file",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/fixed/候选/第003章_先等它凉下来.md"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-09-06T06:41:07.590938+00:00",
+      "log": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/fixed/logs/chapter-03.post.wordcount.log"
+    },
+    {
+      "check": "ai-patterns",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/scripts/check-ai-patterns.js",
+        "--check",
+        "--fail-on=blocking",
+        "--json",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/fixed/候选/第003章_先等它凉下来.md"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-09-06T06:41:07.668931+00:00",
+      "log": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/fixed/logs/chapter-03.post.ai-patterns.log"
+    },
+    {
+      "check": "degeneration",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/scripts/check-degeneration.js",
+        "--check",
+        "--fail-on=blocking",
+        "--json",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/fixed/候选/第003章_先等它凉下来.md"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-09-06T06:41:07.925976+00:00",
+      "log": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/fixed/logs/chapter-03.post.degeneration.log"
+    },
+    {
+      "check": "outline-copy",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/scripts/check-outline-copy.js",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/fixed/候选/第003章_先等它凉下来.md"
+      ],
+      "exit_code": 0,
+      "started_at": "2026-09-06T06:41:08.023984+00:00",
+      "log": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/fixed/logs/chapter-03.post.outline-copy.log"
+    }
+  ]
+}

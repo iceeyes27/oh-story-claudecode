@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "book_title": "第五个人（隔离流程模拟）",
+  "last_chapter": 2,
+  "context": {
+    "position": {
+      "volume": "照片展",
+      "volume_start_chapter": 1,
+      "story_time": "当天",
+      "scene": "旧站照片展展厅"
+    },
+    "long_term_constraints": [],
+    "active_character_names": [
+      "宋棠"
+    ],
+    "continuity_risks": [],
+    "recent_chapters": [
+      {
+        "chapter": 1,
+        "summary": "宋棠收到完整合影，发现墙图裁去边缘半个人。四名职工与五人照片对不上，齐叔不敢认人，她留空姓名，借背面编号及包装电话约到程雪。"
+      },
+      {
+        "chapter": 2,
+        "summary": "程雪承认寄件，出示同日照片和便条。宋棠确认外套曾在站员身上，不能据此认职业，便条引向搬书后还要送信的人。程雪承认是母亲并先电话询问，齐叔愿一起核对。"
+      }
+    ],
+    "next_chapter_commitments": [
+      "程雪电话问母亲意愿",
+      "齐叔答应留在展厅一起核对"
+    ]
+  },
+  "character_snapshots": {
+    "宋棠": {
+      "identity": "社区旧站照片展整理者",
+      "location": "旧站照片展展厅",
+      "goal": "听程雪母亲亲口确认姓名与经历，取得署名同意",
+      "state": "放弃只沿职工名单认人的方向，留空行待当事人核对",
+      "abilities_resources": [
+        "同日两张照片",
+        "程雪提供的家中便条",
+        "现场笔记"
+      ],
+      "relationships": [
+        "程雪承认照片里的是母亲，愿联系母亲",
+        "齐叔愿意参加核对"
+      ],
+      "knowledge": [
+        "厚外套原先属于站员老郭，后来借出",
+        "便条提到搬书后还须送信和归还衣服",
+        "程雪称第五人是其母，尚未公布姓名"
+      ],
+      "open_threads": [
+        "母亲尚待到场亲口核对",
+        "是否同意署名未定"
+      ]
+    }
+  },
+  "foreshadow": [],
+  "timeline_events": [],
+  "metrics": {}
+}

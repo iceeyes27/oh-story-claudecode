@@ -1,0 +1,8 @@
+---
+description: 开篇 N 章连读体检：悬念收支与主线推进量，抓只开不闭的故弄玄虚。
+skills: opening-arc-audit
+---
+
+调用 `$opening-arc-audit`，把用户指定项目的开篇章节当成整体连读，核对悬念开闭与主线推进。
+
+用户参数：$ARGUMENTS

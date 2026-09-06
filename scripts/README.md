@@ -60,14 +60,14 @@
 | `test-narrative-complexity.js` | 平直叙事模式契约 | `contracts` |
 | `test-foreshadow-overdue.js` | 逾期伏笔门 | `contracts` |
 | `test-foreshadow-gate.js` | 伏笔热卡/欠账门 | `contracts` |
-| `test-candidate-commit.py` | 候选采用事务：预检、语义证据、状态过期、故障注入与幂等恢复 | `candidate-transaction`（fast/affected/release） |
+| `test-candidate-commit.py` | 新章采用与普通修订：只读预检、语义证据、陈旧输入、事实影响、原稿保存、故障与恢复 | `candidate-transaction`（fast/affected/release） |
 | `test-tracking-commit.py` | 单权威追踪行为：state 最后提交、失败同事务重跑、派生一致性、修订语义、导入截止章 | `tracking`（affected/release） |
 | `test-tracking-workflow-contracts.py` | 追踪工作流契约 | `tracking-workflow`（affected/release） |
 | `test-chapter-skeleton.js` | 章节骨架验证器 | `chapter-skeleton`（affected/release） |
 | `test-unified-skill-upstream-drift.py` | 上游旧拆分目录变化时，迁移检查会显示统一目标路径，并验证 `--report` 只读返回成功 | `sync-drift`（fast/affected/release） |
 | `test-outline-causal.py` | 细纲因果链 | `narrative-gates` |
 | `test-outline-contract.js` | 细纲读者体验契约 | `narrative-gates` |
-| `test-emotion-run.js` | 目标情绪闭合词表连排：3 章 advisory / 4 章 blocking | `narrative-gates` |
+| `test-emotion-run.js` | 目标情绪分类连排：3 章及以上 advisory；未来章隔离，标签本身不阻断 | `narrative-gates` |
 | `test-name-drift.js` | 现实专名漂移：demo 抖音 blocking，微博/东风/知乎/设定 gloss 不误杀 | `narrative-gates` |
 | `test-outline-copy.sh` | 细纲照抄门 | `narrative-gates` |
 | `test-phase2-contract.js` | Phase 2 契约 | `narrative-gates` |

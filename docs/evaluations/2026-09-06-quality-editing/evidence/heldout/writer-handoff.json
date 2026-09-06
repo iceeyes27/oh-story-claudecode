@@ -1,0 +1,821 @@
+{
+  "schema": "heldout-writer-handoff/v1",
+  "completed_at": "2026-09-06T07:43:54.788504+00:00",
+  "root": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout",
+  "title": "第五个人",
+  "actual_template": {
+    "source": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-setup/references/codex/agents/narrative-writer.toml",
+    "snapshot": "inputs/materials/narrative-writer.toml",
+    "sha256": "552b481f7e2fcb6f9482f6b1867e53dd5c8286e18733663854b18ef3d9b130cd",
+    "read_range": "full",
+    "snapshot_range": "full"
+  },
+  "core_sources": [
+    {
+      "source": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/references/reader-first-writing.md",
+      "snapshot": "inputs/materials/reader-first-writing.md",
+      "sha256": "2cbad1006e0bc37ce053f8826f73a568c9f3da38eeca604cf804b92f6c869644",
+      "read_range": "full",
+      "snapshot_range": "full"
+    },
+    {
+      "source": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/references/long-format.md",
+      "snapshot": "inputs/materials/long-format.md",
+      "sha256": "73d102ce68086465006201a717d7ef90e6fccaaad3cc6610cc4a969c44ba43fc",
+      "read_range": "full",
+      "snapshot_range": "full"
+    },
+    {
+      "source": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/references/anti-ai-writing.md",
+      "snapshot": "inputs/materials/anti-ai-writing.md",
+      "sha256": "35349271d34a869b9758863e93953f4b34475f918e839a0851b53a8a86d68b1b",
+      "read_range": "1-180",
+      "snapshot_range": "full"
+    }
+  ],
+  "execution": "fresh-context spawned writer; full frozen Codex generated instructions used via direct fallback; no additional writer subagents",
+  "initial_context": "Parent task plus full inputs/story-input.json. All three chapter boundaries visible at planning; no other arm prose or reports read. Initial filesystem inventory showed other arm filenames only, never their contents.",
+  "planning_inputs": [
+    "inputs/character-handoff.json",
+    "inputs/scene-design-feedback.json"
+  ],
+  "writer_packets": [
+    "packets/chapter-01.writer-packet.json",
+    "packets/chapter-02.writer-packet.json",
+    "packets/chapter-03.writer-packet.json"
+  ],
+  "template_hashes": [
+    {
+      "source": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-setup/references/codex/agents/narrative-writer.toml",
+      "snapshot": "inputs/materials/narrative-writer.toml",
+      "sha256": "552b481f7e2fcb6f9482f6b1867e53dd5c8286e18733663854b18ef3d9b130cd",
+      "read_range": "full",
+      "snapshot_range": "full"
+    },
+    {
+      "source": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/SKILL.md",
+      "snapshot": "inputs/materials/SKILL.md",
+      "sha256": "2458fd389b62db82a0d2d85ef8c56c5b3823e29a1adc6295c8386de04baf9f44",
+      "read_range": "full",
+      "snapshot_range": "full"
+    },
+    {
+      "source": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/references/reader-first-writing.md",
+      "snapshot": "inputs/materials/reader-first-writing.md",
+      "sha256": "2cbad1006e0bc37ce053f8826f73a568c9f3da38eeca604cf804b92f6c869644",
+      "read_range": "full",
+      "snapshot_range": "full"
+    },
+    {
+      "source": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/references/long-format.md",
+      "snapshot": "inputs/materials/long-format.md",
+      "sha256": "73d102ce68086465006201a717d7ef90e6fccaaad3cc6610cc4a969c44ba43fc",
+      "read_range": "full",
+      "snapshot_range": "full"
+    },
+    {
+      "source": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/references/anti-ai-writing.md",
+      "snapshot": "inputs/materials/anti-ai-writing.md",
+      "sha256": "35349271d34a869b9758863e93953f4b34475f918e839a0851b53a8a86d68b1b",
+      "read_range": "1-180",
+      "snapshot_range": "full"
+    }
+  ],
+  "commands": [
+    {
+      "stage": "pre.outline-contract",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-outline-contract.js",
+        "--json",
+        "--project",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout",
+        "--chapter",
+        "1"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-01.pre.outline-contract.log",
+      "started_at": "2026-09-06T07:29:17.406063+00:00",
+      "completed_at": "2026-09-06T07:29:17.652042+00:00"
+    },
+    {
+      "stage": "pre.outline-causal",
+      "command": [
+        "python3",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-outline-causal.py",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout",
+        "--strict",
+        "--from=1",
+        "--to=1",
+        "--json"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-01.pre.outline-causal.log",
+      "started_at": "2026-09-06T07:29:17.652342+00:00",
+      "completed_at": "2026-09-06T07:29:17.701256+00:00"
+    },
+    {
+      "stage": "pre.skeleton",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-chapter-skeleton.js",
+        "--json",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/骨架/第001章_空着的位置.md"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-01.pre.skeleton.log",
+      "started_at": "2026-09-06T07:29:17.701445+00:00",
+      "completed_at": "2026-09-06T07:29:17.794753+00:00"
+    },
+    {
+      "stage": "post.wordcount",
+      "command": [
+        "python3",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/storyctl.py",
+        "wordcount",
+        "measure",
+        "--file",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/raw/第001章_空着的位置.md"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-01.post.wordcount.log",
+      "started_at": "2026-09-06T07:31:12.647718+00:00",
+      "completed_at": "2026-09-06T07:31:12.729746+00:00"
+    },
+    {
+      "stage": "post.scan",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/scripts/check-ai-patterns.js",
+        "--check",
+        "--fail-on=blocking",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/候选/第001章_空着的位置.md"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-01.post.scan.log",
+      "started_at": "2026-09-06T07:31:12.730354+00:00",
+      "completed_at": "2026-09-06T07:31:13.053210+00:00"
+    },
+    {
+      "stage": "post.degeneration",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/scripts/check-degeneration.js",
+        "--check",
+        "--json",
+        "--fail-on=blocking",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/候选/第001章_空着的位置.md"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-01.post.degeneration.log",
+      "started_at": "2026-09-06T07:31:13.053552+00:00",
+      "completed_at": "2026-09-06T07:31:13.162744+00:00"
+    },
+    {
+      "stage": "post.outline-copy",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-outline-copy.js",
+        "--outline",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/大纲/细纲_第001章.md",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/候选/第001章_空着的位置.md"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-01.post.outline-copy.log",
+      "started_at": "2026-09-06T07:31:13.163010+00:00",
+      "completed_at": "2026-09-06T07:31:13.253515+00:00"
+    },
+    {
+      "stage": "pre.outline-contract",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-outline-contract.js",
+        "--json",
+        "--project",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout",
+        "--chapter",
+        "2"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-02.pre.outline-contract.log",
+      "started_at": "2026-09-06T07:31:54.143029+00:00",
+      "completed_at": "2026-09-06T07:31:54.570222+00:00"
+    },
+    {
+      "stage": "pre.outline-causal",
+      "command": [
+        "python3",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-outline-causal.py",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout",
+        "--strict",
+        "--from=2",
+        "--to=2",
+        "--json"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-02.pre.outline-causal.log",
+      "started_at": "2026-09-06T07:31:54.571039+00:00",
+      "completed_at": "2026-09-06T07:31:54.643970+00:00"
+    },
+    {
+      "stage": "pre.skeleton",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-chapter-skeleton.js",
+        "--json",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/骨架/第002章_借来的外套.md"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-02.pre.skeleton.log",
+      "started_at": "2026-09-06T07:31:54.644240+00:00",
+      "completed_at": "2026-09-06T07:31:54.842259+00:00"
+    },
+    {
+      "stage": "post.wordcount",
+      "command": [
+        "python3",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/storyctl.py",
+        "wordcount",
+        "measure",
+        "--file",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/raw/第002章_借来的外套.md"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-02.post.wordcount.log",
+      "started_at": "2026-09-06T07:34:05.328131+00:00",
+      "completed_at": "2026-09-06T07:34:05.411639+00:00"
+    },
+    {
+      "stage": "post.scan",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/scripts/check-ai-patterns.js",
+        "--check",
+        "--fail-on=blocking",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/候选/第002章_借来的外套.md"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-02.post.scan.log",
+      "started_at": "2026-09-06T07:34:05.412023+00:00",
+      "completed_at": "2026-09-06T07:34:05.920911+00:00"
+    },
+    {
+      "stage": "post.degeneration",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/scripts/check-degeneration.js",
+        "--check",
+        "--json",
+        "--fail-on=blocking",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/候选/第002章_借来的外套.md"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-02.post.degeneration.log",
+      "started_at": "2026-09-06T07:34:05.921289+00:00",
+      "completed_at": "2026-09-06T07:34:06.124935+00:00"
+    },
+    {
+      "stage": "post.outline-copy",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-outline-copy.js",
+        "--outline",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/大纲/细纲_第002章.md",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/候选/第002章_借来的外套.md"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-02.post.outline-copy.log",
+      "started_at": "2026-09-06T07:34:06.125296+00:00",
+      "completed_at": "2026-09-06T07:34:06.269903+00:00"
+    },
+    {
+      "stage": "pre.outline-contract",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-outline-contract.js",
+        "--json",
+        "--project",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout",
+        "--chapter",
+        "3"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-03.pre.outline-contract.log",
+      "started_at": "2026-09-06T07:34:24.836606+00:00",
+      "completed_at": "2026-09-06T07:34:25.052688+00:00"
+    },
+    {
+      "stage": "pre.outline-causal",
+      "command": [
+        "python3",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-outline-causal.py",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout",
+        "--strict",
+        "--from=3",
+        "--to=3",
+        "--json"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-03.pre.outline-causal.log",
+      "started_at": "2026-09-06T07:34:25.053037+00:00",
+      "completed_at": "2026-09-06T07:34:25.106492+00:00"
+    },
+    {
+      "stage": "pre.skeleton",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-chapter-skeleton.js",
+        "--json",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/骨架/第003章_林琴.md"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-03.pre.skeleton.log",
+      "started_at": "2026-09-06T07:34:25.106754+00:00",
+      "completed_at": "2026-09-06T07:34:25.203201+00:00"
+    },
+    {
+      "stage": "post.wordcount",
+      "command": [
+        "python3",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/storyctl.py",
+        "wordcount",
+        "measure",
+        "--file",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/raw/第003章_林琴.md"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-03.post.wordcount.log",
+      "started_at": "2026-09-06T07:36:31.184520+00:00",
+      "completed_at": "2026-09-06T07:36:31.264900+00:00"
+    },
+    {
+      "stage": "post.scan",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/scripts/check-ai-patterns.js",
+        "--check",
+        "--fail-on=blocking",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/候选/第003章_林琴.md"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-03.post.scan.log",
+      "started_at": "2026-09-06T07:36:31.265317+00:00",
+      "completed_at": "2026-09-06T07:36:31.510633+00:00"
+    },
+    {
+      "stage": "post.degeneration",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/scripts/check-degeneration.js",
+        "--check",
+        "--json",
+        "--fail-on=blocking",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/候选/第003章_林琴.md"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-03.post.degeneration.log",
+      "started_at": "2026-09-06T07:36:31.510846+00:00",
+      "completed_at": "2026-09-06T07:36:31.611734+00:00"
+    },
+    {
+      "stage": "post.outline-copy",
+      "command": [
+        "node",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-outline-copy.js",
+        "--outline",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/大纲/细纲_第003章.md",
+        "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/候选/第003章_林琴.md"
+      ],
+      "exit_code": 0,
+      "log": "logs/chapter-03.post.outline-copy.log",
+      "started_at": "2026-09-06T07:36:31.611956+00:00",
+      "completed_at": "2026-09-06T07:36:31.697725+00:00"
+    }
+  ],
+  "chapter_counts": [
+    {
+      "chapter": 1,
+      "raw_sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7",
+      "candidate_sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7",
+      "han_chars": 2055,
+      "visible_chars_v1": 2385,
+      "han_in_range": false,
+      "visible_in_range": true,
+      "sentences": 132,
+      "sentence_distribution": {
+        "short_lt_15": 0.4621212121212121,
+        "medium_15_30": 0.4393939393939394,
+        "long_gt_30": 0.09848484848484848,
+        "mean": 17.068181818181817
+      },
+      "raw_attempts": 1,
+      "reading_edit_passes": 0,
+      "han_in_range_applicability": "not_a_gate; parent clarification"
+    },
+    {
+      "chapter": 2,
+      "raw_sha256": "4c1c53dd528e46c5817580fbcd05ae50844d0bb32dc179a576a4352af8e123c0",
+      "candidate_sha256": "4c1c53dd528e46c5817580fbcd05ae50844d0bb32dc179a576a4352af8e123c0",
+      "han_chars": 2198,
+      "visible_chars_v1": 2569,
+      "han_in_range": false,
+      "visible_in_range": true,
+      "sentences": 140,
+      "sentence_distribution": {
+        "short_lt_15": 0.45714285714285713,
+        "medium_15_30": 0.45714285714285713,
+        "long_gt_30": 0.08571428571428572,
+        "mean": 17.35
+      },
+      "raw_attempts": 1,
+      "reading_edit_passes": 0,
+      "han_in_range_applicability": "not_a_gate; parent clarification"
+    },
+    {
+      "chapter": 3,
+      "raw_sha256": "1d6fc41fb79441cb1ac221037e1ba63e50d7853e69d0b05283551d76bbf4bc36",
+      "candidate_sha256": "1d6fc41fb79441cb1ac221037e1ba63e50d7853e69d0b05283551d76bbf4bc36",
+      "han_chars": 2087,
+      "visible_chars_v1": 2448,
+      "han_in_range": false,
+      "visible_in_range": true,
+      "sentences": 130,
+      "sentence_distribution": {
+        "short_lt_15": 0.46153846153846156,
+        "medium_15_30": 0.3923076923076923,
+        "long_gt_30": 0.14615384615384616,
+        "mean": 17.83076923076923
+      },
+      "raw_attempts": 1,
+      "reading_edit_passes": 0,
+      "han_in_range_applicability": "not_a_gate; parent clarification"
+    }
+  ],
+  "raw_attempts_per_chapter": 1,
+  "reading_edit_passes": 0,
+  "candidate_equals_raw": true,
+  "unresolved_advisory": [
+    {
+      "chapter": 2,
+      "code": "micro-action-tic",
+      "severity": "advisory",
+      "log": "logs/chapter-02.post.scan.log",
+      "evidence": "了一会 了一下 了一道 了声 了下 了一口",
+      "writer_status": "retained_raw_unedited",
+      "writer_note": "命中混含喝水、卷袖口等可见动作；密度本身不能代替阅读结论。依本次一版raw要求不编辑，交root结合独立阅读决定。"
+    }
+  ],
+  "gate_failures": [],
+  "setup_issues": "metadata/setup-issues.json",
+  "postwrite_metadata_validation": "logs/postwrite-metadata-validation.json",
+  "coverage_id_mapping": "metadata O-01 maps to skeleton O1; metadata O-02 maps to O2 etc. metadata is not a candidate binding or transaction.",
+  "reader_status": "Delegated by root; writer did not read any reader report. Only file-ready notices sent.",
+  "author_adoption": "pending; no tracking state or formal prose writes",
+  "wordcount_caliber": "visible_chars_v1 per parent clarification; 2200-2800 inclusive",
+  "pending_root_work": [
+    "独立顺读与理解凭证",
+    "按实际阅读反馈最多一轮定点编辑",
+    "正式candidate检查与其余试验汇总"
+  ],
+  "asset_manifest": [
+    {
+      "path": "inputs/character-handoff.json",
+      "sha256": "c7fd964adcd510b9bd28ad25a808cd06a3f4ffcec2d2e6017e10a0cfe73c8d9a",
+      "bytes": 1691
+    },
+    {
+      "path": "inputs/materials/SKILL.md",
+      "sha256": "2458fd389b62db82a0d2d85ef8c56c5b3823e29a1adc6295c8386de04baf9f44",
+      "bytes": 7499
+    },
+    {
+      "path": "inputs/materials/anti-ai-writing.md",
+      "sha256": "35349271d34a869b9758863e93953f4b34475f918e839a0851b53a8a86d68b1b",
+      "bytes": 31723
+    },
+    {
+      "path": "inputs/materials/long-format.md",
+      "sha256": "73d102ce68086465006201a717d7ef90e6fccaaad3cc6610cc4a969c44ba43fc",
+      "bytes": 3973
+    },
+    {
+      "path": "inputs/materials/narrative-writer.toml",
+      "sha256": "552b481f7e2fcb6f9482f6b1867e53dd5c8286e18733663854b18ef3d9b130cd",
+      "bytes": 31680
+    },
+    {
+      "path": "inputs/materials/reader-first-writing.md",
+      "sha256": "2cbad1006e0bc37ce053f8826f73a568c9f3da38eeca604cf804b92f6c869644",
+      "bytes": 6834
+    },
+    {
+      "path": "inputs/scene-design-feedback.json",
+      "sha256": "3c6f449ad74412ac1b6e550bb62948f513d59193855724055a80d6fc55bc7f43",
+      "bytes": 1189
+    },
+    {
+      "path": "inputs/story-input.json",
+      "sha256": "b311d493ef4f6a3a3ba1838c4507599363a0c6bc6afc62cefc7700dad6276a40",
+      "bytes": 4425
+    },
+    {
+      "path": "大纲/细纲_第001章.md",
+      "sha256": "7896b988d717096a9ceade79d4159b724b883a6395ee0b4f7b827f4738084050",
+      "bytes": 3616
+    },
+    {
+      "path": "大纲/细纲_第002章.md",
+      "sha256": "d5c217efac259fcfdf464c5bdb9d006834377fa1d2e46c645a1932eb95a2d43d",
+      "bytes": 3902
+    },
+    {
+      "path": "大纲/细纲_第003章.md",
+      "sha256": "dfd47519e727acfd66cf6a04ad9e5228235a3b5fe64fd0713dabd3ac82eda479",
+      "bytes": 3953
+    },
+    {
+      "path": "骨架/第001章_空着的位置.md",
+      "sha256": "bb6e8e3adfbe9a2b6791ccaac1d218aae3da4f666363e278491a88995f5dea13",
+      "bytes": 2657
+    },
+    {
+      "path": "骨架/第002章_借来的外套.md",
+      "sha256": "89ffc804be7d1a72af3b365090bd7bba14c5af98bee8ead838acb55ac7edada3",
+      "bytes": 2846
+    },
+    {
+      "path": "骨架/第003章_林琴.md",
+      "sha256": "550f3bea301b24e11a9058698da0e87064eca4e10f911540c2a250209babb5ed",
+      "bytes": 3639
+    },
+    {
+      "path": "packets/chapter-01.writer-packet.json",
+      "sha256": "155d62e8fc12b5810448a645de2c6364f77541e32c3cd41ed0feac1587a76f12",
+      "bytes": 68120
+    },
+    {
+      "path": "packets/chapter-02.writer-packet.json",
+      "sha256": "94c5f09cb6f49fd67d5586f08d295b12ed9055397afddc29a9226a7c05cb4133",
+      "bytes": 76275
+    },
+    {
+      "path": "packets/chapter-03.writer-packet.json",
+      "sha256": "8278731b3224c7c1961a2d3b83c17cc14b7318588b6e8534993e50a5ded750ac",
+      "bytes": 77642
+    },
+    {
+      "path": "raw/第001章_空着的位置.md",
+      "sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7",
+      "bytes": 7118
+    },
+    {
+      "path": "raw/第002章_借来的外套.md",
+      "sha256": "4c1c53dd528e46c5817580fbcd05ae50844d0bb32dc179a576a4352af8e123c0",
+      "bytes": 7637
+    },
+    {
+      "path": "raw/第003章_林琴.md",
+      "sha256": "1d6fc41fb79441cb1ac221037e1ba63e50d7853e69d0b05283551d76bbf4bc36",
+      "bytes": 7258
+    },
+    {
+      "path": "候选/第001章_空着的位置.md",
+      "sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7",
+      "bytes": 7118
+    },
+    {
+      "path": "候选/第002章_借来的外套.md",
+      "sha256": "4c1c53dd528e46c5817580fbcd05ae50844d0bb32dc179a576a4352af8e123c0",
+      "bytes": 7637
+    },
+    {
+      "path": "候选/第003章_林琴.md",
+      "sha256": "1d6fc41fb79441cb1ac221037e1ba63e50d7853e69d0b05283551d76bbf4bc36",
+      "bytes": 7258
+    },
+    {
+      "path": "metadata/chapter-01.counts.json",
+      "sha256": "24df9b97087a711f180696dc3fa8240ed6d8b9e6eb37617851b53e888513b8d6",
+      "bytes": 615
+    },
+    {
+      "path": "metadata/chapter-01.postwrite-reads.json",
+      "sha256": "b3379186048306ae4958877b9556decd2a8fcb91eba07a669f2b7ed9d4f85b7c",
+      "bytes": 1990
+    },
+    {
+      "path": "metadata/chapter-01.postwrite.json",
+      "sha256": "85b1a35c9e21e77ef12641388982f65ee48dacf7b19a92e01a3830821e0880f1",
+      "bytes": 1838
+    },
+    {
+      "path": "metadata/chapter-01.prewrite-reads.json",
+      "sha256": "7a59d03ce9497786eb372bfbc94b1b1c5cde26315e5409fab47731a77e61b4f9",
+      "bytes": 2653
+    },
+    {
+      "path": "metadata/chapter-02.counts.json",
+      "sha256": "321caa682e3dca3b1d414d4b2a1585dea95b8fd734821f9108634b402132f490",
+      "bytes": 604
+    },
+    {
+      "path": "metadata/chapter-02.postwrite-reads.json",
+      "sha256": "228282932ec2f0d1d6025a13bb34427dc4c8d3050d2474f38f235c9f9d1ba88e",
+      "bytes": 1990
+    },
+    {
+      "path": "metadata/chapter-02.postwrite.json",
+      "sha256": "ee00186c19ff875426795545938e82133595b0ff61ecb831245c07a6c3257e5f",
+      "bytes": 1998
+    },
+    {
+      "path": "metadata/chapter-02.prewrite-reads.json",
+      "sha256": "887a01c9a55af45848df04013304003df503bd9793a6b039f804639b75400767",
+      "bytes": 2941
+    },
+    {
+      "path": "metadata/chapter-03.counts.json",
+      "sha256": "00184349c76a2e4a6db1e8bd4872393f9dfd6e1ce754f9466e9ae9c6da866997",
+      "bytes": 615
+    },
+    {
+      "path": "metadata/chapter-03.postwrite-reads.json",
+      "sha256": "d6aa90ba1faf68a6a48fe90616a9cbfddf47d75927a4d17e9078d1a72ced5646",
+      "bytes": 1981
+    },
+    {
+      "path": "metadata/chapter-03.postwrite.json",
+      "sha256": "2fcadbf576152e9aeda2243e7aec8582fc4b0dd84f0c5d498ef97cdfb25ddb5e",
+      "bytes": 2101
+    },
+    {
+      "path": "metadata/chapter-03.prewrite-reads.json",
+      "sha256": "4e48d67219fd0260baafa99afbbf05caf62009c8ed37516fb52c64cd72da4ae0",
+      "bytes": 2932
+    },
+    {
+      "path": "metadata/chapter_workflow.py",
+      "sha256": "b4451aa5776ebbd91bc7e46ed0b882929ac11cc66157425321ad7891dfd01b04",
+      "bytes": 5458
+    },
+    {
+      "path": "metadata/command-exits.jsonl",
+      "sha256": "dd124d2bd7436dc4b6022d57696d8fc81bda5d5db334762e72b5c31a1285c366",
+      "bytes": 11235
+    },
+    {
+      "path": "metadata/finish_handoff.py",
+      "sha256": "a4099b31ee08c07abf15344c36657264023021cddf4d0336c7959ac3f3c17dd4",
+      "bytes": 12077
+    },
+    {
+      "path": "metadata/planning-source.json",
+      "sha256": "6d0e9368413a94c1c3c78c1689deb97cc59c544d1cc60ffbf1626b66343654b5",
+      "bytes": 3572
+    },
+    {
+      "path": "metadata/prepare_planning.py",
+      "sha256": "94643d9f4e45984b50ad48d2d1a5d4387e338f621296bc3d22e87f9161d8efcb",
+      "bytes": 9296
+    },
+    {
+      "path": "metadata/setup-issues.json",
+      "sha256": "6fca2f664cee6d67a9d97d70168e01c80ddb0047503c643bc4a109d0fd9ef5a2",
+      "bytes": 1222
+    },
+    {
+      "path": "metadata/source-manifest.json",
+      "sha256": "2abc7c1be02d729517bd5662a57f1c261c86069eb18fe8d40c556fc51c0a55a8",
+      "bytes": 1830
+    },
+    {
+      "path": "logs/chapter-01.post.degeneration.log",
+      "sha256": "8aa973100a15bf817985395637131e838cf84e427be4792583def923f020f5fa",
+      "bytes": 21
+    },
+    {
+      "path": "logs/chapter-01.post.outline-copy.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/chapter-01.post.scan.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/chapter-01.post.wordcount.log",
+      "sha256": "1421129214bb99cac4629fe4d850c62e96338b40e4b713741a453ed4c714b20c",
+      "bytes": 158
+    },
+    {
+      "path": "logs/chapter-01.pre.outline-causal.log",
+      "sha256": "f67e3494df824854785d6de10d75028a7c39a218d0a1ab465ef470c889611820",
+      "bytes": 55
+    },
+    {
+      "path": "logs/chapter-01.pre.outline-contract.log",
+      "sha256": "9b121cfd6fd839d55e41396a8a3ab091429ac4a28cef2952f0434141b59341d4",
+      "bytes": 5980
+    },
+    {
+      "path": "logs/chapter-01.pre.skeleton.log",
+      "sha256": "482bf52e1595f8757e3cc4edd4fa988001d12157b40df5e5613f23586a488f2c",
+      "bytes": 292
+    },
+    {
+      "path": "logs/chapter-02.post.degeneration.log",
+      "sha256": "8aa973100a15bf817985395637131e838cf84e427be4792583def923f020f5fa",
+      "bytes": 21
+    },
+    {
+      "path": "logs/chapter-02.post.outline-copy.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/chapter-02.post.scan.log",
+      "sha256": "0e12f20afa6fce97b5699d8419a6fcc6cde8f44c3ad41c537c55d4d1d140b302",
+      "bytes": 435
+    },
+    {
+      "path": "logs/chapter-02.post.wordcount.log",
+      "sha256": "7ff28cef5d46532e22e4257f3de0c07f93cb55354d09a08bf73a614b7c6f77d9",
+      "bytes": 158
+    },
+    {
+      "path": "logs/chapter-02.pre.outline-causal.log",
+      "sha256": "f67e3494df824854785d6de10d75028a7c39a218d0a1ab465ef470c889611820",
+      "bytes": 55
+    },
+    {
+      "path": "logs/chapter-02.pre.outline-contract.log",
+      "sha256": "c40387064a6690f545f5d57589e882105d58d1d574d831e50a07131bb1038a7a",
+      "bytes": 5980
+    },
+    {
+      "path": "logs/chapter-02.pre.skeleton.log",
+      "sha256": "f085bcb1545839c5443edf837ff575a15ab4ec3e7757c03ddcfc9693bfb0dec4",
+      "bytes": 292
+    },
+    {
+      "path": "logs/chapter-03.post.degeneration.log",
+      "sha256": "8aa973100a15bf817985395637131e838cf84e427be4792583def923f020f5fa",
+      "bytes": 21
+    },
+    {
+      "path": "logs/chapter-03.post.outline-copy.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/chapter-03.post.scan.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "logs/chapter-03.post.wordcount.log",
+      "sha256": "63e5a3b3da84625981c40dea49d0f581659d21b98c5addbb0fdea992f48fb3da",
+      "bytes": 158
+    },
+    {
+      "path": "logs/chapter-03.pre.outline-causal.log",
+      "sha256": "f67e3494df824854785d6de10d75028a7c39a218d0a1ab465ef470c889611820",
+      "bytes": 55
+    },
+    {
+      "path": "logs/chapter-03.pre.outline-contract.log",
+      "sha256": "a619b3b5609631e64575b08b35e5de0bf302fc5dea0ee464c674a16582f64071",
+      "bytes": 5980
+    },
+    {
+      "path": "logs/chapter-03.pre.skeleton.log",
+      "sha256": "19904c020293ca8fad9c486734bc96da369b281377db1b4e95dd0bbf8fb4db74",
+      "bytes": 283
+    },
+    {
+      "path": "logs/planning.prepare-attempt-1.log",
+      "sha256": "c1558e92c411c6d7f9d888f7173fa268a21de03b929a0572f7d3023627593c84",
+      "bytes": 163
+    },
+    {
+      "path": "logs/planning.prepare-attempt-2.log",
+      "sha256": "20f6cdfbe0d7f16e2daab0f5f795efd6bede8d9d9934cfdade02f0d5fa13c63b",
+      "bytes": 269
+    },
+    {
+      "path": "logs/postwrite-metadata-validation.json",
+      "sha256": "c608af56c8ad82b769f56b6c0758ad4c72d120e59c1fc925d5de31c03d5e4b21",
+      "bytes": 559
+    }
+  ],
+  "memory_used": {
+    "path": "/Users/yolandahao/.codex/memories/MEMORY.md",
+    "lines": [
+      103,
+      138
+    ],
+    "purpose": "确认候选、单稿与实验结果不能代表作者采用；没有读到相关实验正文",
+    "rollout_id": "01a05205-2fe9-7611-9467-c837cb845313"
+  }
+}

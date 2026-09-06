@@ -1,0 +1,8 @@
+{
+  "chapter": 1,
+  "project": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/delivery-checks/heldout-raw/chapter-01",
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "ERROR: candidate_binding.coverage.id 非法\n",
+  "adopted": false
+}

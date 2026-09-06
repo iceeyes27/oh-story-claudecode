@@ -1,0 +1,5 @@
+{
+  "exit_code": 0,
+  "stdout": "{\n  \"action\": \"prepare\",\n  \"operation\": \"r2-1c721891983c5f82bf9f\",\n  \"directory\": \"/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/revision-checks/heldout-fact-edits-corrected/chapter-02/候选/_修订/r2-1c721891983c5f82bf9f\",\n  \"kind\": \"facts\",\n  \"review_scope\": [\n    \"正文/第001章_空着的位置.md\",\n    \"正文/第003章_林琴.md\"\n  ],\n  \"adopted\": false\n}\n",
+  "stderr": ""
+}

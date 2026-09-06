@@ -1,0 +1,59 @@
+{
+  "summary": "程雪到场后直接说明第五人是母亲，出示另一照片和便条。宋棠撤销凭外套推断职业的依据，读出搬书后还须送信；程雪先询问母亲意愿，齐叔愿一起核对。",
+  "protagonist": {
+    "identity": "社区旧站照片展整理者",
+    "location": "旧站照片展展厅",
+    "goal": "听程雪母亲亲口确认姓名与经历，取得署名同意",
+    "state": "撤销凭外套猜职工身份的依据，留空行等待当事人核对",
+    "abilities_resources": [
+      "同日两张照片",
+      "程雪提供的家中便条",
+      "现场笔记"
+    ],
+    "relationships": [
+      "程雪承认照片里的是母亲，愿联系母亲",
+      "齐叔愿意参加核对"
+    ],
+    "knowledge": [
+      "厚外套原先属于站员老郭，后来借出",
+      "便条提到搬书后还须送信和归还衣服",
+      "程雪称第五人是其母，尚未公布姓名"
+    ],
+    "open_threads": [
+      "母亲尚待到场亲口核对",
+      "是否同意署名未定"
+    ]
+  },
+  "commitments": [
+    "程雪电话问母亲意愿",
+    "齐叔答应留在展厅一起核对"
+  ],
+  "coverage": [
+    {
+      "id": "O-01",
+      "evidence": "\"我想先说，别写失落的英雄之类的话。她就是那天在那里，做了那点事。写得太大，她不会愿意。\""
+    },
+    {
+      "id": "O-02",
+      "evidence": "同样的位置，同样有块补丁。不过外套穿到了边缘那个人身上，衣摆显得更长，袖子也往上多卷了一道。"
+    },
+    {
+      "id": "O-03",
+      "evidence": "宋棠低头读：在旧站帮着搬了书，还得把剩下的信送完，晚些回。"
+    },
+    {
+      "id": "O-04",
+      "evidence": "\"那个人是我妈。\"程雪将手底下的便条往回收了一点。"
+    }
+  ],
+  "metrics": {},
+  "chapter": 2,
+  "source_raw_sha256": "4562594295f276b26e4fd3de4431c7c2acb8f52101852bac8faab9148650508d",
+  "status": "post_edit_fact_extraction_by_root_after_reading_all_raw_chapters_and_actual_diffs",
+  "extraction_origin": {
+    "original_metadata": "/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/metadata/chapter-02.postwrite.json",
+    "sha256": "ee00186c19ff875426795545938e82133595b0ff61ecb831245c07a6c3257e5f",
+    "edited_prose": "/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/edited/第002章_借来的外套.md",
+    "reason": "Refresh summary/knowledge and a moved evidence anchor after the one recorded edit pass; no original evidence overwritten."
+  }
+}

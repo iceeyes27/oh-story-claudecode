@@ -19,6 +19,7 @@
 - 候选采用：`python skills/story-write/scripts/candidate-commit.py promote --project DIR --chapter N [--no-scan --reason "<理由>"]`（兼容 `--all` 只接受单候选）
 - 候选预检：`python skills/story-write/scripts/candidate-commit.py check --project DIR --chapter N [--json]`
 - 候选恢复：`python skills/story-write/scripts/candidate-commit.py recover --project DIR (--chapter N|--all)`
+- 普通修订：`python skills/story-write/scripts/revision-commit.py prepare|check|accept|recover|abort --project DIR`，详见 workflow-revision；prepare 不采用，check 只读，accept 要记录实际作者采用指令。
 - 作者声纹：`python skills/story-write/scripts/author_voice_profile.py (check|update) --project DIR [--json] [--dry-run]`（`--dry-run` 仅用于 `update`）
 - 旧书修订实验：先运行 `python skills/story-write/scripts/quality_lifecycle.py record-experiment-preregistration --project DIR --input FILE` 记录 `story-revision-appeal-preregistration/v1`，再运行同脚本的 `check-revision-appeal-experiment --project DIR --input FILE` 校验 `story-revision-appeal-between-subject/v1`
 - 声纹效果实验：先运行 `python skills/story-write/scripts/quality_lifecycle.py record-experiment-preregistration --project DIR --input FILE` 记录 `story-author-voice-effect-preregistration/v1`，再运行同脚本的 `check-author-voice-effect --project DIR --input FILE` 校验 `story-author-voice-effect/v1`
@@ -28,22 +29,30 @@
 - 长篇“写第 N 章 / 续写 / 继续写 / 日更”默认生成骨架；只有明确要求成稿时生成候选。
 - `骨架/` 与 `候选/` 必须位于书根，不能放在 `正文/` 下。章节发现只能用 `正文/` 正稿推进正式章号。
 - 骨架和候选都不能推进 `_tracking-state.json`。候选追踪事务必须根据实际候选正文构造，不能从骨架直接推算。
+- 骨架至少一场，场数不设 3～6 硬限制；编号、字段、O-ID 覆盖、预算与事实边界继续验证。
 - 候选事务必须保留创建时的 `expected_state_revision`，并以 SHA-256 绑定候选、细纲、骨架及 O-ID 覆盖证据；采用时不得刷新旧修订号。
 - 候选绑定必须使用 `candidate_binding.schema_version = 2` 与 `quality_profile = fanqie-long-v2`。每章必须包含 `rc-01`、`rc-02`、`rc-03`；只有第 15 章增加 `arc-01`、`arc-02`，其他章号不按倍数触发 arc 门。
 - `rc-01/02/03` 与 `arc-01` 的语义 receipt 必须包含 `run_id`、`status`、`findings`、非空 `evidence`、`candidate_sha256`、逐文件 `prose_files` 和 `prose_set_sha256`。每个 evidence 路径必须属于 `prose_files`，其非空 anchor 必须能在对应文件中直接定位；`rc-01` 另存确定性结果摘要，第 15 章的两个 arc receipt 绑定同一 ledger 摘要。
 - `promote` 通过项目锁串行执行，按 `prepared → prose_moved → tracking_committed → done` 记录阶段；失败或中断后用 `recover` 幂等恢复。恢复在移动正文或回放追踪前重验原始事务、逐文件读者视图摘要和文件集合摘要。
 - `promote` 在首次写入前执行状态、摘要、骨架、覆盖、标题、严格字数、细纲照抄、追踪 dry-run 与 AI 模式检查。只有 `--no-scan --reason "<理由>"` 能跳过 AI 模式扫描，理由写进采用回执；正文内的 `<!-- 去味:跳过 -->` 对采用无效。
 - `check` 与 `promote` 复用 `validate_binding`；`check` 不获取项目锁、不移动候选、不写采用日志或追踪状态。`imported_through_chapter` 之后的新章缺任一 INTENT_FIELDS 时阻断，历史章只输出 advisory。
-- `目标情绪` 只取 `skills/_shared/references/target-emotion-vocab.md` 的首个词；词表外取值对新章 blocking、历史章 advisory。连排 3 章为 advisory、4 章为 blocking；传 `--chapter N` 时只读取 `N` 及以前的细纲，不得用未来章节阻断当前章。
+- `目标情绪` 只取 `skills/_shared/references/target-emotion-vocab.md` 的首个词；词表外取值对新章 blocking、历史章 advisory。连排 3 章及以上仅为 advisory，不因分类标签相同拒绝候选；传 `--chapter N` 时只读取 `N` 及以前的细纲，不得用未来章节阻断当前章。
 - `check` 与 `promote` 对本章运行严格因果检查，只传相同的 `--from=N --to=N`；新章 blocking，`imported_through_chapter` 内的历史章 advisory。不得为写第 N 章扫描整本书的历史因果欠账。
 - 专名漂移扫描只读共享现实平台/产品词典及项目 `设定/题材定位.md` 的 `保留真名`；扫描正文、候选与细纲，不扫描设定正文。现实专名对新章 blocking、历史章 advisory；从角色设定、角色快照和追踪状态运行时派生的 3～4 字人名，单字替换近似只作 advisory。正文卷目录必须递归发现。
 - tracking schema 保持 4：旧 state 可缺 `metrics` 且 `check` 不改写；新事务必须提交结构化全量 metrics。每条记录保存原文名目、当前值、事实章号和可在正文定位的来源短语。上下文仍为 7 栏，只在 `## 当前位置` 显示按事实章倒序的前 12 项，超出时报告隐藏数量。
 - 候选正文命中共享结算句式而 metrics 无变化时阻断，只有非空 `metrics_unchanged_reason` 可说明本章为何不改数值。变更记录的来源短语必须能在正文定位；数值按“正文直接值”或“前值 + 本章增量”验证，非数值状态只验证来源锚点。
 - 确定性扫描通过只表示未发现已登记 blocking 模式，不能表述为文风自然或没有 AI 痕迹。
+- 共享文风词形按 machine fence 明确解析，contextual/density 只提示语境与密度。书根 `.deslop-author-rules.json` 须绑定明确作者原句和 scope；候选/修订扫描传 book-dir 与计划正稿 target-file，不将系统偏好冒充作者禁令。损坏规则与输入不静默放过。
+- 无研究 HEAD 的普通修订保留原稿与冻结候选、实际 diff、state/上下文摘要；wording/rhythm 绑定相邻章及未变事实阅读声明，facts 绑定全部后文并提交 mode=revision 事务。语义声明不是脚本证明；模型/真人来源必须分开。
+- 普通修订复用 tracking 的规范化与派生逻辑、项目锁及唯一 state，写 state 最后；纯文字调整也递增 revision，移除旧字数记录，使旧绑定失效。日志可恢复且阻止其他写入，prepared 且正式输出未变才可 abort。恢复原稿走新修订，不能倒退 state_revision。已存在研究 HEAD 时普通路径拒绝写入。
 - 作者声纹工具只递归采样书根 `正文/` 下章号唯一的 UTF-8 正式章节，拒绝符号链接并排除候选、骨架、对标和归档目录。工具只能替换 `设定/文风.md` 中唯一一组 `author-voice:machine` 标记区；标记外作者内容保持原字节，机器统计不得表述为读者偏好提升。实际更新与候选采用、追踪写入共用项目锁；`check` 与 `update --dry-run` 保持只读且不获取锁。
 - 旧书局部修订不复用生成实验的被试内 `story-quality-longitudinal/v2`。A/B 必须绑定同一连续 15 章，B 只能修改预注册章，每名真人只读取一个盲码 arm；主要终点固定为 `first_quit_chapter`，secondary 不得事后替换主要终点。真人 evidence 的 `collected_at` 必须不早于两臂冻结时间且不晚于生命周期导入时间，不能用延后导入掩盖提前观察。
 - 旧书 pilot 只能返回 `UNDERPOWERED_PILOT`；powered 结果必须由事前功效设计和固定判定规则推导，且只证明该作品。作者声纹效果实验冻结剧情、模型、上下文、预算和停止规则，只改变 voice treatment；没有非 synthetic 真人证据时只能返回 `PENDING_HUMAN_EVIDENCE`。
 - 证据等级不可互换：revision 证书证明修订正确性；单书 pilot 证明流程可行；单书 powered 提供该书效果证据；系统层效果仍要求多个全新 held-out 故事包和功效审计。
+
+- 普通长篇候选写前、写后和采用统一使用 `fanqie-long-v2` 的 `fanqie_length` 2200～2800，默认目标 2500；不叠加研究协议的 ±12%/±15% 或旧 90% 阈值。超出该 profile 的作者篇幅要求在写前明确兼容范围，不能在采用时刷新绑定绕过。
+- 普通长篇写手使用紧凑 `writer_packet`、`reader-first-writing.md` 与 `long-format.md`，事实前提不得为体积指标被截断；开篇、对白、情绪等标签不能单独触发完整技法库读取。
+- 轻量阅读反馈只读正文、绑定候选摘要并区分模型代理与真人；未运行显示 `NOT_EVALUATED`，正文变化使旧反馈失效。第 3/5 章及单元结尾的建议不改变第 15 章 arc 绑定。
 
 ## 4. Validation & Error Matrix
 
@@ -56,7 +65,7 @@
 | 候选缺追踪事务、扫描失败或正稿已存在 | `promote` 退出 2，正稿与追踪不变 |
 | `check` 发现候选预检 blocking | 退出 1，候选、正文与追踪均不变 |
 | `check` 调用错误、文件不可读或运行环境故障 | 退出 2，候选、正文与追踪均不变 |
-| 当前章形成 4 章同目标情绪连排 | 新章 `check` 退出 1；历史章只输出 advisory |
+| 当前章形成 4 章同目标情绪连排 | 新章和历史章均仅输出 advisory；其他门仍各自校验 |
 | 仅未来章会把连排推到 4 章 | 当前章不受未来细纲影响 |
 | 新章本章因果字段缺失或前因无锚点 | `check` 退出 1；候选、正文与追踪均不变 |
 | 历史章存在严格因果 finding | 输出 advisory，继续其余采用预检 |
@@ -87,10 +96,12 @@
 
 ## 6. Tests Required
 
-- `node scripts/test-chapter-skeleton.js`：正常骨架、缺字段、场景越界、预算、覆盖、文件错误和提示项。
+- `node scripts/test-chapter-skeleton.js`：1/2/3/7 场合法、零场/坏编号、缺字段、预算、覆盖、文件错误和提示项。
 - `bash scripts/test-flow-state.sh`：无骨架、骨架待扩写、候选待审、正式章号、历史候选目录与旧动作兼容。
 - `python scripts/test-candidate-commit.py`：书根候选、`check` 只读保证、新章/历史章细纲分级、完整预检、语义证据锚点、状态过期、批量拒绝、三阶段故障注入与幂等恢复。
-- `node scripts/test-emotion-run.js`：第 2 章无 finding、第 4 章仅 3 连 advisory、第 5 章 4 连 blocking，并证明未来细纲不影响当前章。
+- 同一测试入口覆盖普通修订：台词与节奏调整保留事实、事实修订的后文与事务、陈旧输入/第三方编辑/研究 HEAD/符号链接拒绝、持久化阶段中断与幂等恢复、原稿重新采用保持 revision 单调增加。
+- 普通修订允许新阅读意见通过 `metric_source_updates` 刷新同章既有事实的来源短语；值与事实章不变，新短语必须存在于候选，并继续校验数值一致。新事实、别章记录与数值改变走事实修订。
+- `node scripts/test-emotion-run.js`：第 2 章无 finding、第 4 章仅 3 连 advisory、第 5 章 4 连与 8 连均 advisory；未来不可读细纲也不影响当前章。
 - `node --test scripts/test-outline-contract.js`：闭合词表合法值通过、非法值命中 `outline.emotion-vocab`。
 - `python scripts/test-outline-causal.py`：严格/非严格、缺字段、悬空事件、章节范围与退出码。
 - `python scripts/test-candidate-commit.py`：新章因果 finding 阻断、历史章 advisory、未来坏细纲不影响当前章。

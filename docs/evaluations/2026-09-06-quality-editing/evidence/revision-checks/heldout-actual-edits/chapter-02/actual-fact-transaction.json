@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "mode": "revision",
+  "chapter": 2,
+  "chapter_title": "借来的外套",
+  "expected_state_revision": 0,
+  "delta": {
+    "result": "程雪到场后直接说明第五人是母亲，出示另一照片和便条。宋棠撤销凭外套推断职业的依据，读出搬书后还须送信；程雪先询问母亲意愿，齐叔愿一起核对。",
+    "character_changes": [],
+    "foreshadow_changes": [],
+    "timeline_events": [],
+    "constraints": [],
+    "next_chapter_commitments": [
+      "程雪电话问母亲意愿",
+      "齐叔答应留在展厅一起核对"
+    ]
+  },
+  "context": {
+    "position": {
+      "volume": "照片展",
+      "volume_start_chapter": 1,
+      "story_time": "当天",
+      "scene": "开放后的旧站照片展展厅"
+    },
+    "long_term_constraints": [],
+    "active_character_names": [
+      "宋棠"
+    ],
+    "continuity_risks": []
+  },
+  "character_snapshots": {
+    "宋棠": {
+      "identity": "社区旧站照片展整理者",
+      "location": "开放后的旧站照片展展厅",
+      "goal": "继续听其他照片里普通人的经历，再落笔记录",
+      "state": "填满姓名空行，已完成第五人的核对与署名",
+      "abilities_resources": [
+        "完整合影和同日另一照片已展出",
+        "林琴署名与搬书事实说明牌",
+        "现场笔记"
+      ],
+      "relationships": [
+        "林琴同意写明姓名和实际帮忙事实",
+        "程雪同意并列展出两张照片",
+        "齐叔与林琴通过旧事认出彼此"
+      ],
+      "knowledge": [
+        "第五人姓名林琴，当年为邮递员",
+        "林琴只是路过搭手，未独自救下所有书",
+        "外套由站员借出",
+        "旧名单只列职工，无需推断恶意抹名"
+      ],
+      "open_threads": []
+    }
+  },
+  "metrics": {},
+  "metrics_unchanged_reason": "照片展修订不涉及收支或数值结算"
+}

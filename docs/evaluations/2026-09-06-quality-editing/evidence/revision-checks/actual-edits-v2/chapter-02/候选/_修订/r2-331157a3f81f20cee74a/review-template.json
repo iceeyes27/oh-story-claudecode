@@ -1,0 +1,27 @@
+{
+  "reviewer": "",
+  "reader_type": "model",
+  "status": "pending",
+  "original_sha256": "eb17d6a840aab5e97378e1c7af9b5aa593b2f2f24f424c33399b8e907f9bd746",
+  "candidate_sha256": "80971ff6ecaecc68d0f3c306d796ebb6135c0a6f9b353f3747b5b3ade4a933ad",
+  "diff_sha256": "9f2f722b04bebe3f12ed4796f65d1ae276d34bdee4f7c30195b11a9bbcf0f87d",
+  "facts_unchanged": null,
+  "findings": [],
+  "original_anchor": "",
+  "candidate_anchor": "",
+  "metric_source_updates": {},
+  "context": [
+    {
+      "path": "正文/第001章_一百块定金.md",
+      "sha256": "15ec5bd73635943c7e93cf30df3e095536dfaa9a4bf09a7762e806ae2d6cdb23",
+      "anchor": "",
+      "assessment": ""
+    },
+    {
+      "path": "正文/第003章_先等它凉下来.md",
+      "sha256": "b684cb6fc9e6738336ac0015e27da39ed6fb9af902239d7a548dcb65eb80c22a",
+      "anchor": "",
+      "assessment": ""
+    }
+  ]
+}

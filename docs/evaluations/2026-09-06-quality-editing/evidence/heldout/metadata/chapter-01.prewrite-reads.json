@@ -1,0 +1,61 @@
+{
+  "stage": "before_draft",
+  "files": [
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-setup/references/codex/agents/narrative-writer.toml",
+      "sha256": "552b481f7e2fcb6f9482f6b1867e53dd5c8286e18733663854b18ef3d9b130cd",
+      "range": "full",
+      "characters": 14685
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/references/reader-first-writing.md",
+      "sha256": "2cbad1006e0bc37ce053f8826f73a568c9f3da38eeca604cf804b92f6c869644",
+      "range": "full",
+      "characters": 2498
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/references/long-format.md",
+      "sha256": "73d102ce68086465006201a717d7ef90e6fccaaad3cc6610cc4a969c44ba43fc",
+      "range": "full",
+      "characters": 1587
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/references/anti-ai-writing.md",
+      "sha256": "35349271d34a869b9758863e93953f4b34475f918e839a0851b53a8a86d68b1b",
+      "range": [
+        1,
+        180
+      ],
+      "characters": 4088
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/大纲/细纲_第001章.md",
+      "sha256": "7896b988d717096a9ceade79d4159b724b883a6395ee0b4f7b827f4738084050",
+      "range": "full",
+      "characters": 1440
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/骨架/第001章_空着的位置.md",
+      "sha256": "bb6e8e3adfbe9a2b6791ccaac1d218aae3da4f666363e278491a88995f5dea13",
+      "range": "full",
+      "characters": 1023
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/inputs/character-handoff.json",
+      "sha256": "c7fd964adcd510b9bd28ad25a808cd06a3f4ffcec2d2e6017e10a0cfe73c8d9a",
+      "range": "full",
+      "characters": 983
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/inputs/scene-design-feedback.json",
+      "sha256": "3c6f449ad74412ac1b6e550bb62948f513d59193855724055a80d6fc55bc7f43",
+      "range": "full",
+      "characters": 687
+    }
+  ],
+  "initial_requirements": {
+    "path": "inputs/story-input.json",
+    "sha256": "b311d493ef4f6a3a3ba1838c4507599363a0c6bc6afc62cefc7700dad6276a40",
+    "range": "full"
+  }
+}

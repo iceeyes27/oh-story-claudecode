@@ -56,15 +56,16 @@ class ProsePolicyInventoryTests(unittest.TestCase):
         for rule_id, text in samples.items():
             self.assertRegex(text, module.FORBIDDEN[rule_id])
 
-    def test_detector_blocking_is_restricted_to_context_free_wordlist_types(self) -> None:
-        # blocking 仅允许免语境词表族：banned-word-*（封闭词表）与 rule-load-error。
-        for allowed_type in ("banned-word-exact", "banned-word-syna", "rule-load-error"):
+    def test_detector_blocking_requires_author_scope_or_deterministic_error(self) -> None:
+        for allowed_type in ("author-ban", "referential-count-mismatch", "input-read-error", "rule-load-error"):
             self.assertTrue(module.detector_blocking_allowed(allowed_type, 2), allowed_type)
-        self.assertTrue(module.detector_blocking_allowed("banned-word-exact", module.BLOCKING_TYPE_WINDOW))
+        self.assertTrue(module.detector_blocking_allowed("author-ban", module.BLOCKING_TYPE_WINDOW))
         # 风格类、缺 type、type 距离过远都必须拦下。
         for disallowed in (
             ("ai-metaphor-fusion", 2),
             ("trailer-summary", 2),
+            ("banned-word-exact", 2),
+            ("banned-word-syna", 2),
             (None, 2),
             ("banned-word-exact", module.BLOCKING_TYPE_WINDOW + 1),
             ("rule-load-error", 0),

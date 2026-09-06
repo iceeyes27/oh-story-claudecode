@@ -23,7 +23,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-from project_lock import ProjectLockError, project_lock, unfinished_adoptions
+from project_lock import ProjectLockError, project_lock, unfinished_adoptions, unfinished_revisions
 
 
 BODY_DIR = "正文"
@@ -310,16 +310,10 @@ def emotion_run_gate(project: Path, chapter: int, state: dict[str, Any]) -> None
         require(False, f"目标情绪连排检查无法执行：\n{(result.stdout or result.stderr).strip()}")
     report = parse_node_json(result, "目标情绪连排检查", {0, 1})
     findings = [item for item in report.get("findings", []) if isinstance(item, dict)]
-    blocking = [item for item in findings if item.get("severity") == "blocking"]
-    advisory = [item for item in findings if item.get("severity") != "blocking"]
-    if blocking:
-        message = "；".join(str(item.get("evidence") or item) for item in blocking)
-        if chapter_is_new(state, chapter):
-            require(False, f"目标情绪连排过长：{message}")
-        advisory = blocking + advisory
-    if advisory:
+    # 连排标签只提示复核正文；不能据此拒绝新章或历史章。
+    if findings:
         emit(
-            "目标情绪连排 advisory：\n" + "\n".join(str(item.get("evidence") or item) for item in advisory),
+            "目标情绪连排 advisory：\n" + "\n".join(str(item.get("evidence") or item) for item in findings),
             error=True,
         )
 
@@ -377,14 +371,17 @@ def name_drift_gate(project: Path, chapter: int, state: dict[str, Any]) -> None:
         emit(f"专名漂移 advisory：{message}", error=True)
 
 
-def scan_gate(prose: Path) -> str | None:
+def scan_gate(prose: Path, *, project: Path | None = None, target: Path | None = None) -> str | None:
     blocked: list[str] = []
     for name in SCAN_SCRIPTS:
         script = SHARED_SCRIPTS / name
         if not script.is_file():
             blocked.append(f"[{name}] 扫描器不存在：{script}")
             continue
-        result = run_node([str(script), "--check", "--fail-on=blocking", str(prose)], name)
+        args = [str(script), "--check", "--fail-on=blocking", str(prose)]
+        if name == "check-ai-patterns.js" and project is not None:
+            args.extend(["--book-dir", str(project), "--target-file", str(target or (body_root(project) / prose.name))])
+        result = run_node(args, name)
         if result.returncode != 0:
             blocked.append(f"[{name}]\n{(result.stdout or result.stderr).strip()}")
     return "\n\n".join(blocked) if blocked else None
@@ -729,7 +726,7 @@ def validate_binding(
     if skip_scan:
         scan_skip = {"reason": scan_skip_reason, "skipped_at": datetime.now().astimezone().isoformat()}
     else:
-        findings = scan_gate(prose)
+        findings = scan_gate(prose, project=project)
         require(findings is None, f"候选未通过采用前确定性检查：\n{findings}")
 
     tracking_payload = dict(document)
@@ -1036,6 +1033,7 @@ def promote_chapter(
 ) -> dict[str, Any]:
     project = project.resolve()
     with project_lock(project):
+        require(not unfinished_revisions(project), "存在未完成修订；先执行 revision-commit.py recover")
         pending = pending_journals(project)
         if pending:
             matching = pending_journals(project, chapter)

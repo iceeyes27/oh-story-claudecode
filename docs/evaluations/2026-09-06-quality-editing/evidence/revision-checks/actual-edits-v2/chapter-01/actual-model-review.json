@@ -1,0 +1,37 @@
+{
+  "reviewer": "root context review plus independent reader-a and reader-b comparisons",
+  "reader_type": "model",
+  "status": "pass",
+  "original_sha256": "15ec5bd73635943c7e93cf30df3e095536dfaa9a4bf09a7762e806ae2d6cdb23",
+  "candidate_sha256": "3e9e58f8872538d145881440a37f56257f58a4dd8396ac796d86b8742a03d048",
+  "diff_sha256": "099a85920ebab3052a377a2414f44c60fed5ad27abdb6cccc9afd2fcbd62f0d1",
+  "facts_unchanged": true,
+  "findings": [
+    {
+      "severity": "advisory",
+      "message": "两位模型读者仅小幅偏好删改，追读动力未明显增强；第二章空间展示减少，第一章三两下问答删除使下一章对应变弱。保留此取舍供作者阅读。"
+    }
+  ],
+  "original_anchor": "\"你跟我说句准话，到底能不能修？\"\n\"能修。需要的东西我认得，下午能取。但你要我保证现在就凉，我做不到。\"\n\"下午你过来，三两下修完？\"\n\"拿到配件我就来。修完还得看它能不能稳稳降温，不能听见响了就算完。\"",
+  "candidate_anchor": "\"你跟我说句准话，到底能不能修？\"\n\"能修，拿到配件我就来。修完得试稳了，不能听见响就算完。\"",
+  "metric_source_updates": {},
+  "context": [
+    {
+      "path": "正文/第002章_鱼要有盖.md",
+      "sha256": "eb17d6a840aab5e97378e1c7af9b5aa593b2f2f24f424c33399b8e907f9bd746",
+      "anchor": "盖子必须严实，外面不能带着鱼水往我这儿滴。进门擦干净，单放这边，不跟我的东西混。",
+      "assessment": "相邻章临存条件、另付30元、父亲未指挥与下午维修仍成立；三两下回顾精确性略损失，已保留为advisory。"
+    }
+  ],
+  "evidence_origin": [
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/blind/reviews/reader-a-paired.json",
+      "sha256": "cb9dffd967887e42159f0405f07b684188580a93672ae875f87dedb206a72b57"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/blind/reviews/reader-b-paired.json",
+      "sha256": "22eb5f48a3b94fa8a4566b74d2dfe3dbf9ef5974e3527c59843a6388f785dc3c"
+    }
+  ],
+  "limits": "Model observations only. Prior raw chapters imported for isolated check, no real author adoption. Each candidate checked against original adjacent chapters, not an already adopted edited series."
+}

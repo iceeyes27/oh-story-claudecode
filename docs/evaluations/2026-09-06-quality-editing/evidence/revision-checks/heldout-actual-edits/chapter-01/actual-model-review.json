@@ -1,0 +1,53 @@
+{
+  "reviewer": "root actual raw-prose and diff reading, with saved sequential model observations",
+  "reader_type": "model",
+  "status": "pass",
+  "original_sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7",
+  "candidate_sha256": "9f7395a26d46194b3be2d2987ca598eb50b2622ab2d1cd323f860a1e7a684083",
+  "diff_sha256": "bc05aedccef6c5b8ad72eebd7cd9d70b762871634a226745adf421297ce84141",
+  "facts_unchanged": true,
+  "findings": [
+    {
+      "severity": "advisory",
+      "message": "原则解释仍偏多；编辑不证明长篇追读收益。各章相邻原文中尚未采用的编辑不得当成已发生。"
+    }
+  ],
+  "original_anchor": "这问题该留在她手边，不能先落进说明牌。",
+  "candidate_anchor": "宋棠原本已准备沿着站员去找，听他这么说，就在草纸上写下衣服两个字，后面添了一个问号。",
+  "metric_source_updates": {},
+  "context": [
+    {
+      "path": "正文/第002章_借来的外套.md",
+      "sha256": "4c1c53dd528e46c5817580fbcd05ae50844d0bb32dc179a576a4352af8e123c0",
+      "anchor": "宋棠低头读：在旧站帮着搬了书，还得把剩下的信送完，晚些回。",
+      "assessment": "便条、借衣和电话邀请仍支撑第三章来访相认；第一章删一处原则复述不影响此章。原版过早排除职工方向仍单列为未采用相邻修订，不能宣称已修改。"
+    }
+  ],
+  "evidence_origin": [
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/blind/reviews/heldout-reader-H74-chapter-01.json",
+      "sha256": "59aee50485b4328621a155f17485ddde849f9542e7923f007693a1ad744572eb"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/blind/reviews/heldout-reader-H74-chapter-02.json",
+      "sha256": "1b4e1306c8f2b66eabc49cdc9fac5744fe99f6feef61192e9c9748b9a8ea84ce"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/blind/reviews/heldout-reader-H74-chapter-03.json",
+      "sha256": "379c84a2a58d1b9be005e414c0edb389010c9bc58cd07fb60136737af9e34f3a"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/blind/reviews/heldout-reader-H82-chapter-01.json",
+      "sha256": "e6e0b8505ddf5e4edbac28de2543bdf3b9a3ae753356cf470846268c9e9eba85"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/blind/reviews/heldout-reader-H82-chapter-02.json",
+      "sha256": "73e5579b806533fd21ccc5dea88ffceac469620f1ac8b6daf99da92de7f8ec6f"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/blind/reviews/heldout-reader-H82-chapter-03.json",
+      "sha256": "4c5ed567a939b2c124878e899e26915bad55dde697b1658cd867af759a5257dc"
+    }
+  ],
+  "limits": "Root read all three raw chapters and actual edit diffs; earlier readers used same-version sequential prose. This check binds original adjacent chapters, not an adopted edited series. No human or author adoption. Separate edited-series candidate checks supply cumulative evidence."
+}

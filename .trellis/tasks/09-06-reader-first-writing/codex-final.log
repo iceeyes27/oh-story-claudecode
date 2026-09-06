@@ -1,0 +1,15 @@
+Codex adapter check
+===================
+Repo: /Users/yolandahao/code/oh-story-claudecode
+OK: generated hooks are current (6 registrations)
+OK: Codex hook merge replaces v17 registrations and preserves user hooks
+  OK JSON/Python syntax
+  OK Windows encoding safety (UTF-8 stdio + file reads)
+  OK prose backstop parity surface (Stop net + SessionStart continuity)
+  OK .agents/skills discovery symlink (33 skills)
+  OK Codex custom-agent TOML (schema + generator determinism)
+  OK generated launcher routing + Python self-location + cmd.exe commandWindows
+  OK Codex agent canonical reference path
+  OK Codex docs/instruction anchors
+
+OK: Codex adapter checks passed

@@ -1,0 +1,25 @@
+{
+  "command": "python3 metadata/finish_handoff.py",
+  "exit_code": 0,
+  "checks": [
+    {
+      "chapter": 1,
+      "coverage_quotes_exact": true,
+      "protagonist_schema_valid": true,
+      "raw_equals_candidate": true
+    },
+    {
+      "chapter": 2,
+      "coverage_quotes_exact": true,
+      "protagonist_schema_valid": true,
+      "raw_equals_candidate": true
+    },
+    {
+      "chapter": 3,
+      "coverage_quotes_exact": true,
+      "protagonist_schema_valid": true,
+      "raw_equals_candidate": true
+    }
+  ],
+  "writes_tracking_state": false
+}

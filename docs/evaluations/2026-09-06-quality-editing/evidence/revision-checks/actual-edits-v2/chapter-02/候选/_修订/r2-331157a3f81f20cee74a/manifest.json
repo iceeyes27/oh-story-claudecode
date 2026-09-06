@@ -1,0 +1,22 @@
+{
+  "schema": "ordinary-revision/v1",
+  "chapter": 2,
+  "kind": "rhythm",
+  "summary": "根据真实模型顺读，缩短重复确认；保留人物认可与关系动作",
+  "final": "正文/第002章_鱼要有盖.md",
+  "inventory": {
+    "正文/第001章_一百块定金.md": "15ec5bd73635943c7e93cf30df3e095536dfaa9a4bf09a7762e806ae2d6cdb23",
+    "正文/第002章_鱼要有盖.md": "eb17d6a840aab5e97378e1c7af9b5aa593b2f2f24f424c33399b8e907f9bd746",
+    "正文/第003章_先等它凉下来.md": "b684cb6fc9e6738336ac0015e27da39ed6fb9af902239d7a548dcb65eb80c22a"
+  },
+  "context": {
+    "正文/第001章_一百块定金.md": "15ec5bd73635943c7e93cf30df3e095536dfaa9a4bf09a7762e806ae2d6cdb23",
+    "正文/第003章_先等它凉下来.md": "b684cb6fc9e6738336ac0015e27da39ed6fb9af902239d7a548dcb65eb80c22a"
+  },
+  "state_sha256": "2b7926d9185d78843cbcc310d7e66dbe85df8b9a99d294da6dce84304f7d2d4a",
+  "expected_state_revision": 0,
+  "original_sha256": "eb17d6a840aab5e97378e1c7af9b5aa593b2f2f24f424c33399b8e907f9bd746",
+  "candidate_sha256": "80971ff6ecaecc68d0f3c306d796ebb6135c0a6f9b353f3747b5b3ade4a933ad",
+  "diff_sha256": "9f2f722b04bebe3f12ed4796f65d1ae276d34bdee4f7c30195b11a9bbcf0f87d",
+  "operation": "r2-331157a3f81f20cee74a"
+}

@@ -1,0 +1,17 @@
+{
+  "definition": "正文去标题，按。！？!?分句，移除空白；句内标点计入，仅作风格统计",
+  "sentences": 124,
+  "average": 17.35483870967742,
+  "counts": {
+    "short_lt_15": 58,
+    "medium_15_30": 50,
+    "long_gt_30": 16
+  },
+  "percent": {
+    "short_lt_15": 46.77,
+    "medium_15_30": 40.32,
+    "long_gt_30": 12.9
+  },
+  "raw_sha256": "15ec5bd73635943c7e93cf30df3e095536dfaa9a4bf09a7762e806ae2d6cdb23",
+  "candidate_sha256": "15ec5bd73635943c7e93cf30df3e095536dfaa9a4bf09a7762e806ae2d6cdb23"
+}

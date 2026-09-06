@@ -1,0 +1,19 @@
+{
+  "time": "2026-09-06T06:42:17.779130+00:00",
+  "stage": "raw_saved_candidate_copied_no_edit",
+  "command": [
+    "node",
+    "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/scripts/check-ai-patterns.js",
+    "--check",
+    "--fail-on=blocking",
+    "--json",
+    "--book-dir",
+    "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed",
+    "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/候选/第002章_这边放鱼.md"
+  ],
+  "exit_code": 0,
+  "stdout": "{\n  \"findings\": [\n    {\n      \"file\": \"/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/候选/第002章_这边放鱼.md\",\n      \"line\": 16,\n      \"column\": 1,\n      \"type\": \"micro-action-tic\",\n      \"severity\": \"advisory\",\n      \"message\": \"微动作复读：「了下/了一下」式轻量补语 9 处（7.0/千字）；同一反应模板高密度复现是机械指纹，合并动作 beat、换具体细节，别每个动作都补一个轻反应尾巴。\",\n      \"excerpt\": \"了一下 了口 了一眼 了一圈 了下 了两口\",\n      \"category\": \"density\",\n      \"source\": \"shared-system\",\n      \"scope\": \"prose\"\n    },\n    {\n      \"file\": \"/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/候选/第002章_这边放鱼.md\",\n      \"line\": 28,\n      \"column\": 34,\n      \"type\": \"formulaic-parallelism\",\n      \"severity\": \"advisory\",\n      \"message\": \"同动词「不V A，不V B」容易写成否定清单；含台词也要按语境复核，保留真正有功能的一项即可。\",\n      \"excerpt\": \"不能扣住，不能就直说\",\n      \"category\": \"contextual\",\n      \"source\": \"shared-system\",\n      \"scope\": \"prose\"\n    },\n    {\n      \"file\": \"/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/候选/第002章_这边放鱼.md\",\n      \"line\": 71,\n      \"column\": 24,\n      \"type\": \"em-dash\",\n      \"severity\": \"advisory\",\n      \"message\": \"破折号按功能改写：打断→动作 beat/短句，拖长音→省略或动作，插入说明→逗号/冒号；勿一律改句号。\",\n      \"excerpt\": \"家鱼多，得先把货——\\\"\",\n      \"category\": \"contextual\",\n      \"source\": \"shared-system\",\n      \"scope\": \"prose\"\n    }\n  ]\n}\n",
+  "stderr": "",
+  "raw_sha256": "ee4a5209878e555013a0b2c16d9ea5b4a7e5fab64ab3fb94b03bb773df3381db",
+  "candidate_sha256": "ee4a5209878e555013a0b2c16d9ea5b4a7e5fab64ab3fb94b03bb773df3381db"
+}

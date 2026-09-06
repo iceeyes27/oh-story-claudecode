@@ -1,0 +1,112 @@
+{
+  "reader_type": "model",
+  "reader_id": "resume-reader-c",
+  "version": "H82",
+  "chapter": 1,
+  "actual_version_order": [
+    "H82",
+    "H74"
+  ],
+  "summary": "宋棠在旧站照片展开幕前收到完整合影，发现墙图裁掉第五人。她核对职工名单，区分齐叔的真实记忆与猜测，暂留姓名空行，并联系寄件人程雪携另一张照片前来。",
+  "rc-01": {
+    "status": "pass",
+    "findings": [],
+    "evidence": [
+      {
+        "anchor": "青平码头旧站的照片展下午开放。她刚接手这份整理工作",
+        "reason": "宋棠的工作、场景与当日任务就地交代，说明牌的用途清楚。",
+        "source_chapter": 1
+      },
+      {
+        "anchor": "他退休以前在旧站上班，今天一早就来了",
+        "reason": "齐叔为何能辨认人员、为何在场均有正文依据。",
+        "source_chapter": 1
+      },
+      {
+        "anchor": "我姓程，程雪。另一张在我这里。",
+        "reason": "程雪以寄件电话对话首次具名，不要求此时知道她与第五人的关系。",
+        "source_chapter": 1
+      }
+    ]
+  },
+  "rc-02": {
+    "status": "pass",
+    "findings": [],
+    "evidence": [
+      {
+        "anchor": "四名职工能对上四个人，并不能说明合影只能有四个人。",
+        "reason": "由名单类别发现统计范围不等于照片全部人员，补名动机与认人步骤衔接。",
+        "source_chapter": 1
+      },
+      {
+        "anchor": "背面右下角有个旧编号十八，旁边用铅笔写着十七同日。",
+        "reason": "寻找另一张照片的前因在原片背面，当场可追。",
+        "source_chapter": 1
+      },
+      {
+        "anchor": "寄件人一栏没写姓名，联系电话却还在",
+        "reason": "电话联系有明确号码来源，没有凭空取得联系方式。",
+        "source_chapter": 1
+      }
+    ]
+  },
+  "rc-03": {
+    "status": "pass",
+    "findings": [],
+    "evidence": [
+      {
+        "anchor": "她把原片往右挪了挪，让那张脸露在大图外面。",
+        "reason": "原片与墙图并排比对的动作能理解，裁切位置和第五人方位明确。",
+        "source_chapter": 1
+      },
+      {
+        "anchor": "齐叔嗯了一声，把照片还给她。",
+        "reason": "原片先交齐叔辨认、再回宋棠，之后翻背与拨电话的物件连续性完整。",
+        "source_chapter": 1
+      },
+      {
+        "anchor": "她把椅子旁堆着的空画框移开，给程雪留出坐的位置。",
+        "reason": "程雪仍未到场，清出座位是等待动作；空间人物没有混入。",
+        "source_chapter": 1
+      }
+    ]
+  },
+  "interest": {
+    "reread_or_skip": [
+      {
+        "anchor": "她弯腰捡起，才发现衣袖在照片里。",
+        "type": "brief_reread",
+        "reason": "开头先把衣袖写得像实物，下一句迅速纠正；需很短的视觉重组，不构成理解断点。",
+        "severity": "advisory"
+      },
+      {
+        "anchor": "问号挂在别人名字下面，看起来像是在问那人到底该不该站在这里。",
+        "type": "slight_skip_impulse",
+        "reason": "解释空行的象征意味稍多，行动已经表达尊重；仍不妨碍顺读。",
+        "severity": "advisory"
+      }
+    ],
+    "specific_choices": [
+      "宋棠追问路过是记忆还是站位推断，并拒绝直接用路过定性。",
+      "齐叔主动撤回路过说法，愿意继续辨认。",
+      "宋棠承诺放完整照片，姓名暂空，避免凭衣服认身份。"
+    ],
+    "emotional_payoff": "齐叔承认说不准又担心把帮忙者说成凑热闹，人物有可感的退让；补名尚未兑现，等待程雪带来事实。",
+    "continue_reading": "愿继续。另一张照片和程雪要求先别写故事形成明确、有限的待解问题。",
+    "money_and_practice": "没有金额或专业制度操作；从寄件包装取号码、辨原片和旧编号都在普通场景内。"
+  },
+  "confirmed_breaks": [],
+  "boundary_cases": [
+    {
+      "anchor": "先别替她写什么故事，等我到了再说。",
+      "severity": "advisory",
+      "reason": "这是有意延后解释身份的悬念，尚无应当提前交代的必要，不记阻断。"
+    },
+    {
+      "anchor": "衣服谁都能穿，我不敢凭这个认。",
+      "severity": "advisory",
+      "reason": "正文主动限制制服证据，不能据此认定第五人一定是职工，也不把尚未查明算缺漏。"
+    }
+  ],
+  "reading_scope": "只读本版本第 1 章；未读下一章、任何辅助材料或其他读者报告。"
+}

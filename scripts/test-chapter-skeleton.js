@@ -75,9 +75,24 @@ try {
   const expansionResult = JSON.parse(run([missingExpansionField, '--json'], 1).stdout);
   assert(expansionResult.results[0].blocking.some((item) => item.code === 'missing-expansion-field'));
 
-  const tooFewScenes = write('第003章_场景不足.md', skeleton({ scenes: [1200, 1300] }));
-  const countResult = JSON.parse(run([tooFewScenes, '--json'], 1).stdout);
+  for (const budgets of [[2500], [1200, 1300], [800, 800, 900], [300, 300, 300, 400, 400, 400, 400]]) {
+    const file = write(`第003章_${budgets.length}场.md`, skeleton({ scenes: budgets }));
+    const result = JSON.parse(run([file, '--json'], 0).stdout);
+    assert.strictEqual(result.blocking, 0, `${budgets.length} scenes should be valid`);
+  }
+
+  const noScenes = write('第003章_无场景.md', skeleton({ scenes: [] }));
+  const countResult = JSON.parse(run([noScenes, '--json'], 1).stdout);
   assert(countResult.results[0].blocking.some((item) => item.code === 'scene-count'));
+
+  const badSceneNumber = write('第010章_场景编号错误.md', skeleton().replace('## 场景 2', '## 场景 4'));
+  const sceneNumberResult = JSON.parse(run([badSceneNumber, '--json'], 1).stdout);
+  assert(sceneNumberResult.results[0].blocking.some((item) => item.code === 'scene-sequence'));
+  assert(sceneNumberResult.results[0].blocking.some((item) => item.code === 'invalid-coverage-scene'));
+
+  const duplicateScene = write('第011章_场景编号重复.md', skeleton().replace('## 场景 2', '## 场景 1'));
+  const duplicateSceneResult = JSON.parse(run([duplicateScene, '--json'], 1).stdout);
+  assert(duplicateSceneResult.results[0].blocking.some((item) => item.code === 'duplicate-scene'));
 
   const budgetMismatch = write('第004章_预算错误.md', skeleton({ scenes: [700, 800, 900] }));
   const budgetResult = JSON.parse(run([budgetMismatch, '--json'], 1).stdout);

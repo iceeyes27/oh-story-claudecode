@@ -1,0 +1,22 @@
+{
+  "schema_version": 1,
+  "book_title": "小满修理铺（隔离流程模拟）",
+  "last_chapter": 0,
+  "context": {
+    "position": {
+      "volume": "第一单",
+      "volume_start_chapter": 1,
+      "story_time": "开门前",
+      "scene": "修理铺"
+    },
+    "long_term_constraints": [],
+    "active_character_names": [],
+    "continuity_risks": [],
+    "recent_chapters": [],
+    "next_chapter_commitments": []
+  },
+  "character_snapshots": {},
+  "foreshadow": [],
+  "timeline_events": [],
+  "metrics": {}
+}

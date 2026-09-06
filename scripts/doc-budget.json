@@ -23,7 +23,7 @@
     {
       "path": "skills/story-write/references/long-mode.md",
       "budget": 27500,
-      "why": "mode=long 的完整流程（场景路由、Phase 1-5、候选/骨架规则、质量检查、参考索引），任一长篇请求都加载"
+      "why": "长篇编排参考，按当前阶段定位；正文写手不读取整份流程"
     },
     {
       "path": "skills/story-write/references/short-mode.md",
@@ -43,7 +43,7 @@
     {
       "path": "skills/story-write/references/writing-craft.md",
       "budget": 9100,
-      "why": "正文写作全程参考，长篇/短篇写作 agent 都会读；增加反套式身体反应规则后显式调整预算"
+      "why": "长篇有具体技法问题时按需读取；短篇沿其专项流程"
     },
     {
       "path": "skills/_shared/references/banned-words.md",
@@ -59,6 +59,11 @@
       "path": "skills/story-setup/references/templates/agents/narrative-writer.md",
       "budget": 14000,
       "why": "部署到项目的正文 agent 模板，每次 spawn narrative-writer 都全量加载"
+    },
+    {
+      "path": "skills/story-write/references/reader-first-writing.md",
+      "budget": 2600,
+      "why": "普通长篇写手的紧凑规则；替代默认完整技法读取，新增预算由旧热路径减少抵消。"
     }
   ],
   "paths": [
@@ -81,13 +86,12 @@
       ]
     },
     {
-      "label": "正文 agent 上下文",
-      "budget": 54000,
+      "label": "普通长篇正文 agent 固定参考",
+      "budget": 18500,
       "files": [
         "skills/story-setup/references/templates/agents/narrative-writer.md",
-        "skills/story-write/references/writing-craft.md",
-        "skills/_shared/references/anti-ai-writing.md",
-        "skills/_shared/references/banned-words.md"
+        "skills/story-write/references/reader-first-writing.md",
+        "skills/story-write/references/long-format.md"
       ]
     }
   ]

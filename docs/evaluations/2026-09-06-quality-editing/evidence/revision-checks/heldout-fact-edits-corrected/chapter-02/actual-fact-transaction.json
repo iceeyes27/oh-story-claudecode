@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "mode": "revision",
+  "chapter": 2,
+  "chapter_title": "借来的外套",
+  "expected_state_revision": 0,
+  "delta": {
+    "result": "程雪到场后直接说明第五人是母亲，出示另一照片和便条。宋棠撤销凭外套推断职业的依据，读出搬书后还须送信；程雪先询问母亲意愿，齐叔愿一起核对。",
+    "character_changes": [],
+    "foreshadow_changes": [],
+    "timeline_events": [],
+    "constraints": [],
+    "next_chapter_commitments": [
+      "程雪电话问母亲意愿",
+      "齐叔答应留在展厅一起核对"
+    ]
+  },
+  "context": {
+    "position": {
+      "volume": "照片展",
+      "volume_start_chapter": 1,
+      "story_time": "当天",
+      "scene": "开放后的旧站照片展展厅"
+    },
+    "long_term_constraints": [],
+    "active_character_names": [
+      "宋棠"
+    ],
+    "continuity_risks": []
+  },
+  "character_snapshots": {},
+  "metrics": {},
+  "metrics_unchanged_reason": "照片展修订不涉及收支或数值结算"
+}

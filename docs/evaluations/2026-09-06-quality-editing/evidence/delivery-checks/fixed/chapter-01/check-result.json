@@ -1,0 +1,8 @@
+{
+  "chapter": 1,
+  "project": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/delivery-checks/fixed/chapter-01",
+  "exit_code": 1,
+  "stdout": "",
+  "stderr": "ERROR: 细纲 INTENT_FIELDS 缺失或无实际内容：目标情绪、结尾拍ID/类型、期待ID/类型、读者验收预期\n",
+  "adopted": false
+}

@@ -1,0 +1,28 @@
+{
+  "id": "novel-quality-editing",
+  "name": "novel-quality-editing",
+  "title": "第二轮小说质量：人物设计、局部编辑与修订交付",
+  "description": "执行经子 Agent 复审的六项方案，完成隔离生成、顺读、编辑和候选检查。",
+  "status": "review",
+  "priority": "P1",
+  "creator": "codex",
+  "assignee": "codex",
+  "createdAt": "2026-09-06",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "main",
+  "commit": null,
+  "pr_url": null,
+  "children": [],
+  "parent": null,
+  "notes": "Six implementation items and evidence delivery complete. Held-out raw/edited three-chapter candidate checks and three ordinary revision checks passed after preserving and correcting trial-input failures. Independent reverse-order reading complete with modest benefits and tradeoffs recorded. Current code has 15/15 per-check passing evidence (13/15 original run plus 2 process-environment rechecks). Artifact integrity PASS; author/human acceptance pending. No real-book writes, author adoption, commit or push.",
+  "meta": {
+    "delivery": "docs/evaluations/2026-09-06-quality-editing/README.md",
+    "implementation_status": "complete",
+    "human_acceptance": "pending",
+    "evidence_status": "complete",
+    "engineering_acceptance": "pass",
+    "delivery_integrity": "docs/evaluations/2026-09-06-quality-editing/checks/delivery-integrity.json",
+    "validation": "docs/evaluations/2026-09-06-quality-editing/checks/resume-validation.json"
+  }
+}

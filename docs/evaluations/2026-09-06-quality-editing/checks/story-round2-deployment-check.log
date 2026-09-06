@@ -1,0 +1,20 @@
+Story setup deployment check
+============================
+Repo: /Users/yolandahao/code/oh-story-claudecode
+  OK TS1 hook dependency completeness
+  OK TS1b session-start self-check lists all hook scripts and node cores
+  OK TS2 deployment manifest
+  OK TS3 agent reference integrity
+  OK TS4 hook root resolution
+  OK TS5 sentinel diagnostics
+  OK TS6 short project non-mutation
+  OK TS7 commit hook self-gating
+  OK TS8 multi-book gap detection
+  OK TS9 settings JSON + Bash success/failure registration
+  OK TS10 version + behavior anchors
+  OK TS11 outline-before-prose guard
+  OK TS11b outline guard bash-fallback (Write/Edit) + Bash fail-open without node
+  OK TS11c outline guard: Write/Edit bash-fallback blocks, Bash fail-opens when node broken
+  OK TS12 restart-flag confirmation
+
+OK: story-setup deployment checks passed

@@ -1,0 +1,30 @@
+{
+  "id": "reader-first-writing",
+  "name": "reader-first-writing",
+  "title": "读者体验优先：规则清理与三章对照",
+  "description": "执行已确认的第一轮方案：规则一致性、精简成稿流程、独立测试项目的连续三章对照与诚实验收。",
+  "status": "review",
+  "dev_type": null,
+  "scope": null,
+  "package": null,
+  "priority": "P1",
+  "creator": "codex",
+  "assignee": "codex",
+  "createdAt": "2026-09-06",
+  "completedAt": null,
+  "branch": null,
+  "base_branch": "main",
+  "worktree_path": null,
+  "commit": null,
+  "pr_url": null,
+  "subtasks": [],
+  "children": [],
+  "parent": null,
+  "relatedFiles": [],
+  "notes": "First-round implementation and evidence delivery complete. 15/15 aggregate checks plus final documentation checks passed. Three arms x three raw chapters and three isolated model readings preserved. Awaiting author/human reading feedback; no production prose adoption, commit, push, or real-book deployment.",
+  "meta": {
+    "delivery": "docs/evaluations/2026-09-06-reader-first/README.md",
+    "implementation_status": "complete",
+    "human_acceptance": "pending"
+  }
+}

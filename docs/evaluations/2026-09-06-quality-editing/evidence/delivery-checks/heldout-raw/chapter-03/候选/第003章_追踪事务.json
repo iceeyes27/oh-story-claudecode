@@ -1,0 +1,219 @@
+{
+  "schema_version": 1,
+  "mode": "append",
+  "chapter": 3,
+  "chapter_title": "林琴",
+  "expected_state_revision": 0,
+  "delta": {
+    "result": "林琴到场，与齐叔对上搬书位置、午后雨天、借衣及归还细节，并确认便条与邮递员身份。她纠正夸大功劳，母女同意署名。宋棠补齐说明牌，开放后观众循姓名认出照片第五人。",
+    "character_changes": [
+      {
+        "name": "宋棠",
+        "change": "填满姓名空行，已完成第五人的核对与署名"
+      }
+    ],
+    "foreshadow_changes": [],
+    "timeline_events": [],
+    "constraints": [],
+    "next_chapter_commitments": []
+  },
+  "context": {
+    "position": {
+      "volume": "照片展",
+      "volume_start_chapter": 1,
+      "story_time": "当天",
+      "scene": "开放后的旧站照片展展厅"
+    },
+    "long_term_constraints": [],
+    "active_character_names": [
+      "宋棠"
+    ],
+    "continuity_risks": []
+  },
+  "character_snapshots": {
+    "宋棠": {
+      "identity": "社区旧站照片展整理者",
+      "location": "开放后的旧站照片展展厅",
+      "goal": "继续听其他照片里普通人的经历，再落笔记录",
+      "state": "填满姓名空行，已完成第五人的核对与署名",
+      "abilities_resources": [
+        "完整合影和同日另一照片已展出",
+        "林琴署名与搬书事实说明牌",
+        "现场笔记"
+      ],
+      "relationships": [
+        "林琴同意写明姓名和实际帮忙事实",
+        "程雪同意并列展出两张照片",
+        "齐叔与林琴通过旧事认出彼此"
+      ],
+      "knowledge": [
+        "第五人姓名林琴，当年为邮递员",
+        "林琴只是路过搭手，未独自救下所有书",
+        "外套由站员借出",
+        "旧名单只列职工，无需推断恶意抹名"
+      ],
+      "open_threads": []
+    }
+  },
+  "metrics": {},
+  "candidate_binding": {
+    "schema_version": 2,
+    "quality_profile": "fanqie-long-v2",
+    "prose": {
+      "path": "候选/第003章_林琴.md",
+      "sha256": "1d6fc41fb79441cb1ac221037e1ba63e50d7853e69d0b05283551d76bbf4bc36"
+    },
+    "outline": {
+      "path": "大纲/细纲_第003章.md",
+      "sha256": "dfd47519e727acfd66cf6a04ad9e5228235a3b5fe64fd0713dabd3ac82eda479"
+    },
+    "skeleton": {
+      "path": "骨架/第003章_林琴.md",
+      "sha256": "550f3bea301b24e11a9058698da0e87064eca4e10f911540c2a250209babb5ed"
+    },
+    "coverage": [
+      {
+        "id": "O-01",
+        "evidence": "阿姨往照片里的门指了指：\"进门靠左。外头雨大，水往这边泼，放地上的书先往高处搬。\""
+      },
+      {
+        "id": "O-02",
+        "evidence": "\"林琴。树林的林，弹琴的琴。\""
+      },
+      {
+        "id": "O-03",
+        "evidence": "\"我今天就是照这个给她认的。四个，都是站里上班的。你借了衣服，我还有点往同事上想，越想越不对。\""
+      },
+      {
+        "id": "O-04",
+        "evidence": "林琴看了一会儿那道空行，说：\"那就写上。写对了就行。\""
+      },
+      {
+        "id": "O-05",
+        "evidence": "她把本子翻到下一张空白页，等有人愿意讲讲别的照片。今天她想多听一会儿，再落笔。"
+      }
+    ],
+    "logic_checks": {
+      "rc-01": {
+        "run_id": "native-heldout-reader-H74-3-rc-01",
+        "status": "pass",
+        "findings": [],
+        "evidence": [
+          {
+            "path": "候选/第003章_林琴.md",
+            "anchor": "林琴。树林的林，弹琴的琴。"
+          },
+          {
+            "path": "候选/第003章_林琴.md",
+            "anchor": "嗯，送这附近的。路过站门口，见他们怕书淋湿，就进去搭把手。你们别说成我把书都抢出来了，他们已经搬了好些。"
+          },
+          {
+            "path": "候选/第003章_林琴.md",
+            "anchor": "后来换了这只。这个结实。"
+          }
+        ],
+        "candidate_sha256": "1d6fc41fb79441cb1ac221037e1ba63e50d7853e69d0b05283551d76bbf4bc36",
+        "prose_files": [
+          {
+            "path": "正文/第001章_空着的位置.md",
+            "sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7"
+          },
+          {
+            "path": "正文/第002章_借来的外套.md",
+            "sha256": "4c1c53dd528e46c5817580fbcd05ae50844d0bb32dc179a576a4352af8e123c0"
+          },
+          {
+            "path": "候选/第003章_林琴.md",
+            "sha256": "1d6fc41fb79441cb1ac221037e1ba63e50d7853e69d0b05283551d76bbf4bc36"
+          }
+        ],
+        "prose_set_sha256": "2b797db6eb5fcf68e38dc3a7fa1de61b4df096b44fe0f5491216026537c593d5",
+        "result_sha256": "271ba180b3061caf9af20452fb66cff4a651650b956c6752af6714194c4a916e"
+      },
+      "rc-02": {
+        "run_id": "native-heldout-reader-H74-3-rc-02",
+        "status": "pass",
+        "findings": [
+          {
+            "severity": "nonblocking",
+            "anchor": "宋棠看过去，合影前面那个木箱确实端正些，箱口搭着布。她早上用它对上两张同样的合影，并没把它和较早照片里的那只当成一回事。现在两个参与搬书的人说起箱子，前后就接上了。",
+            "observation": "第一章齐叔看最终合影说这个箱子漏底，第三章却将最终合影里的箱子说成后来换的结实箱子；现在用前后接上了概括，掩盖了回忆对象的冲突。可以理解总体上发生过漏箱与换箱，但若把这段当双方记忆互证，读者缺少明确的纠正环节。此处不阻断姓名及展览结局的理解。"
+          }
+        ],
+        "evidence": [
+          {
+            "path": "正文/第001章_空着的位置.md",
+            "anchor": "这就是搬书那天。我记得这箱子，底下漏了，托着走才没散。"
+          },
+          {
+            "path": "候选/第003章_林琴.md",
+            "anchor": "阿姨转向合影：\"后来换了这只。这个结实。\""
+          },
+          {
+            "path": "候选/第003章_林琴.md",
+            "anchor": "第二天。我从窗口递进去，你还问我怎么不进来喝口水。"
+          },
+          {
+            "path": "候选/第003章_林琴.md",
+            "anchor": "我想让看照片的人知道你叫什么。"
+          }
+        ],
+        "candidate_sha256": "1d6fc41fb79441cb1ac221037e1ba63e50d7853e69d0b05283551d76bbf4bc36",
+        "prose_files": [
+          {
+            "path": "正文/第001章_空着的位置.md",
+            "sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7"
+          },
+          {
+            "path": "正文/第002章_借来的外套.md",
+            "sha256": "4c1c53dd528e46c5817580fbcd05ae50844d0bb32dc179a576a4352af8e123c0"
+          },
+          {
+            "path": "候选/第003章_林琴.md",
+            "sha256": "1d6fc41fb79441cb1ac221037e1ba63e50d7853e69d0b05283551d76bbf4bc36"
+          }
+        ],
+        "prose_set_sha256": "2b797db6eb5fcf68e38dc3a7fa1de61b4df096b44fe0f5491216026537c593d5"
+      },
+      "rc-03": {
+        "run_id": "native-heldout-reader-H74-3-rc-03",
+        "status": "pass",
+        "findings": [],
+        "evidence": [
+          {
+            "path": "候选/第003章_林琴.md",
+            "anchor": "我的字。给家里留的，怕他们等饭。搬完书还有信要送，回去就晚了。"
+          },
+          {
+            "path": "候选/第003章_林琴.md",
+            "anchor": "我又没在站里领工资，职工名单上当然没有我。"
+          },
+          {
+            "path": "候选/第003章_林琴.md",
+            "anchor": "那就写上。写对了就行。"
+          },
+          {
+            "path": "候选/第003章_林琴.md",
+            "anchor": "宋棠又问程雪，两张照片能不能并着展出，让大家看清搬书的前后。程雪答应了。"
+          }
+        ],
+        "candidate_sha256": "1d6fc41fb79441cb1ac221037e1ba63e50d7853e69d0b05283551d76bbf4bc36",
+        "prose_files": [
+          {
+            "path": "正文/第001章_空着的位置.md",
+            "sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7"
+          },
+          {
+            "path": "正文/第002章_借来的外套.md",
+            "sha256": "4c1c53dd528e46c5817580fbcd05ae50844d0bb32dc179a576a4352af8e123c0"
+          },
+          {
+            "path": "候选/第003章_林琴.md",
+            "sha256": "1d6fc41fb79441cb1ac221037e1ba63e50d7853e69d0b05283551d76bbf4bc36"
+          }
+        ],
+        "prose_set_sha256": "2b797db6eb5fcf68e38dc3a7fa1de61b4df096b44fe0f5491216026537c593d5"
+      }
+    }
+  }
+}

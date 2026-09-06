@@ -1,0 +1,8 @@
+Shared File Governance Check
+============================
+OK: 14 canonical groups manage 31 synchronized copies
+Shared references: 71 groups / 83 synchronized copies
+Reference similarity: no undeclared candidates at J>=85% or containment>=95%; 10 derived groups declared
+Agent reference consumers: 68 deployed Markdown files reachable from 30 direct agent roots; profile contract 4 common / 12 long / 7 short
+Short analysis scope: 5 observational rubrics; no legacy long-form playbook tokens
+All declared shared files are consistent; no unmanaged exact or near-identical reference copies found.

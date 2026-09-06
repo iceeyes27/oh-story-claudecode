@@ -1,0 +1,60 @@
+{
+  "summary": "林琴到场，齐叔明确纠正早上把新箱记为漏底旧箱的错误；双方通过搬书、借衣及归还细节相认。林琴确认邮递员身份、实际帮忙范围并同意署名。宋棠补全说明牌，观众循姓名找到合影第五人。",
+  "protagonist": {
+    "identity": "社区旧站照片展整理者",
+    "location": "开放后的旧站照片展展厅",
+    "goal": "继续听其他照片里普通人的经历，再落笔记录",
+    "state": "填满姓名空行，已完成第五人的核对与署名",
+    "abilities_resources": [
+      "完整合影和同日另一照片已展出",
+      "林琴署名与搬书事实说明牌",
+      "现场笔记"
+    ],
+    "relationships": [
+      "林琴同意写明姓名和实际帮忙事实",
+      "程雪同意并列展出两张照片",
+      "齐叔与林琴通过旧事认出彼此"
+    ],
+    "knowledge": [
+      "第五人姓名林琴，当年为邮递员",
+      "林琴只是路过搭手，未独自救下所有书",
+      "外套由站员借出",
+      "旧名单只列职工，无需推断恶意抹名",
+      "齐叔已承认早上记混了旧箱与最终合影的新箱"
+    ],
+    "open_threads": []
+  },
+  "commitments": [],
+  "coverage": [
+    {
+      "id": "O-01",
+      "evidence": "阿姨往照片里的门指了指：\"进门靠左。外头雨大，水往这边泼，放地上的书先往高处搬。\""
+    },
+    {
+      "id": "O-02",
+      "evidence": "\"林琴。树林的林，弹琴的琴。\""
+    },
+    {
+      "id": "O-03",
+      "evidence": "\"我今天就是照这个给她认的。四个，都是站里上班的。你借了衣服，我还有点往同事上想，越想越不对。\""
+    },
+    {
+      "id": "O-04",
+      "evidence": "林琴看了一会儿那道空行，说：\"那就写上。写对了就行。\""
+    },
+    {
+      "id": "O-05",
+      "evidence": "她把本子翻到下一张空白页，等有人愿意讲讲别的照片。今天她想多听一会儿，再落笔。"
+    }
+  ],
+  "metrics": {},
+  "chapter": 3,
+  "source_raw_sha256": "007895da5b8462dbf3cc27fc9c4e930966cc51f280a3ef9d77a8b18b7807578e",
+  "status": "post_edit_fact_extraction_by_root_after_reading_all_raw_chapters_and_actual_diffs",
+  "extraction_origin": {
+    "original_metadata": "/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/metadata/chapter-03.postwrite.json",
+    "sha256": "2fcadbf576152e9aeda2243e7aec8582fc4b0dd84f0c5d498ef97cdfb25ddb5e",
+    "edited_prose": "/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/edited/第003章_林琴.md",
+    "reason": "Refresh summary/knowledge and a moved evidence anchor after the one recorded edit pass; no original evidence overwritten."
+  }
+}

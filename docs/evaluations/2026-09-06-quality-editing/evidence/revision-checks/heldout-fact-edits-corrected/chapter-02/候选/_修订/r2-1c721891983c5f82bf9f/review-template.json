@@ -1,0 +1,27 @@
+{
+  "reviewer": "",
+  "reader_type": "model",
+  "status": "pending",
+  "original_sha256": "4c1c53dd528e46c5817580fbcd05ae50844d0bb32dc179a576a4352af8e123c0",
+  "candidate_sha256": "4562594295f276b26e4fd3de4431c7c2acb8f52101852bac8faab9148650508d",
+  "diff_sha256": "a456e5ce66b02793c2ed1ebc8d081044639a0cad553196ac1a347fc7aac8e26e",
+  "facts_unchanged": null,
+  "findings": [],
+  "original_anchor": "",
+  "candidate_anchor": "",
+  "metric_source_updates": {},
+  "context": [
+    {
+      "path": "正文/第001章_空着的位置.md",
+      "sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7",
+      "anchor": "",
+      "assessment": ""
+    },
+    {
+      "path": "正文/第003章_林琴.md",
+      "sha256": "1d6fc41fb79441cb1ac221037e1ba63e50d7853e69d0b05283551d76bbf4bc36",
+      "anchor": "",
+      "assessment": ""
+    }
+  ]
+}

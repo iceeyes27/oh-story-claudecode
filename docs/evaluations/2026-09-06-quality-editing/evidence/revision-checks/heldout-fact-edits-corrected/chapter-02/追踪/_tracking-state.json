@@ -1,0 +1,65 @@
+{
+  "book_title": "空着的位置（隔离流程模拟）",
+  "chapter_gaps": [],
+  "characters": {
+    "宋棠": {
+      "abilities_resources": [
+        "完整合影和同日另一照片已展出",
+        "林琴署名与搬书事实说明牌",
+        "现场笔记"
+      ],
+      "goal": "继续听其他照片里普通人的经历，再落笔记录",
+      "identity": "社区旧站照片展整理者",
+      "knowledge": [
+        "第五人姓名林琴，当年为邮递员",
+        "林琴只是路过搭手，未独自救下所有书",
+        "外套由站员借出",
+        "旧名单只列职工，无需推断恶意抹名"
+      ],
+      "location": "开放后的旧站照片展展厅",
+      "open_threads": [],
+      "relationships": [
+        "林琴同意写明姓名和实际帮忙事实",
+        "程雪同意并列展出两张照片",
+        "齐叔与林琴通过旧事认出彼此"
+      ],
+      "state": "填满姓名空行，已完成第五人的核对与署名"
+    }
+  },
+  "context": {
+    "active_character_names": [
+      "宋棠"
+    ],
+    "continuity_risks": [],
+    "long_term_constraints": [],
+    "next_chapter_commitments": [],
+    "position": {
+      "scene": "开放后的旧站照片展展厅",
+      "story_time": "当天",
+      "volume": "照片展",
+      "volume_start_chapter": 1
+    },
+    "recent_chapters": [
+      {
+        "chapter": 1,
+        "summary": "宋棠收到完整合影，发现墙图裁去边缘半个人。四名职工与五人照片对不上，齐叔不敢认人，她留空姓名，借背面编号及包装电话约到程雪。"
+      },
+      {
+        "chapter": 2,
+        "summary": "程雪承认寄件，出示同日照片和便条。宋棠确认外套曾在站员身上，不能据此认职业，便条引向搬书后还要送信的人。程雪承认是母亲并先电话询问，齐叔愿一起核对。"
+      },
+      {
+        "chapter": 3,
+        "summary": "林琴到场，与齐叔对上搬书位置、午后雨天、借衣及归还细节，并确认便条与邮递员身份。她纠正夸大功劳，母女同意署名。宋棠补齐说明牌，开放后观众循姓名认出照片第五人。"
+      }
+    ]
+  },
+  "foreshadow": {},
+  "imported_through_chapter": 3,
+  "last_committed_chapter": 3,
+  "metrics": {},
+  "schema_version": 4,
+  "state_revision": 0,
+  "timeline": {},
+  "wordcount_records": {}
+}

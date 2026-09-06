@@ -1,0 +1,24 @@
+{
+  "source": "inputs/story-input.json",
+  "decision": "仅在已批准三章边界内具体化表现",
+  "chapters": [
+    {
+      "chapter": 1,
+      "problem": "查人数易写成名册核验步骤",
+      "chosen_interaction": "齐叔珍惜老同伴的合影，但怕自己说错；宋棠既不顺从猜测，也不把缺名指成恶意。留空行是她当场选择。",
+      "rejected_alternative": "指控旧站蓄意裁人，超越题材边界。"
+    },
+    {
+      "chapter": 2,
+      "problem": "女儿提供资料易成为单向信息倾倒",
+      "chosen_interaction": "程雪先看见空行才愿意取出资料；宋棠想及时补名，程雪把母亲意愿放在前面。两人用另一照片推翻外套职业判断。",
+      "rejected_alternative": "追加取证阻碍或调查第三人，未获授权。"
+    },
+    {
+      "chapter": 3,
+      "problem": "核对事实易重复前章清点",
+      "chosen_interaction": "林琴和齐叔先各自认位置，借衣与搬书由记忆差异接话对上；她主动限制展牌的夸赞，宋棠保留准确的普通搭手。",
+      "rejected_alternative": "再加隐瞒身份或大恩怨以制造高潮。"
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "time": "2026-09-06T06:45:41.006495+00:00",
+  "stage": "raw_saved_candidate_copied_no_edit",
+  "command": [
+    "node",
+    "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/_shared/scripts/check-ai-patterns.js",
+    "--check",
+    "--fail-on=blocking",
+    "--json",
+    "--book-dir",
+    "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed",
+    "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed/候选/第003章_等凉了再收钱.md"
+  ],
+  "exit_code": 0,
+  "stdout": "{\n  \"findings\": []\n}\n",
+  "stderr": "",
+  "raw_sha256": "29cbf0518e010ce7675daa1bf9d7b796fc52d5dd597c27f60f83c8458634156f",
+  "candidate_sha256": "29cbf0518e010ce7675daa1bf9d7b796fc52d5dd597c27f60f83c8458634156f"
+}

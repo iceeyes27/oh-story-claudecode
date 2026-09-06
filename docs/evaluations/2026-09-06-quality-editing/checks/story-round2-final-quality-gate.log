@@ -1,0 +1,506 @@
+
+[quality] sync-unit
+Preparing worktree (new branch 'codex/sync-upstream-efd2ed99e70e-mtpg1gwa')
+HEAD is now at ab4a5de base
+Automatic merge went well; stopped before committing as requested
+✔ policy priority preserves fork boundaries and unified targets (3.617333ms)
+✔ CLI defaults to a read-only status command (0.288167ms)
+✔ ancestor check distinguishes forward and reverse baselines (216.806ms)
+✔ prepare uses a dedicated worktree and leaves dirty caller files untouched (735.443875ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1100.793792
+
+[quality] sync-drift
+PASS: unified upstream checker reports source-to-target migration paths
+
+[quality] platform-capabilities
+PASS: 7 platform contracts; 18 public skills
+
+[quality] release-manifest
+PASS: release identity 0.8.1; upstream 5de060f9a47e
+
+[quality] doc-budget
+热路径文档预算
+------------------------------------------------------------------------------
+  用量 /   预算  余量  文件
+    3769 /   3800     31  skills/story-write/SKILL.md  [ok]
+   26716 /  27500    784  skills/story-write/references/long-mode.md  [ok]
+   21496 /  22200    704  skills/story-write/references/short-mode.md  [ok]
+   16404 /  17500   1096  skills/story-write/references/workflow-daily.md  [ok]
+   12686 /  13000    314  skills/story-write/references/workflow-setup.md  [ok]
+    9059 /   9100     41  skills/story-write/references/writing-craft.md  [ok]
+   15408 /  15500     92  skills/_shared/references/banned-words.md  [ok]
+   11635 /  14100   2465  skills/_shared/references/anti-ai-writing.md  [ok]
+   13229 /  14000    771  skills/story-setup/references/templates/agents/narrative-writer.md  [ok]
+    2398 /   2600    202  skills/story-write/references/reader-first-writing.md  [ok]
+
+路径合计（一次会话真正付的量）
+------------------------------------------------------------------------------
+   46889 /  48500   1611  长篇日更主会话  [ok]
+   43171 /  44000    829  长篇开书  [ok]
+   17087 /  18500   1413  普通长篇正文 agent 固定参考  [ok]
+
+提示（不阻断）：
+  - skills/story-write/references/workflow-daily.md 比预算低 1096 字，可把 budget 降到 16500 锁住这次精简
+  - skills/_shared/references/anti-ai-writing.md 比预算低 2465 字，可把 budget 降到 11700 锁住这次精简
+  - skills/story-setup/references/templates/agents/narrative-writer.md 比预算低 771 字，可把 budget 降到 13300 锁住这次精简
+  - skills/story-write/references/reader-first-writing.md 比预算低 202 字，可把 budget 降到 2400 锁住这次精简
+
+Result: 热路径文档预算检查通过
+
+[quality] candidate-transaction
+test_arc02_blocking_requires_exact_author_approval (__main__.CandidateCommitTests.test_arc02_blocking_requires_exact_author_approval) ... ok
+test_candidate_does_not_touch_body_or_tracking (__main__.CandidateCommitTests.test_candidate_does_not_touch_body_or_tracking) ... ok
+test_candidate_workflow_documents_v2_logic_contract (__main__.CandidateCommitTests.test_candidate_workflow_documents_v2_logic_contract) ... ok
+test_chapter_14_and_16_do_not_require_arc_receipts (__main__.CandidateCommitTests.test_chapter_14_and_16_do_not_require_arc_receipts) ... ok
+test_chapter_15_requires_ledger_and_valid_arc02 (__main__.CandidateCommitTests.test_chapter_15_requires_ledger_and_valid_arc02) ... ok
+test_check_passes_on_new_chapter_with_intent_fields (__main__.CandidateCommitTests.test_check_passes_on_new_chapter_with_intent_fields) ... ok
+test_emotion_run_input_failure_still_rejects_before_writes (__main__.CandidateCommitTests.test_emotion_run_input_failure_still_rejects_before_writes) ... ok
+test_four_same_emotion_distinct_events_check_and_promote (__main__.CandidateCommitTests.test_four_same_emotion_distinct_events_check_and_promote) ... ok
+test_future_emotion_outline_does_not_extend_current_advisory (__main__.CandidateCommitTests.test_future_emotion_outline_does_not_extend_current_advisory) ... ok
+test_historical_chapter_missing_intent_fields_is_advisory (__main__.CandidateCommitTests.test_historical_chapter_missing_intent_fields_is_advisory) ... ok
+test_historical_chapter_real_world_name_is_advisory (__main__.CandidateCommitTests.test_historical_chapter_real_world_name_is_advisory) ... ok
+test_list_reports_pending (__main__.CandidateCommitTests.test_list_reports_pending) ... ok
+test_metrics_cumulative_value_accepts_prose_delta (__main__.CandidateCommitTests.test_metrics_cumulative_value_accepts_prose_delta) ... ok
+test_metrics_update_binds_value_and_source_then_promotes (__main__.CandidateCommitTests.test_metrics_update_binds_value_and_source_then_promotes) ... ok
+test_metrics_value_must_match_source_phrase (__main__.CandidateCommitTests.test_metrics_value_must_match_source_phrase) ... ok
+test_new_chapter_character_near_name_is_advisory (__main__.CandidateCommitTests.test_new_chapter_character_near_name_is_advisory) ... ok
+test_new_chapter_invalid_emotion_value_is_blocked (__main__.CandidateCommitTests.test_new_chapter_invalid_emotion_value_is_blocked) ... ok
+test_new_chapter_missing_causal_fields_is_blocked (__main__.CandidateCommitTests.test_new_chapter_missing_causal_fields_is_blocked) ... ok
+test_new_chapter_missing_intent_fields_is_blocked (__main__.CandidateCommitTests.test_new_chapter_missing_intent_fields_is_blocked) ... ok
+test_new_chapter_undeclared_real_world_name_is_blocked (__main__.CandidateCommitTests.test_new_chapter_undeclared_real_world_name_is_blocked) ... ok
+test_no_scan_cannot_bypass_logic_receipts (__main__.CandidateCommitTests.test_no_scan_cannot_bypass_logic_receipts) ... ok
+test_promote_all_rejects_multiple_candidates_before_writes (__main__.CandidateCommitTests.test_promote_all_rejects_multiple_candidates_before_writes) ... ok
+test_promote_all_with_current_serial_candidate (__main__.CandidateCommitTests.test_promote_all_with_current_serial_candidate) ... ok
+test_promote_honors_explicit_terse_title_profile (__main__.CandidateCommitTests.test_promote_honors_explicit_terse_title_profile) ... ok
+test_promote_ignores_in_prose_exemption_marker (__main__.CandidateCommitTests.test_promote_ignores_in_prose_exemption_marker) ... ok
+test_promote_missing_transaction_aborts (__main__.CandidateCommitTests.test_promote_missing_transaction_aborts) ... ok
+test_promote_moves_prose_and_advances_tracking (__main__.CandidateCommitTests.test_promote_moves_prose_and_advances_tracking) ... ok
+test_promote_no_scan_bypasses_ai_gate_only (__main__.CandidateCommitTests.test_promote_no_scan_bypasses_ai_gate_only) ... ok
+test_promote_no_scan_requires_reason (__main__.CandidateCommitTests.test_promote_no_scan_requires_reason) ... ok
+test_promote_quality_gate_fails_when_node_is_unavailable (__main__.CandidateCommitTests.test_promote_quality_gate_fails_when_node_is_unavailable) ... ok
+test_promote_records_scan_skip_reason (__main__.CandidateCommitTests.test_promote_records_scan_skip_reason) ... ok
+test_promote_refuses_to_overwrite_final (__main__.CandidateCommitTests.test_promote_refuses_to_overwrite_final) ... ok
+test_promote_rejects_duplicate_logic_id_in_json (__main__.CandidateCommitTests.test_promote_rejects_duplicate_logic_id_in_json) ... ok
+test_promote_rejects_empty_or_unbound_semantic_evidence (__main__.CandidateCommitTests.test_promote_rejects_empty_or_unbound_semantic_evidence) ... ok
+test_promote_rejects_missing_or_unknown_logic_id (__main__.CandidateCommitTests.test_promote_rejects_missing_or_unknown_logic_id) ... ok
+test_promote_rejects_stale_expected_revision_before_writes (__main__.CandidateCommitTests.test_promote_rejects_stale_expected_revision_before_writes) ... ok
+test_promote_rejects_stale_reader_file_hash (__main__.CandidateCommitTests.test_promote_rejects_stale_reader_file_hash) ... ok
+test_promote_rejects_v1_binding_with_regeneration_message (__main__.CandidateCommitTests.test_promote_rejects_v1_binding_with_regeneration_message) ... ok
+test_promote_reruns_rc01_even_with_no_scan (__main__.CandidateCommitTests.test_promote_reruns_rc01_even_with_no_scan) ... ok
+test_promote_rolls_back_on_tracking_failure (__main__.CandidateCommitTests.test_promote_rolls_back_on_tracking_failure) ... ok
+test_promote_treats_style_pattern_as_review_finding (__main__.CandidateCommitTests.test_promote_treats_style_pattern_as_review_finding) ... ok
+test_recover_is_idempotent_after_each_persisted_phase (__main__.CandidateCommitTests.test_recover_is_idempotent_after_each_persisted_phase) ... ok
+test_recover_rejects_changed_reader_view_before_move_or_tracking (__main__.CandidateCommitTests.test_recover_rejects_changed_reader_view_before_move_or_tracking) ... ok
+test_recover_validates_transaction_digest_before_moving_prose (__main__.CandidateCommitTests.test_recover_validates_transaction_digest_before_moving_prose) ... ok
+test_reject_archives_without_touching_body (__main__.CandidateCommitTests.test_reject_archives_without_touching_body) ... ok
+test_rewrite_flag_marks_action (__main__.CandidateCommitTests.test_rewrite_flag_marks_action) ... ok
+test_settlement_phrase_without_metrics_change_is_blocked (__main__.CandidateCommitTests.test_settlement_phrase_without_metrics_change_is_blocked) ... ok
+test_settlement_reason_explicitly_allows_unchanged_metrics (__main__.CandidateCommitTests.test_settlement_reason_explicitly_allows_unchanged_metrics) ... ok
+test_fact_revision_cannot_omit_downstream_reading (__main__.OrdinaryRevisionTests.test_fact_revision_cannot_omit_downstream_reading) ... ok
+test_fact_revision_requires_transaction_and_all_later_context (__main__.OrdinaryRevisionTests.test_fact_revision_requires_transaction_and_all_later_context) ... ok
+test_faults_recover_idempotently_and_block_other_writers (__main__.OrdinaryRevisionTests.test_faults_recover_idempotently_and_block_other_writers) ... ok
+test_lifecycle_head_cannot_be_bypassed (__main__.OrdinaryRevisionTests.test_lifecycle_head_cannot_be_bypassed) ... ok
+test_prepare_and_check_leave_adopted_prose_and_state_unchanged (__main__.OrdinaryRevisionTests.test_prepare_and_check_leave_adopted_prose_and_state_unchanged) ... ok
+test_recover_refuses_unrelated_edit (__main__.OrdinaryRevisionTests.test_recover_refuses_unrelated_edit) ... ok
+test_stale_original_context_inventory_and_review_fail_before_writes (__main__.OrdinaryRevisionTests.test_stale_original_context_inventory_and_review_fail_before_writes) ... ok
+test_symlink_parent_rejected (__main__.OrdinaryRevisionTests.test_symlink_parent_rejected) ... ok
+test_volume_directories_and_restoring_original (__main__.OrdinaryRevisionTests.test_volume_directories_and_restoring_original) ... ok
+test_wording_and_rhythm_preserve_tracking_facts_and_original (__main__.OrdinaryRevisionTests.test_wording_and_rhythm_preserve_tracking_facts_and_original) ... ok
+test_wording_requires_explicit_unchanged_facts_review (__main__.OrdinaryRevisionTests.test_wording_requires_explicit_unchanged_facts_review) ... ok
+test_abort_refuses_started_transaction_and_recovery_finishes (revision_review_tests.RevisionReviewTests.test_abort_refuses_started_transaction_and_recovery_finishes) ... ok
+test_adopted_prose_mutation_during_scan_rejects_before_journal (revision_review_tests.RevisionReviewTests.test_adopted_prose_mutation_during_scan_rejects_before_journal) ... ok
+test_check_is_read_only_including_mtimes_and_creates_no_journal (revision_review_tests.RevisionReviewTests.test_check_is_read_only_including_mtimes_and_creates_no_journal) ... ok
+test_derived_view_mutation_during_scan_rejects_before_journal (revision_review_tests.RevisionReviewTests.test_derived_view_mutation_during_scan_rejects_before_journal) ... ok
+test_duplicate_padded_and_unpadded_next_outline_is_rejected (revision_review_tests.RevisionReviewTests.test_duplicate_padded_and_unpadded_next_outline_is_rejected) ... ok
+test_frozen_candidate_mutation_during_scan_rejects_before_journal (revision_review_tests.RevisionReviewTests.test_frozen_candidate_mutation_during_scan_rejects_before_journal) ... ok
+test_metric_value_must_match_revised_prose_before_any_write (revision_review_tests.RevisionReviewTests.test_metric_value_must_match_revised_prose_before_any_write) ... ok
+test_padded_next_outline_is_bound_and_stale_outline_blocks_without_writes (revision_review_tests.RevisionReviewTests.test_padded_next_outline_is_bound_and_stale_outline_blocks_without_writes) ... ok
+test_prepared_abort_keeps_originals_and_unblocks_new_proposal_even_if_candidate_damaged (revision_review_tests.RevisionReviewTests.test_prepared_abort_keeps_originals_and_unblocks_new_proposal_even_if_candidate_damaged) ... ok
+test_prepared_abort_refuses_any_transaction_output_changed_by_external_editor (revision_review_tests.RevisionReviewTests.test_prepared_abort_refuses_any_transaction_output_changed_by_external_editor) ... ok
+test_revised_body_invalidates_only_its_wordcount_certificate (revision_review_tests.RevisionReviewTests.test_revised_body_invalidates_only_its_wordcount_certificate) ... ok
+test_tracking_state_mutation_during_scan_rejects_before_journal (revision_review_tests.RevisionReviewTests.test_tracking_state_mutation_during_scan_rejects_before_journal) ... ok
+test_valid_metric_revision_updates_single_tracking_authority (revision_review_tests.RevisionReviewTests.test_valid_metric_revision_updates_single_tracking_authority) ... ok
+test_abort_refuses_started_transaction_and_recovery_finishes (revision_review_tests.RevisionReviewTests.test_abort_refuses_started_transaction_and_recovery_finishes) ... ok
+test_adopted_prose_mutation_during_scan_rejects_before_journal (revision_review_tests.RevisionReviewTests.test_adopted_prose_mutation_during_scan_rejects_before_journal) ... ok
+test_check_is_read_only_including_mtimes_and_creates_no_journal (revision_review_tests.RevisionReviewTests.test_check_is_read_only_including_mtimes_and_creates_no_journal) ... ok
+test_derived_view_mutation_during_scan_rejects_before_journal (revision_review_tests.RevisionReviewTests.test_derived_view_mutation_during_scan_rejects_before_journal) ... ok
+test_duplicate_padded_and_unpadded_next_outline_is_rejected (revision_review_tests.RevisionReviewTests.test_duplicate_padded_and_unpadded_next_outline_is_rejected) ... ok
+test_frozen_candidate_mutation_during_scan_rejects_before_journal (revision_review_tests.RevisionReviewTests.test_frozen_candidate_mutation_during_scan_rejects_before_journal) ... ok
+test_metric_value_must_match_revised_prose_before_any_write (revision_review_tests.RevisionReviewTests.test_metric_value_must_match_revised_prose_before_any_write) ... ok
+test_padded_next_outline_is_bound_and_stale_outline_blocks_without_writes (revision_review_tests.RevisionReviewTests.test_padded_next_outline_is_bound_and_stale_outline_blocks_without_writes) ... ok
+test_prepared_abort_keeps_originals_and_unblocks_new_proposal_even_if_candidate_damaged (revision_review_tests.RevisionReviewTests.test_prepared_abort_keeps_originals_and_unblocks_new_proposal_even_if_candidate_damaged) ... ok
+test_prepared_abort_refuses_any_transaction_output_changed_by_external_editor (revision_review_tests.RevisionReviewTests.test_prepared_abort_refuses_any_transaction_output_changed_by_external_editor) ... ok
+test_revised_body_invalidates_only_its_wordcount_certificate (revision_review_tests.RevisionReviewTests.test_revised_body_invalidates_only_its_wordcount_certificate) ... ok
+test_tracking_state_mutation_during_scan_rejects_before_journal (revision_review_tests.RevisionReviewTests.test_tracking_state_mutation_during_scan_rejects_before_journal) ... ok
+test_valid_metric_revision_updates_single_tracking_authority (revision_review_tests.RevisionReviewTests.test_valid_metric_revision_updates_single_tracking_authority) ... ok
+
+----------------------------------------------------------------------
+Ran 85 tests in 69.599s
+
+OK
+
+[quality] tracking
+test_a_character_can_die_and_retire_in_one_transaction (__main__.TrackingCommitTests.test_a_character_can_die_and_retire_in_one_transaction) ... ok
+test_an_interrupted_archive_can_be_resumed (__main__.TrackingCommitTests.test_an_interrupted_archive_can_be_resumed) ... ok
+test_append_can_atomically_declare_an_exact_chapter_gap (__main__.TrackingCommitTests.test_append_can_atomically_declare_an_exact_chapter_gap) ... ok
+test_archive_never_clobbers_an_already_archived_file (__main__.TrackingCommitTests.test_archive_never_clobbers_an_already_archived_file) ... ok
+test_chapter_gap_requires_exact_boundaries_and_append_mode (__main__.TrackingCommitTests.test_chapter_gap_requires_exact_boundaries_and_append_mode) ... ok
+test_character_snapshot_lists_are_not_limited_to_eight_items (__main__.TrackingCommitTests.test_character_snapshot_lists_are_not_limited_to_eight_items) ... ok
+test_check_compares_derived_views_to_state_without_parsing_markdown (__main__.TrackingCommitTests.test_check_compares_derived_views_to_state_without_parsing_markdown) ... ok
+test_check_rejects_a_delta_inside_a_declared_gap (__main__.TrackingCommitTests.test_check_rejects_a_delta_inside_a_declared_gap) ... ok
+test_check_rejects_orphan_character_file (__main__.TrackingCommitTests.test_check_rejects_orphan_character_file) ... ok
+test_commit_and_check_still_refuse_a_retired_layout (__main__.TrackingCommitTests.test_commit_and_check_still_refuse_a_retired_layout) ... ok
+test_commit_updates_state_and_all_demo_derived_views (__main__.TrackingCommitTests.test_commit_updates_state_and_all_demo_derived_views) ... ok
+test_declared_context_retirement_is_recorded_in_the_chapter_delta (__main__.TrackingCommitTests.test_declared_context_retirement_is_recorded_in_the_chapter_delta) ... ok
+test_dropping_a_context_item_without_declaring_it_is_rejected (__main__.TrackingCommitTests.test_dropping_a_context_item_without_declaring_it_is_rejected) ... ok
+test_failed_init_leaves_the_old_tracking_directory_untouched (__main__.TrackingCommitTests.test_failed_init_leaves_the_old_tracking_directory_untouched) ... ok
+test_imported_chapter_revision_creates_an_overlay_record (__main__.TrackingCommitTests.test_imported_chapter_revision_creates_an_overlay_record) ... ok
+test_imported_cutoff_requires_only_new_daily_records (__main__.TrackingCommitTests.test_imported_cutoff_requires_only_new_daily_records) ... ok
+test_init_archives_a_pre_transaction_tracking_directory (__main__.TrackingCommitTests.test_init_archives_a_pre_transaction_tracking_directory) ... ok
+test_init_creates_one_structured_authority_and_only_derived_views (__main__.TrackingCommitTests.test_init_creates_one_structured_authority_and_only_derived_views) ... ok
+test_legacy_state_without_chapter_gaps_accepts_first_gap_append (__main__.TrackingCommitTests.test_legacy_state_without_chapter_gaps_accepts_first_gap_append) ... ok
+test_metrics_default_empty_and_render_stays_seven_headings (__main__.TrackingCommitTests.test_metrics_default_empty_and_render_stays_seven_headings) ... ok
+test_metrics_render_as_position_bullet (__main__.TrackingCommitTests.test_metrics_render_as_position_bullet) ... ok
+test_metrics_render_twelve_most_recent_and_report_hidden_count (__main__.TrackingCommitTests.test_metrics_render_twelve_most_recent_and_report_hidden_count) ... ok
+test_metrics_require_structured_record_and_changed_chapter (__main__.TrackingCommitTests.test_metrics_require_structured_record_and_changed_chapter) ... ok
+test_missing_active_snapshot_is_rejected_before_any_write (__main__.TrackingCommitTests.test_missing_active_snapshot_is_rejected_before_any_write) ... ok
+test_old_revision_applies_current_rows_without_moving_update_chapter_back (__main__.TrackingCommitTests.test_old_revision_applies_current_rows_without_moving_update_chapter_back) ... ok
+test_old_revision_preserves_current_next_chapter_commitment (__main__.TrackingCommitTests.test_old_revision_preserves_current_next_chapter_commitment) ... ok
+test_overlapping_persisted_chapter_gaps_are_rejected (__main__.TrackingCommitTests.test_overlapping_persisted_chapter_gaps_are_rejected) ... ok
+test_partial_view_write_keeps_old_authority_and_same_transaction_can_retry (__main__.TrackingCommitTests.test_partial_view_write_keeps_old_authority_and_same_transaction_can_retry) ... ok
+test_retirement_is_rejected_in_a_revision (__main__.TrackingCommitTests.test_retirement_is_rejected_in_a_revision) ... ok
+test_retiring_a_core_character_removes_its_derived_view (__main__.TrackingCommitTests.test_retiring_a_core_character_removes_its_derived_view) ... ok
+test_retiring_a_still_active_character_is_rejected (__main__.TrackingCommitTests.test_retiring_a_still_active_character_is_rejected) ... ok
+test_snapshot_target_warns_and_hard_cap_rejects_before_any_write (__main__.TrackingCommitTests.test_snapshot_target_warns_and_hard_cap_rejects_before_any_write) ... ok
+test_stale_revision_cannot_overwrite_newer_state (__main__.TrackingCommitTests.test_stale_revision_cannot_overwrite_newer_state) ... ok
+test_transaction_missing_metrics_is_rejected (__main__.TrackingCommitTests.test_transaction_missing_metrics_is_rejected) ... ok
+test_unknown_fields_are_rejected (__main__.TrackingCommitTests.test_unknown_fields_are_rejected) ... ok
+test_windows_reserved_character_name_is_rejected (__main__.TrackingCommitTests.test_windows_reserved_character_name_is_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 36 tests in 7.075s
+
+OK
+
+[quality] author-voice-profile
+PASS: test_update_scope_preservation_and_idempotence
+PASS: test_check_and_dry_run_are_read_only
+PASS: test_marker_failures_are_non_destructive
+PASS: test_empty_invalid_and_duplicate_samples
+PASS: test_short_evidence_and_digest_change
+PASS: test_update_respects_project_lock
+PASS: test_symlink_escape_is_rejected
+author voice profile tests: 7/7 passed
+
+[quality] tracking-workflow
+Tracking workflow contract tests passed (15 tests).
+
+[quality] chapter-skeleton
+OK: chapter skeleton validator regressions passed
+
+[quality] contracts
+✔ question titles distinguish market questions from slogan questions by profile (357.645ms)
+✔ fanqie relaxes length and common role overlap but terse keeps the legacy gate (281.670125ms)
+✔ AI summary clauses and exact repeats remain blocking in every profile (217.955834ms)
+✔ demo baseline is 0 blocking in fanqie and 13 in terse (195.265666ms)
+✔ 逾期伏笔拦住首建新章 (8.066625ms)
+✔ 悬空（从没排回收章）不拦日更 (9.46925ms)
+✔ 回收章还没到、以及已回收/放弃的伏笔都不拦 (10.624666ms)
+✔ 正好写到计划回收章那一章不算逾期 (5.594708ms)
+✔ 细纲头部的 <!-- 伏笔:跳过 --> 豁免，超出头 6 行则无效 (4.548708ms)
+✔ 伏笔欠账门排在毒句式欠账门之前 (3.22925ms)
+✔ 正文已存在（续写/改稿/回炉）不触发本门 (3.817542ms)
+✔ 状态损坏一律 fail-open，不因解析失败误伤写作 (4.995417ms)
+✔ 多条逾期只列前 6 条并给出完整体检出口 (2.916958ms)
+✔ CLI 子命令 foreshadow-debt 与核逐字一致 (196.995125ms)
+✔ js ↔ codex py 文案 parity (367.964ms)
+✔ 热卡复刻 tracking_commit.py 的排序：重要度 → 计划回收章 → id，未排期排最后 (3.83725ms)
+✔ 热卡只保留前 8 条，同重要度内旧伏笔（id 小）优先 (0.367583ms)
+✔ 逾期是 blocking：定了回收章又错过 (0.53675ms)
+✔ 正好写到计划回收章那一章不算逾期，过了才算 (0.18275ms)
+✔ 悬空默认 advisory，--strict 下变 blocking (0.188083ms)
+✔ 悬空阈值按重要度分档 (0.211334ms)
+✔ 冷藏点名掉出热卡且埋了很久的伏笔 (0.1655ms)
+✔ 已回收 / 放弃 / 已过期的伏笔不再计入活跃债务 (0.11025ms)
+✔ 非 schema_version 4 与损坏字段被拒绝，不猜测 (0.23175ms)
+✔ CLI 退出码：0 干净 / 1 有逾期 / 2 参数或状态错误 (724.172042ms)
+✔ --json 输出可解析且字段稳定 (105.389875ms)
+✔ demo 书：热卡与已渲染的 追踪/上下文.md 逐条一致 (2.218417ms)
+✔ new books default to plain narrative while legacy books remain regular (2.353333ms)
+✔ plain mode writes causality directly and does not require a hidden ending (1.602125ms)
+✔ title profile keeps pathological forms blocking in both modes (0.272458ms)
+✔ first necessary explanation is preserved before deletion gates (1.56475ms)
+✔ dialogue keeps causal information while rejecting exposition monologues (0.130708ms)
+✔ general mode exposes one explicit route for rewrite, review, and translation (1.640166ms)
+✔ general route boundaries stay consistent and load only task-relevant references (0.3845ms)
+✔ review is ranked and contextual instead of a mandatory-clear scanner (0.129333ms)
+✔ every guide fragment in the index resolves to an actual heading (1.758042ms)
+✔ translation preserves protected values, information, and document structure (0.150875ms)
+✔ novel mode and shared scanner contracts remain present (0.132125ms)
+✔ the repository contract suite includes the general-mode test (0.308ms)
+✔ novel editor and all reviewer entry points reject retired global policies (2.932292ms)
+✔ the consumer guard detects representative old rules instead of silently passing (0.364083ms)
+✔ ordinary editing preserves context and stops after a bounded reading-driven pass (0.603125ms)
+✔ platform and generic rubrics require applicability before judging chapter shape (0.292333ms)
+✔ generic novel check requires all ten stages and the manifest contract (7.45375ms)
+✔ pure Chinese prose profile gives logic checks at least one quarter of applicable budget (0.930709ms)
+✔ validation spec stays synchronized with the composite manifest (2.316375ms)
+✔ AI flavor manifest preserves all ten layers and five semantic mismatch checks (0.296084ms)
+✔ every composite-check dependency is in the installable public skill set (1.285042ms)
+✔ story-deslop file-mode pollution dependency is publicly installable and counted (1.513666ms)
+✔ a finding does not stop later filters, but a missing or blocked item cannot complete (1.794208ms)
+✔ skip requires a reason and trigger precedence keeps version checks separate (0.592292ms)
+✔ runtime hooks use the unified story-write entry and expose the post-event route (2.765375ms)
+ℹ tests 52
+ℹ suites 0
+ℹ pass 52
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1226.741375
+
+[quality] publication
+✔ every repository skill is explicitly public or local-only (4.039208ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 137.090833
+
+[quality] shared-assets
+Shared File Governance Check
+============================
+OK: 14 canonical groups manage 31 synchronized copies
+Shared references: 71 groups / 83 synchronized copies
+Reference similarity: no undeclared candidates at J>=85% or containment>=95%; 10 derived groups declared
+Agent reference consumers: 68 deployed Markdown files reachable from 30 direct agent roots; profile contract 4 common / 12 long / 7 short
+Short analysis scope: 5 observational rubrics; no legacy long-form playbook tokens
+All declared shared files are consistent; no unmanaged exact or near-identical reference copies found.
+
+[quality] static
+Skill Static Check
+==================
+Repo: /Users/yolandahao/code/oh-story-claudecode
+
+--- ai-flavor-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- batch-pollution-detector ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- browser-cdp ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- chinese-novelist ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- deslop-register ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- dialogue-naturalness-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- fanqie-chapter-publish ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- humanizer ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- jargon-verb-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- legal-domain-veracity-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- opening-arc-audit ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- reader-comprehension-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-analyze ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-cover ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-deslop ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-import ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-review ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-setup ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-write ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-before-dev ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-brainstorm ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-break-loop ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-channel ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-check ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-continue ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-finish-work ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-meta ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-session-insight ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-spec-bootstrap ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-start ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-update-spec ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+==================
+Total: 33 | Pass: 33 | Fail: 0 | Warn: 0
+
+[quality] language-gates
+---- test-ai-patterns.sh
+AI pattern detector regression tests passed.
+Prose pattern (碎句号/长段落/破折号) regression tests passed.
+issue #205 (跨空行翻转命中 / 引号内台词豁免 / 未闭合引号不吞叙述) regression tests passed.
+micro-action-tic (电报体微动作复读) regression tests passed.
+stock-reaction-tic (套式反应细节) regression tests passed.
+abstract-summary-tic (抽象总结复读) regression tests passed.
+action-list-tic (监控摄像头式动作清单) regression tests passed.
+cliche-density-tic (套词密度过高) regression tests passed.
+metaphor-density-tic (比喻密度过高) regression tests passed.
+reasoning-chain-tic (解释链密度过高) regression tests passed.
+system-notice-formality-tic (系统公告公文腔过密) regression tests passed.
+overcompressed-prose-tic (过度精炼短段) regression tests passed.
+low-connective-density-tic (低连接密度 + 缺中长句) regression tests passed.
+voice-contrast (音量反差腔) regression tests passed.
+negation-parade (否定排比) regression tests passed.
+chapter-21 AI-flavor gap regression tests passed.
+reverse-not-is (反序对比腔) regression tests passed.
+trailer-ending (预告式总结收尾) regression tests passed.
+quote-emphasis-tic (引号强调滥用) regression tests passed.
+trailer-summary (章尾状态总结体) regression tests passed.
+PASS ordinary literal actions, temperature, smell, cleaning, and time have no findings
+PASS isolated contextual patterns retain evidence, not automatic rejection
+PASS all four weak adverbs contribute to density while isolated use is safe
+PASS repeated micro actions still identify a review window
+PASS quoted count mismatch blocks and matched count passes
+PASS prose explanations and parenthetical examples are never parsed as tokens
+PASS explicit malformed literal field fails rather than parsing parentheses
+PASS missing, duplicate, invalid, and unsupported rule data fail closed
+PASS invalid or unterminated regex fences fail instead of silently skipping
+PASS author rule inherits from book, reports source, and respects narration surface
+PASS author bans do not leak across books and cannot be waived by shared whitelist
+PASS external candidate uses explicit book and planned chapter scope
+PASS source mismatch, missing scope, wrong category, and path escape fail closed
+PASS symlink escape in planned target and registry cannot broaden author authority
+PASS unreadable input and broken UTF-8 return a machine-readable blocking error
+15 rule classification and scope tests passed.
+---- test-degeneration.sh
+Degeneration detector regression tests passed.
+---- test-prose-policy.py
+test_detector_blocking_requires_author_scope_or_deterministic_error (__main__.ProsePolicyInventoryTests.test_detector_blocking_requires_author_scope_or_deterministic_error) ... ok
+test_forbidden_patterns_cover_the_rejected_global_rules (__main__.ProsePolicyInventoryTests.test_forbidden_patterns_cover_the_rejected_global_rules) ... ok
+test_p1_treatment_and_suspense_priority_remain_explicit (__main__.ProsePolicyInventoryTests.test_p1_treatment_and_suspense_priority_remain_explicit) ... ok
+test_repository_has_one_priority_and_no_known_global_conflict (__main__.ProsePolicyInventoryTests.test_repository_has_one_priority_and_no_known_global_conflict) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 6.786s
+
+OK
+---- test-normalize-punctuation.js
+OK: structural punctuation cleanup preserves voice, fences, CRLF, quote modes, and errors
+✔ scripts/test-normalize-punctuation.js (1679.0855ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 1
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1688.416792
+---- test-charcount-portable.sh
+selected interpreter: python3
+char count: 12 (expect 12)
+PASS
+---- test-prose-backstop-hook.sh
+Prose backstop hook regression tests passed.
+---- test-prose-net-parity.sh
+功能 parity：codex python 网 == opencode TS 网 == zcode JS 网（44 fixtures + CRLF 字数边界，含毒句式正反例/AI 自指/截断收尾与豁免标记）。
+命令函数 parity：codex python == zcode JS（扩展 fixtures：正文抽取/apply-patch/git commit 侦测逐字相等，含包装器/命令替换/多 heredoc/转义引号、apply_patch 搬家与 ReDoS 预算）。
+未归核面 parity：codex python == JS core（staged warnings 大小写变体/文案 + 大纲阻断 9 组判定含毒句式欠账门/无脚手架 fail-closed/文案逐字相等）。
+写正文守卫 parity：Claude bash guard == JS core（13 组工程场景：无 state/缺细纲/导入窗口/跳章/续写/显式缺口/嵌套分卷/派生修订不一致/坏 schema/回炉备份，含 node 缺席 fail-open）。
+Prose net parity tests passed.
+Language gate regressions passed.
+
+[quality] affected: PASS (15/15 PASS)

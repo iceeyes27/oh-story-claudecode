@@ -1,0 +1,21 @@
+{
+  "reviewer": "",
+  "reader_type": "model",
+  "status": "pending",
+  "original_sha256": "b684cb6fc9e6738336ac0015e27da39ed6fb9af902239d7a548dcb65eb80c22a",
+  "candidate_sha256": "480097eabd41732f7a980fb327c2625819b203fe67aed27641a48c3eb36cc36b",
+  "diff_sha256": "6e7181387140f146cfb4b3608e0288b2523afea47af87c60c1c521ee4d784833",
+  "facts_unchanged": null,
+  "findings": [],
+  "original_anchor": "",
+  "candidate_anchor": "",
+  "metric_source_updates": {},
+  "context": [
+    {
+      "path": "正文/第002章_鱼要有盖.md",
+      "sha256": "eb17d6a840aab5e97378e1c7af9b5aa593b2f2f24f424c33399b8e907f9bd746",
+      "anchor": "",
+      "assessment": ""
+    }
+  ]
+}

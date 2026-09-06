@@ -1,0 +1,13 @@
+{
+  "files": 1,
+  "blocking": 0,
+  "advisory": 0,
+  "results": [
+    {
+      "file": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/fixed/骨架/第002章_鱼要有盖.md",
+      "chapter": 2,
+      "blocking": [],
+      "advisory": []
+    }
+  ]
+}

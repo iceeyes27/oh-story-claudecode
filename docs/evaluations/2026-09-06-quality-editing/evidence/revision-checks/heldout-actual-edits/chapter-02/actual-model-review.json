@@ -1,0 +1,59 @@
+{
+  "reviewer": "root actual raw-prose and diff reading, with saved sequential model observations",
+  "reader_type": "model",
+  "status": "pass",
+  "original_sha256": "4c1c53dd528e46c5817580fbcd05ae50844d0bb32dc179a576a4352af8e123c0",
+  "candidate_sha256": "4562594295f276b26e4fd3de4431c7c2acb8f52101852bac8faab9148650508d",
+  "diff_sha256": "a456e5ce66b02793c2ed1ebc8d081044639a0cad553196ac1a347fc7aac8e26e",
+  "facts_unchanged": false,
+  "findings": [
+    {
+      "severity": "advisory",
+      "message": "原则解释仍偏多；编辑不证明长篇追读收益。各章相邻原文中尚未采用的编辑不得当成已发生。"
+    }
+  ],
+  "original_anchor": "心里那条沿着职工名字往下找的路，到这里已走不通。",
+  "candidate_anchor": "把草纸上凭外套猜身份的那一行划掉。",
+  "metric_source_updates": {},
+  "context": [
+    {
+      "path": "正文/第001章_空着的位置.md",
+      "sha256": "d91a02f56eea30f7d97d55b604b9fcd1a4af9e50fcbf4cc7b0b7f2e2bece9bd7",
+      "anchor": "这就是搬书那天。我记得这箱子，底下漏了，托着走才没散。",
+      "assessment": "第一章齐叔把漏底指向最终合影的箱子。第二章修改不触及这句；第三章需明确纠正它。联系寄件者、五人照片和留空姓名的因果仍保留。"
+    },
+    {
+      "path": "正文/第003章_林琴.md",
+      "sha256": "1d6fc41fb79441cb1ac221037e1ba63e50d7853e69d0b05283551d76bbf4bc36",
+      "anchor": "林琴看向程雪：\"你带我来就为这个？\"",
+      "assessment": "后章母女署名意愿不依赖第二章延迟披露关系，提前说明仍有前因。原第三章箱子互证存在已记录的局部矛盾，第二章修订不会自动修好，第三章候选另作事实修订。"
+    }
+  ],
+  "evidence_origin": [
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/blind/reviews/heldout-reader-H74-chapter-01.json",
+      "sha256": "59aee50485b4328621a155f17485ddde849f9542e7923f007693a1ad744572eb"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/blind/reviews/heldout-reader-H74-chapter-02.json",
+      "sha256": "1b4e1306c8f2b66eabc49cdc9fac5744fe99f6feef61192e9c9748b9a8ea84ce"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/blind/reviews/heldout-reader-H74-chapter-03.json",
+      "sha256": "379c84a2a58d1b9be005e414c0edb389010c9bc58cd07fb60136737af9e34f3a"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/blind/reviews/heldout-reader-H82-chapter-01.json",
+      "sha256": "e6e0b8505ddf5e4edbac28de2543bdf3b9a3ae753356cf470846268c9e9eba85"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/blind/reviews/heldout-reader-H82-chapter-02.json",
+      "sha256": "73e5579b806533fd21ccc5dea88ffceac469620f1ac8b6daf99da92de7f8ec6f"
+    },
+    {
+      "path": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/blind/reviews/heldout-reader-H82-chapter-03.json",
+      "sha256": "4c5ed567a939b2c124878e899e26915bad55dde697b1658cd867af759a5257dc"
+    }
+  ],
+  "limits": "Root read all three raw chapters and actual edit diffs; earlier readers used same-version sequential prose. This check binds original adjacent chapters, not an adopted edited series. No human or author adoption. Separate edited-series candidate checks supply cumulative evidence."
+}

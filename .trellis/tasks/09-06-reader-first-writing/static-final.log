@@ -1,0 +1,138 @@
+Skill Static Check
+==================
+Repo: /Users/yolandahao/code/oh-story-claudecode
+
+--- ai-flavor-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- batch-pollution-detector ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- browser-cdp ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- chinese-novelist ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- deslop-register ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- dialogue-naturalness-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- fanqie-chapter-publish ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- humanizer ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- jargon-verb-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- legal-domain-veracity-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- opening-arc-audit ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- reader-comprehension-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-analyze ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-cover ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-deslop ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-import ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-review ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-scan ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-setup ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- story-write ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-before-dev ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-brainstorm ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-break-loop ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-channel ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-check ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-continue ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-finish-work ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-meta ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-session-insight ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-spec-bootstrap ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-start ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+--- trellis-update-spec ---
+  [PASS] structured frontmatter, links, anchors, agents, and references
+  Result: PASS
+
+==================
+Total: 33 | Pass: 33 | Fail: 0 | Warn: 0

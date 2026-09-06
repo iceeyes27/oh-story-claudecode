@@ -1,0 +1,5 @@
+{
+  "exit_code": 0,
+  "stdout": "{\n  \"action\": \"prepare\",\n  \"operation\": \"r2-331157a3f81f20cee74a\",\n  \"directory\": \"/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/revision-checks/actual-edits-v2/chapter-02/候选/_修订/r2-331157a3f81f20cee74a\",\n  \"kind\": \"rhythm\",\n  \"review_scope\": [\n    \"正文/第001章_一百块定金.md\",\n    \"正文/第003章_先等它凉下来.md\"\n  ],\n  \"adopted\": false\n}\n",
+  "stderr": ""
+}

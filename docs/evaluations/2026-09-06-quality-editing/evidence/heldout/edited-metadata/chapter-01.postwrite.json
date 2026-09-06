@@ -1,0 +1,60 @@
+{
+  "summary": "宋棠收到完整合影，发现墙图裁去边缘半个人。四名职工与五人照片对不上，齐叔不敢认人，她留空姓名，借背面编号及包装电话约到程雪。",
+  "protagonist": {
+    "identity": "社区旧站照片展整理者",
+    "location": "青平码头旧站照片展展厅",
+    "goal": "认出合影中第五人，写准说明牌",
+    "state": "暂留姓名空行，等待程雪带另一照片来",
+    "abilities_resources": [
+      "完整合影及提醒纸条",
+      "四名职工旧名单",
+      "照片背面的相邻编号",
+      "程雪的联系电话"
+    ],
+    "relationships": [
+      "齐叔协助认人，承认记不准",
+      "已联系程雪，约她上午来"
+    ],
+    "knowledge": [
+      "完整合影有五人，墙图裁去右边缘",
+      "旧名单对应四名职工",
+      "第五人穿站员外套，身份未定",
+      "程雪持有编号相邻的同日照片"
+    ],
+    "open_threads": [
+      "第五人身份待核对",
+      "程雪尚未到场"
+    ]
+  },
+  "commitments": [
+    "程雪答应上午带另一张照片来展厅"
+  ],
+  "coverage": [
+    {
+      "id": "O-01",
+      "evidence": "随照片掉出来的纸条很短，上面写着：请别再少写一个名字。"
+    },
+    {
+      "id": "O-02",
+      "evidence": "可信封里这张，站着五个人。"
+    },
+    {
+      "id": "O-03",
+      "evidence": "宋棠翻过说明牌，在背面重新排人名。这一回，她依照片从左到右写，写完第四个，在下面留了一行。"
+    },
+    {
+      "id": "O-04",
+      "evidence": "\"我姓程，程雪。另一张在我这里。\""
+    }
+  ],
+  "metrics": {},
+  "chapter": 1,
+  "source_raw_sha256": "9f7395a26d46194b3be2d2987ca598eb50b2622ab2d1cd323f860a1e7a684083",
+  "status": "post_edit_fact_extraction_by_root_after_reading_all_raw_chapters_and_actual_diffs",
+  "extraction_origin": {
+    "original_metadata": "/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/metadata/chapter-01.postwrite.json",
+    "sha256": "85b1a35c9e21e77ef12641388982f65ee48dacf7b19a92e01a3830821e0880f1",
+    "edited_prose": "/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/heldout/edited/第001章_空着的位置.md",
+    "reason": "Refresh summary/knowledge and a moved evidence anchor after the one recorded edit pass; no original evidence overwritten."
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "chapter": 1,
+  "project": "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/delivery-checks/fixed-contract-repaired/chapter-01",
+  "exit_code": 0,
+  "stdout": "{\n  \"action\": \"check\",\n  \"chapter\": 1,\n  \"ok\": true,\n  \"outline\": \"大纲/细纲_第1章.md\",\n  \"skeleton\": \"骨架/第001章_一百块定金.md\",\n  \"expected_revision\": 0\n}\n",
+  "stderr": "细纲契约 advisory：\noutline.required-fields：缺字段：核心事件、字数口径、阶段位置、单元ID/位置、章节定位、本章结构公式、章首钩子、爽点、本章禁止提前释放、契约风险\noutline.subsections：缺小节：内容概括、情节安排、人物关系和出场顺序、情节细化\noutline.five-act：五段式缺：起因、发展、转折、高潮、结尾\noutline.plotpoint-table：未找到 | # | 情节点 | 功能标签 | 执行边界 | 表头\noutline.wordcount-target：字数目标：2500；字数口径 visible_chars_v1：false\n",
+  "adopted": false
+}

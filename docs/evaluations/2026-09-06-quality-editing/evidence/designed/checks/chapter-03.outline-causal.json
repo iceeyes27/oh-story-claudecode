@@ -1,0 +1,17 @@
+{
+  "time": "2026-09-06T06:42:52.809363+00:00",
+  "stage": "before_raw_draft",
+  "command": [
+    "python3",
+    "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/runtime/.agents/skills/story-write/scripts/check-outline-causal.py",
+    "/private/var/folders/9d/3jyz3rns17gcm_0r_9zbhjn40000gn/T/story-round2-pilot-4jebjbag/designed",
+    "--strict",
+    "--from=3",
+    "--to=3",
+    "--json"
+  ],
+  "exit_code": 0,
+  "stdout": "{\n  \"outlines\": 1,\n  \"blocking\": 0,\n  \"findings\": []\n}\n",
+  "stderr": "",
+  "tracking_exists": false
+}

@@ -1,0 +1,332 @@
+{
+  "transport": "native collaboration; all successful arms use inherited parent model and effort",
+  "failed_transport": "CLI baseline 1 failed before any prose: invalid_api_key; excluded as infrastructure failure, retained outside repository",
+  "baseline_sha": "21663ad6cc81a3854480b803509affe33cc8b9d7",
+  "scope": "prose-prompt pilot, not production adoption E2E",
+  "arms": {
+    "baseline": {
+      "arm": "baseline",
+      "created_at": "2026-09-06T04:06:14.169558+00:00",
+      "source_sha256": [
+        {
+          "path": "skills/story-write/references/long-mode.md",
+          "sha256": "31cbcdd7724add8c5103e88f05708dbe7d68e0f10ea723730b72f5249bcd8156"
+        },
+        {
+          "path": "skills/story-write/references/candidate-workflow.md",
+          "sha256": "f2def5d65fecddf1b1c3d5c4fe09351f19f6b1d991bff27c41db65adaf36a0b3"
+        },
+        {
+          "path": "skills/story-write/references/writing-craft.md",
+          "sha256": "07db641b88e4d627842931dcc79517fa61f115292fa092d8dcd31576b43dc083"
+        },
+        {
+          "path": "skills/story-write/references/long-format.md",
+          "sha256": "202a9636b563d63d80a9bb93292c5a749b75959868098670db2f1515c9e51207"
+        },
+        {
+          "path": "skills/story-write/references/long-chapter-quality.md",
+          "sha256": "2bb483051e7338a6d7dd20ffdae9338aa45872185deb85498213908e4e45989b"
+        },
+        {
+          "path": "skills/story-write/references/long-chapter-hooks.md",
+          "sha256": "0d492f0b0d64017fa8ad4cb5232a7a1b7857bf3a8c8e21eac5fde5b50d890848"
+        },
+        {
+          "path": "skills/story-write/references/long-suspense.md",
+          "sha256": "8ae3e1d654dd149abad22bd2be906bc92ad5a0bb9b2afa6376187a8f9b8d1de7"
+        },
+        {
+          "path": "skills/story-write/references/long-reversal.md",
+          "sha256": "98e78968f204b5945d0a11e38f8eeee677b8e4386052e72e4082ecb539de0365"
+        }
+      ],
+      "chars": 67860,
+      "sha256": "e94daa4d423730259b96282ac9b9de4eb9c2bdc1f19440c406e1208a65a566a2"
+    },
+    "cleanup": {
+      "arm": "cleanup",
+      "created_at": "2026-09-06T04:13:53.478190+00:00",
+      "source_sha256": [
+        {
+          "path": "skills/story-write/references/reader-first-writing.md",
+          "sha256": "f395774d3ff6f9e948b998a3e34b60fe307ba27a228a760c4333705f123e5a3d"
+        },
+        {
+          "path": "skills/story-write/references/long-format.md",
+          "sha256": "a7df1dcd8e89b30dc8ff4556581241069f0c8091110e0fa8fa3539c3da571afa"
+        }
+      ],
+      "chars": 3084,
+      "sha256": "cdddc553739ccfc48ffbb874b75c3485eddeb6f374d325f2495b7bc2a86d5cd2"
+    },
+    "combined": {
+      "arm": "combined",
+      "created_at": "2026-09-06T04:13:53.620035+00:00",
+      "source_sha256": [
+        {
+          "path": "skills/story-write/references/reader-first-writing.md",
+          "sha256": "f395774d3ff6f9e948b998a3e34b60fe307ba27a228a760c4333705f123e5a3d"
+        },
+        {
+          "path": "skills/story-write/references/long-format.md",
+          "sha256": "a7df1dcd8e89b30dc8ff4556581241069f0c8091110e0fa8fa3539c3da571afa"
+        }
+      ],
+      "chars": 3456,
+      "sha256": "f8ed074474714abd58a77595868024ea7511f4c2c4ca8d66c02c9f8c31d52dfc"
+    }
+  },
+  "common_story_sha256": "5fca13fa5dc7d30381301b0483c4be862c15b733a5edd8f902e4c01895d95890",
+  "generation_attempts_per_chapter": 1,
+  "chapter_count_per_arm": 3,
+  "target_chars": 2500,
+  "allowed_range": [
+    2200,
+    2800
+  ],
+  "replicates_per_arm": 1,
+  "decision": "descriptive only; no winner or system effect claim; human feedback remains pending",
+  "scene_ablation_verified": true,
+  "consolidated_at": "2026-09-06T04:13:53.724664+00:00",
+  "registration_note": "Consolidated after baseline chapter 1; per-arm policy snapshots were frozen before each successful arm started. This is not a formal preregistered efficacy study.",
+  "post_freeze_changes": [
+    "Deployment-only correction: clarify reader review belongs to orchestrator and replace dangling candidate-logic-binding.md link with prose. Frozen pilot rules remain unchanged.",
+    "Clarify the existing production count includes punctuation and excludes title/whitespace; P1 percentage bands remain experiment-only. Pilot wording and all output are unchanged.",
+    "Final deployment documents bare-draft wordcount measure before complete candidate check. Agent priority allows linked requirements in one sentence. Pilot did not include full agent template; frozen prompts and output unchanged."
+  ],
+  "packaged_at": "2026-09-06T04:40:21.169589+00:00",
+  "records": [
+    {
+      "arm": "baseline",
+      "blind_code": "R17",
+      "chapter": 1,
+      "writer_agent": "sample_pine",
+      "creative_attempt": 1,
+      "raw_prose": "evidence/baseline/chapter-01.md",
+      "body_sha256": "d54137706ad1084e6760cd906d5f42b93a3d76da102fdbb51653150986f63702",
+      "prompt": "evidence/baseline/chapter-01.prompt.txt",
+      "prompt_sha256": "4c949db9dee5a84ceca3c7c9022bfa293ee5b1900f0c2252f72720588070e680",
+      "prompt_chars": 68945,
+      "length": {
+        "metric": "visible_chars_v1",
+        "min": 2200,
+        "max": 2800,
+        "actual": 2503,
+        "status": "pass"
+      },
+      "provenance_note": "One native writer per arm, same writer continued all three chapters. Model and effort inherited from parent; exact snapshot and seed not exposed. Byte-identical copy, no repair."
+    },
+    {
+      "arm": "baseline",
+      "blind_code": "R17",
+      "chapter": 2,
+      "writer_agent": "sample_pine",
+      "creative_attempt": 1,
+      "raw_prose": "evidence/baseline/chapter-02.md",
+      "body_sha256": "320f7eeb8fdfd9a14640bb11ff689d5165994a23b6ab5fbdc5b74106d1cc6290",
+      "prompt": "evidence/baseline/chapter-02.prompt.txt",
+      "prompt_sha256": "3288d468b634107003fc82a8bc716269209629e5dbcb1a5ce3baffa3a3123fe6",
+      "prompt_chars": 71536,
+      "length": {
+        "metric": "visible_chars_v1",
+        "min": 2200,
+        "max": 2800,
+        "actual": 2353,
+        "status": "pass"
+      },
+      "provenance_note": "One native writer per arm, same writer continued all three chapters. Model and effort inherited from parent; exact snapshot and seed not exposed. Byte-identical copy, no repair."
+    },
+    {
+      "arm": "baseline",
+      "blind_code": "R17",
+      "chapter": 3,
+      "writer_agent": "sample_pine",
+      "creative_attempt": 1,
+      "raw_prose": "evidence/baseline/chapter-03.md",
+      "body_sha256": "bd8b208cf680f14105b8422f98052aa914e4ca2ca672bb647a1d14776a6baa11",
+      "prompt": "evidence/baseline/chapter-03.prompt.txt",
+      "prompt_sha256": "227034bada39089155186ee648371accd287cf65d695ced67acab37c0b7655a8",
+      "prompt_chars": 74000,
+      "length": {
+        "metric": "visible_chars_v1",
+        "min": 2200,
+        "max": 2800,
+        "actual": 2339,
+        "status": "pass"
+      },
+      "provenance_note": "One native writer per arm, same writer continued all three chapters. Model and effort inherited from parent; exact snapshot and seed not exposed. Byte-identical copy, no repair."
+    },
+    {
+      "arm": "cleanup",
+      "blind_code": "R42",
+      "chapter": 1,
+      "writer_agent": "sample_maple",
+      "creative_attempt": 1,
+      "raw_prose": "evidence/cleanup/chapter-01.md",
+      "body_sha256": "dbf2b2c6b3e29ef45c34c6d2bac9e8b1aacd7683e7d88e2cb977d2c5e40af686",
+      "prompt": "evidence/cleanup/chapter-01.prompt.txt",
+      "prompt_sha256": "af31dbc69b1b4ca7029c4c5d1d8cb4c007bfe1185b7361dab636cac3d0663c01",
+      "prompt_chars": 4169,
+      "length": {
+        "metric": "visible_chars_v1",
+        "min": 2200,
+        "max": 2800,
+        "actual": 2578,
+        "status": "pass"
+      },
+      "provenance_note": "One native writer per arm, same writer continued all three chapters. Model and effort inherited from parent; exact snapshot and seed not exposed. Byte-identical copy, no repair."
+    },
+    {
+      "arm": "cleanup",
+      "blind_code": "R42",
+      "chapter": 2,
+      "writer_agent": "sample_maple",
+      "creative_attempt": 1,
+      "raw_prose": "evidence/cleanup/chapter-02.md",
+      "body_sha256": "08848c66440f65db1d113e97609d0540d578afc692c81a338a063115dbdcde89",
+      "prompt": "evidence/cleanup/chapter-02.prompt.txt",
+      "prompt_sha256": "a03e41ea57b9a3716405ab65b710d62e886fa5f1d5547aaae16bed66bd55628f",
+      "prompt_chars": 6821,
+      "length": {
+        "metric": "visible_chars_v1",
+        "min": 2200,
+        "max": 2800,
+        "actual": 2788,
+        "status": "pass"
+      },
+      "provenance_note": "One native writer per arm, same writer continued all three chapters. Model and effort inherited from parent; exact snapshot and seed not exposed. Byte-identical copy, no repair."
+    },
+    {
+      "arm": "cleanup",
+      "blind_code": "R42",
+      "chapter": 3,
+      "writer_agent": "sample_maple",
+      "creative_attempt": 1,
+      "raw_prose": "evidence/cleanup/chapter-03.md",
+      "body_sha256": "8fda645fba1af7f8f37a16ee1fae4bac6ee8e746eb9ec4260b4772170d4c85af",
+      "prompt": "evidence/cleanup/chapter-03.prompt.txt",
+      "prompt_sha256": "3d97e6700df95263ebeb41be7962adeaeeb00f91334036e4d090587e0ec57379",
+      "prompt_chars": 9719,
+      "length": {
+        "metric": "visible_chars_v1",
+        "min": 2200,
+        "max": 2800,
+        "actual": 2738,
+        "status": "pass"
+      },
+      "provenance_note": "One native writer per arm, same writer continued all three chapters. Model and effort inherited from parent; exact snapshot and seed not exposed. Byte-identical copy, no repair."
+    },
+    {
+      "arm": "combined",
+      "blind_code": "R86",
+      "chapter": 1,
+      "writer_agent": "sample_cedar",
+      "creative_attempt": 1,
+      "raw_prose": "evidence/combined/chapter-01.md",
+      "body_sha256": "75b7132abb19dc1df6a01a4d86d125724bff2e973c1a9a690f96028975d9a5fc",
+      "prompt": "evidence/combined/chapter-01.prompt.txt",
+      "prompt_sha256": "603a2ccb2e1ce7f7233d6a9b05d1680af1a3dbb63d3fba9b4c93550f953e961e",
+      "prompt_chars": 4541,
+      "length": {
+        "metric": "visible_chars_v1",
+        "min": 2200,
+        "max": 2800,
+        "actual": 2773,
+        "status": "pass"
+      },
+      "provenance_note": "One native writer per arm, same writer continued all three chapters. Model and effort inherited from parent; exact snapshot and seed not exposed. Byte-identical copy, no repair."
+    },
+    {
+      "arm": "combined",
+      "blind_code": "R86",
+      "chapter": 2,
+      "writer_agent": "sample_cedar",
+      "creative_attempt": 1,
+      "raw_prose": "evidence/combined/chapter-02.md",
+      "body_sha256": "0166bc8919cac4f64e4cb363a1694b98cada934112484323fc009cbe61b486b7",
+      "prompt": "evidence/combined/chapter-02.prompt.txt",
+      "prompt_sha256": "cb51295faea0230bf3be6a09de33673836650df24da0b9681559d83772e597f5",
+      "prompt_chars": 7405,
+      "length": {
+        "metric": "visible_chars_v1",
+        "min": 2200,
+        "max": 2800,
+        "actual": 2807,
+        "status": "over"
+      },
+      "provenance_note": "One native writer per arm, same writer continued all three chapters. Model and effort inherited from parent; exact snapshot and seed not exposed. Byte-identical copy, no repair."
+    },
+    {
+      "arm": "combined",
+      "blind_code": "R86",
+      "chapter": 3,
+      "writer_agent": "sample_cedar",
+      "creative_attempt": 1,
+      "raw_prose": "evidence/combined/chapter-03.md",
+      "body_sha256": "e6010856375ad1d79adf44f601ae27d354e12202a003fa94e97e26b3bb3c532b",
+      "prompt": "evidence/combined/chapter-03.prompt.txt",
+      "prompt_sha256": "337fc9d8a7e290be2734d2ab332ca6e8de4fdfaa5ab0f8f787fbdc05ffaeecce",
+      "prompt_chars": 10329,
+      "length": {
+        "metric": "visible_chars_v1",
+        "min": 2200,
+        "max": 2800,
+        "actual": 2755,
+        "status": "pass"
+      },
+      "provenance_note": "One native writer per arm, same writer continued all three chapters. Model and effort inherited from parent; exact snapshot and seed not exposed. Byte-identical copy, no repair."
+    }
+  ],
+  "blind_mapping": "mapping.json",
+  "review_design": "One isolated model reader per arm; only that anonymous three-chapter prose. Same rubric, no other versions or oracle. Not human evidence; no efficacy inference.",
+  "reviews": [
+    {
+      "blind_code": "R17",
+      "agent": "blind_reader_17",
+      "input": "reviews/R17.input.txt",
+      "input_sha256": "ce240fa392ed3baab6ab0ed25e7dbf0b6e390e806317b3cec7cbcabc0a7a2d15",
+      "output": "reviews/R17.md",
+      "output_sha256": "bc6c0de067e2c991a9ee40e043e15fdf70ff669ff6830d62702df8fe469e7f1a",
+      "evidence_type": "model_proxy",
+      "human_response": null,
+      "attempts": 1
+    },
+    {
+      "blind_code": "R42",
+      "agent": "blind_reader_42",
+      "input": "reviews/R42.input.txt",
+      "input_sha256": "e8ec71bd38629dbb3c5ef0541140aad66d0996ecfb530d75a0f9f6e37b8cadce",
+      "output": "reviews/R42.md",
+      "output_sha256": "58796f973efbf196ffe8d531cf2c85a5f723d82649341d8fb59992c3c3857ef9",
+      "evidence_type": "model_proxy",
+      "human_response": null,
+      "attempts": 1
+    },
+    {
+      "blind_code": "R86",
+      "agent": "blind_reader_86",
+      "input": "reviews/R86.input.txt",
+      "input_sha256": "d8c4039b99e55543d0a43aa9d871d906d9d4cf7a48b12d11f13173c88abe7ec5",
+      "output": "reviews/R86.md",
+      "output_sha256": "414ba1634ef0910d541dc6037081977b61294fa8e6e075ea53806b47a602aa98",
+      "evidence_type": "model_proxy",
+      "human_response": null,
+      "attempts": 1
+    }
+  ],
+  "deterministic_scans": {
+    "ai_patterns": {
+      "findings": 23,
+      "blocking": 19,
+      "affected_chapters": 9,
+      "path": "check-ai-patterns.js.json"
+    },
+    "degeneration": {
+      "findings": 0,
+      "path": "check-degeneration.js.json"
+    }
+  },
+  "production_adoption": "NOT_EVALUATED: no production transaction or candidate reader receipts were created.",
+  "human_effect": "PENDING_HUMAN_EVIDENCE"
+}

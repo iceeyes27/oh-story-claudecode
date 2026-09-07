@@ -961,9 +961,12 @@ class OrdinaryRevisionTests(unittest.TestCase):
         self.project = self.fixture.project
         self.original = sorted((self.project / "正文").glob("*.md"))[1]
         fill = "".join(chr(0x6000 + n) for n in range(2300))
-        self.original.write_text("# 第2章 手套\n她把手套递给弟弟。\n" + fill + "。\n", encoding="utf-8")
+        # newline="\n" 是可移植性要求，不是风格：生产侧 atomic_write_text 固定写 LF，
+        # 而 write_text 默认 newline=None 会在 Windows 上把 \n 转成 \r\n，
+        # 让「修订后的正文 == 候选源」这类逐字节断言只在 POSIX 上成立。
+        self.original.write_text("# 第2章 手套\n她把手套递给弟弟。\n" + fill + "。\n", encoding="utf-8", newline="\n")
         self.source = self.project / "候选/修订稿.md"
-        self.source.write_text(self.original.read_text(encoding="utf-8").replace("她把手套递给弟弟。", "她将手套递给弟弟。"), encoding="utf-8")
+        self.source.write_text(self.original.read_text(encoding="utf-8").replace("她把手套递给弟弟。", "她将手套递给弟弟。"), encoding="utf-8", newline="\n")
 
     def tearDown(self):
         self.fixture.temporary.cleanup()
@@ -1013,7 +1016,7 @@ class OrdinaryRevisionTests(unittest.TestCase):
         for kind in ("wording", "rhythm"):
             with self.subTest(kind=kind):
                 if kind == "rhythm":
-                    self.source.write_text(self.source.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+                    self.source.write_text(self.source.read_text(encoding="utf-8") + "\n", encoding="utf-8", newline="\n")
                 before = self.fixture.read_state()
                 old = self.original.read_bytes()
                 self.prepare(kind)
@@ -1085,7 +1088,7 @@ class OrdinaryRevisionTests(unittest.TestCase):
         for phase in ("prepared", "prose_written", "views_written", "state_written"):
             with self.subTest(phase=phase):
                 if hasattr(self, "operation"):
-                    self.source.write_text(self.source.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+                    self.source.write_text(self.source.read_text(encoding="utf-8") + "\n", encoding="utf-8", newline="\n")
                 self.prepare()
                 env = dict(os.environ, STORY_REVISION_FAIL_AFTER=phase)
                 self.action("accept", expect=97, env=env)

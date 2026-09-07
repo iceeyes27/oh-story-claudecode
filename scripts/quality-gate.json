@@ -22,6 +22,9 @@
       "tracking-workflow",
       "chapter-skeleton",
       "contracts",
+      "author-memory",
+      "phase2-contract",
+      "delivery-contract",
       "publication",
       "shared-assets",
       "static",
@@ -131,6 +134,26 @@
         "run",
         "test:contracts",
         "--silent"
+      ]
+    },
+    "author-memory": {
+      "command": "python",
+      "args": [
+        "scripts/test-author-memory-commit.py"
+      ]
+    },
+    "phase2-contract": {
+      "command": "node",
+      "args": [
+        "--test",
+        "scripts/test-phase2-contract.js"
+      ]
+    },
+    "delivery-contract": {
+      "command": "node",
+      "args": [
+        "--test",
+        "scripts/test-delivery-contract.js"
       ]
     },
     "publication": {

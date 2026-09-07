@@ -18,7 +18,12 @@ from pathlib import Path
 import re
 import sys
 
-from project_lock import project_lock, assert_no_unfinished_adoption, ProjectLockError
+from project_lock import (
+    project_lock,
+    assert_no_unfinished_adoption,
+    ProjectLockError,
+    TRACKING_RUNTIME_FILES,
+)
 
 _spec = importlib.util.spec_from_file_location("revision_candidate", Path(__file__).with_name("candidate-commit.py"))
 assert _spec and _spec.loader
@@ -175,11 +180,23 @@ def valid_review(project: Path, directory: Path, manifest: dict, review: dict) -
         require(isinstance(row.get("assessment"), str) and row["assessment"].strip(), f"context assessment missing: {name}")
 
 
+def tracking_snapshot(project: Path) -> dict[str, str]:
+    """追踪/ 下真实追踪内容的逐字节快照，按项目相对路径索引。
+
+    必须排除 TRACKING_RUNTIME_FILES：调用方在 project_lock 内运行，而 Windows 的
+    msvcrt 强制锁会让 read_bytes() 读活动锁文件时抛 PermissionError；POSIX 的
+    flock 是劝告锁读得通，所以漏掉排除只会在 Windows 上暴露。
+    """
+    root = project / "追踪"
+    return {p.relative_to(project).as_posix(): p.read_bytes().hex()
+            for p in root.rglob("*")
+            if p.is_file() and p.relative_to(root) not in TRACKING_RUNTIME_FILES}
+
+
 def build_changes(project: Path, directory: Path, manifest: dict, review: dict, transaction: dict | None) -> tuple[dict, dict]:
     ordinary(project)
     state = tracking.check_project(project)
-    tracking_before = {p.relative_to(project).as_posix(): p.read_bytes().hex()
-                       for p in (project / "追踪").rglob("*") if p.is_file()}
+    tracking_before = tracking_snapshot(project)
     require(inventory(project) == manifest["inventory"], "adopted prose changed since revision preparation")
     require(candidate.sha256_file(project / STATE) == manifest["state_sha256"], "tracking changed since revision preparation")
     for name, digest in manifest["context"].items():

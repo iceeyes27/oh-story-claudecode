@@ -43,9 +43,11 @@ class RevisionReviewTests(unittest.TestCase):
         # Unique CJK filler isolates persistence tests from repetition detectors.
         filler = "".join(chr(0x6000 + n) for n in range(2300))
         self.final = self.project / "正文/第001章_回执.md"
-        self.final.write_text("# 第1章 回执\n她把回执递给弟弟。\n" + filler + "。\n", encoding="utf-8")
+        # newline="\n" 是可移植性要求：生产侧 atomic_write_text 固定写 LF，而
+        # write_text 默认 newline=None 在 Windows 上会写成 CRLF，使逐字节断言只在 POSIX 成立。
+        self.final.write_text("# 第1章 回执\n她把回执递给弟弟。\n" + filler + "。\n", encoding="utf-8", newline="\n")
         self.source = Path(self.temporary.name) / "revised.md"
-        self.source.write_text(self.final.read_text(encoding="utf-8").replace("她把回执", "她将回执"), encoding="utf-8")
+        self.source.write_text(self.final.read_text(encoding="utf-8").replace("她把回执", "她将回执"), encoding="utf-8", newline="\n")
         revision.tracking.initialize(self.project, fixtures.initial_document(last_chapter=1))
 
     def snapshot(self):
@@ -90,8 +92,8 @@ class RevisionReviewTests(unittest.TestCase):
 
     def metrics_case(self, value):
         original = self.final.read_text(encoding="utf-8").replace("她把回执递给弟弟。", "余额为200元。")
-        self.final.write_text(original, encoding="utf-8")
-        self.source.write_text(original.replace("余额为200元。", "余额为100元。"), encoding="utf-8")
+        self.final.write_text(original, encoding="utf-8", newline="\n")
+        self.source.write_text(original.replace("余额为200元。", "余额为100元。"), encoding="utf-8", newline="\n")
         self.prepare("facts")
         tx = fixtures.transaction(1, mode="revision")
         tx["expected_state_revision"] = 0
@@ -100,11 +102,11 @@ class RevisionReviewTests(unittest.TestCase):
 
     def source_refresh_case(self, kind="wording", *, revised="账上还有200元。", metric_chapter=1):
         original = self.final.read_text(encoding="utf-8").replace("她把回执递给弟弟。", "余额为200元。")
-        self.final.write_text(original, encoding="utf-8")
-        self.source.write_text(original.replace("余额为200元。", revised), encoding="utf-8")
+        self.final.write_text(original, encoding="utf-8", newline="\n")
+        self.source.write_text(original.replace("余额为200元。", revised), encoding="utf-8", newline="\n")
         state = revision.tracking.check_project(self.project)
         if metric_chapter > 1:
-            (self.project / "正文/第002章_余款.md").write_text("# 第2章 余款\n余额为200元。\n", encoding="utf-8")
+            (self.project / "正文/第002章_余款.md").write_text("# 第2章 余款\n余额为200元。\n", encoding="utf-8", newline="\n")
             tx = fixtures.transaction(2)
             tx["expected_state_revision"] = state["state_revision"]
             revision.tracking.apply_transaction(self.project, tx)
@@ -135,7 +137,7 @@ class RevisionReviewTests(unittest.TestCase):
         for kind, anchor in (("wording", "她将回执递给弟弟。"), ("rhythm", "回执被她递给弟弟。")):
             with self.subTest(kind=kind):
                 original_anchor = self.final.read_text(encoding="utf-8").splitlines()[1]
-                self.source.write_text(self.final.read_text(encoding="utf-8").replace(original_anchor, anchor), encoding="utf-8")
+                self.source.write_text(self.final.read_text(encoding="utf-8").replace(original_anchor, anchor), encoding="utf-8", newline="\n")
                 state = revision.tracking.check_project(self.project)
                 state["metrics"] = {"回执归属": fixtures.metric("弟弟", 1, original_anchor)}
                 revision.tracking.write_views(self.project / "追踪", revision.tracking.render_views(state))
@@ -274,7 +276,7 @@ class RevisionReviewTests(unittest.TestCase):
         self.assertEqual((self.project / revision.STATE).read_bytes(), state)
         self.assertEqual(json.loads(self.journal.read_text(encoding="utf-8"))["phase"], "aborted")
         revision.assert_no_unfinished_adoption(self.project)
-        self.source.write_text(self.source.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+        self.source.write_text(self.source.read_text(encoding="utf-8") + "\n", encoding="utf-8", newline="\n")
         self.prepare()
 
     def test_prepared_abort_refuses_any_transaction_output_changed_by_external_editor(self):
@@ -315,6 +317,30 @@ class RevisionReviewTests(unittest.TestCase):
         self.assertEqual(after["wordcount_records"], {})
         expected = dict(state, state_revision=1, wordcount_records={})
         self.assertEqual(after, expected)
+
+    def test_tracking_snapshot_excludes_runtime_lock_files(self):
+        """快照必须跳过 追踪/ 下的运行时锁文件，且这一点在每个平台都可验。
+
+        回归背景：build_changes 在 project_lock 内运行。Windows 的 msvcrt 是强制
+        锁，读活动锁文件抛 PermissionError [Errno 13]；POSIX 的 flock 是劝告锁，
+        读得通。所以「漏掉排除」在 macOS/Linux 上完全无症状，只在 Windows 上炸。
+        本用例直接断言排除集生效，不依赖平台锁语义。
+        """
+        tracking_root = self.project / "追踪"
+        real = tracking_root / "逐章记录" / "第001章.md"
+        real.parent.mkdir(parents=True, exist_ok=True)
+        real.write_text("真实追踪内容。\n", encoding="utf-8", newline="\n")
+        for name in revision.TRACKING_RUNTIME_FILES:
+            (tracking_root / name).write_bytes(b"runtime lock residue")
+
+        snapshot = revision.tracking_snapshot(self.project)
+
+        self.assertIn("追踪/逐章记录/第001章.md", snapshot)
+        for name in revision.TRACKING_RUNTIME_FILES:
+            relative = (tracking_root / name).relative_to(self.project).as_posix()
+            self.assertNotIn(relative, snapshot)
+            # 排除只影响快照口径，不得顺手动了磁盘上的文件。
+            self.assertTrue((tracking_root / name).is_file())
 
 
 if __name__ == "__main__":

@@ -18,6 +18,16 @@ def lock_path(project: Path) -> Path:
     return project.resolve() / "追踪" / ".story-write.lock"
 
 
+# 追踪/ 下的运行时文件：不是追踪内容，遍历快照或做投影校验时必须排除。
+# 必须排除的原因是跨平台锁语义不同：Windows 的 msvcrt.locking 是**强制**字节范围
+# 锁，持锁期间另一个句柄读锁文件会抛 PermissionError [Errno 13]；POSIX 的
+# fcntl.flock 是**劝告**锁，照样读得通。所以「在锁内遍历 追踪/ 读全部文件」这类
+# 代码在 macOS/Linux 上静默通过、在 Windows 上必炸。
+# `.tracking-commit.lock` 是上游遗留名，本 fork 的 tracking_commit.project_write_lock
+# 已改为委派给本模块，只有旧项目目录里可能还留着它。
+TRACKING_RUNTIME_FILES = frozenset({Path(".tracking-commit.lock"), Path(".story-write.lock")})
+
+
 def _lock(handle: TextIO) -> None:
     handle.seek(0)
     if os.name == "nt":

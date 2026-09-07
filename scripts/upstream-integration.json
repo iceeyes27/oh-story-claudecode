@@ -120,6 +120,9 @@
         "prefix": "skills/"
       },
       {
+        "prefix": "tests/"
+      },
+      {
         "path": ".gitignore"
       },
       {

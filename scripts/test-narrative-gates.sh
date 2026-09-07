@@ -26,6 +26,7 @@ suites=(
   "test-story-continuity.sh bash scripts/test-story-continuity.sh"
   "test-chapter-completion-lifecycle.py $PYBIN scripts/test-chapter-completion-lifecycle.py"
   "test-longform-stability.sh bash scripts/test-longform-stability.sh"
+  "test-volume-audit.py $PYBIN scripts/test-volume-audit.py"
   "test-state-store.sh bash scripts/test-state-store.sh"
   "test-author-memory-commit.py $PYBIN scripts/test-author-memory-commit.py"
   "test-flow-state.sh bash scripts/test-flow-state.sh"

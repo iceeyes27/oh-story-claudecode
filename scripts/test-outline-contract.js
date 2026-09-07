@@ -228,6 +228,29 @@ try {
   assert.strictEqual(missingFile.status, 2)
   assert.match(missingFile.stderr, /没有第 21 章细纲/)
 
+  // Proactive agency sliding window advisory check:
+  const agencyProj = path.join(tmpRoot, 'agency-test')
+  const agencyDir = path.join(agencyProj, '大纲')
+  fs.mkdirSync(agencyDir, { recursive: true })
+  fs.writeFileSync(path.join(agencyDir, '细纲_第001章.md'), outline({ fieldValues: { '主角目标/关键选择': '被动防守，逃避追杀' } }), 'utf8')
+  fs.writeFileSync(path.join(agencyDir, '细纲_第002章.md'), outline({ fieldValues: { '主角目标/关键选择': '被动承受，防备偷袭' } }), 'utf8')
+  fs.writeFileSync(path.join(agencyDir, '细纲_第003章.md'), outline({ fieldValues: { '主角目标/关键选择': '应诉防守，仅自卫' } }), 'utf8')
+  const agencyRes = run(agencyProj, '3')
+  assert.strictEqual(agencyRes.status, 0)
+  assert(agencyRes.report.checks.some((c) => c.id === 'outline.proactive-agency-window' && c.severity === 'advisory' && !c.ok))
+
+  // 被动窗口被一章主动谋略打断时不得触发；同时锁住词表不再被单字偶然命中
+  // （「藏身破庙」的“破”、「取水疗伤」的“取”曾把被动章误判成主动）。
+  const agencyOkProj = path.join(tmpRoot, 'agency-ok')
+  const agencyOkDir = path.join(agencyOkProj, '大纲')
+  fs.mkdirSync(agencyOkDir, { recursive: true })
+  fs.writeFileSync(path.join(agencyOkDir, '细纲_第001章.md'), outline({ fieldValues: { '主角目标/关键选择': '逃避追杀，藏身破庙' } }), 'utf8')
+  fs.writeFileSync(path.join(agencyOkDir, '细纲_第002章.md'), outline({ fieldValues: { '主角目标/关键选择': '主动布局，引诱二长老出手' } }), 'utf8')
+  fs.writeFileSync(path.join(agencyOkDir, '细纲_第003章.md'), outline({ fieldValues: { '主角目标/关键选择': '防备偷袭，取水疗伤' } }), 'utf8')
+  const agencyOkRes = run(agencyOkProj, '3')
+  assert.strictEqual(agencyOkRes.status, 0)
+  assert(!agencyOkRes.report.checks.some((c) => c.id === 'outline.proactive-agency-window'))
+
   const invalid = spawnSync(process.execPath, [verifier, '--unknown'], { cwd: repoRoot, encoding: 'utf8' })
   assert.strictEqual(invalid.status, 2)
   assert.match(invalid.stderr, /用法/)

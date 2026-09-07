@@ -167,6 +167,15 @@ function validateFile(file) {
   const target = numberIn(contractFields.get('最终正文字数目标'));
   if (target === null || target < 1) add(blocking, 'invalid-target-budget', '最终正文字数目标必须包含正整数');
 
+  const hook = contractFields.get('章尾钩子');
+  if (hook) {
+    if (hook.length < 4 || /^(?:\[?待补充\]?|无|暂无|待定)$/.test(hook)) {
+      add(blocking, 'empty-cliffhanger', '章尾钩子缺少实质内容，必须写明具体的章尾悬念/动作/事件落点');
+    } else if (/(?:他|她|他们)不知道的是|危机.*悄然来临|风雨欲来|等待他.*将是/.test(hook)) {
+      add(advisory, 'vague-cliffhanger', `章尾钩子疑似使用了空洞预告句（“${hook}”），建议改写为具体的场内动作、画面、物件或台词`);
+    }
+  }
+
   const expansionFields = fieldsOf(byTitle.get('扩写约束')?.body || '');
   for (const field of EXPANSION_FIELDS) {
     if (!expansionFields.get(field)) add(blocking, 'missing-expansion-field', `扩写约束缺少字段：${field}`);

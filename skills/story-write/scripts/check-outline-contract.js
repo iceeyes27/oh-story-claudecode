@@ -65,11 +65,20 @@ function readUtf8(file) {
   }
 }
 
-function makeCheck(id, ok, file, evidence, expected, repair) {
+// 主角目标被动/主动词表。一律用双字以上词条：单字（查/探/破/争/设/取/买/炼）
+// 会被「藏身破庙」「取水疗伤」这类无关搭配偶然命中，把真正的被动章误判成主动。
+const PASSIVE_GOAL = /被动|被迫|防守|防御|防备|戒备|避难|躲避|躲藏|藏身|应诉|应付|挨打|逃跑|逃亡|逃命|逃避|承受|忍受|忍气|忍辱|听从|服从|求饶|自保|保命|脱身|按兵不动|等待时机|见机行事/
+const PROACTIVE_GOAL = /主动|调查|查明|查清|查探|探查|探听|试探|打探|摸底|谋划|筹谋|算计|布局|设局|下套|埋伏|反击|反攻|反杀|反制|出击|进攻|突破|破局|争取|夺取|抢夺|截取|收买|拉拢|招募|结盟|引诱|诱敌|逼迫|要挟|立威|扬名|炼制|购入|拿下/
+
+function isPassiveGoal(str) {
+  return PASSIVE_GOAL.test(str) && !PROACTIVE_GOAL.test(str)
+}
+
+function makeCheck(id, ok, file, evidence, expected, repair, severity = 'blocking') {
   return {
     id,
     ok,
-    severity: 'blocking',
+    severity,
     file,
     evidence,
     expected,
@@ -291,11 +300,38 @@ function verify(file, options = {}) {
     '只补字数目标或字数口径行，不调整情节安排。'
   ))
 
+  if (options.project && options.chapter) {
+    const chNum = Number(options.chapter)
+    if (Number.isInteger(chNum) && chNum >= 3) {
+      const prev1 = resolveChapter(options.project, chNum - 1)
+      const prev2 = resolveChapter(options.project, chNum - 2)
+      if (!prev1.error && !prev2.error) {
+        const text1 = readUtf8(prev1.file).text
+        const text2 = readUtf8(prev2.file).text
+        const goalCurr = fieldValue(text, '主角目标/关键选择') || ''
+        const goalPrev1 = fieldValue(text1, '主角目标/关键选择') || ''
+        const goalPrev2 = fieldValue(text2, '主角目标/关键选择') || ''
+
+        if (isPassiveGoal(goalCurr) && isPassiveGoal(goalPrev1) && isPassiveGoal(goalPrev2)) {
+          checks.push(makeCheck(
+            'outline.proactive-agency-window',
+            false,
+            name,
+            `第 ${chNum - 2}～${chNum} 章连续 3 章主角目标偏向被动防御`,
+            '商业网文建议每 3～5 章包含主角主动确立目标、试探或布局（避免连续被动救火）',
+            '建议在本章或下一章细纲中为主角增加主动出击、调查或夺取资源的谋略目标。',
+            'advisory'
+          ))
+        }
+      }
+    }
+  }
+
   return report(file, checks)
 }
 
 function report(file, checks) {
-  const failures = checks.filter((check) => !check.ok)
+  const failures = checks.filter((check) => !check.ok && check.severity !== 'advisory')
   return {
     schema_version: 1,
     verifier: 'story-long-write.outline-contract',
@@ -368,6 +404,7 @@ function main(argv) {
     return 2
   }
   let targets = parsed.files
+  let verifyOptions = { requireP1: parsed.requireP1 }
   if (!targets) {
     const resolved = resolveChapter(parsed.project, parsed.chapter)
     if (resolved.error) {
@@ -375,8 +412,9 @@ function main(argv) {
       return 2
     }
     targets = [resolved.file]
+    verifyOptions = { requireP1: parsed.requireP1, project: parsed.project, chapter: parsed.chapter }
   }
-  const reports = targets.map((file) => verify(file, { requireP1: parsed.requireP1 }))
+  const reports = targets.map((file) => verify(file, verifyOptions))
   const ok = reports.every((entry) => entry.ok)
   process.stdout.write(`${JSON.stringify(reports.length === 1 ? reports[0] : reports, null, 2)}\n`)
   return ok ? 0 : 1

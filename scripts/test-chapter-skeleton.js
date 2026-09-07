@@ -121,6 +121,14 @@ try {
   const filenameResult = JSON.parse(run([invalidName, '--json'], 1).stdout);
   assert(filenameResult.results[0].blocking.some((item) => item.code === 'filename'));
 
+  const emptyHook = write('第010章_空洞钩子.md', skeleton().replace('- 章尾钩子：发现异常编号', '- 章尾钩子：他不知道的是，更大的危机正在悄然来临'));
+  const hookResult = JSON.parse(run([emptyHook, '--json'], 0).stdout);
+  assert(hookResult.results[0].advisory.some((item) => item.code === 'vague-cliffhanger'));
+
+  const shortHook = write('第011章_过短钩子.md', skeleton().replace('- 章尾钩子：发现异常编号', '- 章尾钩子：走'));
+  const shortHookResult = JSON.parse(run([shortHook, '--json'], 1).stdout);
+  assert(shortHookResult.results[0].blocking.some((item) => item.code === 'empty-cliffhanger'));
+
   run([path.join(TEMP, '不存在.md')], 2);
   run([], 2);
   process.stdout.write('OK: chapter skeleton validator regressions passed\n');

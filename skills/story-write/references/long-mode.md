@@ -358,6 +358,7 @@ advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界�
 | 题材框架与定位 | `references/genre-catalog.md` + `references/genre-core-mechanics.md` |
 | 创建 artifact | `references/artifact-protocols.md` |
 | 读者契约与主角高光 | `references/reader-contract-and-progression.md` |
+| 战力层级与通胀防崩 | `references/power-scale-and-economy.md` |
 
 ### Phase 3：大纲搭建
 
@@ -382,7 +383,7 @@ advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界�
 | 章节钩子 | `references/hooks-chapter.md` |
 | 悬念设计 | `references/hooks-suspense.md` |
 | 段落级钩子 | `references/hooks-paragraph.md` |
-| 题材正文提示卡 / 题材分类卡 | `references/genre-prose-cards.md` 索引 + `references/genre-prose-cards/` 单题材卡目录（按题材分类优先） + `references/style-genre-modules.md`（通用流派补充） |
+| 题材正文提示卡 | `references/genre-prose-cards.md` 索引 + `references/genre-prose-cards/` + `references/style-genre-modules.md` |
 | 打斗/装逼 | `references/style-combat-face.md` |
 | 写作技法 | `references/style-craft.md` |
 | 商业创作核心方法 | `references/commercial-core-methods.md` |
@@ -408,6 +409,7 @@ advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界�
 | 禁用词扫描 | `../_shared/references/banned-words.md` |
 | AI句式脚本复扫 | `../_shared/scripts/check-ai-patterns.js` |
 | 去AI味 | `../_shared/references/anti-ai-writing.md` |
+| 卷级审计与换卷门禁 | `scripts/volume-audit.py` |
 
 ### 按主题快速定位（横切主题）
 

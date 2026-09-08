@@ -89,6 +89,8 @@
 | `test-skill-numbering.sh` | Step 重排级联安全、锚点 fail-closed、代码块引用、验证零写入/提交回滚、dry-run/write/幂等性 | `platform-gates` |
 | `test-storyctl.py` | storyctl 回归 | `platform-gates` |
 | `test-current-skill-contracts.py` | current-contract manifest 类型/固定值与主产物 fail-fast 语义 fixture | `platform-gates` |
+| `test-agent-permissions.py` | Codex / Antigravity 权限按有效能力生成、无效声明拒绝且保留既有输出 | `platform-gates` |
+| `test-doc-budget.py` | 路径预算、条件分支求和、缺失文件与超限回归 | `platform-gates` |
 | `test-shared-assets.py` | 共享资产 manifest 的 drift、sync、路径越界、basename 单一 owner 与未登记重复检测 | `platform-gates` |
 | `test-shared-references.py` | 共享 reference 组登记 | `platform-gates` |
 | `test-static-check.py` | 真 frontmatter block、精确路径/锚点、跨 Skill 引用、fence、死 reference、Agent 与章节链接 fixture | `platform-gates` |

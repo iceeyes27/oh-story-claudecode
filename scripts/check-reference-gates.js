@@ -75,4 +75,9 @@ for (const reference of [
   assert(short.includes(reference), `short gate must route ${reference}`)
 }
 
+assert(short.includes('references/workflow-design.md'), 'short Phase 2 must route workflow-design')
+const shortDesign = read('references/workflow-design.md')
+assert.match(shortDesign, /check-phase2-contract\.js --json/)
+assert.match(shortDesign, /最多做 2 轮定向 repair/)
+
 process.stdout.write(`reference-gates: unified source policy holds; ordinary writer core ${writerCoreChars} characters in ${writerReferences.length} files\n`)

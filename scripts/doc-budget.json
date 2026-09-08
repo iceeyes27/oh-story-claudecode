@@ -27,8 +27,8 @@
     },
     {
       "path": "skills/story-write/references/short-mode.md",
-      "budget": 22200,
-      "why": "mode=short 的完整流程（格式规范、Phase 1-4、核心框架、参考索引），任一短篇请求都加载"
+      "budget": 18000,
+      "why": "短篇路由与写作流程；Phase 2 设计模板按需加载 workflow-design.md。"
     },
     {
       "path": "skills/story-write/references/workflow-daily.md",
@@ -64,6 +64,11 @@
       "path": "skills/story-write/references/reader-first-writing.md",
       "budget": 2600,
       "why": "普通长篇写手的紧凑规则；替代默认完整技法读取，新增预算由旧热路径减少抵消。"
+    },
+    {
+      "path": "skills/story-write/references/workflow-design.md",
+      "budget": 3000,
+      "why": "短篇 Phase 2 按阶段读取；从 short-mode 移出构思模板与完成门禁，减少正文阶段上下文。"
     }
   ],
   "paths": [
@@ -93,6 +98,186 @@
         "skills/story-write/references/reader-first-writing.md",
         "skills/story-write/references/long-format.md"
       ]
+    },
+    {
+      "label": "短篇 Phase 2",
+      "files": [
+        "skills/story-write/SKILL.md",
+        "skills/story-write/references/short-mode.md",
+        "skills/story-write/references/workflow-design.md",
+        "skills/story-write/references/writing-workflow.md",
+        "skills/story-write/references/submission-craft.md",
+        "skills/story-write/references/short-craft.md",
+        "skills/story-write/references/short-reversal.md"
+      ],
+      "branches": [
+        {
+          "label": "世情打脸，无反派/揭露",
+          "budget": 46390,
+          "files": [
+            "skills/story-write/references/genre-styles/世情打脸.md"
+          ]
+        },
+        {
+          "label": "世情打脸，含反派/揭露",
+          "budget": 48750,
+          "files": [
+            "skills/story-write/references/genre-styles/世情打脸.md",
+            "skills/story-write/references/villain-and-reveal.md"
+          ]
+        },
+        {
+          "label": "双男主，无反派/揭露",
+          "budget": 45130,
+          "files": [
+            "skills/story-write/references/genre-styles/双男主.md"
+          ]
+        },
+        {
+          "label": "双男主，含反派/揭露",
+          "budget": 47500,
+          "files": [
+            "skills/story-write/references/genre-styles/双男主.md",
+            "skills/story-write/references/villain-and-reveal.md"
+          ]
+        },
+        {
+          "label": "复仇打脸，无反派/揭露",
+          "budget": 45850,
+          "files": [
+            "skills/story-write/references/genre-styles/复仇打脸.md"
+          ]
+        },
+        {
+          "label": "复仇打脸，含反派/揭露",
+          "budget": 48220,
+          "files": [
+            "skills/story-write/references/genre-styles/复仇打脸.md",
+            "skills/story-write/references/villain-and-reveal.md"
+          ]
+        },
+        {
+          "label": "宅斗宫斗，无反派/揭露",
+          "budget": 46120,
+          "files": [
+            "skills/story-write/references/genre-styles/宅斗宫斗.md"
+          ]
+        },
+        {
+          "label": "宅斗宫斗，含反派/揭露",
+          "budget": 48490,
+          "files": [
+            "skills/story-write/references/genre-styles/宅斗宫斗.md",
+            "skills/story-write/references/villain-and-reveal.md"
+          ]
+        },
+        {
+          "label": "总裁豪门，无反派/揭露",
+          "budget": 46690,
+          "files": [
+            "skills/story-write/references/genre-styles/总裁豪门.md"
+          ]
+        },
+        {
+          "label": "总裁豪门，含反派/揭露",
+          "budget": 49060,
+          "files": [
+            "skills/story-write/references/genre-styles/总裁豪门.md",
+            "skills/story-write/references/villain-and-reveal.md"
+          ]
+        },
+        {
+          "label": "悬疑，无反派/揭露",
+          "budget": 45450,
+          "files": [
+            "skills/story-write/references/genre-styles/悬疑.md"
+          ]
+        },
+        {
+          "label": "悬疑，含反派/揭露",
+          "budget": 47810,
+          "files": [
+            "skills/story-write/references/genre-styles/悬疑.md",
+            "skills/story-write/references/villain-and-reveal.md"
+          ]
+        },
+        {
+          "label": "民俗怪谈，无反派/揭露",
+          "budget": 45170,
+          "files": [
+            "skills/story-write/references/genre-styles/民俗怪谈.md"
+          ]
+        },
+        {
+          "label": "民俗怪谈，含反派/揭露",
+          "budget": 47540,
+          "files": [
+            "skills/story-write/references/genre-styles/民俗怪谈.md",
+            "skills/story-write/references/villain-and-reveal.md"
+          ]
+        },
+        {
+          "label": "沙雕脑洞，无反派/揭露",
+          "budget": 45730,
+          "files": [
+            "skills/story-write/references/genre-styles/沙雕脑洞.md"
+          ]
+        },
+        {
+          "label": "沙雕脑洞，含反派/揭露",
+          "budget": 48090,
+          "files": [
+            "skills/story-write/references/genre-styles/沙雕脑洞.md",
+            "skills/story-write/references/villain-and-reveal.md"
+          ]
+        },
+        {
+          "label": "甜宠，无反派/揭露",
+          "budget": 44770,
+          "files": [
+            "skills/story-write/references/genre-styles/甜宠.md"
+          ]
+        },
+        {
+          "label": "甜宠，含反派/揭露",
+          "budget": 47130,
+          "files": [
+            "skills/story-write/references/genre-styles/甜宠.md",
+            "skills/story-write/references/villain-and-reveal.md"
+          ]
+        },
+        {
+          "label": "追妻火葬场，无反派/揭露",
+          "budget": 46220,
+          "files": [
+            "skills/story-write/references/genre-styles/追妻火葬场.md"
+          ]
+        },
+        {
+          "label": "追妻火葬场，含反派/揭露",
+          "budget": 48590,
+          "files": [
+            "skills/story-write/references/genre-styles/追妻火葬场.md",
+            "skills/story-write/references/villain-and-reveal.md"
+          ]
+        },
+        {
+          "label": "冷门题材公式，无反派/揭露",
+          "budget": 48570,
+          "files": [
+            "skills/story-write/references/genre-writing-formulas.md"
+          ]
+        },
+        {
+          "label": "冷门题材公式，含反派/揭露",
+          "budget": 50930,
+          "files": [
+            "skills/story-write/references/genre-writing-formulas.md",
+            "skills/story-write/references/villain-and-reveal.md"
+          ]
+        }
+      ],
+      "why": "保留上游阶段和题材分支预算，并计入本 fork 统一入口（3800 字）及共享规则、作者采用边界的路径开销（1200 字）；短篇文件移除无关长篇索引。"
     }
   ]
 }

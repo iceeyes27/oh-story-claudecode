@@ -116,6 +116,8 @@ npx skills add iceeyes27/oh-story-claudecode -y -g
 
 `-g` installs globally (available in every directory); drop `-g` to install only into the current directory. Re-run the same command to update.
 
+To diagnose an installed writing environment, invoke story-setup with `check`. This mode inspects the existing deployment and reports findings without modifying the project.
+
 <details>
 <summary>Codex / ZCode / OpenClaw / Reasonix / Web AI usage notes</summary>
 

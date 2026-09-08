@@ -18,6 +18,8 @@ suites=(
   "test-skill-numbering.sh bash scripts/test-skill-numbering.sh"
   "test-storyctl.py $PYBIN scripts/test-storyctl.py"
   "test-current-skill-contracts.py $PYBIN scripts/test-current-skill-contracts.py"
+  "test-agent-permissions.py $PYBIN scripts/test-agent-permissions.py"
+  "test-doc-budget.py $PYBIN scripts/test-doc-budget.py"
   "test-shared-assets.py $PYBIN scripts/test-shared-assets.py"
   "test-shared-references.py $PYBIN scripts/test-shared-references.py"
   "test-static-check.py $PYBIN scripts/test-static-check.py"

@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import os
 import shlex
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -37,11 +38,25 @@ def write_manifest(path: Path, groups: list[dict[str, object]]) -> None:
     path.write_text(json.dumps({"version": 1, "groups": groups}), encoding="utf-8")
 
 
-def bash_path(path: Path) -> str:
-    text = str(path.resolve()).replace("\\", "/")
-    if len(text) >= 2 and text[1] == ":":
-        return "/mnt/" + text[0].lower() + text[2:]
-    return text
+def native_bash() -> str:
+    # A Windows Python fallback must run in Git Bash, not cross into WSL with
+    # a Windows interpreter and a Windows Git worktree marker.
+    if os.name == "nt":
+        git = shutil.which("git")
+        if git:
+            git_dir = Path(git).resolve().parent
+            for candidate in (
+                git_dir / "bash.exe",
+                git_dir.parent / "bin/bash.exe",
+                git_dir.parent.parent / "bin/bash.exe",
+            ):
+                if candidate.is_file():
+                    return str(candidate)
+        raise RuntimeError("Git Bash is required for the Windows Python fallback fixture")
+    bash = shutil.which("bash")
+    if bash is None:
+        raise RuntimeError("Bash is required for the Python fallback fixture")
+    return bash
 
 
 def assert_manifest_error(
@@ -129,7 +144,7 @@ with tempfile.TemporaryDirectory(prefix="shared-assets-") as tmp:
         "escapes repository root",
     )
 
-    duplicate_target_groups = [
+    duplicate_target_groups: list[dict[str, object]] = [
         {"name": "one", "source": "src/tool.js", "targets": ["skills/one/scripts/tool.js"]},
         {"name": "two", "source": "src/other.js", "targets": ["skills/one/scripts/tool.js"]},
     ]
@@ -156,7 +171,7 @@ with tempfile.TemporaryDirectory(prefix="shared-assets-") as tmp:
         "duplicate managed target skills/one/scripts/tool.js repeated in repeated",
     )
 
-    copy_chain = [
+    copy_chain: list[dict[str, object]] = [
         {
             "name": "canonical",
             "source": "src/a/tool.js",
@@ -243,22 +258,71 @@ with tempfile.TemporaryDirectory(prefix="shared-assets-") as tmp:
     assert "OK:" not in missing_source_sync.stdout
 
 
+for markdown_suffix in (".md", ".MDX", ".mDx"):
+    with tempfile.TemporaryDirectory(prefix="shared-assets-domain-") as tmp:
+        root = Path(tmp)
+        manifest = root / "manifest.json"
+        source = root / "skills" / "one" / "references" / f"guide{markdown_suffix}"
+        target = root / "skills" / "one" / "references" / "runtime-shadow" / source.name
+        source.parent.mkdir(parents=True)
+        source.write_text("reference document\n", encoding="utf-8")
+        write_manifest(
+            manifest,
+            [
+                {
+                    "name": "reference-misregistered-as-runtime",
+                    "source": source.relative_to(root).as_posix(),
+                    "targets": [target.relative_to(root).as_posix()],
+                }
+            ],
+        )
+
+        rejected = run(root, manifest, "sync")
+        assert rejected.returncode == 2, rejected.stderr + rejected.stdout
+        assert "runtime manifest cannot manage Markdown" in rejected.stderr
+        assert not target.exists(), "invalid runtime manifests must fail before copying"
+
+
+with tempfile.TemporaryDirectory(prefix="shared-assets-reference-runtime-") as tmp:
+    root = Path(tmp)
+    manifest = root / "manifest.json"
+    runtime_groups: list[dict[str, object]] = []
+    for filename in ("story_hook_core.js", "reference_helper.PY"):
+        source = root / "skills" / "one" / "references" / filename
+        target = root / "skills" / "one" / "references" / "runtime-shadow" / filename
+        source.parent.mkdir(parents=True, exist_ok=True)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        source.write_text(f"runtime {filename}\n", encoding="utf-8")
+        target.write_bytes(source.read_bytes())
+        runtime_groups.append(
+            {
+                "name": filename,
+                "source": source.relative_to(root).as_posix(),
+                "targets": [target.relative_to(root).as_posix()],
+            }
+        )
+    write_manifest(manifest, runtime_groups)
+
+    allowed = run(root, manifest, "check")
+    assert allowed.returncode == 0, allowed.stderr + allowed.stdout
+
+
 with tempfile.TemporaryDirectory(prefix="python-store-stub-") as tmp:
     stub_dir = Path(tmp)
     python3_stub = stub_dir / "python3"
-    python3_stub.write_text("#!/bin/sh\nexit 49\n", encoding="utf-8")
+    python3_stub.write_text("#!/bin/sh\nexit 49\n", encoding="utf-8", newline="\n")
     python3_stub.chmod(0o755)
     python_fallback = stub_dir / "python"
     python_fallback.write_text(
-        "#!/bin/sh\nexec {} \"$@\"\n".format(shlex.quote(sys.executable)),
-        encoding="utf-8",
+        "#!/bin/sh\nexec {} \"$@\"\n".format(shlex.quote(Path(sys.executable).as_posix())),
+        encoding="utf-8", newline="\n",
     )
     python_fallback.chmod(0o755)
     environment = os.environ.copy()
     environment["PATH"] = str(stub_dir) + os.pathsep + environment.get("PATH", "")
-    wrapper_script = bash_path(REPO_ROOT / "scripts" / "check-shared-files.sh")
+    wrapper_script = (REPO_ROOT / "scripts" / "check-shared-files.sh").as_posix()
     wrapper = subprocess.run(
-        ["bash", wrapper_script],
+        [native_bash(), wrapper_script],
         cwd=REPO_ROOT,
         env=environment,
         text=True,

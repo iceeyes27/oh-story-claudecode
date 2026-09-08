@@ -116,6 +116,8 @@ npx skills add iceeyes27/oh-story-claudecode -y -g
 
 `-g` 全局安装，所有目录可用；去掉 `-g` 则只装到当前目录。更新时重新执行同一条命令即可。
 
+排查已安装环境时，向 Agent 说「用 story-setup 检查写作环境」，或传入 `check` 参数；该模式只读检查并报告。
+
 <details>
 <summary>Codex / ZCode / OpenClaw / Reasonix / Web AI 使用说明</summary>
 

@@ -4,12 +4,12 @@
 
 ## 短篇 Reference Gate
 
-进入阶段前完整读取该阶段必需文件直到 EOF；`rg` 检索或局部摘读不算读完。格式先读 `short-format.md`；构思按需读 `short-genre-formulas.md`、`short-reversal.md`、`short-suspense.md` 与题材包；正文读 `short-craft.md`、`short-prose-quality.md` 和已选题材包。任一必需路径缺失或不可读即停止，不混读长篇资料。Phase 2 与交付分别执行 `check-phase2-contract.js`、`check-delivery-contract.js`。
+进入阶段前完整读取该阶段必需文件直到 EOF；`rg` 检索或局部摘读不算读完。格式先读 `short-format.md`；构思必读 `references/workflow-design.md`（Phase 3/4 不预加载），按需读 `short-genre-formulas.md`、`short-reversal.md`、`short-suspense.md` 与题材包；正文读 `short-craft.md`、`short-prose-quality.md` 和已选题材包。任一必需路径缺失或不可读即停止，不混读长篇资料。Phase 2 与交付分别执行 `check-phase2-contract.js`、`check-delivery-contract.js`。
 
 **执行规则：短篇以情绪为目标，所有内容为情绪服务。**
 
 短篇专属执行规则（在通用执行规则基础上追加）：
-1. **一个反转撑一篇**。所有铺垫为反转服务，所有情绪为反转蓄力。不多线、不铺世界观。
+1. **一个核心支点撑一篇**。反转型围绕主反转安排铺垫；无反转型围绕报应兑现或甜度递进积累期待。不多线、不铺世界观。
 2. **开头 3 句定生死，结尾定传播**。开头必须包含钩子，结尾必须有余韵。
 3. **默认第一人称**。短篇网文（盐言/七猫短篇等）绝大多数用第一人称，代入感最强。除非题材明确需要第三人称（如多视角悬疑），否则一律用「我」。
 
@@ -114,67 +114,9 @@
 
 > **多对标书时**：参 `references/cross-book-recall.md`，副对标 anchor 入「对标摘要」区
 
-#### Agent 调用：story-architect
+#### 构思、设计与验收
 
-构思阶段，如果项目已部署 story-architect agent（查找顺序见顶部），可 spawn `Agent(subagent_type: "story-architect", prompt: "项目目录：{dir}\n任务类型：短篇构思\n查询参数：{情绪目标+题材方向}")` 辅助框架设计。如 agent 不可用，由主线程直接执行。
-
-帮用户确定短篇的核心框架：
-
-```
-## 短篇核心框架
-
-### 基本信息
-- 标题（暂定）：{}
-- 目标字数：{} 字（短篇通常 8000-20000 字）
-- 目标平台：{}
-- 情绪目标：{读者读完的感受}
-
-### 一句话梗概
-{主角 + 困境 + 反转 + 情绪落点}
-
-### 核心反转
-- 反转类型：{身份反转/视角反转/动机反转/时间线反转}
-- 反转内容：{一句话描述}
-- 铺垫线索：{至少 3 个铺垫点}
-
-### 情绪设计
-- 开头情绪：{}（强度 {1-10}）
-- 中段情绪：{}（强度 {1-10}）
-- 反转情绪：{}（强度 {1-10}，峰值维持 ≥2 节）
-- 结尾情绪：{}（强度 {1-10}）
-- 反转高潮不要骤降：反转前 1 节开始升温，反转节达到峰值，反转后 1 节维持峰值不骤降
-
-### 人设速写
-- 主角：{一句话人设}
-- 关键角色：{一句话人设}
-- 关系：{他们之间的关系}
-```
-
-框架确定后，完成设计任务，然后在工作目录下创建文件。
-
-#### 设计任务（框架确定后执行）
-
-详细步骤和模板见 `references/writing-workflow.md`。构思时从目标情绪反推剧情，不是从灵感正向构建。按顺序完成：
-
-1. 定平台基调 + 加载题材风格包 → 先读 `references/submission-craft.md` 定投稿平台（知乎/小程序/番茄），正文视角、矛盾烈度、章末落点随之切换；再读 `references/genre-styles/{题材}.md`（核心 10 题材）+ 通用底座 `references/short-craft.md`，从招式库选 2-3 个核心招式（如追妻的白月光触发链 / 信物翻转 / 火葬场预告），写入 设定.md「题材招式」区，全程照此招式与腔调写
-2. 设计反派（如有）→ 加载 `villain-and-reveal.md`
-3. 确定揭露方式 → 同上
-4. 编写 小节大纲.md（格式见 writing-workflow.md）：短篇只做轻量蓝图，每节包含结构段/五段功能、人物/关系或其他状态变化、因果/逻辑链、结尾承接/钩子，不套长篇完整章节蓝图。**标出付费点卡在哪一节末**（见 `submission-craft.md`「付费点」：用未完成动作、身份/证据变化或两难选择形成真实断点）；用反推法先想透付费点那一节，再倒排前后。每节可选一个任务卡点，但必须服务情绪升级、证据推进、关系撕裂、反转铺垫或反击动作；没有就不强补
-5. 反转信息差验证（公式见 writing-workflow.md）
-6. 伏笔回查清单（标准见 writing-workflow.md）
-
-#### Phase 2 完成门禁
-
-两份文件生成后、声明构思完成或进入 Phase 3 前，运行 `node .agents/skills/_shared/scripts/check-phase2-contract.js --json {短篇目录}`：
-
-- exit 0：机械契约通过，才可进入下一阶段；这不替代故事质量判断
-- exit 1：只把 `repair_scope` 中的检查 ID、证据、期望、reference 路径和修复范围交给本轮 writer；只改失败字段，再运行同一命令
-- 最多做 2 轮定向 repair；仍失败则停止并报告剩余检查 ID，不得声称 Phase 2 已完成
-- exit 2、脚本缺失或不可执行：报告 verifier 不可用，不得用泛化自检替代
-
-#### Agent 调用：character-designer
-
-设计任务完成后，如果项目已部署 character-designer agent（查找顺序见顶部），可 spawn `Agent(subagent_type: "character-designer", prompt: "项目目录：{dir}\n任务类型：角色设定\n查询参数：{人设速写+关系}")` 辅助角色设定和语言风格档案。如 agent 不可用，由主线程直接执行。
+完整步骤见 [references/workflow-design.md](workflow-design.md)。按首屏 Reference Gate 读完后执行；两份设计文件通过其中的 Phase 2 完成门禁，才可进入 Phase 3。
 
 ---
 
@@ -187,6 +129,10 @@
 **拆文结果自动使用规则**：执行写作前必须按「对标上下文加载」（Phase 2）顺序扫描。找到拆文报告时，把“结构/情绪/反转/写作手法”作为技法参考；找到结构化子目录时，按当前小节目标检索最相关模块。
 
 > 术语说明：Phase 3 按「段」划分叙事结构（开头段/铺垫段/升级段/反转段/结尾段），每段包含若干「小节」（数字编号的 beat）。「场景」指写作时的具体画面。
+
+**交付参数先锁定**：用户明确的字数范围优先，逐字取其最小值/最大值与节数；只给单一目标时用目标的 95%-105%；都未给时用 8000-20000 字和大纲节数。后文的默认字数不得覆盖用户范围。
+
+**写前参数验收**：给 Phase 4 的交付命令加 `--check-contract` 先运行。参数通过不算交付；冲突时停在写前，报告字数范围与节数，请用户选择调整项，不代改用户约束。
 
 **写前准备**（每个场景写前执行 2 步，是核心方法的落地：确认情绪目标 → 召回技法模块）：
 - **步骤 1：记忆+召回**：① 本场景目标情绪词？② 借鉴哪个参考文件的哪个技法？③ 具体用在哪个段落？答不出 → 先回读参考再动笔。如有 `对标/` 或 `拆文库/` 结构化产出，按“对标上下文加载”规则检索与当前场景最相关的结构/情绪/反转/写作手法模块作为参考，并写入“拆文召回摘要”
@@ -202,7 +148,7 @@
 - 标点跟语气走：质问用问号，爆发处少量感叹；犹豫、未尽、打断可用动作、短句、换行或符合人物声线的省略与破折，detector 只登记 finding，无功能才改。
 - 具体字数表达（如“这五个字”）只有逐字核对且故事必要时才用；不能确认时改成“这句话一落”“那几个字”等非具体数字表达。
 - 短篇默认第一人称在场：受虐段可直白宣泄，反击段可冷静审判；只删中立无情绪的作者讲解，不删带主角偏色的审判/预告。
-- 情绪可以直写，但后面要接场景里特有的动作或物件；没有具体承接的情绪总结句才删。
+- 情绪可以直写，按 `references/short-craft.md` 第 2 节检查上下文支撑，不逐句补动作或物件。
 - 任务卡点也可以承接情绪，但必须直接加重羞辱、误会、背叛、证据、反击或心死节点；删掉后情绪/证据/关系无损就压缩。
 - 情绪强度服从题材、人物与铺垫；冲突、爽点和台词都要产生具体后果，心死或余韵可按题材包保持克制。
 
@@ -378,84 +324,17 @@
 
 按场景加载，不一次全部加载。长篇与短篇共享 `references/` 目录，路径从本 skill 目录下读取。
 
-### 长篇 Phase 1：选题方向
-
-| 场景 | 加载文件 |
-|------|---------|
-| 确定题材类型 | `references/genre-catalog.md` |
-| 判断市场方向 | `references/genre-readers.md` |
-| 特殊题材考量 | `references/plot-special-topics.md` |
-| 女频长篇（题材/文案/平台/感情线） | `references/female-audience-writing.md` |
-
-### 长篇 Phase 2：核心设定
-
-| 场景 | 加载文件 |
-|------|---------|
-| 设定人物 | `references/character-basics.md` |
-| 设计关系 | `references/character-relations.md` |
-| 题材框架与定位 | `references/genre-catalog.md` + `references/genre-core-mechanics.md` |
-| 创建 artifact | `references/artifact-protocols.md` |
-| 读者契约与主角高光 | `references/reader-contract-and-progression.md` |
-
-### 长篇 Phase 3：大纲搭建
-
-| 场景 | 加载文件 |
-|------|---------|
-| 搭建大纲 | `references/outline-methods.md` |
-| 设计矛盾与结构 | `references/outline-conflict.md` |
-| 深度结构设计 | `references/outline-structure-theory.md` |
-| 节奏与升级感 | `references/outline-rhythm.md` |
-| 小纲与卡文 | `references/plot-core-methods.md` |
-| 选择叙事框架 | `references/plot-frameworks.md` |
-| 题材写作公式 | `references/genre-writing-formulas.md` |
-| 黄金三章 | `references/opening-design.md` |
-| 情绪弧线 | `references/emotional-arc-design.md` |
-| 契约/终局储备/剧情单元安全审查 | `references/reader-contract-and-progression.md` |
-| 反转设计 | `references/reversal-toolkit.md` |
-
-### 长篇 Phase 4：章节生产辅助
-
-| 场景 | 加载文件 |
-|------|---------|
-| 章节钩子 | `references/hooks-chapter.md` |
-| 悬念设计 | `references/hooks-suspense.md` |
-| 段落级钩子 | `references/hooks-paragraph.md` |
-| 题材正文提示卡 / 题材分类卡 | `references/genre-prose-cards.md` 索引 + `references/genre-prose-cards/` 单题材卡目录（按题材分类优先） + `references/style-genre-modules.md`（通用流派补充） |
-| 打斗/装逼 | `references/style-combat-face.md` |
-| 写作技法 | `references/style-craft.md` |
-| 商业创作核心方法 | `references/commercial-core-methods.md` |
-| 对话 | `references/dialogue-mastery.md` |
-| 人物深化 | `references/character-design-methods.md` |
-| 情绪技法 + 叙事单元 | `references/plot-emotion-system.md` + `references/emotional-methods.md` |
-| 写作技法全程参考 | `references/writing-craft.md` |
-| 格式与结构规范 | `references/format-and-structure.md`（仅对话/段落格式适用长篇） |
-| 状态追踪协议 | `references/state-tracking.md` |
-| 写作阶段披露协议 | `references/progressive-disclosure.md` |
-| 写作流程状态工具 | `scripts/flow-state.js` |
-| 章节骨架（长篇默认） | `references/chapter-skeleton-workflow.md` + `scripts/check-chapter-skeleton.js` |
-| 候选模式（作者拍板/采用/重写） | `references/candidate-workflow.md` + `scripts/candidate-commit.py` |
-| 结构化状态库（实验性旁路） | `references/state-store.md` |
-| 当前剧情单元与契约校准 | `references/reader-contract-and-progression.md` |
-
-### 长篇 Phase 5：质量检查
-
-| 场景 | 加载文件 |
-|------|---------|
-| 质量检查 | `references/short-prose-quality.md` + `references/reader-contract-and-progression.md` |
-| 禁用词扫描 | `.agents/skills/_shared/references/banned-words.md` |
-| AI句式脚本复扫 | `.agents/skills/_shared/scripts/check-ai-patterns.js` |
-| 稳定性批量验收（启用时） | `scripts/stability-audit.js` + `scripts/handoff-pack.js`（用法见 `references/longform-stability.md`） |
-| 去AI味 | `.agents/skills/_shared/references/anti-ai-writing.md` |
-
 ### 短篇：按需加载
 
-写作时同时加载 ≤ 3 个：
+Phase 2 完整读取 `references/workflow-design.md`；Phase 3/4 不预加载该设计流程。
+
+按当前阶段 Reference Gate 加载必需文件，其余按需：
 
 | 文件 | 何时加载 |
 |------|----------|
 | [references/short-format.md](short-format.md) | 写作前必读（短篇正文格式，两平台模板） |
 | [references/submission-craft.md](submission-craft.md) | 投稿前必读（平台基调 知乎/小程序/番茄 · 导语门面 · 付费点断点） |
-| [references/short-craft.md](short-craft.md) | 写作全程参考（短篇通用底座：情绪直接写+后接具体反应、在场叙述、超短章节制） |
+| [references/short-craft.md](short-craft.md) | 写作全程参考（短篇通用底座：情绪直写与场景支撑、在场叙述、超短章节制） |
 | [references/genre-styles/](genre-styles/) | **定方向后必读**：按题材加载对应风格包（追妻火葬场 / 世情打脸 / 复仇打脸 / 总裁豪门 / 宅斗宫斗 / 民俗怪谈 / 悬疑 / 甜宠 / 双男主 / 沙雕脑洞），正文风格随之切换 |
 | [references/short-deslop.md](short-deslop.md) | 去AI味时必读（短篇专属，只杀真·AI腔，不杀情绪烈度） |
 | [references/writing-workflow.md](writing-workflow.md) | Phase 2 设计任务 + Phase 4 精修 |
@@ -498,7 +377,7 @@
 
 | 主题 | 权威文件（先读） | 配套文件（按角度补充） |
 |------|-----------------|----------------------|
-| 情绪外化（怎么写情绪） | **`references/short-craft.md` 第2节**（情绪直接写+后接具体反应、三段对照、改写四步——替代旧机械替换表） | 各 `genre-styles/` 包的「情绪烈度与模式」 |
+| 情绪落地（怎么写情绪） | **`references/short-craft.md` 第2节**（情绪直写、场景支撑与重复说明取舍） | 各 `genre-styles/` 包的「情绪烈度与模式」 |
 | 情绪设计（情感结构） | **`references/emotional-methods.md`**（情感三板斧 + 拉扯节奏 + 失败模式） | `references/genre-writing-techniques.md`（情绪操控核心法则 / 情绪三层次） |
 | 反转 | **`references/reversal-toolkit.md`**（反转类型 / 铺垫 / 有效性自检） | `references/villain-and-reveal.md`（真相揭露机制 / 反转有效性自检） |
 | 反派揭露 | **`references/villain-and-reveal.md`**（反派模板 / 揭露机制 / 报应设计） | `references/reversal-toolkit.md` |

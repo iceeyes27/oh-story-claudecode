@@ -37,8 +37,8 @@
     },
     {
       "path": "skills/story-write/references/workflow-setup.md",
-      "budget": 13000,
-      "why": "开书 Phase 1-3，与 long-mode.md 叠加"
+      "budget": 15500,
+      "why": "开书 Phase 1-3，与 long-mode.md 叠加。+2500：迁入排纲供给自查、创作自主权分级、写手自由区、分辨率与禁放边界，同时保留统一 fork 的目标字数预算与 P1 读者契约。"
     },
     {
       "path": "skills/story-write/references/writing-craft.md",
@@ -83,7 +83,7 @@
     },
     {
       "label": "长篇开书",
-      "budget": 44000,
+      "budget": 46500,
       "files": [
         "skills/story-write/SKILL.md",
         "skills/story-write/references/long-mode.md",

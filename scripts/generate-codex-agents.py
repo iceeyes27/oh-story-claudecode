@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Generate Codex custom-agent TOML templates from Claude agent markdown.
 
-The Claude/OpenCode agent markdown remains the source of truth for role text.
+The Claude agent markdown remains the source of truth for role text.
 Codex expects standalone TOML files with at least name, description, and
 `developer_instructions`; this script performs a deterministic conversion.
 """
@@ -82,7 +82,7 @@ def toml_list(values: list[str]) -> str:
 
 
 def adapt_body_for_codex(body: str, name: str) -> str:
-    """Translate Claude/OpenCode caller terminology to Codex custom-agent wording."""
+    """Translate Claude caller terminology to Codex custom-agent wording."""
     adapted = body.replace("subagent_type", "agent_type")
     adapted = adapted.replace(
         ".claude/skills/story-setup/references/agent-references/",

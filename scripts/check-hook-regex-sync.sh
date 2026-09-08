@@ -156,7 +156,7 @@ echo "OK: hook foreshadow detection warns only on overdue/abnormal states"
 
 # ── 毒句式 js↔py 同步锁 ─────────────────────────────────────────────────────
 # 写后正文网的确定性毒句式规则在两处各有一份同构实现：JS 共享核 story_hook_core.js
-# （Claude/OpenCode/ZCode 三副本字节一致由 check-shared-files.sh 保证）与 codex
+# （Claude/ZCode 副本字节一致由 check-shared-files.sh 保证）与 codex
 # story_codex_hook.py（Stop 回合末复扫）。每条正则/常量/文案的规范文本必须在两份里
 # 逐字出现，改一处漏改另一处即 fail——与 test-prose-net-parity.sh 的 fixture 级
 # 功能 parity 互补（这里锁源文本，那里锁行为输出）。

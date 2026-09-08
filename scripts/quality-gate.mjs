@@ -113,7 +113,7 @@ export function aggregateStatus(results) {
 export async function execute(argv = process.argv.slice(2)) {
   const options = parseArgs(argv);
   if (options.help) {
-    process.stdout.write('Usage: node scripts/quality-gate.mjs --profile <fast|affected|release> [--json-out FILE]\n');
+    process.stdout.write('Usage: node scripts/quality-gate.mjs --profile <fast|affected|release|external> [--json-out FILE]\n');
     return 0;
   }
   const raw = await readFile(resolve(root, 'scripts/quality-gate.json'), 'utf8');

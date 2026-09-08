@@ -132,12 +132,6 @@ LEGACY_RULES = (
         ("skills/story-setup/SKILL.md",),
     ),
     AbsentRule(
-        "opencode-old-reference-prefix",
-        "OpenCode agents use the deployed skills/ reference path only",
-        r"\.opencode/skills/story-setup/references/agent-references/",
-        ("skills/story-setup/references/opencode/agents",),
-    ),
-    AbsentRule(
         "codex-old-reference-prefix",
         "Codex agents use the deployed .codex/skills reference path only",
         r"\.(?:claude|opencode)/skills/story-setup/references/agent-references/|\{项目根\}/skills/story-setup/references/agent-references/",
@@ -213,7 +207,6 @@ LEGACY_RULES = (
             "skills/story-write/references/long-mode.md",
             "skills/story-write/references/short-mode.md",
             "skills/story-setup/references/templates/agents/narrative-writer.md",
-            "skills/story-setup/references/opencode/agents/narrative-writer.md",
             "skills/story-setup/references/codex/agents/narrative-writer.toml",
         ),
     ),
@@ -241,7 +234,6 @@ LEGACY_RULES = (
         r"Glob\s*`?(?:对标|拆文库)/\*/文风\.md",
         (
             "skills/story-setup/references/templates/agents/story-explorer.md",
-            "skills/story-setup/references/opencode/agents/story-explorer.md",
             "skills/story-setup/references/codex/agents/story-explorer.toml",
         ),
     ),

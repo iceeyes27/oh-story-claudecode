@@ -31,7 +31,6 @@ const IGNORED_DIRECTORIES = new Set([
   ".omx",
   ".claude",
   ".codex",
-  ".opencode",
   ".zcode",
   ".agents",
   "node_modules",

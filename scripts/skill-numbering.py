@@ -861,7 +861,7 @@ def transactional_write(changes: dict[Path, str]) -> None:
     except BaseException as exc:
         # 必须是 BaseException：Ctrl-C 抛出的 KeyboardInterrupt 不是 Exception，
         # 而下面的 finally 无条件删掉所有备份，只捕获 Exception 会让提交循环中途
-        # 被打断的那次改写永久半落盘且无从恢复。与 sync-opencode.py 的提交循环一致。
+        # 被打断的那次改写永久半落盘且无从恢复。与 sync-shared-assets.py 的提交循环一致。
         rollback_errors: list[str] = []
         for path in reversed(replaced):
             try:

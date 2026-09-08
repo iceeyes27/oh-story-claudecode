@@ -15,6 +15,21 @@ test('all required checks must pass', () => {
   assert.equal(aggregateStatus([{ status: 'BLOCKED' }, { status: 'FAIL' }]), 'FAIL');
 });
 
+test('external E2E checks remain runnable without becoming local release requirements', () => {
+  const gate = JSON.parse(readFileSync(join(SCRIPTS, 'quality-gate.json'), 'utf8'));
+  for (const name of ['codex-cli-e2e', 'dashboard-e2e']) {
+    assert.ok(gate.checks[name], `external check must remain registered: ${name}`);
+    assert.ok(gate.profiles.external.includes(name), `external check must be runnable: ${name}`);
+    for (const profile of ['fast', 'affected', 'release']) {
+      assert.ok(!gate.profiles[profile].includes(name), `${profile} must not require ${name}`);
+    }
+  }
+  for (const name of ['opencode-adapter', 'opencode-cli-e2e']) {
+    assert.ok(!gate.checks[name], `removed platform check must not remain registered: ${name}`);
+    assert.ok(Object.values(gate.profiles).every((names) => !names.includes(name)));
+  }
+});
+
 function collectScriptRefs(text) {
   const refs = new Set();
   const live = text.split(/\r?\n/).filter((line) => {

@@ -125,9 +125,9 @@ agent-browser --cdp 9222 type "<sel>" "<text>"
 
 ---
 
-## OpenCode 环境注意事项
+## 无后台执行能力的运行环境注意事项
 
-opencode 没有后台执行命令行的工具，长时间的 CDP 操作（如等待页面加载、大批量数据抓取）会阻塞整个会话，导致 CLI 无响应。
+部分 CLI 没有后台执行命令行的工具，长时间的 CDP 操作（如等待页面加载、大批量数据抓取）会阻塞整个会话，导致 CLI 无响应。
 
 ### 超时包装
 
@@ -158,7 +158,7 @@ timeout 30 agent-browser --cdp 9222 eval "window.location.replace('https://www.q
 | Chrome 进程僵死 | CDP 连接断开但进程未退出 | 先核验 debug profile 对应 PID，只结束该 debug 实例后重连；不得连带普通 Chrome |
 | 网络波动 | 请求挂起无超时 | 超时后自动重试一次 |
 
-如遇到持续卡死的操作，在 opencode 中按 `ESC` 手动打断。
+如遇到持续卡死的操作，按运行环境提供的中断键（多数 CLI 为 `ESC` 或 Ctrl-C）手动打断。
 
 ---
 

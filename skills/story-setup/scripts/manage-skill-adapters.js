@@ -9,7 +9,6 @@ const VERSION = 1;
 const PLATFORM_DIRS = Object.freeze({
   claude: '.claude/skills',
   codex: '.codex/skills',
-  opencode: '.opencode/skills',
   zcode: '.zcode/skills',
   workbuddy: '.workbuddy/skills',
   codebuddy: '.codebuddy/skills',

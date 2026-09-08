@@ -6,7 +6,7 @@
 #   - 长篇 正文/第N章_*.md 首建且缺细纲：要求同书 大纲/细纲_第N章.md 存在
 #   - 短篇 正文.md 首建且缺大纲：要求同目录 小节大纲.md 存在
 #   - 长篇追踪检查点不成立：state 缺失/schema 不符/续写状态卡修订不一致/首建新章时
-#     上一章事务未提交（判定走共享核，与 opencode/zcode/codex 同一份；见下方该段注释）
+#     上一章事务未提交（判定走共享核，与 zcode/codex 同一份；见下方该段注释）
 # 细纲/大纲门只在首建时判，追踪门对首建与续写都判（与 JS 核 proseBlockReason 同序）。
 # 非正文目标、解析不到路径一律静默放行。
 # 设计原则：宁可漏拦不可误伤——任何不确定都 exit 0。
@@ -166,7 +166,7 @@ case "$BASE" in
     fi
     # 追踪检查点门：state 缺失 / schema 不是 4 / 续写状态卡修订与 state 不一致 / 首建新章
     # 时上一章事务未提交，都拦下。判定走共享核（story_hook_cli.js tracking-checkpoint），
-    # 与 opencode/zcode/codex 同一份实现——issue #305 之前这道门只进了 JS 核与 codex py，
+    # 与 zcode/codex 同一份实现——issue #305 之前这道门只进了 JS 核与 codex py，
     # Claude 侧独缺，会静默写出若干章无追踪的正文。
     # 需要解析 JSON，只能靠 node；node 缺席/核缺失/子命令不识别一律放行（宁可漏拦不可误伤，
     # 与本文件其余降级一致）。SessionStart 连续性提醒与批末 check 仍兜底。
@@ -183,7 +183,7 @@ case "$BASE" in
     # 正文已存在的到此为止：欠账门只针对首建新章。
     [ -n "$EXISTS" ] && exit 0
     # 伏笔欠账门（无状态）：写第 N 章（首建）前，若有伏笔越过了自己排定的回收章仍未回收，先处理再写。
-    # 判定走共享核 foreshadow-debt 子命令（与 opencode/zcode/codex 同一份实现和同一份文案），
+    # 判定走共享核 foreshadow-debt 子命令（与 zcode/codex 同一份实现和同一份文案），
     # 顺序与 JS 核 proseBlockReason 一致：伏笔欠账门在毒句式欠账门之前。
     # 只拦「作者自己排了回收章又错过」这一类明确违约；悬空/冷藏是 advisory，不在日更路径上拦
     # （与 detect-story-gaps.sh 的既定设计一致：不把日更变成全量伏笔审计）。

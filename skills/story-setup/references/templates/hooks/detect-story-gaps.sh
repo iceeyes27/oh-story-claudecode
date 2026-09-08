@@ -111,7 +111,7 @@ if [ -n "$GLOBAL_PROGRESS_OUTPUT" ]; then
 fi
 
 # 6. 跨批连续性兜底（追踪 staleness + 章节标题去重）——走 node 共享核 continuityFindings，
-# 与 Codex/OpenCode/ZCode 同一份实现。会话起点提醒：续写前发现「写了章但 上下文.md 没跟上」
+# 与 Codex/ZCode 同一份实现。会话起点提醒：续写前发现「写了章但 上下文.md 没跟上」
 # 或「两章撞名」。消息串与共享连续性核心保持一致；多书/并列去重的排序按 js 语义（已文档化，仅影响
 # advisory 顺序，不影响是否报）。扫描范围 repo-wide（与上方缺口检测一致），多书项目里非活跃书
 # 也会提醒——有意为之（切书前也想知道断线），不按 .active-book 收窄。staleness 用 mtime 比较

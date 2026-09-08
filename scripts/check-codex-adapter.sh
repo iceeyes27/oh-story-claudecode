@@ -103,7 +103,7 @@ echo "  OK Windows encoding safety (UTF-8 stdio + file reads)"
 
 # Prose backstop parity surface: Codex has no PostToolUse, so the light prose net runs at Stop
 # (sweeping git-changed 正文) and continuity runs at SessionStart. These must stay present.
-assert_grep 'def prose_net_findings' "$HOOK_PY" "Codex hook must carry the light prose net (parity with claude/opencode)"
+assert_grep 'def prose_net_findings' "$HOOK_PY" "Codex hook must carry the light prose net (parity with claude/zcode)"
 assert_grep 'def find_changed_prose_files' "$HOOK_PY" "Codex Stop sweep must discover git-changed prose"
 assert_grep 'def continuity_findings' "$HOOK_PY" "Codex hook must carry the continuity backstop (追踪 staleness + dup-title)"
 

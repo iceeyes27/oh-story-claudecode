@@ -1,9 +1,8 @@
 #!/bin/bash
 # test-prose-net-parity.sh — 正文兜底「轻量确定性网」四端 parity 守卫
-# 网有两份运行实现：Codex `story_codex_hook.py` 与共享 JS core；Claude、OpenCode、ZCode
+# 网有两份运行实现：Codex `story_codex_hook.py` 与共享 JS core；Claude、ZCode
 # 消费各自的同字节 core 副本。本测试四层保证：
-#   A. 功能 parity：codex python 网、opencode TS 网、
-#      zcode JS 网在同一组 fixture 上逐字相等。
+#   A. 功能 parity：codex python 网与 zcode JS 网在同一组 fixture 上逐字相等。
 #   B. 命令函数 parity（CI 硬保证）：正文目标抽取、apply-patch 目标、git commit 侦测三个纯函数
 #      在 codex python 与 zcode JS 间逐字相等——锁住此前无守卫、已漂移的手抄逻辑。
 #   C. 未归核面 parity（CI 硬保证）：staged markdown warnings 与大纲阻断判定未归核——codex
@@ -25,23 +24,19 @@ ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
 . "$ROOT/scripts/python3-shim.sh"
 
 CODEX="$ROOT/skills/story-setup/references/codex/hooks/story_codex_hook.py"
-OPENCODE="$ROOT/skills/story-setup/references/opencode/plugin.ts"
 ZCODE="$ROOT/skills/story-setup/references/zcode/hooks/story_zcode_hook.js"
 ZCODE_CORE="$ROOT/skills/story-setup/references/zcode/hooks/story_hook_core.js"
-OPENCODE_CORE="$ROOT/skills/story-setup/references/opencode/story_hook_core.js"
 CLAUDE_CORE="$ROOT/skills/story-setup/references/templates/hooks/story_hook_core.js"
 CLAUDE_COMMIT="$ROOT/skills/story-setup/references/templates/hooks/validate-story-commit.sh"
 CLAUDE_GAPS="$ROOT/skills/story-setup/references/templates/hooks/detect-story-gaps.sh"
 CLAUDE_GUARD="$ROOT/skills/story-setup/references/templates/hooks/guard-outline-before-prose.sh"
-for f in "$CODEX" "$OPENCODE" "$ZCODE" "$ZCODE_CORE" "$OPENCODE_CORE" "$CLAUDE_CORE" "$CLAUDE_COMMIT" "$CLAUDE_GAPS" "$CLAUDE_GUARD"; do
+for f in "$CODEX" "$ZCODE" "$ZCODE_CORE" "$CLAUDE_CORE" "$CLAUDE_COMMIT" "$CLAUDE_GAPS" "$CLAUDE_GUARD"; do
   [ -f "$f" ] || { echo "FAIL: missing impl: $f" >&2; exit 1; }
 done
 
 fails=0
 
-# ── A. 功能 parity（codex python 网 vs opencode TS 网） ──
-# TS 运行：优先 node 原生类型擦除（node ≥ 22.6 的 --experimental-strip-types），否则用本机 esbuild；
-# 都没有时只跳过 OpenCode plugin 直跑，Codex ↔ ZCode 行为 parity 仍执行。
+# ── A. 功能 parity（codex python 网 vs zcode JS 网） ──
 run_functional() {
   command -v node >/dev/null 2>&1 || return 1
   command -v python3 >/dev/null 2>&1 || return 1
@@ -215,45 +210,6 @@ PY
   grep -q '^truncate_astral | 第2行 疑似截断' "$tmp/py.txt" || { echo "FAIL: 增补面字符结尾的真截断未被检出" >&2; return 3; }
   ! grep '^truncate_astral |' "$tmp/py.txt" | grep -q '�' || { echo "FAIL: 增补面字符摘要被 UTF-16 切坏" >&2; return 3; }
 
-  # 转译 TS：擦除类型即可（net 函数只用 RegExp/String/Set/Array）。优先 node 原生类型擦除
-  # （node ≥ 22.6 的 --experimental-strip-types），否则用本机已装的 esbuild 二进制。
-  # 不走 `npx --yes esbuild`：CI 的 node 20 job 逐次联网下载既慢又脆；
-  # 无 TS 运行时只跳过 OpenCode plugin 直跑；上面的 Codex ↔ ZCode 行为 parity 仍是硬门。
-  cp "$OPENCODE" "$tmp/p.ts"
-  # plugin.ts imports the core from ./lib/story_hook_core.js (the deploy target — a lib/
-  # subdir escapes OpenCode's single-level .opencode/plugins/*.js plugin auto-discovery);
-  # mirror that layout here so the copied plugin's import resolves.
-  mkdir -p "$tmp/lib"
-  cp "$OPENCODE_CORE" "$tmp/lib/story_hook_core.js"
-  # plugin.ts imports the net from ./lib/story_hook_core.js; re-export it from that companion
-  # so the type-stripped module exposes the exact function OpenCode runs at deploy time.
-  printf "\nexport { proseNetFindings as _net } from './lib/story_hook_core.js'\n" >> "$tmp/p.ts"
-  local ran=0
-  if node --experimental-strip-types -e '' >/dev/null 2>&1; then
-    node --experimental-strip-types --input-type=module -e "
-      import { _net } from '$tmp/p.ts';
-      import fs from 'node:fs';
-      const fx = JSON.parse(fs.readFileSync('$tmp/fixtures.json','utf-8'));
-      for (const k of Object.keys(fx).sort()) console.log(k, '|', _net(fx[k]).join(' ;; '));
-    " > "$tmp/ts.txt" 2>/dev/null && ran=1
-  fi
-  if [ "$ran" -eq 0 ] && command -v esbuild >/dev/null 2>&1; then
-    if esbuild "$tmp/p.ts" --format=esm --platform=node --log-level=silent --outfile="$tmp/p.mjs" >/dev/null 2>&1; then
-      node --input-type=module -e "
-        import { _net } from '$tmp/p.mjs';
-        import fs from 'node:fs';
-        const fx = JSON.parse(fs.readFileSync('$tmp/fixtures.json','utf-8'));
-        for (const k of Object.keys(fx).sort()) console.log(k, '|', _net(fx[k]).join(' ;; '));
-      " > "$tmp/ts.txt" 2>/dev/null && ran=1
-    fi
-  fi
-  [ "$ran" -eq 0 ] && return 2
-
-  if ! diff "$tmp/py.txt" "$tmp/ts.txt" >/dev/null; then
-    echo "FAIL: 功能 parity 不一致（codex python 网 vs opencode TS 网）：" >&2
-    diff "$tmp/py.txt" "$tmp/ts.txt" >&2 || true
-    return 3
-  fi
   return 0
 }
 
@@ -486,7 +442,7 @@ run_uncored_parity() {
   printf '　名字 ：苏离\n' > "$repo/设定/配角.md"          # 全角空格补白：字段在，不告警
   printf '简介：没有名字字段\n' > "$repo/设定/反派.md"     # 缺字段：告警
   # 角色卡收窄：只有 设定/角色|人物 子目录内的文件 + 设定/ 直属扁平角色卡才查 name 字段；
-  # 项目级设定件（关系/文风/题材定位…）与非角色子目录不查。四端（bash/OpenCode/JS/py）
+  # 项目级设定件（关系/文风/题材定位…）与非角色子目录不查。三端（bash/JS/py）
   # 同口径，这里锁 py↔js 两端，防任一端被改回「整棵 设定/ 一刀切」的假警告版本。
   mkdir -p "$repo/设定/角色" "$repo/设定/世界观"
   printf '简介：没有名字字段的角色卡\n' > "$repo/设定/角色/新人.md"  # 角色卡子目录：缺字段，告警
@@ -676,8 +632,7 @@ run_functional
 rc=$?
 set -e
 case "$rc" in
-  0) echo "功能 parity：codex python 网 == opencode TS 网 == zcode JS 网（44 fixtures + CRLF 字数边界，含毒句式正反例/AI 自指/截断收尾与豁免标记）。" ;;
-  2) echo "功能 parity：codex python 网 == zcode JS 网；OpenCode plugin 直跑跳过（无 TS 运行时）。" ;;
+  0) echo "功能 parity：codex python 网 == zcode JS 网（44 fixtures + CRLF 字数边界，含毒句式正反例/AI 自指/截断收尾与豁免标记）。" ;;
   *) fails=$((fails + 1)) ;;
 esac
 

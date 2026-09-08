@@ -1275,7 +1275,7 @@ function isGitCommitCommand(command) {
 const SETTING_NON_CHARACTER_FILES = new Set(["关系.md", "题材定位.md", "题材正文提示卡.md", "文风.md", "世界规则.md", "世界观.md", "金手指.md", "背景设定.md"])
 
 // 只查角色卡：整棵 设定/ 一刀切会让每次碰设定的提交都刷一屏假警告，把同框的
-// 「正文硬编码角色属性」真警告埋掉。判定口径与 validate-story-commit.sh / opencode
+// 「正文硬编码角色属性」真警告埋掉。判定口径与 validate-story-commit.sh / zcode
 // pre-commit.sh 的 case 分支一一对齐（bash↔js↔py 四端同口径，别单边改回一刀切）：
 // ① 设定/角色|人物 子目录内的文件 → 角色卡；
 // ② 其余 设定/<子目录>/ → 整目录跳过（世界观/势力/报告/原理/人物关系 等）；

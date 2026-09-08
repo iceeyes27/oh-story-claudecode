@@ -28,7 +28,6 @@ body:
       options:
         - Claude Code
         - Codex
-        - OpenCode
         - ZCode
         - OpenClaw
         - Reasonix

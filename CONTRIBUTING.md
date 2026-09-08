@@ -64,7 +64,6 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 - `python3 scripts/test-scan-runtime-policy.py` — 验证无关/死代码关键词不能骗过 scan/browser 策略守卫
 - `scripts/check-story-setup-deployment.sh` — story-setup 部署完整性
 - `scripts/check-claude-adapter.sh` — Claude marketplace 与 skill 映射检查
-- `scripts/check-opencode-adapter.sh` — OpenCode adapter 同步、commands/agents/plugin/config 锚点检查
 - `scripts/check-openclaw-skills.sh` — OpenClaw 单行 frontmatter、`metadata.openclaw` 与可选真实 CLI 发现检查
 - `scripts/check-codex-adapter.sh` — Codex repo skills symlink、custom-agent TOML（schema + 生成确定性）与 hooks 锚点检查
 - `scripts/test-codex-hooks.sh` — Codex hooks 合成事件测试
@@ -100,7 +99,6 @@ python3 scripts/test-author-memory-commit.py
 bash scripts/check-story-setup-deployment.sh
 bash scripts/check-claude-adapter.sh
 bash scripts/check-codex-adapter.sh
-bash scripts/check-opencode-adapter.sh
 bash scripts/check-openclaw-skills.sh
 bash scripts/test-codex-hooks.sh
 bash scripts/check-python-invocation.sh
@@ -112,7 +110,6 @@ bash scripts/test-charcount-portable.sh --stub
 # 可选真实 CLI smoke（需分别安装对应 CLI）
 CLAUDE_REAL_CHECK=1 bash scripts/check-claude-adapter.sh
 bash scripts/test-codex-cli-e2e.sh
-bash scripts/test-opencode-cli-e2e.sh
 OPENCLAW_REAL_CHECK=1 bash scripts/check-openclaw-skills.sh
 ```
 
@@ -148,72 +145,6 @@ fork → branch → commit → PR → review → merge
 - 一个 PR 聚焦一个改动
 - commit message 用中文，格式：`类型: 简短描述`
 - 类型：`feat`（新增）/ `fix`（修复）/ `docs`（文档）/ `refactor`（重构）
-
-## OpenCode 模板同步
-
-本项目同时支持 Claude Code、OpenCode、Codex、ZCode、OpenClaw 和 Reasonix（Phase 1）。OpenCode 的 agent 模板和项目指令模板由 `scripts/sync-opencode.py` 从 Claude Code 模板自动生成。
-
-### 何时需要同步
-
-当你修改了以下文件后，需要运行同步脚本：
-
-- `skills/story-setup/references/templates/agents/*.md`（agent 定义）
-- `skills/story-setup/references/templates/CLAUDE.md.tmpl`（项目指令模板）
-
-### 同步步骤
-
-```bash
-python3 scripts/sync-opencode.py
-python3 scripts/sync-opencode.py --check  # 可选：只校验，不改文件
-bash scripts/check-opencode-adapter.sh
-bash scripts/test-opencode-cli-e2e.sh  # 可选：需要本机已安装 opencode
-```
-
-脚本会：
-1. 将 `templates/agents/` 下的 Claude Code agent 转换为 opencode 格式，写入 `opencode/agents/`
-2. 将 `CLAUDE.md.tmpl` 复制到 `opencode/AGENTS.md.tmpl`，替换 `.claude/` 路径引用
-3. 输出同步结果摘要
-4. 可选真实 CLI smoke 会在临时项目里验证公开清单生成的 slash commands、agents 与 `story-hooks.ts` 插件能被 OpenCode 解析加载
-
-### 本地检测
-
-修改 Claude Code 模板文件后，必须在本地运行同步脚本和 `bash scripts/check-opencode-adapter.sh`，检查 opencode 模板、`opencode.json.patch`、`plugin.ts`、公开清单生成的 command 与 agent 结构锚点，再提交结果。
-
-### 手动维护的部分
-
-以下文件无法自动生成，需要手动维护：
-
-- `skills/story-setup/references/opencode/plugin.ts` — hooks 逻辑
-- `skills/story-setup/references/opencode/commands/` — slash commands
-- `skills/story-setup/references/opencode/opencode.json.patch` — 配置片段
-
-### sync-opencode.py 已知局限
-
-运行同步脚本后需进行以下手动检查：
-
-- **路径解析段**：已由 `fix_path_rules_section()` 自动处理，无需手动修复
-- **agent 数量**：确认 `opencode/agents/` 下始终为 7 个文件
-
-### OpenCode 关键兼容性问题
-
-**Glob 不搜索隐藏目录**：opencode 的 Glob 工具不搜索 `.opencode/` 目录，这导致了以下设计决策：
-
-- **agent-references** 部署到 `skills/story-setup/references/agent-references/`（非隐藏），而非 `.opencode/skills/`
-- **agent 文件** 双份部署：`.opencode/agents/`（opencode 系统使用）+ `agents/`（Glob 可见副本）
-- **subagent 检测**：所有 spawn agent 的 skill（story-review、story-write、story-deslop、story-import、story-analyze）需按 `.claude/agents/` → `.opencode/agents/` → `.codex/agents/` 顺序检查；ZCode 3.3.4 与 OpenClaw Phase 1 不部署项目 agents，走 solo/direct fallback。
-
-**插件输出不可见**：opencode 插件的 `output.extra.system` 已移除（真实 API 中不存在此字段）。系统提示注入改用 `experimental.session.compacting` 的 `output.context` 传递写作上下文。
-
-**session-start 系统提示注入不支持**：OpenCode 公开 Plugin API 中无 `chat.message` 或等效 hook，部署状态检测和写作进度无法在会话开始时注入模型上下文。用户可手动运行 `/story-setup` 查看状态。
-
-**其它 hook 差异**：`detect-gaps`（缺口检测）插件未移植，会话开始不注入提示（仅保留 compact 摘要与写正文前的大纲守卫）；`session-end` opencode 无等价事件、暂不支持；`validate-commit` 改用 git 原生 `pre-commit` hook（适用于所有 CLI）。
-
-### OpenCode 使用注意事项
-
-- **首次部署后需要重启 opencode**：story-setup 部署的 `.opencode/commands/` 下的 slash command 在 opencode 重启后才会生效。退出 opencode 后执行 `opencode -c` 重新进入即可。
-- **首次部署使用自然语言触发**：新项目中没有 slash command，需要用自然语言触发 story-setup（如「请使用 story-setup skill，帮我部署网文写作环境」）。
-- **opencode 配置不热加载**：修改 `opencode.json`、agent 文件或 plugin 后均需重启 opencode。
-- **browser-cdp 长耗时操作可能卡死**：opencode 无后台任务机制，长耗时浏览器操作需用户按 `ESC` 打断（SKILL.md 已内置超时包装指引）。
 
 ## OpenClaw 适配维护
 
@@ -258,7 +189,7 @@ bash scripts/test-zcode-hooks.sh
 bash scripts/test-prose-net-parity.sh
 ```
 
-更新正文轻量确定性网时，必须同步 Claude、OpenCode、Codex、ZCode 四端，并让 parity 测试通过。
+更新正文轻量确定性网时，必须同步 Claude、Codex、ZCode 三端，并让 parity 测试通过。
 
 ## Reasonix 适配维护
 

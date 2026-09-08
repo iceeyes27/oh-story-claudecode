@@ -110,7 +110,7 @@ story-architect 属于高层级结构设计 agent。轻量题材定位优先由�
 
 #### Agent 调用：story-architect + character-designer
 
-核心设定阶段，如果项目已部署对应 agent（优先检查 `.claude/agents/` 下的 `story-architect.md` 和 `character-designer.md` 是否存在；不存在时再检查 `.opencode/agents/`，再不存在时检查 `.codex/agents/`），可 spawn 以下 agent 辅助：
+核心设定阶段，如果项目已部署对应 agent（优先检查 `.claude/agents/` 下的 `story-architect.md` 和 `character-designer.md` 是否存在；不存在时再检查 `.codex/agents/`），可 spawn 以下 agent 辅助：
 - `Agent(subagent_type: "story-architect", prompt: "项目目录：{dir}\n任务类型：核心设定\n查询参数：世界观构建+核心冲突设计")` — 辅助世界观和核心冲突设计；spawn prompt 必须原样附带 Phase 1 的「story-architect 契约摘要」（升级台阶检查约束力量体系设计）
 - `Agent(subagent_type: "character-designer", prompt: "项目目录：{dir}\n任务类型：角色设定\n查询参数：{主角设定信息}")` — 辅助角色设定和语言风格档案
 

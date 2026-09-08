@@ -3,7 +3,7 @@
 
 // story_hook_cli.js — Claude Code bash hook 的 node 桥
 // Claude 侧 hook 是 bash（settings.json 挂 bash 脚本），归核逻辑走这里 require 的
-// 共享核 story_hook_core.js——和 OpenCode/ZCode 用的是同一份，由 check-shared-files
+// 共享核 story_hook_core.js——和 ZCode 用的是同一份，由 check-shared-files
 // 保证字节相同。归核（单份实现在 core）的面：正文网/字数（prose-net）、路径抽取
 // （extract-target）、Bash 正文写入前置门（prose-command-guard）、写后事件适配
 // （prose-after-event）、git commit 侦测（is-git-commit）、连续性（continuity）、
@@ -193,7 +193,7 @@ if (command === "extract-target") {
   }
 } else if (command === "tracking-checkpoint") {
   // 追踪检查点门（BLOCKING 面）：guard-outline-before-prose.sh 调本子命令复用共享核
-  // trackingCheckpointIssue，与 codex py / opencode / zcode 同一份判定（issue #305 之前
+  // trackingCheckpointIssue，与 codex py / zcode 同一份判定（issue #305 之前
   // Claude 侧独缺这道门，同一工程同一次写正文，主力端放行、另三端拦下）。
   // 用法：tracking-checkpoint <root> <bookDir> <上一章号|->
   //   首建新章传上一章号，做「上一章事务是否已提交」的顺序校验；
@@ -216,7 +216,7 @@ if (command === "extract-target") {
   }
 } else if (command === "foreshadow-debt") {
   // 伏笔欠账门（BLOCKING 面）：guard-outline-before-prose.sh 调本子命令复用共享核
-  // foreshadowDebtIssue，与 codex py / opencode / zcode 同一份判定和同一份文案。
+  // foreshadowDebtIssue，与 codex py / zcode 同一份判定和同一份文案。
   // 用法：foreshadow-debt <bookDir> <本章号>
   // 只在首建新章时由 bash 侧调用；本章细纲头 6 行有 <!-- 伏笔:跳过 --> 即豁免。
   // 契约：stdout 空 = 放行；非空 = 完整拦截文案，与 core.proseBlockReason 逐字一致。
@@ -234,7 +234,7 @@ if (command === "extract-target") {
   }
 } else if (command === "is-git-commit") {
   // git commit 侦测。命令优先取 STORY_COMMIT_COMMAND，缺省再从 HOOK_INPUT 挖 command/cmd/script。
-  // 用共享核 isGitCommitCommand（js 分词语义，与 OpenCode/ZCode 一致；对「引号内分隔符」这类
+  // 用共享核 isGitCommitCommand（js 分词语义，与 ZCode 一致；对「引号内分隔符」这类
   // 边界与旧 python shlex 有已文档化、仅 advisory 的差异）。是 git commit → exit 0，否则 exit 1。
   let raw = process.env.STORY_COMMIT_COMMAND || ""
   if (!raw) {

@@ -4,7 +4,7 @@
 
 # oh-story-claudecode
 
-A web novel writing skill pack with built-in adapters for Claude Code, OpenCode, ZCode, OpenClaw, Codex CLI, and Reasonix. Web AI / agent environments that can read project files can use the generic skills path. Covers the full pipeline for long-form and short-form Chinese web novels: trend scanning, deconstruction, writing, AI tone removal, and cover generation.
+A web novel writing skill pack with built-in adapters for Claude Code, ZCode, OpenClaw, Codex CLI, and Reasonix. Web AI / agent environments that can read project files can use the generic skills path. Covers the full pipeline for long-form and short-form Chinese web novels: trend scanning, deconstruction, writing, AI tone removal, and cover generation.
 
 ## Core Approach
 
@@ -102,7 +102,7 @@ flowchart LR
 
 ## Installation
 
-**Option 1** Tell Claude Code / OpenCode / ZCode / OpenClaw / Codex / Reasonix, or another Web AI / agent platform that can import a GitHub repo or skill:
+**Option 1** Tell Claude Code / ZCode / OpenClaw / Codex / Reasonix, or another Web AI / agent platform that can import a GitHub repo or skill:
 
 ```
 Install this skill https://github.com/iceeyes27/oh-story-claudecode
@@ -117,7 +117,7 @@ npx skills add iceeyes27/oh-story-claudecode -y -g
 `-g` installs globally (available in every directory); drop `-g` to install only into the current directory. Re-run the same command to update.
 
 <details>
-<summary>Codex / ZCode / OpenCode / OpenClaw / Reasonix / Web AI usage notes</summary>
+<summary>Codex / ZCode / OpenClaw / Reasonix / Web AI usage notes</summary>
 
 **Codex users:** Use it in-place: Codex scans `$REPO_ROOT/.agents/skills` (a symlink to `skills/`) and discovers all 31 repository Skills; invoke via `$story`, `$story-setup`, or `/skills`. On Windows, enable git `core.symlinks=true` or the symlink breaks — then use the `$story-setup` deployment below.
 
@@ -125,7 +125,6 @@ After `$story-setup` deploys into a writing project, it creates `.codex/agents/*
 
 **ZCode users:** Add this repository as a marketplace in Plugin Management and install `oh-story`; then invoke the 16 published Skills/Commands through `$story`, `$story-setup`, or the `/` panel. With `target_cli=zcode`, `$story-setup` deploys `.zcode/skills/`, `.zcode/commands/`, and `.zcode/hooks/story_zcode_hook.js`, then safely merges `.zcode/config.json` and the root `AGENTS.md`. Hooks require `node` on PATH. ZCode 3.3.4 does not execute project/plugin custom agents and has no `PreCompact` or `SessionEnd`; affected workflows report a solo/direct fallback, while `SessionStart` restores context after compaction.
 
-**OpenCode users:** After global install, opencode auto-discovers skills from `~/.claude/skills/`; trigger story-setup with natural language on first use (e.g., "use story-setup to deploy the web novel environment"), then **exit and re-enter with `opencode -c`** for slash commands to work. Some hook behaviors differ from Claude Code (session-start / session-end / compact, etc.) — see the OpenCode section in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 **OpenClaw users:** Current support is skills-only. OpenClaw can discover the 16 published Skills from workspace `skills/`, `.agents/skills`, `~/.agents/skills`, `~/.openclaw/skills`, or configured extra skill roots. `SKILL.md` files use OpenClaw-compatible single-line `name` / `description` plus single-line JSON `metadata.openclaw`. When `story-setup` targets OpenClaw, it copies those published Skills into project `skills/` and writes an OpenClaw `AGENTS.md`; agents/hooks are intentionally deferred, so outline-before-prose guards are soft skill checks rather than runtime enforcement. If new skills do not appear immediately, open a fresh OpenClaw session or wait for the skills watcher to refresh.
 
@@ -149,7 +148,7 @@ After updating, if a project has already run `/story-setup`, re-run `/story-setu
 
 | Skill | Trigger | Description |
 |:------|:--------|:------------|
-| `story-setup` | `/story-setup` / `$story-setup` | Environment setup — Claude/OpenCode/Codex/ZCode/OpenClaw/Reasonix plus generic (safe merge) |
+| `story-setup` | `/story-setup` / `$story-setup` | Environment setup — Claude/Codex/ZCode/OpenClaw/Reasonix plus generic (safe merge) |
 | `story` | `/story` / `$story` / `/story dashboard` | Toolbox router, author-preference management, and local deconstruction/project dashboard |
 | `story-write` | `/story-write` | Long-form writing — outline building, character design, prose output |
 | `story-analyze` | `/story-analyze` | Long-form deconstruction — Golden First 3 Chapters, payoff design, pacing analysis |

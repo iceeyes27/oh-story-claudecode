@@ -47,13 +47,12 @@ disable: true
 1. **确定请求模式**：解析用户输入中的 `full`、`lean`、`solo`；未指定时目标模式为 `full`。
 2. **确认是否允许 spawn**：如果当前已经在子代理/Agent 内执行，不再递归 spawn，直接降级为 `solo`。
 3. **识别 ZCode 能力边界**：如果当前运行于 ZCode 且项目使用 `.zcode/`，ZCode 3.3.4 不执行项目/plugin custom agents；不要因为磁盘上存在其他端的 agent 文件就尝试同名 spawn，直接降级 `solo` 并报告 `Fallback: project custom agents unavailable -> solo`。
-4. **检查核心 Agent 部署状态**（检查项目内 agents，同时兼容 Claude Code、OpenCode 和 Codex）：
-   - 优先检查 `.claude/agents/`，其次检查 `.opencode/agents/`，再检查 `.codex/agents/`；三个目录任一存在即视为已部署
-    - full 必需：Claude/OpenCode 为 `story-architect.md`、`character-designer.md`、`narrative-writer.md`、`consistency-checker.md`；Codex 为同名 `.toml`
-    - lean 必需：Claude/OpenCode 为 `story-architect.md`、`consistency-checker.md`；Codex 为同名 `.toml`
+4. **检查核心 Agent 部署状态**（检查项目内 agents，同时兼容 Claude Code 和 Codex）：
+   - 优先检查 `.claude/agents/`，其次检查 `.codex/agents/`；两个目录任一存在即视为已部署
+    - full 必需：Claude 为 `story-architect.md`、`character-designer.md`、`narrative-writer.md`、`consistency-checker.md`；Codex 为同名 `.toml`
+    - lean 必需：Claude 为 `story-architect.md`、`consistency-checker.md`；Codex 为同名 `.toml`
     - 对每个必需 Agent 文件：
       - **Claude Code agent（`.claude/agents/`）**：读取 frontmatter，确认 `name:` 与 subagent_type 完全一致；frontmatter 缺失、不可解析或 name 不匹配时视为 malformed agent。
-      - **OpenCode agent（`.opencode/agents/`）**：文件名即 agent 名（OpenCode 不要求在 frontmatter 中写 `name:`），读取 frontmatter 确认 `mode: subagent` 和 `permission` 字段存在且可解析即可；frontmatter 缺失或不可解析视为 malformed。
       - **Codex agent（`.codex/agents/`）**：文件名为 `{agent}.toml`，TOML 必须可解析，且包含 `name`、`description`、`developer_instructions`；`name` 必须与目标 agent 完全一致。
     - `agents_version` 与本版不一致不影响本步：照常检查下列 agent 文件结构并 spawn，只按顶部规则附带版本提示。文件缺失或 malformed 才降级。
    - 如果目标模式所需任一文件缺失或 malformed，**不要尝试 spawn 缺失/异常 Agent**；自动降级为 `solo`，并在报告开头写明：`Fallback: missing agents -> solo` 或 `Fallback: malformed agents -> solo`，列出问题文件，建议用户运行 `/story-setup`。
@@ -84,14 +83,13 @@ Rubric Source: file | embedded fallback
 
 可读取参考文件时，按以下顺序尝试，第一个命中即用：
 1. `{项目根}/.claude/skills/{规范路径}`（Claude Code 项目内安装）
-2. `{项目根}/.opencode/skills/{规范路径}`（OpenCode 项目内安装）
-3. `{项目根}/.codex/skills/{规范路径}`（Codex 项目内安装）
-4. `{项目根}/.zcode/skills/{规范路径}`（ZCode 项目内安装）
-5. `{项目根}/skills/{规范路径}`（OpenClaw / Reasonix / generic 部署，也是本仓库开发环境）
-6. `{项目根}/.agents/skills/{规范路径}`（Codex / Reasonix 扫描的项目 skill root，通常是指向 `skills/` 的 symlink）
-7. 当前运行时加载本 skill 的目录，或其可访问的全局 skill 搜索路径中同名 `{skill-name}/...` 目录
+2. `{项目根}/.codex/skills/{规范路径}`（Codex 项目内安装）
+3. `{项目根}/.zcode/skills/{规范路径}`（ZCode 项目内安装）
+4. `{项目根}/skills/{规范路径}`（OpenClaw / Reasonix / generic 部署，也是本仓库开发环境）
+5. `{项目根}/.agents/skills/{规范路径}`（Codex / Reasonix 扫描的项目 skill root，通常是指向 `skills/` 的 symlink）
+6. 当前运行时加载本 skill 的目录，或其可访问的全局 skill 搜索路径中同名 `{skill-name}/...` 目录
 
-> 靠前几层不存在是正常的，不是部署损坏。`/story-setup` 只在 ZCode 的 `.zcode/skills/` 和 OpenClaw / Reasonix / generic 的 `skills/` 下整份复制 skill；Codex 项目部署不复制 skill 本体，本 skill 由 Codex 从 skill root 加载，references 就在其中，通常命中第 6 或第 7 层。不要手工把 `references/` 复制进 `.codex/skills/`——手工副本不受 story-setup 管理，升级后会静默变旧。
+> 靠前几层不存在是正常的，不是部署损坏。`/story-setup` 只在 ZCode 的 `.zcode/skills/` 和 OpenClaw / Reasonix / generic 的 `skills/` 下整份复制 skill；Codex 项目部署不复制 skill 本体，本 skill 由 Codex 从 skill root 加载，references 就在其中，通常命中第 5 或第 6 层。不要手工把 `references/` 复制进 `.codex/skills/`——手工副本不受 story-setup 管理，升级后会静默变旧。
 
 规范路径如下；禁止只写裸文件名，禁止跨 skill 误读其他 skill 的 references：
 
@@ -222,7 +220,7 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
 
 专项检查输出至少包含：`时间轴结论`、`空间连续性结论`、`证据闭环结论`、`程序边界结论`、`起承转合结论`，以及按统一 Findings Schema 列出的具体问题。对“无硬伤但有软问题”必须明确标注为软问题，避免把可读性建议误报成事实冲突。
 
-**Phase 1.5：可选 story-explorer 预查询**。仅当 `Effective Mode` 仍为 `full`/`lean`、当前允许 spawn 且 Agent/Task 工具可用时，才可检查 agent 目录（优先 `.claude/agents/`，其次 `.opencode/agents/`，再检查 `.codex/agents/`）下的 `story-explorer.md` 或 `story-explorer.toml` 并 spawn `story-explorer` 预查设定摘要；`solo` 或子代理递归保护场景下不得 spawn，只能直接 Read/Grep。Prompt 示例：
+**Phase 1.5：可选 story-explorer 预查询**。仅当 `Effective Mode` 仍为 `full`/`lean`、当前允许 spawn 且 Agent/Task 工具可用时，才可检查 agent 目录（优先 `.claude/agents/`，其次 `.codex/agents/`）下的 `story-explorer.md` 或 `story-explorer.toml` 并 spawn `story-explorer` 预查设定摘要；`solo` 或子代理递归保护场景下不得 spawn，只能直接 Read/Grep。Prompt 示例：
 
 ```text
 项目目录：{dir}
@@ -394,7 +392,7 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
 
 1. 收集实际执行的 reviewer VERDICT 和 FINDINGS。
 2. 合并去重：按 `severity` 排序（S1 > S2 > S3 > S4），同级按实际阅读损失排序；列全硬问题，首轮建议只选 1～2 个最高阅读损失，并列出应保留表达。N/A、误报与证据不足不计作问题数量，不从建议多推导全章重写。
-3. **可选事实核查**：如果审查内容涉及需要验证的外部事实（历史年代、地理方位、职业细节等），只有在 `Effective Mode` 仍为 `full`/`lean`、当前不是子 Agent、Agent/Task 工具可用且 agent 目录（优先 `.claude/agents/`，其次 `.opencode/agents/`，再检查 `.codex/agents/`）下的 `story-researcher.md` 或 `story-researcher.toml` 已部署时，才可额外 spawn `story-researcher` 搜索验证；`solo`、missing/malformed/stale/spawn failed 降级或子代理递归保护场景下不得 spawn，只能在报告中标记“需人工事实核查”。
+3. **可选事实核查**：如果审查内容涉及需要验证的外部事实（历史年代、地理方位、职业细节等），只有在 `Effective Mode` 仍为 `full`/`lean`、当前不是子 Agent、Agent/Task 工具可用且 agent 目录（优先 `.claude/agents/`，其次 `.codex/agents/`）下的 `story-researcher.md` 或 `story-researcher.toml` 已部署时，才可额外 spawn `story-researcher` 搜索验证；`solo`、missing/malformed/stale/spawn failed 降级或子代理递归保护场景下不得 spawn，只能在报告中标记“需人工事实核查”。
 4. **分歧呈现**：如果 reviewer 间有冲突意见，明确呈现分歧让用户裁决；不要自动妥协。
 5. 输出综合审查报告。报告必须列出实际模式、fallback 原因、使用的 rubric、Rubric Source、审查范围和证据不足项。
 

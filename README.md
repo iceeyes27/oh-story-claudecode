@@ -4,7 +4,7 @@
 
 > **2026-07 起本仓库为统一命名版**（story-write / story-analyze / story-scan，mode 区分长短篇）。拆分命名的历史版本见 tag [`pre-unified-split-naming`](../../tree/pre-unified-split-naming)。
 
-网文写作 skill 包，覆盖长篇与短篇网络小说的扫榜、拆文、写作、去AI味、封面图全流程。内置适配 Claude Code、OpenCode、ZCode、OpenClaw、Codex CLI、Reasonix、workbuddy；能读取项目文件的 Web AI / Agent 环境也可按通用 skills 路径使用。
+网文写作 skill 包，覆盖长篇与短篇网络小说的扫榜、拆文、写作、去AI味、封面图全流程。内置适配 Claude Code、ZCode、OpenClaw、Codex CLI、Reasonix、workbuddy；能读取项目文件的 Web AI / Agent 环境也可按通用 skills 路径使用。
 
 ## 核心思路
 
@@ -102,7 +102,7 @@ flowchart LR
 
 ## 安装
 
-**方式一** 直接告诉 Claude Code / OpenCode / ZCode / OpenClaw / Codex / Reasonix，或其他支持导入 GitHub 仓库/skill 的 Web AI / Agent 平台：
+**方式一** 直接告诉 Claude Code / ZCode / OpenClaw / Codex / Reasonix，或其他支持导入 GitHub 仓库/skill 的 Web AI / Agent 平台：
 
 ```
 安装这个 skill https://github.com/iceeyes27/oh-story-claudecode
@@ -117,14 +117,13 @@ npx skills add iceeyes27/oh-story-claudecode -y -g
 `-g` 全局安装，所有目录可用；去掉 `-g` 则只装到当前目录。更新时重新执行同一条命令即可。
 
 <details>
-<summary>Codex / ZCode / OpenCode / OpenClaw / Reasonix / Web AI 使用说明</summary>
+<summary>Codex / ZCode / OpenClaw / Reasonix / Web AI 使用说明</summary>
 
 > **Codex 用户：** repo 内直接使用：Codex 会扫描 `$REPO_ROOT/.agents/skills`（指向 `skills/` 的 symlink）发现仓库 Skill；用 `$story`、`$story-setup` 或 `/skills` 调用。Windows 上 git 需开 `core.symlinks=true`，否则 symlink 失效，改走下方 `$story-setup` 部署。
 > 跑 `$story-setup` 部署到写作项目后，会写入 `.codex/agents/*.toml`、`.codex/hooks.json`、`.codex/hooks/{story_codex_hook.py,run-story-hook.sh,run-story-hook.cmd}` 和 `.codex/skills/story-setup/references/agent-references/`；请信任项目 `.codex/` 配置层并在 `/hooks` review/trust hooks、新开 Codex 会话，让 custom agents 生效。
 >
 > **ZCode 用户：** 在 Plugin Management 中把本仓库加入 marketplace，安装 `oh-story` 后可用 `$story`、`$story-setup` 或 `/` 面板调用公开 Skills/Commands；实际集合以 `scripts/platform-skill-set.json` 为准。`$story-setup` 选择 `target_cli=zcode` 会部署 `.zcode/skills/`、`.zcode/commands/`、`.zcode/hooks/story_zcode_hook.js`，安全合并 `.zcode/config.json` 与根 `AGENTS.md`；Hook 依赖 PATH 中的 `node`。ZCode 3.3.4 不执行项目/plugin custom agents，也没有 `PreCompact` / `SessionEnd`，相关流程会明确降级 solo/direct，compact 后由 `SessionStart` 恢复上下文。
 >
-> **OpenCode 用户：** 全局安装后 opencode 自动从 `~/.claude/skills/` 发现 skills；首次用自然语言触发 story-setup（如「用 story-setup 部署网文写作环境」），**部署后退出重进 `opencode -c`** 才能用 slash command。部分 hook 行为与 Claude Code 有差异（session-start / session-end / compact 等），详见 [CONTRIBUTING.md](CONTRIBUTING.md) 的 OpenCode 章节。
 >
 > **OpenClaw 用户：** 当前支持 skills-only：OpenClaw 可从 workspace `skills/`、`.agents/skills`、`~/.agents/skills`、`~/.openclaw/skills` 等 skill root 发现清单中的公开 Skill；`SKILL.md` 已按 OpenClaw 要求使用单行 `name` / `description` 与单行 JSON `metadata.openclaw`。`story-setup` 选择 `target_cli=openclaw` 时会把这些公开 Skill 复制到项目 `skills/` 并写入 OpenClaw 版 `AGENTS.md`；agents/hooks 暂不部署，写正文前大纲守卫在 OpenClaw 下是 skill 内软约束。部署后如未显示新 skills，请新开 OpenClaw session 或等待 watcher 刷新。
 >
@@ -147,7 +146,7 @@ npx skills add iceeyes27/oh-story-claudecode -y -g
 
 | Skill | 触发 | 说明 |
 |:------|:-----|:-----|
-| `story-setup` | `/story-setup` `$story-setup` `/准备写书` | 环境部署 · Claude/OpenCode/Codex/ZCode/OpenClaw/Reasonix + generic（已有配置安全合并） |
+| `story-setup` | `/story-setup` `$story-setup` `/准备写书` | 环境部署 · Claude/Codex/ZCode/OpenClaw/Reasonix + generic（已有配置安全合并） |
 | `story` | `/story` `$story` `/story dashboard` | 工具箱路由 · 模糊意图分发 + 作者习惯管理 + 本地拆文/项目 Dashboard |
 | `story-write` | `/story-write` `/写长篇` | 长篇写作 · 大纲搭建、人物设定、正文输出 |
 | `story-analyze` | `/story-analyze` | 长篇拆文 · 黄金三章、爽点设计、节奏分析 |

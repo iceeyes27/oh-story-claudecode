@@ -22,14 +22,13 @@
 | `check-antigravity-adapter.sh` | Antigravity 适配层 + 内部跑 3 个 antigravity `test-*` | `antigravity-adapter`（release） |
 | `check-python-invocation.sh` | 技能文档禁止裸调 `python3`（须 python3→python→py 探测） | 提交前本地 |
 | `check-doc-budget.sh` + `doc-budget.json` | 校验每次会话或每章加载的热路径文档没有超过显式预算 | 修改 Skill 入口与写作热路径后 |
-| `platform-skill-set.json` | 跨平台公开发布 Skill 的唯一清单；Claude、OpenCode、ZCode 与 OpenClaw 校验共用 | 增减公开 Skill 时先修改 |
+| `platform-skill-set.json` | 跨平台公开发布 Skill 的唯一清单；Claude、ZCode 与 OpenClaw 校验共用 | 增减公开 Skill 时先修改 |
 | `local-only-skill-set.json` | 不进入跨平台公开部署的 Skill 及原因；与公开清单的并集必须覆盖仓库全部 Skill | 新增或改变 Skill 发布范围时修改 |
 | `sync-upstream.js` | 在专用 worktree 中固定双方 SHA，按策略分类、记录审阅决定、验证并生成双亲 merge commit；不改调用者工作区 | 同步上游时运行 |
 | `platform-capabilities.json` + `check-platform-capabilities.mjs` | 平台能力、降级行为、Windows 启动方式与公开 Skill 完整性 | 平台适配改动后 |
-| `quality-gate.json` + `quality-gate.mjs` | `fast` / `affected` / `release` 本地质量配置与 JSON 报告 | 改动后或发布前 |
+| `quality-gate.json` + `quality-gate.mjs` | `fast` / `affected` / `release` 本地质量配置与 JSON 报告；`external` 单独运行依赖外部工具的 E2E | 改动后或发布前 |
 | `release-manifest.json` + `check-release-manifest.mjs` | 发布身份、上游基线与权威资产摘要 | 发布前 |
 | `check-claude-adapter.sh` | Claude marketplace 与公开 Skill 清单的一一映射；可选真实 CLI strict validate | 本地静态；`CLAUDE_REAL_CHECK=1`（真实 CLI） |
-| `check-opencode-adapter.sh` | OpenCode 适配层同步 + commands/agents/config 结构 + plugin 行为回归 | 本地（调 sync-opencode.py） |
 | `check-openclaw-skills.sh` | OpenClaw AgentSkills/frontmatter 兼容性 | 本地 |
 | `check-codex-adapter.sh` | Codex 适配层：repo skills symlink、agent TOML、hooks 与跨平台 launcher | 本地（调 generate-codex-agents.py 验生成确定性） |
 | `check-zcode-adapter.sh` | ZCode plugin/marketplace、Skills/Commands/Hooks 与部署锚点 | 本地 |
@@ -38,6 +37,8 @@
 ## 测试回归（test-*）
 
 `scripts/test-*` 必须被 `quality-gate.json` 的某个 profile 跑到（直接引用、聚合 runner 或适配器内部调用都算）。注释/文档里出现的名字不算运行时引用。新增 `test-*` 不接线会让 `scripts/quality-gate.test.mjs` 在 `platform-gates` 红掉。`fast` 的 check 集保持原样，不承担这张回归网。
+
+已安装 Codex CLI 和 Playwright 浏览器的环境可运行 `node scripts/quality-gate.mjs --profile external`，执行 `codex-cli-e2e` 和 `dashboard-e2e`。两项保留原有失败与环境阻断判定，不属于 release 的准入条件。
 
 聚合 runner（沿用 `test-story-continuity.sh` 可调其他 test 的先例）：
 
@@ -55,7 +56,7 @@
 | `test-normalize-punctuation.js` | 标点归一化的只读检查、frontmatter/fence、CRLF、引号模式与幂等性 | `language-gates` |
 | `test-charcount-portable.sh` | 跨平台字符统计命令在三平台 + Windows 的正确性 | `language-gates` |
 | `test-prose-backstop-hook.sh` | `check-prose-after-write.sh` 回归 | `language-gates` |
-| `test-prose-net-parity.sh` | 正文后置「轻量确定性网」Claude/OpenCode/Codex/ZCode parity | `language-gates` |
+| `test-prose-net-parity.sh` | 正文后置「轻量确定性网」Claude/Codex/ZCode parity | `language-gates` |
 | `test-chapter-titles.js` | 章节标题设问规则回归：明确疑问形态 blocking、悬念式疑问词开头 advisory | `contracts`（fast/affected/release） |
 | `test-narrative-complexity.js` | 平直叙事模式契约 | `contracts` |
 | `test-foreshadow-overdue.js` | 逾期伏笔门 | `contracts` |
@@ -93,22 +94,19 @@
 | `test-static-check.py` | 真 frontmatter block、精确路径/锚点、跨 Skill 引用、fence、死 reference、Agent 与章节链接 fixture | `platform-gates` |
 | `test-hook-encoding-portable.sh` | 部署 hook 在 Windows 中文系统的编码健壮性 | `platform-gates`（不经 locale-safety 守卫，后者只做静态检查） |
 | `test-codex-hook-merge.py` | Codex hook 合并 | `codex-adapter`（release） |
-| `test-opencode-plugin.mjs` | 直接执行 OpenCode TypeScript plugin，验大纲守卫、Bash 绕过、写后检查与 compact 恢复 | `opencode-adapter`（release） |
 | `test-antigravity-hook-merge.py` / `test-antigravity-hooks.mjs` / `test-antigravity-skills-deploy.py` | Antigravity 适配回归 | `antigravity-adapter`（release） |
 | `test-quality-lifecycle.py` | 质量生命周期（约 90s） | `quality-lifecycle`（release） |
-| `test-codex-cli-e2e.sh` | 隔离 HOME 后用真实 Codex CLI 检查完整仓库 Skill 的发现结果 | `codex-cli-e2e`（release；CLI 缺失 → BLOCKED） |
-| `test-opencode-cli-e2e.sh` | 真实 OpenCode CLI 加载 smoke | `opencode-cli-e2e`（release；CLI 缺失 → BLOCKED） |
+| `test-codex-cli-e2e.sh` | 隔离 HOME 后用真实 Codex CLI 检查完整仓库 Skill 的发现结果 | `codex-cli-e2e`（external；CLI 缺失 → BLOCKED） |
 
 ## 代码生成 / 同步
 
 | 脚本 | 干什么 | 何时跑 |
 |---|---|---|
-| `sync-opencode.py` | 从 Claude agent 模板 + `CLAUDE.md.tmpl` 生成 `opencode/agents/` 与 `AGENTS.md.tmpl`；`--check` 只读验同步 | 改 agent 模板后手动跑；被 check-opencode-adapter 调 |
 | `generate-codex-agents.py` | 从 Claude agent 模板生成 Codex `.toml` agents | 改 agent 模板后手动跑；被 check-codex-adapter 调验确定性 |
 | `generate-codex-hooks.py` | 从 6 个 event 清单生成 `hooks.json`，POSIX/Windows 共用 launcher 负责解释器探测 | 改 Codex hook 注册后；被 check-codex-adapter 调验确定性 |
 | `shared-assets.json` + `sync-shared-assets.py` | 为必须随 skill 独立部署的重复 runtime 脚本指定唯一源和目标 | 改共享 runtime 后跑 `sync`；提交前跑 `check` |
 
-> 改了 `skills/story-setup/references/templates/agents/*.md` 或 `CLAUDE.md.tmpl`，必须重跑这两个生成脚本并提交结果，否则本地适配检查失败。详见 [CONTRIBUTING.md](../CONTRIBUTING.md)「OpenCode 模板同步」「Codex 适配维护」。
+> 改了 `skills/story-setup/references/templates/agents/*.md` 或 `CLAUDE.md.tmpl`，必须重跑 `generate-codex-agents.py` 并提交结果，否则本地适配检查失败。详见 [CONTRIBUTING.md](../CONTRIBUTING.md)「Codex 适配维护」。
 
 ## 上游同步
 

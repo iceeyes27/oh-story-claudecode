@@ -11,15 +11,6 @@
       "activation": ["restart_session"],
       "fallback": "solo"
     },
-    "opencode": {
-      "skill_root": ".opencode/skills",
-      "commands": true,
-      "hooks": ["session.created", "tool.execute.after", "session.compacted"],
-      "custom_agents": "supported",
-      "windows_runner": "node",
-      "activation": ["restart_session"],
-      "fallback": "solo"
-    },
     "codex": {
       "skill_root": ".codex/skills",
       "commands": false,

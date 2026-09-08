@@ -24,6 +24,30 @@
       {
         "prefix": ".github/workflows/",
         "reason": "This fork uses local verification and does not ship GitHub Actions."
+      },
+      {
+        "prefix": ".opencode/",
+        "reason": "This fork dropped OpenCode as a supported platform; upstream still ships it, so auto-reject instead of re-conflicting every sync."
+      },
+      {
+        "prefix": "skills/story-setup/references/opencode/",
+        "reason": "This fork dropped OpenCode as a supported platform; upstream still ships it, so auto-reject instead of re-conflicting every sync."
+      },
+      {
+        "path": "scripts/check-opencode-adapter.sh",
+        "reason": "This fork dropped OpenCode as a supported platform."
+      },
+      {
+        "path": "scripts/sync-opencode.py",
+        "reason": "This fork dropped OpenCode as a supported platform."
+      },
+      {
+        "path": "scripts/test-opencode-cli-e2e.sh",
+        "reason": "This fork dropped OpenCode as a supported platform."
+      },
+      {
+        "path": "scripts/test-opencode-plugin.mjs",
+        "reason": "This fork dropped OpenCode as a supported platform."
       }
     ],
     "protected": [
@@ -66,20 +90,12 @@
         "reason": "Platform Skill entries are generated from the canonical skills tree."
       },
       {
-        "prefix": ".opencode/skills/",
-        "reason": "Platform Skill entries are generated from the canonical skills tree."
-      },
-      {
         "prefix": ".zcode/skills/",
         "reason": "Platform Skill entries are generated from the canonical skills tree."
       },
       {
         "prefix": "skills/story-setup/references/codex/",
         "reason": "Codex adapters are generated from canonical templates."
-      },
-      {
-        "prefix": "skills/story-setup/references/opencode/",
-        "reason": "OpenCode adapters are generated from canonical templates."
       },
       {
         "prefix": "skills/story-setup/references/zcode/",

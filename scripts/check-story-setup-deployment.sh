@@ -190,6 +190,55 @@ done
 for group in 'templates/hooks/' 'templates/rules' 'templates/agents' 'agent-references' 'settings-hooks\.json' 'CLAUDE\.md' '\.story-deployed'; do
   assert_grep "$group" "$SKILL_FILE" "deployment manifest missing asset group: $group"
 done
+# 文档是部署执行契约：其他章节提到路径不能代替清单行或实际合并步骤。
+# helper 的用户配置保留与幂等行为由下方 v24 -> v25 实际迁移验证。
+python3 - "$SKILL_FILE" <<'PY' || fail "Claude deployment instructions are incomplete"
+import re
+import sys
+from pathlib import Path
+
+text = Path(sys.argv[1]).read_text(encoding="utf-8")
+manifest_heading = "### 2.0 部署清单（机械可检查）"
+merge_heading = "### 2.5 合并 Hooks 注册到 settings.local.json"
+hooks_source = "skills/story-setup/references/templates/hooks/"
+
+
+def section(doc, heading):
+    match = re.search(r"^" + re.escape(heading) + r"\n(.*?)(?=^#{2,3} |\Z)", doc, re.M | re.S)
+    return match.group(1) if match else ""
+
+
+def contract_errors(doc):
+    errors = []
+    rows = [
+        [cell.strip().strip("`") for cell in line.strip("|").split("|")]
+        for line in section(doc, manifest_heading).splitlines() if line.startswith("|")
+    ]
+    if not any(row[:4] == [hooks_source, ".claude/hooks/", "story-setup managed", "recursive replace"] for row in rows):
+        errors.append("Claude recursive hook deployment row missing")
+    merge = section(doc, merge_heading)
+    if not re.search(r'merge-claude-settings\.py" --existing "[^"\n]+/\.claude/settings\.local\.json" --template "[^"\n]+/references/templates/settings-hooks\.json" --output "[^"\n]+/\.claude/settings\.local\.json"', merge):
+        errors.append("Claude settings merge command missing or incomplete")
+    if not any(line.startswith("| references/templates/hooks/ |") for line in section(doc, "## 参考资料").splitlines()):
+        errors.append("Claude hook reference row missing")
+    return errors
+
+
+errors = contract_errors(text)
+assert not errors, errors
+# 模拟本次误删：其他章节仍提到这些路径时，缺失清单行/步骤也必须失败。
+hook_row = next(line for line in text.splitlines(keepends=True) if line.startswith("| `" + hooks_source + "` |"))
+merge_section = merge_heading + "\n" + section(text, merge_heading)
+mutations = {
+    "missing hook row": text.replace(hook_row, "", 1),
+    "wrong hook target": text.replace("`" + hooks_source + "` | `.claude/hooks/`", "`" + hooks_source + "` | `.claude/other/`", 1),
+    "missing merge step": text.replace(merge_section, "", 1),
+    "missing existing settings input": text.replace('--existing "{项目}/.claude/settings.local.json" ', "", 1),
+    "missing hook reference": re.sub(r"^\| references/templates/hooks/ \|.*\n", "", text, flags=re.M),
+}
+for label, mutated in mutations.items():
+    assert mutated != text and contract_errors(mutated), label
+PY
 assert_file "$SKILL_DIR/references/openclaw/AGENTS.md.tmpl"
 assert_file "$SKILL_DIR/references/generic/AGENTS.md.tmpl"
 assert_file "$SKILL_DIR/references/reasonix/AGENTS.md.tmpl"
@@ -198,11 +247,6 @@ assert_file "$SKILL_DIR/references/zcode/config.json.patch"
 assert_file "$SKILL_DIR/references/zcode/hooks/hooks.json"
 assert_file "$SKILL_DIR/references/zcode/hooks/story_zcode_hook.js"
 assert_file "$SKILL_DIR/references/zcode/hooks/story_hook_core.js"
-# OpenCode shares the same prose-guard core (byte-identity guarded by check-opencode-adapter.sh);
-# it deploys alongside plugin.ts as .opencode/plugins/lib/story_hook_core.js (lib/ subdir so it
-# escapes OpenCode's single-level .opencode/plugins/*.js plugin auto-discovery).
-assert_file "$SKILL_DIR/references/opencode/story_hook_core.js"
-assert_grep 'opencode/story_hook_core\.js' "$SKILL_FILE" "deployment manifest missing OpenCode shared prose-guard core"
 assert_grep 'references/openclaw/AGENTS\.md\.tmpl' "$SKILL_FILE" "deployment manifest missing OpenClaw AGENTS template"
 assert_grep 'OpenClaw skills-only|target_cli 含 openclaw' "$SKILL_FILE" "story-setup must document OpenClaw skills-only deployment"
 assert_grep 'references/generic/AGENTS\.md\.tmpl' "$SKILL_FILE" "deployment manifest missing generic AGENTS template"
@@ -347,7 +391,7 @@ sys.exit(1 if bad else 0)
 PY
 
 cat > "$TMP_DIR/self-copy-fixtures.md" <<'FIXTURE'
-- 将 `references/opencode/agents/` 下所有文件复制到 `.opencode/agents/`；`references/opencode/agents/` 是唯一来源。
+- 将 `references/zcode/agents/` 下所有文件复制到 `.zcode/agents/`；`references/zcode/agents/` 是唯一来源。
 - 复制 `a/b/` 到 `a/b/`。
 - 将 `a/b/` 同步复制到 `a/b/`。
 - 复制 `x/y/` 到 `.codex/x/y/`。
@@ -435,6 +479,10 @@ cmp -s "$TMP_DIR/claude-v25.json" "$TMP_DIR/claude-v25-again.json" \
 
 # 重部署时 sentinel 的 target_cli 是权威：不认它就会每次重问，且 skills-only 三端根本无从探测。
 assert_grep '已部署项目以 sentinel 里的值为准' "$SKILL_FILE" "story-setup must reuse the deployed target_cli on redeploy"
+# 退役或未知目标不能被悄悄过滤，也不能在用户选择新目标前写 sentinel。
+assert_grep '先校验非空 `target_cli`.*按逗号拆分.*任一目标不受支持.*立即停止部署' "$SKILL_FILE" "story-setup must stop when any deployed target is unsupported"
+assert_grep '不得自动删除原平台目录.*过滤该项后继续部署.*改写 `\.story-deployed`' "$SKILL_FILE" "unsupported targets must preserve platform directories and sentinel"
+assert_grep '用户确认新目标后才重新执行部署.*全部验证通过后再写 sentinel' "$SKILL_FILE" "unsupported targets require an explicit supported selection before redeploy"
 # metadata.openclaw 在 13 个 skill 上全都有，拿它判定会把 reasonix / generic 项目误认成 OpenClaw。
 assert_no_grep '中的 `metadata\.openclaw`' "$SKILL_FILE" "story-setup must not detect OpenClaw from the skills bundle it deploys itself"
 assert_grep '不作 OpenClaw 信号' "$SKILL_FILE" "story-setup must explain why metadata.openclaw is not a detection signal"
@@ -754,7 +802,7 @@ for ref_dir in "$SKILL_DIR"/references/*/; do
   esac
 done
 ref_dir_count="$(find "$SKILL_DIR/references" -maxdepth 1 -mindepth 1 -type d | wc -l | tr -d ' ')"
-[ "$ref_dir_count" -eq 9 ] || fail "story-setup references/ now has $ref_dir_count subdirs (expected 9); update the Phase 1 self-check list and this assertion"
+[ "$ref_dir_count" -eq 8 ] || fail "story-setup references/ now has $ref_dir_count subdirs (expected 8); update the Phase 1 self-check list and this assertion"
 assert_grep '剧情/情绪模块\.md.*missing_primary_contract|missing_primary_contract.*剧情/情绪模块\.md' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must require the current emotion-module artifact"
 assert_grep '剧情/节奏\.md.*missing_primary_contract|missing_primary_contract.*剧情/节奏\.md' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must require the current rhythm artifact"
 assert_no_grep 'legacy_deconstruction|contract_version.*legacy|pre-v12' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must not keep legacy benchmark branches"
@@ -778,7 +826,6 @@ assert_grep '不得把已有项目默认为日更 3 章|默认为日更 3 章' "
 assert_grep '默认停在细纲交付|默认停靠.*Phase 1→3' "$REPO_ROOT/skills/story-write/references/long-mode.md" "story-write opening flow must stop after outline by default"
 assert_grep '本轮 K（最多 3 章）后必须进入 Step 3/4 收尾并停止|最多 3 章.*收尾并停止' "$REPO_ROOT/skills/story-write/references/workflow-daily.md" "daily workflow must stop after bounded batch"
 assert_grep '细纲边界|outline_underfilled|不得自造剧情' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must enforce outline boundary and report outline_underfilled"
-assert_grep 'outline_underfilled' "$SKILL_DIR/references/opencode/agents/narrative-writer.md" "opencode narrative-writer must inherit outline_underfilled boundary"
 assert_grep 'outline_underfilled' "$SKILL_DIR/references/codex/agents/narrative-writer.toml" "codex narrative-writer must inherit outline_underfilled boundary"
 assert_grep '导入续写入口顺序|推荐顺序.*story-setup' "$REPO_ROOT/skills/story-import/SKILL.md" "story-import must answer setup-vs-import order before asking for source"
 echo "  OK TS10 version + behavior anchors"

@@ -5,6 +5,8 @@
 - `setup_skill_version: 1.2.11`
 - `agents_version: 29`
 
+本 fork 已移除 OpenCode 部署支持。旧 `.story-deployed` 的 `target_cli` 含 `opencode` 时（包括多端组合），重新部署会停止并要求选择受支持目标；不会自动删除旧平台目录，也不会在选择和部署验证完成前改写 sentinel。下列历史版本记录保留当时的平台名称，不代表当前支持范围。
+
 > **本 fork 的取值约定**：`setup_skill_version` 跟随上游 zenstory-ai/oh-story-claudecode，不另起 fork 自有版本线。本 fork 的架构差异由 `resolver_strategy: agents-canonical-v1` 连同 `canonical_skills_dir` / `adapter_manifest` 两个上游没有的字段标识，那几行远离上游高频改动区，能自动合并。
 >
 > 原因：`setup_skill_version` 与 `agents_version` 在本文件、`SKILL.md`、`current-contract.json`、`session-start.sh` 里都是相邻行，而上游每次发版都会 bump `agents_version`。两行贴在一起时会落进同一个 diff 块，只要 fork 在其中一行有自己的取值，每次合并上游必然冲突。让 `setup_skill_version` 与上游一致即可消除这类冲突，且不损失任何信息——运行时只用 `agents_version` 判断部署是否过期（见 `check-story-setup-deployment.sh` TS10 的 mixed-version 夹具），`setup_skill_version` 只做仓库内三处一致性校验。
@@ -45,7 +47,7 @@ OpenClaw / Reasonix / generic 三条路径的 skill 副本在项目 `skills/` �
 这些文件可能含用户自定义内容：
 - `CLAUDE.md` — 按 marker/section 合并，用户独有 section 保留
 - `.claude/settings.local.json` — 按 command 识别 story hooks；已存在的受管 command 会迁移到当前模板的 event/matcher/timeout/if（例如 v25 的 Bash 正文 pre-guard），其他用户 hook 与配置保留
-- `AGENTS.md` — ZCode/OpenCode/Codex/OpenClaw/generic 按 marker/section 合并
+- `AGENTS.md` — ZCode/Codex/OpenClaw/generic 按 marker/section 合并
 - `.agents/hooks.json` — 只替换顶层 `oh-story` 组，保留用户其他 hook groups
 - `.zcode/config.json` — 仅按事件、matcher 和 process args 去重合并 oh-story Hooks，其他字段保留
 
@@ -89,7 +91,7 @@ OpenClaw / Reasonix / generic 三条路径的 skill 副本在项目 `skills/` �
 
 重新部署后需**新开会话**，custom agent 与 hooks 才会重新注册。
 
-## v24 当前契约
+## v24 历史契约
 
 - Claude 的 `guard-outline-before-prose.sh` 增加追踪检查点门，与 OpenCode、ZCode、Codex 共用 `story_hook_cli.js tracking-checkpoint`：追踪状态缺失、schema 非 4、状态卡修订不一致，以及首建新章时上一章事务未提交都会拦截。
 - 细纲门只检查首建章节，追踪检查点同时覆盖首建和续写；Node 不可用时追踪门放行，原有纯 Bash 大纲/细纲门仍生效。
@@ -145,7 +147,7 @@ OpenClaw / Reasonix / generic 三条路径的 skill 副本在项目 `skills/` �
 | 情况 | 表现 |
 |------|------|
 | `追踪/_tracking-state.json` 存在且 `check` 通过 | 正常，无需处理 |
-| 缺 `_tracking-state.json` 但已有正文 | 日更停止；OpenCode / ZCode / Codex 上写正文被 hook 直接拦截 |
+| 缺 `_tracking-state.json` 但已有正文 | 日更停止；Claude Code / Antigravity / ZCode / Codex 上写正文被 hook 直接拦截 |
 | 存在但派生视图被手改 | `check` 报 `derived view differs from _tracking-state.json` |
 
 迁移**不需要重跑全书拆解**：正文、`设定/`、`大纲/`、`拆文库/` 都不受影响，只重建 `追踪/`。执行 `/story-import` 的「旧追踪项目迁移」——数出最后完整章号 `N`，从旧追踪文件与最近几章正文重建当前状态，构造 `last_chapter=N` 的初始化事务跑 `tracking_commit.py init`。旧追踪结构会被按原样整体移入 `追踪/_旧追踪存档/`，不删除、不参与解析。
@@ -156,7 +158,7 @@ OpenClaw / Reasonix / generic 三条路径的 skill 副本在项目 `skills/` �
 
 ## 版本变更
 
-### v25 (当前)
+### v25
 
 - `.story-deployed` 的 `agents_version` 升级到 `25`（`setup_skill_version` 仍为 `1.2.7`）。
 - **Bash 正文写入守卫（#316）**：正文前置守卫注册到 Bash，复用共享核识别重定向/tee/touch/cp/mv/install 的写入目标；只读命令的引号示例与 heredoc 正文提及不拦，相对路径按 hook cwd 解析。静态 best-effort 识别、非 shell 沙箱，node/共享核异常时显式告警后 fail-open。

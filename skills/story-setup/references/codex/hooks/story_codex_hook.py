@@ -473,7 +473,7 @@ def find_changed_prose_files(root: Path) -> list[Path]:
 
 def _wordcount_finding(abs_path: Path, text: str) -> str | None:
     """字数欠账（仅长篇分章正文）：从 大纲/细纲_第N章*.md 读「字数目标」，实际 < 90% 提示。
-    与 check-prose-after-write.sh 内嵌 python / opencode wordcountFinding 同实现。"""
+    与 check-prose-after-write.sh 内嵌 python / zcode wordcountFinding 同实现。"""
     chapter_info = _long_chapter_info(abs_path)
     if chapter_info is None:
         return None
@@ -1555,7 +1555,7 @@ _SETTING_NON_CHARACTER_FILES = {"关系.md", "题材定位.md", "题材正文提
 
 def _is_character_sheet_path(rel: str) -> bool:
     """只查角色卡：整棵 设定/ 一刀切会让每次碰设定的提交都刷一屏假警告，把同框的
-    「正文硬编码角色属性」真警告埋掉。判定口径与 validate-story-commit.sh / opencode
+    「正文硬编码角色属性」真警告埋掉。判定口径与 validate-story-commit.sh / zcode
     pre-commit.sh 的 case 分支一一对齐（bash↔js↔py 四端同口径，别单边改回一刀切）：
     ① 设定/角色|人物 子目录内的文件 → 角色卡；
     ② 其余 设定/<子目录>/ → 整目录跳过（世界观/势力/报告/原理/人物关系 等）；

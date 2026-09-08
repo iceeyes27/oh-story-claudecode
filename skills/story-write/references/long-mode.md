@@ -167,7 +167,7 @@
 只有用户明确要求“成稿 / 最终正文 / 直接写正文”时执行：
 
 1. **检查细纲**：读取 `大纲/细纲_第{N}章.md`，并从对应 `大纲/卷纲_第X卷.md` 读取当前剧情单元（单元ID/位置、卷契约、本卷主推线/战果、终局底牌边界、风险等级）。如果不存在或缺少当前章节蓝图的必需字段，**必须先补建细纲再写正文**，不允许跳过细纲直接写作。补建时参考卷纲中本章对应的事件规划和上下文，补齐阶段位置、结构公式、禁止提前释放、内容概括、情节安排、人物关系/出场顺序、情节细化、结尾设定；无法从已有证据判断的字段写 `[待补充]`，不杜撰副线或关系。
-2. **编排器读取上下文**（筛选后按 `reader-first-writing.md` 交给写手，不原样转交完整资料；按需选择；缺失时遵循各项及上方「缺失文件处理」，仅明确标为可选的非主产物跳过。可选快捷路径：如果项目已部署 story-explorer agent（优先检查 `.claude/agents/story-explorer.md` 是否存在；不存在时再检查 `.opencode/agents/`，再不存在时检查 `.codex/agents/`），可 spawn `Agent(subagent_type: "story-explorer", prompt: "项目目录：{dir}\n查询类型：context_load\n查询参数：准备写第 {N} 章\n追踪状态：last_committed_chapter={check 的值}，state_revision={check 的值}")` 一次获取上下文）：
+2. **编排器读取上下文**（筛选后按 `reader-first-writing.md` 交给写手，不原样转交完整资料；按需选择；缺失时遵循各项及上方「缺失文件处理」，仅明确标为可选的非主产物跳过。可选快捷路径：如果项目已部署 story-explorer agent（优先检查 `.claude/agents/story-explorer.md` 是否存在；不存在时再检查 `.codex/agents/`），可 spawn `Agent(subagent_type: "story-explorer", prompt: "项目目录：{dir}\n查询类型：context_load\n查询参数：准备写第 {N} 章\n追踪状态：last_committed_chapter={check 的值}，state_revision={check 的值}")` 一次获取上下文）：
    - (1) `正文/第{N-1}章_*.md` — 上一章正文
    - (2) `大纲/细纲_第{N}章.md` — 本章细纲（含钩子设计）
    - (2a) `大纲/卷纲_第X卷.md` — 当前剧情单元、卷契约与终局储备（主推线/战果、终局底牌边界）
@@ -196,7 +196,7 @@
      - (g) 输出"主对标召回摘要 + 副对标召回摘要 + selected_emotion_module + rhythm_reference + genre_prose_card + 文风召回指令 + 原文锚点片段引用"，由编排器保留完整召回记录，只把本章用得上的结论按 `reader-first-writing.md` 的材料包传给 narrative-writer。**多对标书时**参 `references/cross-book-recall.md`：主对标提供文风、原文锚点与 selected_emotion_module / rhythm_reference；副对标/参考对标按阶段预算提供结构化摘要，不限制登记书目，不读取副书 `文风.md` / 原文，超过预算时裁条目不裁书目记录。
      - (h) 从题材定位解析 `narrative_complexity`；新书默认平直，旧书缺字段取常规。平直档按 `narrative-complexity.md` 组织因果与章尾。
      - **快捷路径**：项目已部署 story-explorer agent 时，可一次性召回文风/模块材料。
-       - 检查顺序：`.claude/agents/story-explorer.md` → `.opencode/agents/` → `.codex/agents/`。
+       - 检查顺序：`.claude/agents/story-explorer.md` → `.codex/agents/`。
        - 查询类型：`benchmark_style_load`；传入项目目录、章节号、目标基调/字数和爽点类型。
        - 需要返回：`style_profile_path`、`style_profile_summary`、`selected_emotion_module`、`rhythm_reference`、来源路径、匹配章节、锚点片段、`gaps`。
        - `gaps.missing_primary_contract` 为 true 时先按 `repair_action` 修复，不进入正文生成。
@@ -210,13 +210,13 @@
 	     - 检查任务卡点：本章如果有“办事被卡住”，它必须卡出信息、关系、代价、选择或伏笔变化；没有就不强补。
 	     - 契约风险检查：按 `references/reader-contract-and-progression.md` 判定 契约安全 / 需补强 / 契约破坏；若高光/收益被配角、机构或偶然性拿走且没有可见交换，先修纲再写。
      - 例：「快节奏打脸——账单暴露→逼问→反证→公开代价；读者等了三章，这章必须一拳到位。」
-4. **资料研究**（按需）：如果写作中遇到需要查证的外部事实（历史年代、地理方位、职业细节等），如果项目已部署 story-researcher agent（优先检查 `.claude/agents/` 下的 `story-researcher.md` 是否存在；不存在时再检查 `.opencode/agents/`，再不存在时检查 `.codex/agents/`），spawn `story-researcher` agent 搜索并输出到 `参考资料/` 目录。如 agent 不可用，由主线程直接执行。研究完成后再继续写作。
+4. **资料研究**（按需）：如果写作中遇到需要查证的外部事实（历史年代、地理方位、职业细节等），如果项目已部署 story-researcher agent（优先检查 `.claude/agents/` 下的 `story-researcher.md` 是否存在；不存在时再检查 `.codex/agents/`），spawn `story-researcher` agent 搜索并输出到 `参考资料/` 目录。如 agent 不可用，由主线程直接执行。研究完成后再继续写作。
 5. **标题分档门禁**：从 `设定/题材定位.md` 读取 `标题档位`，缺失取 `fanqie`。写前定名与写后交付都运行 `node .agents/skills/_shared/scripts/check-chapter-titles.js --dir "{正文目录}" --profile {fanqie|terse}`。两档都阻断 AI 偏正摘要句、口号式设问、精确/近似复读；`fanqie` 对单纯超长、普通问句、通用角色词重合只提示，`terse` 保留 2～6 字、最长 7 字的旧严格门禁。详见 `narrative-complexity.md`。
 	6. **写作**：第 1 章尽快建立人物处境、目标与行动理由；独处或内心开场能让读者理解选择、顾忌或关系时保留，不强制改成外部事件。代入或推进偏薄先分清表现与设计问题：缺必要信息就补清，只有办事流程则回场景方案反馈；不靠重复解释、微动作或强加任务卡点凑字。
    - **正文元信息隔离**：`章节：第{N}章`、`上一章：正文/第{N-1}章_*.md`、`匹配第K章`、`细纲文件` 等只用于定位材料。标题行以外的正文不得出现 `第[一二三四五六七八九十百千万两0-9]+章|上一章|上章|前一章|本章|这一章|前文|后文|伏笔|细纲|读者` 这类写作工程词。需要承接前文时，改成角色能感知的事件锚点或相对时间，例如“比第一章那三秒开火更疼”必须写成“比那三秒开火更疼”。例外：角色在故事世界内真实阅读/讨论“第X章”文本，或真实身为作者/读者并谈论读者身份时，可保留相应词。
    - **具体字数表达校验**：正文评价台词、题字、信件、诏令、念头或弹幕时，只有在统计口径明确、已用脚本逐字核对、且故事确有必要时，才使用“这五个字 / 短短四字 / 三个字一落 / 八个字砸下去”这类具体字数表达。不能确保字数计算正确时，一律改成非具体数字表达，如“这句话一落”“这一句落下”“那几个字”“这行字”“话音落下”。例如 `荀攸只说：“他会疑，不会快。”这五个字一落` 应改为 `荀攸只说：“他会疑，不会快。”这句话一落`。
 7. **正文执行**：
-   - 先检查 narrative-writer agent：`.claude/agents/narrative-writer.md` → `.opencode/agents/` → `.codex/agents/`。
+   - 先检查 narrative-writer agent：`.claude/agents/narrative-writer.md` → `.codex/agents/`。
    - 如可用，spawn `Agent(subagent_type: "narrative-writer", prompt: ...)`；显式传 `quality_profile: fanqie-long-v2` 与 `writer_packet`（本章材料包），不增加 candidate binding 字段。写手固定核心仅 `reader-first-writing.md` 与 `long-format.md`，`writer_packet` 按核心组装：
      - 本次要求、章节、输出路径、当前细纲/骨架及已合并的语义覆盖、前一章已采用正文。
      - 关键人物从已有档案、状态及相关正文摘出的当前盘算、顾忌、关系前史、声口，附来源；替换重复状态与泛化题材摘录。另取关键数值、需用伏笔/承诺和当前单元边界；不传全档案、未来细纲或完整 state。缺动机设计先补设计，不从追踪编造事实。
@@ -297,7 +297,7 @@ advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界�
 
 #### Agent 调用：consistency-checker
 
-质量检查阶段，如果项目已部署 consistency-checker agent（优先检查 `.claude/agents/consistency-checker.md` 是否存在；不存在时再检查 `.opencode/agents/`，再不存在时检查 `.codex/agents/`），spawn `Agent(subagent_type: "consistency-checker", prompt: "项目目录：{dir}\n检查范围：{本次写作的章节}\n检查类型：事实冲突+伏笔断线+角色属性不一致")` 执行一致性检查，获取 S1-S4 分级报告。如 agent 不可用，由主线程参照 long-chapter-quality.md 直接检查。
+质量检查阶段，如果项目已部署 consistency-checker agent（优先检查 `.claude/agents/consistency-checker.md` 是否存在；不存在时再检查 `.codex/agents/`），spawn `Agent(subagent_type: "consistency-checker", prompt: "项目目录：{dir}\n检查范围：{本次写作的章节}\n检查类型：事实冲突+伏笔断线+角色属性不一致")` 执行一致性检查，获取 S1-S4 分级报告。如 agent 不可用，由主线程参照 long-chapter-quality.md 直接检查。
 
 #### Agent 调用：narrative-writer（定向文字复核）
 

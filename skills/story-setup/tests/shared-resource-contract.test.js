@@ -53,6 +53,19 @@ test('AI scanner fails closed when the canonical banned-word file is missing', (
 test('AI scanner flushes complete JSON before returning a blocking exit code', (t) => {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), 'scanner-json-flush-'));
   t.after(() => fs.rmSync(temp, { recursive: true, force: true }));
+  // Shared punctuation findings are advisory; a sourced author rule supplies
+  // the blocking finding needed to exercise JSON flushing on a failing exit.
+  const quote = '本测试书正文禁止使用破折号。';
+  fs.writeFileSync(path.join(temp, 'author-preferences.md'), quote, 'utf8');
+  fs.writeFileSync(path.join(temp, '.deslop-author-rules.json'), JSON.stringify({
+    schema_version: 1,
+    rules: [{
+      id: 'author-em-dash', category: 'author',
+      source: { path: 'author-preferences.md', quote },
+      scope: { path: '.', surface: 'all' },
+      match: { kind: 'literal', value: '——' },
+    }],
+  }), 'utf8');
   const files = [];
   for (let index = 0; index < 240; index += 1) {
     const prose = path.join(temp, `chapter-${index}.md`);
@@ -62,11 +75,16 @@ test('AI scanner flushes complete JSON before returning a blocking exit code', (
   const scanner = path.join(SHARED, 'scripts', 'check-ai-patterns.js');
   const result = spawnSync(process.execPath, [scanner, '--check', '--json', '--fail-on=blocking', ...files], {
     encoding: 'utf8',
+    cwd: temp,
     maxBuffer: 20 * 1024 * 1024,
   });
   assert.equal(result.status, 1, result.stderr);
+  assert(Buffer.byteLength(result.stdout, 'utf8') > 64 * 1024, 'fixture must exceed a small pipe buffer');
   const payload = JSON.parse(result.stdout);
   assert.equal(payload.findings.filter((finding) => finding.type === 'em-dash').length, files.length);
+  const blocking = payload.findings.filter((finding) => finding.severity === 'blocking');
+  assert.equal(blocking.length, files.length);
+  assert(blocking.every((finding) => finding.type === 'author-ban' && finding.rule_id === 'author-em-dash'));
 });
 
 test('AI scanner catches double-dangling identity shifts without flagging explicit identities', (t) => {
@@ -82,11 +100,15 @@ test('AI scanner catches double-dangling identity shifts without flagging explic
     '最后留下来的那个人，成了他的证人。',
   ].join('\n'), 'utf8');
   const scanner = path.join(SHARED, 'scripts', 'check-ai-patterns.js');
-  const result = spawnSync(process.execPath, [scanner, '--json', '--fail-on=blocking', prose], { encoding: 'utf8' });
-  assert.equal(result.status, 1, result.stderr);
-  const payload = JSON.parse(result.stdout);
-  const findings = payload.findings.filter((finding) => finding.type === 'banned-word-dangling-identity');
-  assert.deepEqual(findings.map((finding) => finding.line), [1, 2, 3]);
+  for (const [failOn, status] of [['all', 1], ['blocking', 0]]) {
+    const result = spawnSync(process.execPath, [scanner, '--json', `--fail-on=${failOn}`, prose], { encoding: 'utf8', cwd: temp });
+    assert.equal(result.status, status, result.stderr);
+    const payload = JSON.parse(result.stdout);
+    const findings = payload.findings.filter((finding) => finding.type === 'banned-word-dangling-identity');
+    assert.deepEqual(findings.map((finding) => finding.line), [1, 2, 3]);
+    assert(findings.every((finding) => finding.severity === 'advisory'));
+    assert(!payload.findings.some((finding) => finding.severity === 'blocking'));
+  }
 });
 
 test('AI scanner catches body-shell metaphors without flagging literal or concrete body descriptions', (t) => {
@@ -103,11 +125,15 @@ test('AI scanner catches body-shell metaphors without flagging literal or concre
     '他瘫在靠背里，肩膀塌着，石膏外的脚趾一动不动。',
   ].join('\n'), 'utf8');
   const scanner = path.join(SHARED, 'scripts', 'check-ai-patterns.js');
-  const result = spawnSync(process.execPath, [scanner, '--json', '--fail-on=blocking', prose], { encoding: 'utf8' });
-  assert.equal(result.status, 1, result.stderr);
-  const payload = JSON.parse(result.stdout);
-  const findings = payload.findings.filter((finding) => finding.type === 'banned-word-body-shell');
-  assert.deepEqual(findings.map((finding) => finding.line), [1, 2, 3]);
+  for (const [failOn, status] of [['all', 1], ['blocking', 0]]) {
+    const result = spawnSync(process.execPath, [scanner, '--json', `--fail-on=${failOn}`, prose], { encoding: 'utf8', cwd: temp });
+    assert.equal(result.status, status, result.stderr);
+    const payload = JSON.parse(result.stdout);
+    const findings = payload.findings.filter((finding) => finding.type === 'banned-word-body-shell');
+    assert.deepEqual(findings.map((finding) => finding.line), [1, 2, 3]);
+    assert(findings.every((finding) => finding.severity === 'advisory'));
+    assert(!payload.findings.some((finding) => finding.severity === 'blocking'));
+  }
 });
 
 test('canonical source agent templates reference the .agents bundle only', () => {
@@ -120,6 +146,7 @@ test('canonical source agent templates reference the .agents bundle only', () =>
       if (!/\.(md|toml)$/.test(entry)) continue;
       const file = path.join(directory, entry);
       const text = fs.readFileSync(file, 'utf8');
+      // Removed platform paths remain forbidden in canonical references.
       if (/\.(?:claude|codex|opencode|zcode)\/skills\/story-setup\/references\/agent-references\//.test(text)) {
         stale.push(path.relative(SKILLS, file));
       }

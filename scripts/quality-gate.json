@@ -48,23 +48,27 @@
       "story-setup",
       "claude-adapter",
       "codex-adapter",
-      "opencode-adapter",
       "zcode-adapter",
       "openclaw-adapter",
       "reasonix-adapter",
       "static",
       "dashboard",
-      "dashboard-e2e",
       "language-gates",
       "narrative-gates",
       "platform-gates",
       "quality-lifecycle",
       "antigravity-adapter",
       "hook-regex-sync",
-      "hook-locale-safety",
+      "hook-locale-safety"
+    ],
+    "external": [
       "codex-cli-e2e",
-      "opencode-cli-e2e"
+      "dashboard-e2e"
     ]
+  },
+  "profile_notes": {
+    "release": "codex-cli-e2e 与 dashboard-e2e 保留在 external profile：它们依赖本机安装的 Codex CLI 与 Playwright 浏览器分包，不作为本 fork 上游同步所需的 release PASS 条件。",
+    "external": "已安装所需工具的环境运行 node scripts/quality-gate.mjs --profile external；缺少工具仍按原检查规则报告 BLOCKED，不安装或下载依赖。"
   },
   "checks": {
     "sync-unit": {
@@ -193,12 +197,6 @@
         "scripts/check-codex-adapter.sh"
       ]
     },
-    "opencode-adapter": {
-      "command": "bash",
-      "args": [
-        "scripts/check-opencode-adapter.sh"
-      ]
-    },
     "zcode-adapter": {
       "command": "bash",
       "args": [
@@ -289,15 +287,6 @@
       "command": "bash",
       "args": [
         "scripts/test-codex-cli-e2e.sh"
-      ],
-      "blocked_patterns": [
-        "CLI not found"
-      ]
-    },
-    "opencode-cli-e2e": {
-      "command": "bash",
-      "args": [
-        "scripts/test-opencode-cli-e2e.sh"
       ],
       "blocked_patterns": [
         "CLI not found"

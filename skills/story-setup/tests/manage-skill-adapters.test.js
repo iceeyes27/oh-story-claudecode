@@ -97,16 +97,16 @@ test('junction backend resolves to canonical source', (t) => {
 test('fallback detects content drift and stale source hashes', (t) => {
   const root = fixture();
   t.after(() => cleanup(root));
-  const result = run(root, 'install', '--platform=opencode', '--mode=fallback');
+  const result = run(root, 'install', '--platform=zcode', '--mode=fallback');
   assert.equal(result.status, 0, result.stderr);
-  const targetFile = path.join(root, '.opencode', 'skills', 'story-test', 'SKILL.md');
+  const targetFile = path.join(root, '.zcode', 'skills', 'story-test', 'SKILL.md');
   fs.chmodSync(targetFile, 0o644);
   fs.appendFileSync(targetFile, 'drift\n');
-  assert.notEqual(run(root, 'check', '--platform=opencode').status, 0);
-  assert.equal(run(root, 'repair', '--platform=opencode', '--mode=fallback').status, 0);
+  assert.notEqual(run(root, 'check', '--platform=zcode').status, 0);
+  assert.equal(run(root, 'repair', '--platform=zcode', '--mode=fallback').status, 0);
   const sourceFile = path.join(root, '.agents', 'skills', 'story-test', 'SKILL.md');
   fs.appendFileSync(sourceFile, 'new source\n');
-  assert.notEqual(run(root, 'check', '--platform=opencode').status, 0);
+  assert.notEqual(run(root, 'check', '--platform=zcode').status, 0);
 });
 
 test('check reports an ordinary copy and a broken link', (t) => {

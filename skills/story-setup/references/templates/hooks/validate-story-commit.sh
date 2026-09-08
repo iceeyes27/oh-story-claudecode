@@ -15,7 +15,7 @@ fi
 
 is_git_commit_command() {
   # 走 node 共享核 isGitCommitCommand：命令优先取 STORY_COMMIT_COMMAND，缺省从 HOOK_INPUT
-  # 挖 command/cmd/script。js 分词语义，与 OpenCode/ZCode 一致；对「引号内分隔符」这类边界
+  # 挖 command/cmd/script。js 分词语义，与 ZCode 一致；对「引号内分隔符」这类边界
   # 与旧 python shlex 有已文档化、仅 advisory 的差异（不影响本 hook 的 exit 0 非阻塞语义）。
   # node 探测不到就当「非 commit」，让下方静默放行（兜底不反噬提交流程；native 安装可能
   # 无 node，此时 commit 格式提示停用，session-start.sh 会在会话起点提示一次）。
@@ -79,7 +79,7 @@ while IFS= read -r -d '' file; do
   # 都刷一屏假警告，把同框的「正文硬编码角色属性」真警告埋掉。判定：设定/角色|人物 子目录内的
   # 文件 + 设定/ 直属的扁平角色卡（角色.md/主角.md/配角.md/反派.md 等自定义命名）才查；
   # 其余子目录与已知项目级文件跳过。
-  # 四端同口径：本脚本（Claude）、OpenCode 的 .git/hooks/pre-commit、JS core 的
+  # 三端同口径：本脚本（Claude）、JS core 的
   # isCharacterSheetPath / stagedMarkdownWarnings、codex 的 _is_character_sheet_path /
   # staged_markdown_warnings 已全部收窄到同一判定。改任一端都要四端一起改，否则
   # 同一次提交在不同 CLI 上会给出不同警告（parity 测试 Part E 锁 py↔js 两端）。

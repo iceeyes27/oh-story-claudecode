@@ -21,7 +21,7 @@ for (const [name, platform] of Object.entries(capabilities.platforms || {})) {
   if (!Array.isArray(platform.activation) || platform.activation.length === 0) findings.push(`${name}: activation is required`);
   if (!allowedFallback.has(platform.fallback)) findings.push(`${name}: fallback is invalid`);
 }
-for (const required of ['claude', 'opencode', 'codex', 'zcode', 'openclaw', 'reasonix', 'generic']) {
+for (const required of ['claude', 'codex', 'zcode', 'openclaw', 'reasonix', 'generic']) {
   if (!capabilities.platforms?.[required]) findings.push(`missing platform: ${required}`);
 }
 if (findings.length) {

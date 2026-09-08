@@ -20,7 +20,9 @@ disable: true
 
 > 运行环境兼容性：Claude Code / Codex / ZCode / OpenClaw 是内置适配目标。检查专业 agent 时按 `.claude/agents/{agent}.md` → `.codex/agents/{agent}.toml` 查找；找不到、Codex 返回 `unknown agent_type`，或检测到 `.zcode/`（ZCode 3.3.4 不执行项目 custom agents）时，直接 solo/direct 执行并报告 fallback。
 >
-> Spawn 版本提示（不阻断 spawn）：先读取项目根 `.story-deployed` 的 `agents_version`。与本版 `agents_version: 29` 不一致时（标记缺失、字段缺失/非整数、小于或大于 29）**照常按文件存在性检查并 spawn**，同时报告 `Notice: agents bundle 版本不匹配（项目 {N}，本版 29）` 并提示重新运行 `/story-setup` 后新开会话；大于 29 时额外提示先更新 oh-story-claudecode，不要用本地旧版 setup 降级覆盖。只有 agent 文件缺失、或运行时不暴露 custom agent 时才降级 solo/direct，报告 `Fallback: ... -> solo`。
+> Spawn 版本提示（不阻断 spawn）：先读取项目根 `.story-deployed` 的 `agents_version`。与本版 `agents_version: 30` 不一致时（标记缺失、字段缺失/非整数、小于或大于 30）**照常按文件存在性检查并 spawn**，同时报告 `Notice: agents bundle 版本不匹配（项目 {N}，本版 30）` 并提示重新运行 `/story-setup` 后新开会话；大于 30 时额外提示先更新 oh-story-claudecode，不要用本地旧版 setup 降级覆盖。只有 agent 文件缺失、或运行时不暴露 custom agent 时才降级 solo/direct，报告 `Fallback: ... -> solo`。
+>
+> **卷纲取段器**：读取卷纲内容时运行 `{PYTHON} {skill 根}/scripts/outline_view.py`。先用 `--toc` 定位单元，只取卷级契约用 `--contract`，取单元闭包用 `--unit {单元ID}`；写正文加 `--stage write`，排纲保留默认 `--stage outline`。找不到单元或作用域声明无效时按脚本错误修复，不能改为整读卷纲。新建卷纲写入后运行 `outline_view.py --check --strict {卷纲路径}`；存量卷纲未声明作用域时保守纳入并提示补充。
 
 ## 模式路由（mode = long / short）
 

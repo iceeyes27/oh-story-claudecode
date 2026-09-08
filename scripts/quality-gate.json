@@ -28,7 +28,8 @@
       "publication",
       "shared-assets",
       "static",
-      "language-gates"
+      "language-gates",
+      "writer-pipeline"
     ],
     "release": [
       "sync-unit",
@@ -54,6 +55,7 @@
       "static",
       "dashboard",
       "language-gates",
+      "writer-pipeline",
       "narrative-gates",
       "platform-gates",
       "quality-lifecycle",
@@ -245,6 +247,12 @@
       "command": "bash",
       "args": [
         "scripts/test-language-gates.sh"
+      ]
+    },
+    "writer-pipeline": {
+      "command": "python",
+      "args": [
+        "scripts/test-writer-pipeline.py"
       ]
     },
     "narrative-gates": {

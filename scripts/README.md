@@ -5,6 +5,8 @@
 - 本 fork 不使用 GitHub Actions；提交前本地检查命令见 [CONTRIBUTING.md](../CONTRIBUTING.md)「本地检查」。
 - **改名 / 移动任一脚本**，要同步改 `CONTRIBUTING.md`、本文件，以及调用它的兄弟脚本（见下方「何时跑」里的调用关系）。
 
+`python scripts/test-writer-pipeline.py` 验证长篇取段器与 prompt 组装器的公开 CLI：存量卷纲、作用域、退役历史、原生路径、必需资料与召回降档；纳入本地 release 检查。
+
 ## 静态守卫（check-*）
 
 | 脚本 | 检查什么 | 何时跑 |
@@ -66,6 +68,7 @@
 | `test-tracking-workflow-contracts.py` | 追踪工作流契约 | `tracking-workflow`（affected/release） |
 | `test-chapter-skeleton.js` | 章节骨架验证器 | `chapter-skeleton`（affected/release） |
 | `test-unified-skill-upstream-drift.py` | 上游旧拆分目录变化时，迁移检查会显示统一目标路径，并验证 `--report` 只读返回成功 | `sync-drift`（fast/affected/release） |
+| `test-writer-pipeline.py` | 卷纲取段器、写手 prompt 组装器与候选输出路径 | `writer-pipeline`（affected/release） |
 | `test-outline-causal.py` | 细纲因果链 | `narrative-gates` |
 | `test-outline-contract.js` | 细纲读者体验契约 | `narrative-gates` |
 | `test-emotion-run.js` | 目标情绪分类连排：3 章及以上 advisory；未来章隔离，标签本身不阻断 | `narrative-gates` |

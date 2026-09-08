@@ -3,7 +3,7 @@
 ## 当前版本
 
 - `setup_skill_version: 1.2.11`
-- `agents_version: 29`
+- `agents_version: 30`
 
 本 fork 已移除 OpenCode 部署支持。旧 `.story-deployed` 的 `target_cli` 含 `opencode` 时（包括多端组合），重新部署会停止并要求选择受支持目标；不会自动删除旧平台目录，也不会在选择和部署验证完成前改写 sentinel。下列历史版本记录保留当时的平台名称，不代表当前支持范围。
 
@@ -11,7 +11,7 @@
 >
 > 原因：`setup_skill_version` 与 `agents_version` 在本文件、`SKILL.md`、`current-contract.json`、`session-start.sh` 里都是相邻行，而上游每次发版都会 bump `agents_version`。两行贴在一起时会落进同一个 diff 块，只要 fork 在其中一行有自己的取值，每次合并上游必然冲突。让 `setup_skill_version` 与上游一致即可消除这类冲突，且不损失任何信息——运行时只用 `agents_version` 判断部署是否过期（见 `check-story-setup-deployment.sh` TS10 的 mixed-version 夹具），`setup_skill_version` 只做仓库内三处一致性校验。
 
-`.story-deployed` 缺失任一字段，或 `agents_version` 缺失 / 非整数 / 小于 `29`，都视为待更新部署。直接重新运行 `/story-setup`（Codex 用 `$story-setup`，Antigravity 用 `/skills` 或自然语言点名）；不在运行时逐级兼容历史模板。如项目 `agents_version` 大于 `29`，说明本地 story-setup 比项目旧：先更新 oh-story-claudecode，不得用 v29 降级覆盖。历史版本改动见仓库根目录 `CHANGELOG.md`。
+`.story-deployed` 缺失任一字段，或 `agents_version` 缺失 / 非整数 / 小于 `30`，都视为待更新部署。直接重新运行 `/story-setup`（Codex 用 `$story-setup`，Antigravity 用 `/skills` 或自然语言点名）；不在运行时逐级兼容历史模板。如项目 `agents_version` 大于 `30`，说明本地 story-setup 比项目旧：先更新 oh-story-claudecode，不得用 v30 降级覆盖。历史版本改动见仓库根目录 `CHANGELOG.md`。
 
 ## 升级策略
 
@@ -59,7 +59,16 @@ OpenClaw / Reasonix / generic 三条路径的 skill 副本在项目 `skills/` �
 - `.active-book` — 用户活跃书目
 - 短篇项目的 `追踪/` — setup/hooks 不应为短篇自动创建
 
-## v29 当前契约
+## v30 当前契约
+
+- 默认保留一次 checkpoint；全章细纲供整体编排，用户可明确选择一次成文。
+- 写手 prompt 使用脚本组装；卷纲按作用域取段，旧卷纲未声明的段保守保留并告警。
+- 新增材料按后续影响分级；需作者裁定的章节暂停提交和续写，避免正文事实漏进追踪。
+- 更新 narrative-writer 与参考资料，同时保留短篇格式、所选 Gate 范围及既有情绪表达规则。
+
+重新部署后需**新开会话**，使新 agent 定义生效。
+
+## v29 历史契约
 
 - 正文候选、质量审查、读者证据和追踪事务由不可变质量生命周期绑定；旧章修订会使后续审查链失效并要求顺序重放。
 - 运行锁文件不进入代际快照；正文、追踪和审查产物按原始字节物化，Windows 换行差异不得改变内容哈希。
@@ -122,7 +131,7 @@ OpenClaw / Reasonix / generic 三条路径的 skill 副本在项目 `skills/` �
 
 1. 在项目根目录重新运行 story-setup。
 2. 运行 `node .agents/skills/story-setup/scripts/manage-skill-adapters.js install --replace-managed-copies` 迁移旧平台副本。
-3. 确认 `.story-deployed` 写入 `agents_version: 29`、`setup_skill_version: 1.2.11`、`resolver_strategy: agents-canonical-v1`、`canonical_skills_dir` 与 `adapter_manifest`。
+3. 确认 `.story-deployed` 写入 `agents_version: 30`、`setup_skill_version: 1.2.11`、`resolver_strategy: agents-canonical-v1`、`canonical_skills_dir` 与 `adapter_manifest`。
 4. 运行 adapter `check`，确认 Skill 入口、agents、hooks/rules 和 references 通过验证。
 5. 新开会话，使 custom agents 与 hooks 按当前文件重新注册。
 6. **长篇在写项目必做**：检查每本书的 `追踪/_tracking-state.json` 是否存在。不存在就是旧追踪结构，按下方「追踪模型迁移」重建，否则写下一章会被拦。

@@ -259,3 +259,24 @@
 ### Status
 
 [OK] **Completed**
+
+
+## Session 12: Remove OpenCode platform and verify release
+
+**Date**: 2026-09-08
+**Task**: Remove OpenCode platform and verify release
+**Branch**: `main`
+
+### Summary
+
+Removed OpenCode deployment support, added external E2E profile, restored Claude hook deployment instructions and repaired stale scanner fixtures. affected 18/18 PASS; release 29/29 PASS; adapters 103/103. Archived 09-07-drop-opencode-platform for delivery.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `675d53c` | (see git log) |
+
+### Status
+
+[OK] **Completed**

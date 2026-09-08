@@ -1,0 +1,94 @@
+TAP version 13
+# Subtest: fresh install links managed skills and preserves custom skills
+ok 1 - fresh install links managed skills and preserves custom skills
+  ---
+  duration_ms: 330.5038
+  type: 'test'
+  ...
+# Subtest: default root inference works from the project root
+ok 2 - default root inference works from the project root
+  ---
+  duration_ms: 355.2689
+  type: 'test'
+  ...
+# Subtest: upgrade replaces a recognized legacy copy only with explicit consent
+ok 3 - upgrade replaces a recognized legacy copy only with explicit consent
+  ---
+  duration_ms: 264.1663
+  type: 'test'
+  ...
+# Subtest: upgrade refuses a same-name directory with platform-only files
+ok 4 - upgrade refuses a same-name directory with platform-only files
+  ---
+  duration_ms: 151.9935
+  type: 'test'
+  ...
+# Subtest: junction backend resolves to canonical source
+ok 5 - junction backend resolves to canonical source
+  ---
+  duration_ms: 272.8169
+  type: 'test'
+  ...
+# Subtest: fallback detects content drift and stale source hashes
+ok 6 - fallback detects content drift and stale source hashes
+  ---
+  duration_ms: 606.2932
+  type: 'test'
+  ...
+# Subtest: check reports an ordinary copy and a broken link
+ok 7 - check reports an ordinary copy and a broken link
+  ---
+  duration_ms: 227.5172
+  type: 'test'
+  ...
+# Subtest: shared prose rules and scanners have one canonical entity
+ok 8 - shared prose rules and scanners have one canonical entity
+  ---
+  duration_ms: 27.4832
+  type: 'test'
+  ...
+# Subtest: AI scanner fails closed when the canonical banned-word file is missing
+ok 9 - AI scanner fails closed when the canonical banned-word file is missing
+  ---
+  duration_ms: 172.99
+  type: 'test'
+  ...
+# Subtest: AI scanner flushes complete JSON before returning a blocking exit code
+ok 10 - AI scanner flushes complete JSON before returning a blocking exit code
+  ---
+  duration_ms: 1944.7151
+  type: 'test'
+  ...
+# Subtest: AI scanner catches double-dangling identity shifts without flagging explicit identities
+ok 11 - AI scanner catches double-dangling identity shifts without flagging explicit identities
+  ---
+  duration_ms: 262.6516
+  type: 'test'
+  ...
+# Subtest: AI scanner catches body-shell metaphors without flagging literal or concrete body descriptions
+ok 12 - AI scanner catches body-shell metaphors without flagging literal or concrete body descriptions
+  ---
+  duration_ms: 261.625
+  type: 'test'
+  ...
+# Subtest: canonical source agent templates reference the .agents bundle only
+ok 13 - canonical source agent templates reference the .agents bundle only
+  ---
+  duration_ms: 5.0805
+  type: 'test'
+  ...
+# Subtest: story consumers do not call removed skill-local prose scanners
+ok 14 - story consumers do not call removed skill-local prose scanners
+  ---
+  duration_ms: 3.7296
+  type: 'test'
+  ...
+1..14
+# tests 14
+# suites 0
+# pass 14
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2864.8078

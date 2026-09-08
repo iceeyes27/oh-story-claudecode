@@ -1,0 +1,501 @@
+{
+  "schema_version": 1,
+  "profile": "release",
+  "status": "PASS",
+  "config_sha256": "cb0c6465613fa224960b37dab9ef6571fcfc2099aa101d7fadf586190b2a5476",
+  "generated_at": "2026-09-08T01:39:52.738Z",
+  "results": [
+    {
+      "name": "sync-unit",
+      "command": [
+        "node",
+        "--test",
+        "scripts/sync-upstream.test.js"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 3628,
+      "stdout": "TAP version 13\n# Preparing worktree (new branch 'codex/sync-upstream-507cf7eedd55-mtrzdocy')\n# HEAD is now at 518f9e2 base\n# Automatic merge went well; stopped before committing as requested\n# Subtest: policy priority preserves fork boundaries and unified targets\nok 1 - policy priority preserves fork boundaries and unified targets\n  ---\n  duration_ms: 3.0498\n  type: 'test'\n  ...\n# Subtest: CLI defaults to a read-only status command\nok 2 - CLI defaults to a read-only status command\n  ---\n  duration_ms: 0.4827\n  type: 'test'\n  ...\n# Subtest: removed OpenCode assets are forbidden without excluding other platforms or Trellis\nok 3 - removed OpenCode assets are forbidden without excluding other platforms or Trellis\n  ---\n  duration_ms: 0.6987\n  type: 'test'\n  ...\n# Subtest: ancestor check distinguishes forward and reverse baselines\nok 4 - ancestor check distinguishes forward and reverse baselines\n  ---\n  duration_ms: 767.3645\n  type: 'test'\n  ...\n# Subtest: prepare uses a dedicated worktree and leaves dirty caller files untouched\nok 5 - prepare uses a dedicated worktree and leaves dirty caller files untouched\n  ---\n  duration_ms: 2602.5801\n  type: 'test'\n  ...\n1..5\n# tests 5\n# suites 0\n# pass 5\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 3515.3456\n",
+      "stderr": "",
+      "executed_command": [
+        "node",
+        "--test",
+        "scripts/sync-upstream.test.js"
+      ]
+    },
+    {
+      "name": "sync-drift",
+      "command": [
+        "python",
+        "scripts/test-unified-skill-upstream-drift.py"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 2068,
+      "stdout": "PASS: unified upstream checker reports source-to-target migration paths\r\n",
+      "stderr": "",
+      "executed_command": [
+        "python",
+        "scripts/test-unified-skill-upstream-drift.py"
+      ]
+    },
+    {
+      "name": "platform-capabilities",
+      "command": [
+        "node",
+        "scripts/check-platform-capabilities.mjs"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 108,
+      "stdout": "PASS: 6 platform contracts; 18 public skills\n",
+      "stderr": "",
+      "executed_command": [
+        "node",
+        "scripts/check-platform-capabilities.mjs"
+      ]
+    },
+    {
+      "name": "release-manifest",
+      "command": [
+        "node",
+        "scripts/check-release-manifest.mjs"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 122,
+      "stdout": "PASS: release identity 0.8.1; upstream 5de060f9a47e\n",
+      "stderr": "",
+      "executed_command": [
+        "node",
+        "scripts/check-release-manifest.mjs"
+      ]
+    },
+    {
+      "name": "doc-budget",
+      "command": [
+        "bash",
+        "scripts/check-doc-budget.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 5710,
+      "stdout": "热路径文档预算\n------------------------------------------------------------------------------\n  用量 /   预算  余量  文件\n    3730 /   3800     70  skills/story-write/SKILL.md  [ok]\n   26692 /  27500    808  skills/story-write/references/long-mode.md  [ok]\n   21496 /  22200    704  skills/story-write/references/short-mode.md  [ok]\n   16687 /  17500    813  skills/story-write/references/workflow-daily.md  [ok]\n   12779 /  13000    221  skills/story-write/references/workflow-setup.md  [ok]\n    9973 /  10050     77  skills/story-write/references/writing-craft.md  [ok]\n   15408 /  15500     92  skills/_shared/references/banned-words.md  [ok]\n   11635 /  14100   2465  skills/_shared/references/anti-ai-writing.md  [ok]\n   13229 /  14000    771  skills/story-setup/references/templates/agents/narrative-writer.md  [ok]\n    2398 /   2600    202  skills/story-write/references/reader-first-writing.md  [ok]\n\n路径合计（一次会话真正付的量）\n------------------------------------------------------------------------------\n   47109 /  48500   1391  长篇日更主会话  [ok]\n   43201 /  44000    799  长篇开书  [ok]\n   17087 /  18500   1413  普通长篇正文 agent 固定参考  [ok]\n\n提示（不阻断）：\n  - skills/_shared/references/anti-ai-writing.md 比预算低 2465 字，可把 budget 降到 11700 锁住这次精简\n  - skills/story-setup/references/templates/agents/narrative-writer.md 比预算低 771 字，可把 budget 降到 13300 锁住这次精简\n  - skills/story-write/references/reader-first-writing.md 比预算低 202 字，可把 budget 降到 2400 锁住这次精简\n\nResult: 热路径文档预算检查通过\n",
+      "stderr": "",
+      "executed_command": [
+        "bash",
+        "scripts/check-doc-budget.sh"
+      ]
+    },
+    {
+      "name": "candidate-transaction",
+      "command": [
+        "python",
+        "scripts/test-candidate-commit.py"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 113022,
+      "stdout": "",
+      "stderr": "test_arc02_blocking_requires_exact_author_approval (__main__.CandidateCommitTests.test_arc02_blocking_requires_exact_author_approval) ... ok\r\ntest_candidate_does_not_touch_body_or_tracking (__main__.CandidateCommitTests.test_candidate_does_not_touch_body_or_tracking) ... ok\r\ntest_candidate_workflow_documents_v2_logic_contract (__main__.CandidateCommitTests.test_candidate_workflow_documents_v2_logic_contract) ... ok\r\ntest_chapter_14_and_16_do_not_require_arc_receipts (__main__.CandidateCommitTests.test_chapter_14_and_16_do_not_require_arc_receipts) ... ok\r\ntest_chapter_15_requires_ledger_and_valid_arc02 (__main__.CandidateCommitTests.test_chapter_15_requires_ledger_and_valid_arc02) ... ok\r\ntest_check_passes_on_new_chapter_with_intent_fields (__main__.CandidateCommitTests.test_check_passes_on_new_chapter_with_intent_fields) ... ok\r\ntest_emotion_run_input_failure_still_rejects_before_writes (__main__.CandidateCommitTests.test_emotion_run_input_failure_still_rejects_before_writes) ... ok\r\ntest_four_same_emotion_distinct_events_check_and_promote (__main__.CandidateCommitTests.test_four_same_emotion_distinct_events_check_and_promote) ... ok\r\ntest_future_emotion_outline_does_not_extend_current_advisory (__main__.CandidateCommitTests.test_future_emotion_outline_does_not_extend_current_advisory) ... ok\r\ntest_historical_chapter_missing_intent_fields_is_advisory (__main__.CandidateCommitTests.test_historical_chapter_missing_intent_fields_is_advisory) ... ok\r\ntest_historical_chapter_real_world_name_is_advisory (__main__.CandidateCommitTests.test_historical_chapter_real_world_name_is_advisory) ... ok\r\ntest_list_reports_pending (__main__.CandidateCommitTests.test_list_reports_pending) ... ok\r\ntest_metrics_cumulative_value_accepts_prose_delta (__main__.CandidateCommitTests.test_metrics_cumulative_value_accepts_prose_delta) ... ok\r\ntest_metrics_update_binds_value_and_source_then_promotes (__main__.CandidateCommitTests.test_metrics_update_binds_value_and_source_then_promotes) ... ok\r\ntest_metrics_value_must_match_source_phrase (__main__.CandidateCommitTests.test_metrics_value_must_match_source_phrase) ... ok\r\ntest_new_chapter_character_near_name_is_advisory (__main__.CandidateCommitTests.test_new_chapter_character_near_name_is_advisory) ... ok\r\ntest_new_chapter_invalid_emotion_value_is_blocked (__main__.CandidateCommitTests.test_new_chapter_invalid_emotion_value_is_blocked) ... ok\r\ntest_new_chapter_missing_causal_fields_is_blocked (__main__.CandidateCommitTests.test_new_chapter_missing_causal_fields_is_blocked) ... ok\r\ntest_new_chapter_missing_intent_fields_is_blocked (__main__.CandidateCommitTests.test_new_chapter_missing_intent_fields_is_blocked) ... ok\r\ntest_new_chapter_undeclared_real_world_name_is_blocked (__main__.CandidateCommitTests.test_new_chapter_undeclared_real_world_name_is_blocked) ... ok\r\ntest_no_scan_cannot_bypass_logic_receipts (__main__.CandidateCommitTests.test_no_scan_cannot_bypass_logic_receipts) ... ok\r\ntest_promote_all_rejects_multiple_candidates_before_writes (__main__.CandidateCommitTests.test_promote_all_rejects_multiple_candidates_before_writes) ... ok\r\ntest_promote_all_with_current_serial_candidate (__main__.CandidateCommitTests.test_promote_all_with_current_serial_candidate) ... ok\r\ntest_promote_honors_explicit_terse_title_profile (__main__.CandidateCommitTests.test_promote_honors_explicit_terse_title_profile) ... ok\r\ntest_promote_ignores_in_prose_exemption_marker (__main__.CandidateCommitTests.test_promote_ignores_in_prose_exemption_marker) ... ok\r\ntest_promote_missing_transaction_aborts (__main__.CandidateCommitTests.test_promote_missing_transaction_aborts) ... ok\r\ntest_promote_moves_prose_and_advances_tracking (__main__.CandidateCommitTests.test_promote_moves_prose_and_advances_tracking) ... ok\r\ntest_promote_no_scan_bypasses_ai_gate_only (__main__.CandidateCommitTests.test_promote_no_scan_bypasses_ai_gate_only) ... ok\r\ntest_promote_no_scan_requires_reason (__main__.CandidateCommitTests.test_promote_no_scan_requires_reason) ... ok\r\ntest_promote_quality_gate_fails_when_node_is_unavailable (__main__.CandidateCommitTests.test_promote_quality_gate_fails_when_node_is_unavailable) ... ok\r\ntest_promote_records_scan_skip_reason (__main__.CandidateCommitTests.test_promote_records_scan_skip_reason) ... ok\r\ntest_promote_refuses_to_overwrite_final (__main__.CandidateCommitTests.test_promote_refuses_to_overwrite_final) ... ok\r\ntest_promote_rejects_duplicate_logic_id_in_json (__main__.CandidateCommitTests.test_promote_rejects_duplicate_logic_id_in_json) ... ok\r\ntest_promote_rejects_empty_or_unbound_semantic_evidence (__main__.CandidateCommitTests.test_promote_rejects_empty_or_unbound_semantic_evidence) ... ok\r\ntest_promote_rejects_missing_or_unknown_logic_id (__main__.CandidateCommitTests.test_promote_rejects_missing_or_unknown_logic_id) ... ok\r\ntest_promote_rejects_stale_expected_revision_before_writes (__main__.CandidateCommitTests.test_promote_rejects_stale_expected_revision_before_writes) ... ok\r\ntest_promote_rejects_stale_reader_file_hash (__main__.CandidateCommitTests.test_promote_rejects_stale_reader_file_hash) ... ok\r\ntest_promote_rejects_v1_binding_with_regeneration_message (__main__.CandidateCommitTests.test_promote_rejects_v1_binding_with_regeneration_message) ... ok\r\ntest_promote_reruns_rc01_even_with_no_scan (__main__.CandidateCommitTests.test_promote_reruns_rc01_even_with_no_scan) ... ok\r\ntest_promote_rolls_back_on_tracking_failure (__main__.CandidateCommitTests.test_promote_rolls_back_on_tracking_failure) ... ok\r\ntest_promote_treats_style_pattern_as_review_finding (__main__.CandidateCommitTests.test_promote_treats_style_pattern_as_review_finding) ... ok\r\ntest_recover_is_idempotent_after_each_persisted_phase (__main__.CandidateCommitTests.test_recover_is_idempotent_after_each_persisted_phase) ... ok\r\ntest_recover_rejects_changed_reader_view_before_move_or_tracking (__main__.CandidateCommitTests.test_recover_rejects_changed_reader_view_before_move_or_tracking) ... ok\r\ntest_recover_validates_transaction_digest_before_moving_prose (__main__.CandidateCommitTests.test_recover_validates_transaction_digest_before_moving_prose) ... ok\r\ntest_reject_archives_without_touching_body (__main__.CandidateCommitTests.test_reject_archives_without_touching_body) ... ok\r\ntest_rewrite_flag_marks_action (__main__.CandidateCommitTests.test_rewrite_flag_marks_action) ... ok\r\ntest_settlement_phrase_without_metrics_change_is_blocked (__main__.CandidateCommitTests.test_settlement_phrase_without_metrics_change_is_blocked) ... ok\r\ntest_settlement_reason_explicitly_allows_unchanged_metrics (__main__.CandidateCommitTests.test_settlement_reason_explicitly_allows_unchanged_metrics) ... ok\r\ntest_fact_revision_cannot_omit_downstream_reading (__main__.OrdinaryRevisionTests.test_fact_revision_cannot_omit_downstream_reading) ... ok\r\ntest_fact_revision_requires_transaction_and_all_later_context (__main__.OrdinaryRevisionTests.test_fact_revision_requires_transaction_and_all_later_context) ... ok\r\ntest_faults_recover_idempotently_and_block_other_writers (__main__.OrdinaryRevisionTests.test_faults_recover_idempotently_and_block_other_writers) ... ok\r\ntest_lifecycle_head_cannot_be_bypassed (__main__.OrdinaryRevisionTests.test_lifecycle_head_cannot_be_bypassed) ... ok\r\ntest_prepare_and_check_leave_adopted_prose_and_state_unchanged (__main__.OrdinaryRevisionTests.test_prepare_and_check_leave_adopted_prose_and_state_unchanged) ... ok\r\ntest_recover_refuses_unrelated_edit (__main__.OrdinaryRevisionTests.test_recover_refuses_unrelated_edit) ... ok\r\ntest_stale_original_context_inventory_and_review_fail_before_writes (__main__.OrdinaryRevisionTests.test_stale_original_context_inventory_and_review_fail_before_writes) ... ok\r\ntest_symlink_parent_rejected (__main__.OrdinaryRevisionTests.test_symlink_parent_rejected) ... ok\r\ntest_volume_directories_and_restoring_original (__main__.OrdinaryRevisionTests.test_volume_directories_and_restoring_original) ... ok\r\ntest_wording_and_rhythm_preserve_tracking_facts_and_original (__main__.OrdinaryRevisionTests.test_wording_and_rhythm_preserve_tracking_facts_and_original) ... ok\r\ntest_wording_can_refresh_evidence_without_changing_metric_value (__main__.OrdinaryRevisionTests.test_wording_can_refresh_evidence_without_changing_metric_value) ... ok\r\ntest_wording_requires_explicit_unchanged_facts_review (__main__.OrdinaryRevisionTests.test_wording_requires_explicit_unchanged_facts_review) ... ok\r\ntest_abort_refuses_started_transaction_and_recovery_finishes (revision_review_tests.RevisionReviewTests.test_abort_refuses_started_transaction_and_recovery_finishes) ... ok\r\ntest_adopted_prose_mutation_during_scan_rejects_before_journal (revision_review_tests.RevisionReviewTests.test_adopted_prose_mutation_during_scan_rejects_before_journal) ... ok\r\ntest_check_is_read_only_including_mtimes_and_creates_no_journal (revision_review_tests.RevisionReviewTests.test_check_is_read_only_including_mtimes_and_creates_no_journal) ... ok\r\ntest_derived_view_mutation_during_scan_rejects_before_journal (revision_review_tests.RevisionReviewTests.test_derived_view_mutation_during_scan_rejects_before_journal) ... ok\r\ntest_duplicate_padded_and_unpadded_next_outline_is_rejected (revision_review_tests.RevisionReviewTests.test_duplicate_padded_and_unpadded_next_outline_is_rejected) ... ok\r\ntest_frozen_candidate_mutation_during_scan_rejects_before_journal (revision_review_tests.RevisionReviewTests.test_frozen_candidate_mutation_during_scan_rejects_before_journal) ... ok\r\ntest_metric_value_must_match_revised_prose_before_any_write (revision_review_tests.RevisionReviewTests.test_metric_value_must_match_revised_prose_before_any_write) ... ok\r\ntest_padded_next_outline_is_bound_and_stale_outline_blocks_without_writes (revision_review_tests.RevisionReviewTests.test_padded_next_outline_is_bound_and_stale_outline_blocks_without_writes) ... ok\r\ntest_prepared_abort_keeps_originals_and_unblocks_new_proposal_even_if_candidate_damaged (revision_review_tests.RevisionReviewTests.test_prepared_abort_keeps_originals_and_unblocks_new_proposal_even_if_candidate_damaged) ... ok\r\ntest_prepared_abort_refuses_any_transaction_output_changed_by_external_editor (revision_review_tests.RevisionReviewTests.test_prepared_abort_refuses_any_transaction_output_changed_by_external_editor) ... ok\r\ntest_revised_body_invalidates_only_its_wordcount_certificate (revision_review_tests.RevisionReviewTests.test_revised_body_invalidates_only_its_wordcount_certificate) ... ok\r\ntest_source_refresh_cannot_change_other_chapter_metric (revision_review_tests.RevisionReviewTests.test_source_refresh_cannot_change_other_chapter_metric) ... ok\r\ntest_source_refresh_cannot_hide_numeric_fact_change (revision_review_tests.RevisionReviewTests.test_source_refresh_cannot_hide_numeric_fact_change) ... ok\r\ntest_source_refresh_preserves_nonnumeric_value_and_chapter_for_both_kinds (revision_review_tests.RevisionReviewTests.test_source_refresh_preserves_nonnumeric_value_and_chapter_for_both_kinds) ... ok\r\ntest_source_refresh_rejects_unknown_metric_record_injection_and_missing_anchor (revision_review_tests.RevisionReviewTests.test_source_refresh_rejects_unknown_metric_record_injection_and_missing_anchor) ... ok\r\ntest_source_refresh_still_requires_unchanged_facts_and_forbids_transaction (revision_review_tests.RevisionReviewTests.test_source_refresh_still_requires_unchanged_facts_and_forbids_transaction) ... ok\r\ntest_tracking_snapshot_excludes_runtime_lock_files (revision_review_tests.RevisionReviewTests.test_tracking_snapshot_excludes_runtime_lock_files)\r\n快照必须跳过 追踪/ 下的运行时锁文件，且这一点在每个平台都可验。 ... ok\r\ntest_tracking_state_mutation_during_scan_rejects_before_journal (revision_review_tests.RevisionReviewTests.test_tracking_state_mutation_during_scan_rejects_before_journal) ... ok\r\ntest_valid_metric_revision_updates_single_tracking_authority (revision_review_tests.RevisionReviewTests.test_valid_metric_revision_updates_single_tracking_authority) ... ok\r\n\r\n----------------------------------------------------------------------\r\nRan 79 tests in 112.711s\r\n\r\nOK\r\n",
+      "executed_command": [
+        "python",
+        "scripts/test-candidate-commit.py"
+      ]
+    },
+    {
+      "name": "tracking",
+      "command": [
+        "python",
+        "scripts/test-tracking-commit.py"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 18675,
+      "stdout": "",
+      "stderr": "test_a_character_can_die_and_retire_in_one_transaction (__main__.TrackingCommitTests.test_a_character_can_die_and_retire_in_one_transaction) ... ok\r\ntest_an_interrupted_archive_can_be_resumed (__main__.TrackingCommitTests.test_an_interrupted_archive_can_be_resumed) ... ok\r\ntest_append_can_atomically_declare_an_exact_chapter_gap (__main__.TrackingCommitTests.test_append_can_atomically_declare_an_exact_chapter_gap) ... ok\r\ntest_archive_never_clobbers_an_already_archived_file (__main__.TrackingCommitTests.test_archive_never_clobbers_an_already_archived_file) ... ok\r\ntest_chapter_gap_requires_exact_boundaries_and_append_mode (__main__.TrackingCommitTests.test_chapter_gap_requires_exact_boundaries_and_append_mode) ... ok\r\ntest_character_snapshot_lists_are_not_limited_to_eight_items (__main__.TrackingCommitTests.test_character_snapshot_lists_are_not_limited_to_eight_items) ... ok\r\ntest_check_compares_derived_views_to_state_without_parsing_markdown (__main__.TrackingCommitTests.test_check_compares_derived_views_to_state_without_parsing_markdown) ... ok\r\ntest_check_rejects_a_delta_inside_a_declared_gap (__main__.TrackingCommitTests.test_check_rejects_a_delta_inside_a_declared_gap) ... ok\r\ntest_check_rejects_orphan_character_file (__main__.TrackingCommitTests.test_check_rejects_orphan_character_file) ... ok\r\ntest_commit_and_check_still_refuse_a_retired_layout (__main__.TrackingCommitTests.test_commit_and_check_still_refuse_a_retired_layout) ... ok\r\ntest_commit_updates_state_and_all_demo_derived_views (__main__.TrackingCommitTests.test_commit_updates_state_and_all_demo_derived_views) ... ok\r\ntest_declared_context_retirement_is_recorded_in_the_chapter_delta (__main__.TrackingCommitTests.test_declared_context_retirement_is_recorded_in_the_chapter_delta) ... ok\r\ntest_dropping_a_context_item_without_declaring_it_is_rejected (__main__.TrackingCommitTests.test_dropping_a_context_item_without_declaring_it_is_rejected) ... ok\r\ntest_failed_init_leaves_the_old_tracking_directory_untouched (__main__.TrackingCommitTests.test_failed_init_leaves_the_old_tracking_directory_untouched) ... ok\r\ntest_imported_chapter_revision_creates_an_overlay_record (__main__.TrackingCommitTests.test_imported_chapter_revision_creates_an_overlay_record) ... ok\r\ntest_imported_cutoff_requires_only_new_daily_records (__main__.TrackingCommitTests.test_imported_cutoff_requires_only_new_daily_records) ... ok\r\ntest_init_archives_a_pre_transaction_tracking_directory (__main__.TrackingCommitTests.test_init_archives_a_pre_transaction_tracking_directory) ... ok\r\ntest_init_creates_one_structured_authority_and_only_derived_views (__main__.TrackingCommitTests.test_init_creates_one_structured_authority_and_only_derived_views) ... ok\r\ntest_legacy_state_without_chapter_gaps_accepts_first_gap_append (__main__.TrackingCommitTests.test_legacy_state_without_chapter_gaps_accepts_first_gap_append) ... ok\r\ntest_metrics_default_empty_and_render_stays_seven_headings (__main__.TrackingCommitTests.test_metrics_default_empty_and_render_stays_seven_headings) ... ok\r\ntest_metrics_render_as_position_bullet (__main__.TrackingCommitTests.test_metrics_render_as_position_bullet) ... ok\r\ntest_metrics_render_twelve_most_recent_and_report_hidden_count (__main__.TrackingCommitTests.test_metrics_render_twelve_most_recent_and_report_hidden_count) ... ok\r\ntest_metrics_require_structured_record_and_changed_chapter (__main__.TrackingCommitTests.test_metrics_require_structured_record_and_changed_chapter) ... ok\r\ntest_missing_active_snapshot_is_rejected_before_any_write (__main__.TrackingCommitTests.test_missing_active_snapshot_is_rejected_before_any_write) ... ok\r\ntest_old_revision_applies_current_rows_without_moving_update_chapter_back (__main__.TrackingCommitTests.test_old_revision_applies_current_rows_without_moving_update_chapter_back) ... ok\r\ntest_old_revision_preserves_current_next_chapter_commitment (__main__.TrackingCommitTests.test_old_revision_preserves_current_next_chapter_commitment) ... ok\r\ntest_overlapping_persisted_chapter_gaps_are_rejected (__main__.TrackingCommitTests.test_overlapping_persisted_chapter_gaps_are_rejected) ... ok\r\ntest_partial_view_write_keeps_old_authority_and_same_transaction_can_retry (__main__.TrackingCommitTests.test_partial_view_write_keeps_old_authority_and_same_transaction_can_retry) ... ok\r\ntest_retirement_is_rejected_in_a_revision (__main__.TrackingCommitTests.test_retirement_is_rejected_in_a_revision) ... ok\r\ntest_retiring_a_core_character_removes_its_derived_view (__main__.TrackingCommitTests.test_retiring_a_core_character_removes_its_derived_view) ... ok\r\ntest_retiring_a_still_active_character_is_rejected (__main__.TrackingCommitTests.test_retiring_a_still_active_character_is_rejected) ... ok\r\ntest_snapshot_target_warns_and_hard_cap_rejects_before_any_write (__main__.TrackingCommitTests.test_snapshot_target_warns_and_hard_cap_rejects_before_any_write) ... ok\r\ntest_stale_revision_cannot_overwrite_newer_state (__main__.TrackingCommitTests.test_stale_revision_cannot_overwrite_newer_state) ... ok\r\ntest_transaction_missing_metrics_is_rejected (__main__.TrackingCommitTests.test_transaction_missing_metrics_is_rejected) ... ok\r\ntest_unknown_fields_are_rejected (__main__.TrackingCommitTests.test_unknown_fields_are_rejected) ... ok\r\ntest_windows_reserved_character_name_is_rejected (__main__.TrackingCommitTests.test_windows_reserved_character_name_is_rejected) ... ok\r\n\r\n----------------------------------------------------------------------\r\nRan 36 tests in 18.492s\r\n\r\nOK\r\n",
+      "executed_command": [
+        "python",
+        "scripts/test-tracking-commit.py"
+      ]
+    },
+    {
+      "name": "author-voice-profile",
+      "command": [
+        "python",
+        "scripts/test-author-voice-profile.py"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 3233,
+      "stdout": "PASS: test_update_scope_preservation_and_idempotence\r\nPASS: test_check_and_dry_run_are_read_only\r\nPASS: test_marker_failures_are_non_destructive\r\nPASS: test_empty_invalid_and_duplicate_samples\r\nPASS: test_short_evidence_and_digest_change\r\nPASS: test_update_respects_project_lock\r\nPASS: test_symlink_escape_is_rejected\r\nauthor voice profile tests: 7/7 passed\r\n",
+      "stderr": "",
+      "executed_command": [
+        "python",
+        "scripts/test-author-voice-profile.py"
+      ]
+    },
+    {
+      "name": "tracking-workflow",
+      "command": [
+        "python",
+        "scripts/test-tracking-workflow-contracts.py"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 125,
+      "stdout": "Tracking workflow contract tests passed (15 tests).\r\n",
+      "stderr": "",
+      "executed_command": [
+        "python",
+        "scripts/test-tracking-workflow-contracts.py"
+      ]
+    },
+    {
+      "name": "chapter-skeleton",
+      "command": [
+        "node",
+        "scripts/test-chapter-skeleton.js"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 1977,
+      "stdout": "OK: chapter skeleton validator regressions passed\n",
+      "stderr": "",
+      "executed_command": [
+        "node",
+        "scripts/test-chapter-skeleton.js"
+      ]
+    },
+    {
+      "name": "contracts",
+      "command": [
+        "C:\\WINDOWS\\system32\\cmd.exe",
+        "/d",
+        "/s",
+        "/c",
+        "npm.cmd",
+        "run",
+        "test:contracts",
+        "--silent"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 1571,
+      "stdout": "TAP version 13\n# Subtest: question titles distinguish market questions from slogan questions by profile\nok 1 - question titles distinguish market questions from slogan questions by profile\n  ---\n  duration_ms: 246.001\n  type: 'test'\n  ...\n# Subtest: fanqie relaxes length and common role overlap but terse keeps the legacy gate\nok 2 - fanqie relaxes length and common role overlap but terse keeps the legacy gate\n  ---\n  duration_ms: 196.3141\n  type: 'test'\n  ...\n# Subtest: AI summary clauses and exact repeats remain blocking in every profile\nok 3 - AI summary clauses and exact repeats remain blocking in every profile\n  ---\n  duration_ms: 217.3496\n  type: 'test'\n  ...\n# Subtest: demo baseline is 0 blocking in fanqie and 13 in terse\nok 4 - demo baseline is 0 blocking in fanqie and 13 in terse\n  ---\n  duration_ms: 194.0986\n  type: 'test'\n  ...\n# Subtest: 逾期伏笔拦住首建新章\nok 5 - 逾期伏笔拦住首建新章\n  ---\n  duration_ms: 23.3038\n  type: 'test'\n  ...\n# Subtest: 悬空（从没排回收章）不拦日更\nok 6 - 悬空（从没排回收章）不拦日更\n  ---\n  duration_ms: 15.0131\n  type: 'test'\n  ...\n# Subtest: 回收章还没到、以及已回收/放弃的伏笔都不拦\nok 7 - 回收章还没到、以及已回收/放弃的伏笔都不拦\n  ---\n  duration_ms: 58.1766\n  type: 'test'\n  ...\n# Subtest: 正好写到计划回收章那一章不算逾期\nok 8 - 正好写到计划回收章那一章不算逾期\n  ---\n  duration_ms: 25.4006\n  type: 'test'\n  ...\n# Subtest: 细纲头部的 <!-- 伏笔:跳过 --> 豁免，超出头 6 行则无效\nok 9 - 细纲头部的 <!-- 伏笔:跳过 --> 豁免，超出头 6 行则无效\n  ---\n  duration_ms: 21.4429\n  type: 'test'\n  ...\n# Subtest: 伏笔欠账门排在毒句式欠账门之前\nok 10 - 伏笔欠账门排在毒句式欠账门之前\n  ---\n  duration_ms: 11.413\n  type: 'test'\n  ...\n# Subtest: 正文已存在（续写/改稿/回炉）不触发本门\nok 11 - 正文已存在（续写/改稿/回炉）不触发本门\n  ---\n  duration_ms: 9.8279\n  type: 'test'\n  ...\n# Subtest: 状态损坏一律 fail-open，不因解析失败误伤写作\nok 12 - 状态损坏一律 fail-open，不因解析失败误伤写作\n  ---\n  duration_ms: 17.4191\n  type: 'test'\n  ...\n# Subtest: 多条逾期只列前 6 条并给出完整体检出口\nok 13 - 多条逾期只列前 6 条并给出完整体检出口\n  ---\n  duration_ms: 12.2221\n  type: 'test'\n  ...\n# Subtest: CLI 子命令 foreshadow-debt 与核逐字一致\nok 14 - CLI 子命令 foreshadow-debt 与核逐字一致\n  ---\n  duration_ms: 103.6479\n  type: 'test'\n  ...\n# Subtest: js ↔ codex py 文案 parity\nok 15 - js ↔ codex py 文案 parity\n  ---\n  duration_ms: 193.3405\n  type: 'test'\n  ...\n# Subtest: 热卡复刻 tracking_commit.py 的排序：重要度 → 计划回收章 → id，未排期排最后\nok 16 - 热卡复刻 tracking_commit.py 的排序：重要度 → 计划回收章 → id，未排期排最后\n  ---\n  duration_ms: 5.0438\n  type: 'test'\n  ...\n# Subtest: 热卡只保留前 8 条，同重要度内旧伏笔（id 小）优先\nok 17 - 热卡只保留前 8 条，同重要度内旧伏笔（id 小）优先\n  ---\n  duration_ms: 0.7696\n  type: 'test'\n  ...\n# Subtest: 逾期是 blocking：定了回收章又错过\nok 18 - 逾期是 blocking：定了回收章又错过\n  ---\n  duration_ms: 2.7051\n  type: 'test'\n  ...\n# Subtest: 正好写到计划回收章那一章不算逾期，过了才算\nok 19 - 正好写到计划回收章那一章不算逾期，过了才算\n  ---\n  duration_ms: 0.5284\n  type: 'test'\n  ...\n# Subtest: 悬空默认 advisory，--strict 下变 blocking\nok 20 - 悬空默认 advisory，--strict 下变 blocking\n  ---\n  duration_ms: 0.9196\n  type: 'test'\n  ...\n# Subtest: 悬空阈值按重要度分档\nok 21 - 悬空阈值按重要度分档\n  ---\n  duration_ms: 0.6587\n  type: 'test'\n  ...\n# Subtest: 冷藏点名掉出热卡且埋了很久的伏笔\nok 22 - 冷藏点名掉出热卡且埋了很久的伏笔\n  ---\n  duration_ms: 0.5204\n  type: 'test'\n  ...\n# Subtest: 已回收 / 放弃 / 已过期的伏笔不再计入活跃债务\nok 23 - 已回收 / 放弃 / 已过期的伏笔不再计入活跃债务\n  ---\n  duration_ms: 0.2153\n  type: 'test'\n  ...\n# Subtest: 非 schema_version 4 与损坏字段被拒绝，不猜测\nok 24 - 非 schema_version 4 与损坏字段被拒绝，不猜测\n  ---\n  duration_ms: 0.7922\n  type: 'test'\n  ...\n# Subtest: CLI 退出码：0 干净 / 1 有逾期 / 2 参数或状态错误\nok 25 - CLI 退出码：0 干净 / 1 有逾期 / 2 参数或状态错误\n  ---\n  duration_ms: 498.7352\n  type: 'test'\n  ...\n# Subtest: --json 输出可解析且字段稳定\nok 26 - --json 输出可解析且字段稳定\n  ---\n  duration_ms: 83.2919\n  type: 'test'\n  ...\n# Subtest: demo 书：热卡与已渲染的 追踪/上下文.md 逐条一致\nok 27 - demo 书：热卡与已渲染的 追踪/上下文.md 逐条一致\n  ---\n  duration_ms: 1.2585\n  type: 'test'\n  ...\n# Subtest: new books default to plain narrative while legacy books remain regular\nok 28 - new books default to plain narrative while legacy books remain regular\n  ---\n  duration_ms: 5.3718\n  type: 'test'\n  ...\n# Subtest: plain mode writes causality directly and does not require a hidden ending\nok 29 - plain mode writes causality directly and does not require a hidden ending\n  ---\n  duration_ms: 2.1572\n  type: 'test'\n  ...\n# Subtest: title profile keeps pathological forms blocking in both modes\nok 30 - title profile keeps pathological forms blocking in both modes\n  ---\n  duration_ms: 1.1542\n  type: 'test'\n  ...\n# Subtest: first necessary explanation is preserved before deletion gates\nok 31 - first necessary explanation is preserved before deletion gates\n  ---\n  duration_ms: 3.7481\n  type: 'test'\n  ...\n# Subtest: dialogue keeps causal information while rejecting exposition monologues\nok 32 - dialogue keeps causal information while rejecting exposition monologues\n  ---\n  duration_ms: 0.4644\n  type: 'test'\n  ...\n# Subtest: general mode exposes one explicit route for rewrite, review, and translation\nok 33 - general mode exposes one explicit route for rewrite, review, and translation\n  ---\n  duration_ms: 2.3224\n  type: 'test'\n  ...\n# Subtest: general route boundaries stay consistent and load only task-relevant references\nok 34 - general route boundaries stay consistent and load only task-relevant references\n  ---\n  duration_ms: 0.7478\n  type: 'test'\n  ...\n# Subtest: review is ranked and contextual instead of a mandatory-clear scanner\nok 35 - review is ranked and contextual instead of a mandatory-clear scanner\n  ---\n  duration_ms: 0.3797\n  type: 'test'\n  ...\n# Subtest: every guide fragment in the index resolves to an actual heading\nok 36 - every guide fragment in the index resolves to an actual heading\n  ---\n  duration_ms: 3.7018\n  type: 'test'\n  ...\n# Subtest: translation preserves protected values, information, and document structure\nok 37 - translation preserves protected values, information, and document structure\n  ---\n  duration_ms: 0.4096\n  type: 'test'\n  ...\n# Subtest: novel mode and shared scanner contracts remain present\nok 38 - novel mode and shared scanner contracts remain present\n  ---\n  duration_ms: 0.1876\n  type: 'test'\n  ...\n# Subtest: the repository contract suite includes the general-mode test\nok 39 - the repository contract suite includes the general-mode test\n  ---\n  duration_ms: 0.5699\n  type: 'test'\n  ...\n# Subtest: novel editor and all reviewer entry points reject retired global policies\nok 40 - novel editor and all reviewer entry points reject retired global policies\n  ---\n  duration_ms: 6.7953\n  type: 'test'\n  ...\n# Subtest: the consumer guard detects representative old rules instead of silently passing\nok 41 - the consumer guard detects representative old rules instead of silently passing\n  ---\n  duration_ms: 0.6483\n  type: 'test'\n  ...\n# Subtest: ordinary editing preserves context and stops after a bounded reading-driven pass\nok 42 - ordinary editing preserves context and stops after a bounded reading-driven pass\n  ---\n  duration_ms: 0.9233\n  type: 'test'\n  ...\n# Subtest: platform and generic rubrics require applicability before judging chapter shape\nok 43 - platform and generic rubrics require applicability before judging chapter shape\n  ---\n  duration_ms: 0.5733\n  type: 'test'\n  ...\n# Subtest: generic novel check requires all ten stages and the manifest contract\nok 44 - generic novel check requires all ten stages and the manifest contract\n  ---\n  duration_ms: 12.9184\n  type: 'test'\n  ...\n# Subtest: pure Chinese prose profile gives logic checks at least one quarter of applicable budget\nok 45 - pure Chinese prose profile gives logic checks at least one quarter of applicable budget\n  ---\n  duration_ms: 2.3754\n  type: 'test'\n  ...\n# Subtest: validation spec stays synchronized with the composite manifest\nok 46 - validation spec stays synchronized with the composite manifest\n  ---\n  duration_ms: 0.6567\n  type: 'test'\n  ...\n# Subtest: AI flavor manifest preserves all ten layers and five semantic mismatch checks\nok 47 - AI flavor manifest preserves all ten layers and five semantic mismatch checks\n  ---\n  duration_ms: 0.3999\n  type: 'test'\n  ...\n# Subtest: every composite-check dependency is in the installable public skill set\nok 48 - every composite-check dependency is in the installable public skill set\n  ---\n  duration_ms: 1.131\n  type: 'test'\n  ...\n# Subtest: story-deslop file-mode pollution dependency is publicly installable and counted\nok 49 - story-deslop file-mode pollution dependency is publicly installable and counted\n  ---\n  duration_ms: 1.2734\n  type: 'test'\n  ...\n# Subtest: a finding does not stop later filters, but a missing or blocked item cannot complete\nok 50 - a finding does not stop later filters, but a missing or blocked item cannot complete\n  ---\n  duration_ms: 0.5253\n  type: 'test'\n  ...\n# Subtest: skip requires a reason and trigger precedence keeps version checks separate\nok 51 - skip requires a reason and trigger precedence keeps version checks separate\n  ---\n  duration_ms: 0.5182\n  type: 'test'\n  ...\n# Subtest: runtime hooks use the unified story-write entry and expose the post-event route\nok 52 - runtime hooks use the unified story-write entry and expose the post-event route\n  ---\n  duration_ms: 2.3126\n  type: 'test'\n  ...\n1..52\n# tests 52\n# suites 0\n# pass 52\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 992.9055\n",
+      "stderr": "",
+      "executed_command": [
+        "C:\\WINDOWS\\system32\\cmd.exe",
+        "/d",
+        "/s",
+        "/c",
+        "npm.cmd",
+        "run",
+        "test:contracts",
+        "--silent"
+      ]
+    },
+    {
+      "name": "publication",
+      "command": [
+        "node",
+        "--test",
+        "scripts/skill-publication-coverage.test.js"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 258,
+      "stdout": "TAP version 13\n# Subtest: every repository skill is explicitly public or local-only\nok 1 - every repository skill is explicitly public or local-only\n  ---\n  duration_ms: 6.6807\n  type: 'test'\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 139.6727\n",
+      "stderr": "",
+      "executed_command": [
+        "node",
+        "--test",
+        "scripts/skill-publication-coverage.test.js"
+      ]
+    },
+    {
+      "name": "current-contracts",
+      "command": [
+        "python",
+        "scripts/check-current-skill-contracts.py"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 2301,
+      "stdout": "Current Skill Contract Check\r\n============================\r\n  [PASS] manifest schema and declared release values\r\n  [PASS] legacy/path guards\r\n  [PASS] version, phase, progress, and artifact contracts\r\n  [PASS] primary-artifact fallback semantics\r\n  [PASS] demo primary artifacts and 20 outlines\r\n\r\nResult: all current-contract checks passed\r\n",
+      "stderr": "",
+      "executed_command": [
+        "python",
+        "scripts/check-current-skill-contracts.py"
+      ]
+    },
+    {
+      "name": "shared-assets",
+      "command": [
+        "bash",
+        "scripts/check-shared-files.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 68737,
+      "stdout": "Shared File Governance Check\n============================\nOK: 14 canonical groups manage 29 synchronized copies\nShared references: 71 groups / 83 synchronized copies\nReference similarity: no undeclared candidates at J>=85% or containment>=95%; 10 derived groups declared\nAgent reference consumers: 68 deployed Markdown files reachable from 30 direct agent roots; profile contract 4 common / 12 long / 7 short\nShort analysis scope: 5 observational rubrics; no legacy long-form playbook tokens\nAll declared shared files are consistent; no unmanaged exact or near-identical reference copies found.\n",
+      "stderr": "",
+      "executed_command": [
+        "bash",
+        "scripts/check-shared-files.sh"
+      ]
+    },
+    {
+      "name": "story-setup",
+      "command": [
+        "bash",
+        "scripts/check-story-setup-deployment.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 14085,
+      "stdout": "Story setup deployment check\n============================\nRepo: /mnt/d/code/oh-story-claudecode\n  OK TS1 hook dependency completeness\n  OK TS1b session-start self-check lists all hook scripts and node cores\n  OK TS2 deployment manifest\n  OK TS3 agent reference integrity\n  OK TS4 hook root resolution\n  OK TS5 sentinel diagnostics\n  OK TS6 short project non-mutation\n  OK TS7 commit hook self-gating\n  OK TS8 multi-book gap detection\n  OK TS9 settings JSON + Bash success/failure registration\n  OK TS10 version + behavior anchors\n  OK TS11 outline-before-prose guard\n  OK TS11b outline guard bash-fallback (Write/Edit) + Bash fail-open without node\n  OK TS11c outline guard: Write/Edit bash-fallback blocks, Bash fail-opens when node broken\n  OK TS12 restart-flag confirmation\n\nOK: story-setup deployment checks passed\n",
+      "stderr": "",
+      "executed_command": [
+        "bash",
+        "scripts/check-story-setup-deployment.sh"
+      ]
+    },
+    {
+      "name": "claude-adapter",
+      "command": [
+        "bash",
+        "scripts/check-claude-adapter.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 500,
+      "stdout": "Claude Code adapter check\n=========================\nRepo: /mnt/d/code/oh-story-claudecode\n  OK marketplace maps all 18 published skills exactly once\n  OK every repository skill is explicitly public or local-only\nOK: Claude Code adapter checks passed\n",
+      "stderr": "",
+      "executed_command": [
+        "bash",
+        "scripts/check-claude-adapter.sh"
+      ]
+    },
+    {
+      "name": "codex-adapter",
+      "command": [
+        "bash",
+        "scripts/check-codex-adapter.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 2157,
+      "stdout": "Codex adapter check\n===================\nRepo: /mnt/d/code/oh-story-claudecode\nOK: generated hooks are current (6 registrations)\nOK: Codex hook merge replaces v17 registrations and preserves user hooks\n  OK JSON/Python syntax\n  OK Windows encoding safety (UTF-8 stdio + file reads)\n  OK prose backstop parity surface (Stop net + SessionStart continuity)\n  OK .agents/skills discovery symlink (33 skills)\n  OK Codex custom-agent TOML (schema + generator determinism)\n  OK generated launcher routing + Python self-location + cmd.exe commandWindows\n  OK Codex agent canonical reference path\n  OK Codex docs/instruction anchors\n\nOK: Codex adapter checks passed\n",
+      "stderr": "",
+      "executed_command": [
+        "bash",
+        "scripts/check-codex-adapter.sh"
+      ]
+    },
+    {
+      "name": "zcode-adapter",
+      "command": [
+        "bash",
+        "scripts/check-zcode-adapter.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 1129,
+      "stdout": "ZCode adapter check\n===================\nRepo: /mnt/d/code/oh-story-claudecode\n  OK JSON/JavaScript syntax\n  OK native plugin/marketplace manifest\n  OK published Skills + Commands (schema and one-to-one names)\n  OK supported events + strict process-hook shape\n  OK deployment instructions + explicit capability boundaries\n\nOK: ZCode adapter checks passed\n",
+      "stderr": "",
+      "executed_command": [
+        "bash",
+        "scripts/check-zcode-adapter.sh"
+      ]
+    },
+    {
+      "name": "openclaw-adapter",
+      "command": [
+        "bash",
+        "scripts/check-openclaw-skills.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 333,
+      "stdout": "OpenClaw skills check\n=====================\nRepo: /mnt/d/code/oh-story-claudecode\n  OK ai-flavor-scan\n  OK batch-pollution-detector\n  OK browser-cdp\n  OK dialogue-naturalness-scan\n  OK humanizer\n  OK jargon-verb-scan\n  OK legal-domain-veracity-scan\n  OK opening-arc-audit\n  OK reader-comprehension-scan\n  OK story\n  OK story-analyze\n  OK story-cover\n  OK story-deslop\n  OK story-import\n  OK story-review\n  OK story-scan\n  OK story-setup\n  OK story-write\nOK: 18 skills have OpenClaw-compatible single-line frontmatter\nOK: OpenClaw skills checks passed\n",
+      "stderr": "",
+      "executed_command": [
+        "bash",
+        "scripts/check-openclaw-skills.sh"
+      ]
+    },
+    {
+      "name": "reasonix-adapter",
+      "command": [
+        "bash",
+        "scripts/check-reasonix-adapter.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 394,
+      "stdout": "Reasonix adapter check\n======================\nRepo: /mnt/d/code/oh-story-claudecode\n  OK reasonix-plugin.json (schema + version pin + public set + repository Skills)\n\nOK: Reasonix adapter checks passed\n",
+      "stderr": "",
+      "executed_command": [
+        "bash",
+        "scripts/check-reasonix-adapter.sh"
+      ]
+    },
+    {
+      "name": "static",
+      "command": [
+        "bash",
+        "scripts/static-check.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 186908,
+      "stdout": "Skill Static Check\n==================\nRepo: /mnt/d/code/oh-story-claudecode\n\n--- ai-flavor-scan ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- batch-pollution-detector ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- browser-cdp ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- chinese-novelist ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- deslop-register ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- dialogue-naturalness-scan ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- fanqie-chapter-publish ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- humanizer ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- jargon-verb-scan ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- legal-domain-veracity-scan ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- opening-arc-audit ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- reader-comprehension-scan ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story-analyze ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story-cover ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story-deslop ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story-import ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story-review ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story-scan ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story-setup ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- story-write ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-before-dev ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-brainstorm ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-break-loop ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-channel ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-check ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-continue ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-finish-work ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-meta ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-session-insight ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-spec-bootstrap ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-start ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n--- trellis-update-spec ---\n  [PASS] structured frontmatter, links, anchors, agents, and references\n  Result: PASS\n\n==================\nTotal: 33 | Pass: 33 | Fail: 0 | Warn: 0\n",
+      "stderr": "",
+      "executed_command": [
+        "bash",
+        "scripts/static-check.sh"
+      ]
+    },
+    {
+      "name": "dashboard",
+      "command": [
+        "C:\\WINDOWS\\system32\\cmd.exe",
+        "/d",
+        "/s",
+        "/c",
+        "npm.cmd",
+        "run",
+        "test:dashboard",
+        "--silent"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 7895,
+      "stdout": "TAP version 13\n# Subtest: Claude Code marketplace exposes the canonical story skill bundle\nok 1 - Claude Code marketplace exposes the canonical story skill bundle\n  ---\n  duration_ms: 13.4228\n  type: 'test'\n  ...\n# Subtest: candidate review\n    # Subtest: lists candidates through the transaction authority with version and state binding\n    ok 1 - lists candidates through the transaction authority with version and state binding\n      ---\n      duration_ms: 377.1789\n      type: 'test'\n      ...\n    # Subtest: rejects stale actions and archives an unchanged candidate\n    ok 2 - rejects stale actions and archives an unchanged candidate\n      ---\n      duration_ms: 847.0417\n      type: 'test'\n      ...\n    # Subtest: blocks generic edits to tracking state and candidate transaction files\n    ok 3 - blocks generic edits to tracking state and candidate transaction files\n      ---\n      duration_ms: 98.626\n      type: 'test'\n      ...\n    1..3\nok 2 - candidate review\n  ---\n  duration_ms: 1324.875\n  type: 'suite'\n  ...\n# Subtest: workspace scanning\n    # Subtest: recognizes standard long and short projects without treating loose files or libraries as projects\n    ok 1 - recognizes standard long and short projects without treating loose files or libraries as projects\n      ---\n      duration_ms: 51.4037\n      type: 'test'\n      ...\n    # Subtest: does not use symlinked short-story marker files\n    ok 2 - does not use symlinked short-story marker files\n      ---\n      duration_ms: 17.0098\n      type: 'test'\n      ...\n    # Subtest: uses a stable dot path when the workspace itself is a short-story project\n    ok 3 - uses a stable dot path when the workspace itself is a short-story project\n      ---\n      duration_ms: 7.9876\n      type: 'test'\n      ...\n    # Subtest: discovers roots without recursively serializing every manuscript\n    ok 4 - discovers roots without recursively serializing every manuscript\n      ---\n      duration_ms: 3.6685\n      type: 'test'\n      ...\n    # Subtest: loads only one directory level and keeps infrastructure folders hidden\n    ok 5 - loads only one directory level and keeps infrastructure folders hidden\n      ---\n      duration_ms: 25.5086\n      type: 'test'\n      ...\n    # Subtest: paginates a wide directory without dropping or duplicating files\n    ok 6 - paginates a wide directory without dropping or duplicating files\n      ---\n      duration_ms: 141.0284\n      type: 'test'\n      ...\n    # Subtest: searches unloaded descendants on demand and respects the active collection\n    ok 7 - searches unloaded descendants on demand and respects the active collection\n      ---\n      duration_ms: 24.4639\n      type: 'test'\n      ...\n    # Subtest: continues searching later projects after one subtree exceeds the depth limit\n    ok 8 - continues searching later projects after one subtree exceeds the depth limit\n      ---\n      duration_ms: 33.1467\n      type: 'test'\n      ...\n    # Subtest: reports result-limit and node-budget truncation independently\n    ok 9 - reports result-limit and node-budget truncation independently\n      ---\n      duration_ms: 3498.7335\n      type: 'test'\n      ...\n    # Subtest: marks search results incomplete when an unloaded descendant is unreadable\n    ok 10 - marks search results incomplete when an unloaded descendant is unreadable # SKIP 当前平台或用户无法制造不可读目录\n      ---\n      duration_ms: 0.8396\n      type: 'test'\n      ...\n    1..10\nok 3 - workspace scanning\n  ---\n  duration_ms: 3805.459\n  type: 'suite'\n  ...\n# Subtest: path boundary\n    # Subtest: rejects traversal and absolute paths\n    ok 1 - rejects traversal and absolute paths\n      ---\n      duration_ms: 24.3723\n      type: 'test'\n      ...\n    # Subtest: does not follow file symlinks\n    ok 2 - does not follow file symlinks\n      ---\n      duration_ms: 23.7914\n      type: 'test'\n      ...\n    1..2\nok 4 - path boundary\n  ---\n  duration_ms: 48.5832\n  type: 'suite'\n  ...\n# Subtest: CLI portability\n    # Subtest: uses each operating system's default-browser command\n    ok 1 - uses each operating system's default-browser command\n      ---\n      duration_ms: 0.414\n      type: 'test'\n      ...\n    # Subtest: recognizes the CLI entrypoint through a symlinked install path\n    ok 2 - recognizes the CLI entrypoint through a symlinked install path\n      ---\n      duration_ms: 23.2065\n      type: 'test'\n      ...\n    1..2\nok 5 - CLI portability\n  ---\n  duration_ms: 23.8586\n  type: 'suite'\n  ...\n# Subtest: HTTP API\n    # Subtest: handles the browser favicon request without a console-visible 404\n    ok 1 - handles the browser favicon request without a console-visible 404\n      ---\n      duration_ms: 32.1557\n      type: 'test'\n      ...\n    # Subtest: serves lazy roots, directory pages, and on-demand search\n    ok 2 - serves lazy roots, directory pages, and on-demand search\n      ---\n      duration_ms: 51.6853\n      type: 'test'\n      ...\n    # Subtest: escapes HTML-significant characters in JSON responses\n    ok 3 - escapes HTML-significant characters in JSON responses\n      ---\n      duration_ms: 26.8377\n      type: 'test'\n      ...\n    # Subtest: loads and atomically saves an editable file\n    ok 4 - loads and atomically saves an editable file\n      ---\n      duration_ms: 37.9579\n      type: 'test'\n      ...\n    # Subtest: returns 409 instead of overwriting an externally changed file\n    ok 5 - returns 409 instead of overwriting an externally changed file\n      ---\n      duration_ms: 57.3562\n      type: 'test'\n      ...\n    # Subtest: deletes an unchanged editable file but rejects cross-origin deletion\n    ok 6 - deletes an unchanged editable file but rejects cross-origin deletion\n      ---\n      duration_ms: 33.9708\n      type: 'test'\n      ...\n    # Subtest: does not delete a file changed after it was opened\n    ok 7 - does not delete a file changed after it was opened\n      ---\n      duration_ms: 58.1177\n      type: 'test'\n      ...\n    # Subtest: accepts only one of several simultaneous saves based on the same version\n    ok 8 - accepts only one of several simultaneous saves based on the same version\n      ---\n      duration_ms: 71.8922\n      type: 'test'\n      ...\n    # Subtest: serializes simultaneous save and delete operations on the same version\n    ok 9 - serializes simultaneous save and delete operations on the same version\n      ---\n      duration_ms: 44.2481\n      type: 'test'\n      ...\n    # Subtest: rejects unsupported files, traversal, and malformed JSON\n    ok 10 - rejects unsupported files, traversal, and malformed JSON\n      ---\n      duration_ms: 34.549\n      type: 'test'\n      ...\n    # Subtest: keeps the saved file's permission bits instead of letting umask narrow them\n    ok 11 - keeps the saved file's permission bits instead of letting umask narrow them # SKIP Windows 不使用 POSIX 权限位\n      ---\n      duration_ms: 0.4099\n      type: 'test'\n      ...\n    # Subtest: still serves the rest of the workspace when one library directory is unreadable\n    ok 12 - still serves the rest of the workspace when one library directory is unreadable # SKIP 当前平台或用户无法制造不可读目录\n      ---\n      duration_ms: 0.2073\n      type: 'test'\n      ...\n    # Subtest: reports an actionable error when the workspace root itself is unreadable\n    ok 13 - reports an actionable error when the workspace root itself is unreadable # SKIP 当前平台或用户无法制造不可读目录\n      ---\n      duration_ms: 0.1339\n      type: 'test'\n      ...\n    1..13\nok 6 - HTTP API\n  ---\n  duration_ms: 450.6318\n  type: 'suite'\n  ...\n# Subtest: candidate review listing filters and HTTP contract\n    # Subtest: lists prose candidates with context paths and skips history, transactions, and non-markdown\n    ok 1 - lists prose candidates with context paths and skips history, transactions, and non-markdown\n      ---\n      duration_ms: 197.1402\n      type: 'test'\n      ...\n    # Subtest: serves candidates over HTTP and rejects invalid action payloads\n    ok 2 - serves candidates over HTTP and rejects invalid action payloads\n      ---\n      duration_ms: 209.4458\n      type: 'test'\n      ...\n    # Subtest: reject archives the candidate through candidate-commit.py\n    ok 3 - reject archives the candidate through candidate-commit.py\n      ---\n      duration_ms: 667.9872\n      type: 'test'\n      ...\n    # Subtest: promote without a replayable transaction is refused fail-closed\n    ok 4 - promote without a replayable transaction is refused fail-closed\n      ---\n      duration_ms: 182.3401\n      type: 'test'\n      ...\n    1..4\nok 7 - candidate review listing filters and HTTP contract\n  ---\n  duration_ms: 1257.4144\n  type: 'suite'\n  ...\n1..7\n# tests 35\n# suites 6\n# pass 31\n# fail 0\n# cancelled 0\n# skipped 4\n# todo 0\n# duration_ms 7297.3802\n",
+      "stderr": "",
+      "executed_command": [
+        "C:\\WINDOWS\\system32\\cmd.exe",
+        "/d",
+        "/s",
+        "/c",
+        "npm.cmd",
+        "run",
+        "test:dashboard",
+        "--silent"
+      ]
+    },
+    {
+      "name": "language-gates",
+      "command": [
+        "bash",
+        "scripts/test-language-gates.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 51893,
+      "stdout": "---- test-ai-patterns.sh\nAI pattern detector regression tests passed.\nProse pattern (碎句号/长段落/破折号) regression tests passed.\nissue #205 (跨空行翻转命中 / 引号内台词豁免 / 未闭合引号不吞叙述) regression tests passed.\nmicro-action-tic (电报体微动作复读) regression tests passed.\nstock-reaction-tic (套式反应细节) regression tests passed.\nabstract-summary-tic (抽象总结复读) regression tests passed.\naction-list-tic (监控摄像头式动作清单) regression tests passed.\ncliche-density-tic (套词密度过高) regression tests passed.\nmetaphor-density-tic (比喻密度过高) regression tests passed.\nreasoning-chain-tic (解释链密度过高) regression tests passed.\nsystem-notice-formality-tic (系统公告公文腔过密) regression tests passed.\novercompressed-prose-tic (过度精炼短段) regression tests passed.\nlow-connective-density-tic (低连接密度 + 缺中长句) regression tests passed.\nvoice-contrast (音量反差腔) regression tests passed.\nnegation-parade (否定排比) regression tests passed.\nchapter-21 AI-flavor gap regression tests passed.\nreverse-not-is (反序对比腔) regression tests passed.\ntrailer-ending (预告式总结收尾) regression tests passed.\nquote-emphasis-tic (引号强调滥用) regression tests passed.\ntrailer-summary (章尾状态总结体) regression tests passed.\nPASS ordinary literal actions, temperature, smell, cleaning, and time have no findings\nPASS isolated contextual patterns retain evidence, not automatic rejection\nPASS all four weak adverbs contribute to density while isolated use is safe\nPASS repeated micro actions still identify a review window\nPASS quoted count mismatch blocks and matched count passes\nPASS prose explanations and parenthetical examples are never parsed as tokens\nPASS explicit malformed literal field fails rather than parsing parentheses\nPASS missing, duplicate, invalid, and unsupported rule data fail closed\nPASS invalid or unterminated regex fences fail instead of silently skipping\nPASS author rule inherits from book, reports source, and respects narration surface\nPASS author bans do not leak across books and cannot be waived by shared whitelist\nPASS external candidate uses explicit book and planned chapter scope\nPASS source mismatch, missing scope, wrong category, and path escape fail closed\nPASS symlink escape in planned target and registry cannot broaden author authority\nPASS unreadable input and broken UTF-8 return a machine-readable blocking error\n15 rule classification and scope tests passed.\n---- test-degeneration.sh\nDegeneration detector regression tests passed.\n---- test-prose-policy.py\n---- test-normalize-punctuation.js\nTAP version 13\n# OK: structural punctuation cleanup preserves voice, fences, CRLF, quote modes, and errors\n# Subtest: /mnt/d/code/oh-story-claudecode/scripts/test-normalize-punctuation.js\nok 1 - /mnt/d/code/oh-story-claudecode/scripts/test-normalize-punctuation.js\n  ---\n  duration_ms: 1348.9104\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 1360.272102\n---- test-charcount-portable.sh\nselected interpreter: python3\nchar count: 12 (expect 12)\nPASS\n---- test-prose-backstop-hook.sh\nProse backstop hook regression tests passed.\n---- test-prose-net-parity.sh\n功能 parity：codex python 网 == zcode JS 网（44 fixtures + CRLF 字数边界，含毒句式正反例/AI 自指/截断收尾与豁免标记）。\n命令函数 parity：codex python == zcode JS（扩展 fixtures：正文抽取/apply-patch/git commit 侦测逐字相等，含包装器/命令替换/多 heredoc/转义引号、apply_patch 搬家与 ReDoS 预算）。\n未归核面 parity：codex python == JS core（staged warnings 大小写变体/文案 + 大纲阻断 9 组判定含毒句式欠账门/无脚手架 fail-closed/文案逐字相等）。\n写正文守卫 parity：Claude bash guard == JS core（13 组工程场景：无 state/缺细纲/导入窗口/跳章/续写/显式缺口/嵌套分卷/派生修订不一致/坏 schema/回炉备份，含 node 缺席 fail-open）。\nProse net parity tests passed.\nLanguage gate regressions passed.\n",
+      "stderr": "test_detector_blocking_requires_author_scope_or_deterministic_error (__main__.ProsePolicyInventoryTests.test_detector_blocking_requires_author_scope_or_deterministic_error) ... ok\ntest_forbidden_patterns_cover_the_rejected_global_rules (__main__.ProsePolicyInventoryTests.test_forbidden_patterns_cover_the_rejected_global_rules) ... ok\ntest_p1_treatment_and_suspense_priority_remain_explicit (__main__.ProsePolicyInventoryTests.test_p1_treatment_and_suspense_priority_remain_explicit) ... ok\ntest_repository_has_one_priority_and_no_known_global_conflict (__main__.ProsePolicyInventoryTests.test_repository_has_one_priority_and_no_known_global_conflict) ... ok\n\n----------------------------------------------------------------------\nRan 4 tests in 16.942s\n\nOK\n",
+      "executed_command": [
+        "bash",
+        "scripts/test-language-gates.sh"
+      ]
+    },
+    {
+      "name": "narrative-gates",
+      "command": [
+        "bash",
+        "scripts/test-narrative-gates.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 79440,
+      "stdout": "---- test-outline-causal.py\n  [PASS] 正常因果链无 blocking\n  [PASS] 前因指向未来章 blocking\n  [PASS] 前因指向不存在的更早章 blocking\n  [PASS] 缺因果字段仅 advisory\n  [PASS] 占位因果字段仅 advisory\n  [PASS] strict 模式占位字段 blocking\n  [PASS] strict 模式具体事件锚点通过\n  [PASS] strict 模式悬空事件 blocking\n  [PASS] 缺参数退出码 2\n  [PASS] 不存在目录退出码 2\n\n共通过 10 项，失败 0 项。\n---- test-outline-contract.js\nTAP version 13\n# outline-contract: all tests passed\n# Subtest: /mnt/d/code/oh-story-claudecode/scripts/test-outline-contract.js\nok 1 - /mnt/d/code/oh-story-claudecode/scripts/test-outline-contract.js\n  ---\n  duration_ms: 1964.386452\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 1975.762405\n---- test-emotion-run.js\nemotion-run: 3+ advisory; future outlines excluded; input errors fail\n---- test-name-drift.js\nname-drift: 现实专名、书级白名单、卷目录、人名近似与错误退出码通过\n---- test-outline-copy.sh\nPASS: check-outline-copy.js (12 cases)\n---- test-phase2-contract.js\nTAP version 13\n# phase2-contract: all tests passed\n# Subtest: /mnt/d/code/oh-story-claudecode/scripts/test-phase2-contract.js\nok 1 - /mnt/d/code/oh-story-claudecode/scripts/test-phase2-contract.js\n  ---\n  duration_ms: 1979.821972\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 1991.822677\n---- test-delivery-contract.js\nTAP version 13\n# delivery-contract: all tests passed\n# Subtest: /mnt/d/code/oh-story-claudecode/scripts/test-delivery-contract.js\nok 1 - /mnt/d/code/oh-story-claudecode/scripts/test-delivery-contract.js\n  ---\n  duration_ms: 861.999888\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 873.190508\n---- test-scan-contract.js\nTAP version 13\n# OK: strict scan CLI, Unicode/time, Qidian schema, and Qimao period contracts passed\n# Subtest: /mnt/d/code/oh-story-claudecode/scripts/test-scan-contract.js\nok 1 - /mnt/d/code/oh-story-claudecode/scripts/test-scan-contract.js\n  ---\n  duration_ms: 4044.852357\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 4056.463884\n---- test-scan-runtime.js\nTAP version 13\n# OK: scan runtime uses shell-safe CDP calls and side-effect-free scraper modules\n# Subtest: /mnt/d/code/oh-story-claudecode/scripts/test-scan-runtime.js\nok 1 - /mnt/d/code/oh-story-claudecode/scripts/test-scan-runtime.js\n  ---\n  duration_ms: 38675.850626\n  ...\n1..1\n# tests 1\n# suites 0\n# pass 1\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 38687.954849\n---- test-scan-runtime-policy.py\nPASS: scan runtime policy guard rejects dead-occurrence false negatives\n---- test-review-state.js\nTAP version 13\n# Subtest: full 新建、同 review 恢复且不增 revision\nok 1 - full 新建、同 review 恢复且不增 revision\n  ---\n  duration_ms: 17.276924\n  ...\n# Subtest: active review 不得被其他 review_id 覆盖\nok 2 - active review 不得被其他 review_id 覆盖\n  ---\n  duration_ms: 8.617052\n  ...\n# Subtest: 显式 reset 要求确认与 expected revision\nok 3 - 显式 reset 要求确认与 expected revision\n  ---\n  duration_ms: 8.563127\n  ...\n# Subtest: 批次更新、幂等重跑和完成后新任务\nok 4 - 批次更新、幂等重跑和完成后新任务\n  ---\n  duration_ms: 24.822366\n  ...\n# Subtest: revision 冲突不覆盖状态且清理自己的 claim\nok 5 - revision 冲突不覆盖状态且清理自己的 claim\n  ---\n  duration_ms: 5.882408\n  ...\n# Subtest: 已存在目标 revision 申领立即冲突\nok 6 - 已存在目标 revision 申领立即冲突\n  ---\n  duration_ms: 1.002645\n  ...\n# Subtest: 输入摘要变化将旧开放项标为 needs_revalidation\nok 7 - 输入摘要变化将旧开放项标为 needs_revalidation\n  ---\n  duration_ms: 13.52653\n  ...\n# Subtest: 同一输入文件重新分批且内容变化时旧开放项也需复核\nok 8 - 同一输入文件重新分批且内容变化时旧开放项也需复核\n  ---\n  duration_ms: 12.653238\n  ...\n# Subtest: 损坏 latest.json 明确失败且不覆盖\nok 9 - 损坏 latest.json 明确失败且不覆盖\n  ---\n  duration_ms: 1.527596\n  ...\n# Subtest: solo/显式只读只查状态，不创建任何目录或文件\nok 10 - solo/显式只读只查状态，不创建任何目录或文件\n  ---\n  duration_ms: 2.15947\n  ...\n# Subtest: 异常申领可报告，release 必须匹配 claim/revision/确认\nok 11 - 异常申领可报告，release 必须匹配 claim/revision/确认\n  ---\n  duration_ms: 7.454059\n  ...\n1..11\n# tests 11\n# suites 0\n# pass 11\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 280.087495\n---- test-story-continuity.sh\nStory continuity regression tests passed.\n---- test-chapter-completion-lifecycle.py\n---- test-longform-stability.sh\nLongform Stability Toolchain Tests\n===================================\nPASS: 单章全 PASS\nPASS: 本人 POV 出现禁知词 → FAIL\nPASS: 泄漏错误码为 Knowledge_Leak\nPASS: 红线错误码为 Motivation_Drift\nPASS: beat 关键词缺失 → Beat_Missing\nPASS: 禁词提前出现 → Foreshadow_Early_Payoff\nPASS: 世界观不变量文件缺失 → 整项跳过\nPASS: 世界观不变量存在且无违规词 → PASS\nPASS: 世界观违规词命中 → Canon_Conflict\nPASS: 缺契约 → Contract_Missing\nPASS: 门控缺失 → Gate_Missing\nPASS: 门控 PASS 时交接包生成成功\nPASS: 交接包已落盘\nPASS: 交接包含继承关键词\nPASS: 交接包含活跃伏笔（已埋）\nPASS: 已回收伏笔未进交接包\nPASS: 交接包含出场角色不变量指引\nPASS: 门控 FAIL → 交接包拒绝生成\nPASS: 批量审计（含跨章继承）PASS\nPASS: 审计报告已落盘\nPASS: 报告结论 PASS\nPASS: 继承断裂 → Continuity_Missing\nPASS: 交接包缺失 → Handoff_Missing\nPASS: --json 输出为合法 JSON\nPASS: dry-run 不移动文件\nPASS: 窗口外门控已归档\nPASS: 窗口内门控保持活跃\nPASS: 窗口外交接包已归档\nPASS: 窗口外审计报告已归档\nPASS: 归档后审计透明回退 PASS\nPASS: 归档门控可供 handoff-pack 回退读取\n\n===================================\npassed: 31, failed: 0\nAll longform stability tests passed.\n---- test-volume-audit.py\n---- test-state-store.sh\nState Store Tests\n===================================\nPASS: 第 12 章事件进 001-050 分片\nPASS: 第 51 章事件进 051-100 分片\nPASS: 缺 value 的状态事件被拒绝\nPASS: 非法 type 被拒绝\nPASS: 第 10 章快照看到历史值\nPASS: 第 25 章快照看到覆盖后的值\nPASS: 快照含已获知信息\nPASS: 跨分片快照折叠正确\nPASS: 活跃伏笔在列\nPASS: 已回收伏笔不在活跃列表\nPASS: 超过预计回收章标记超期\nPASS: 健康库 check PASS\nPASS: 死亡后活动 → FAIL\nPASS: 错误码为 Dead_Entity_Active\nPASS: 复活事件解除死亡矛盾\nPASS: 未埋先收 → Foreshadow_Not_Planted\nPASS: 重复回收 → Foreshadow_After_Close\nPASS: 放错分片 → Shard_Mismatch\nPASS: 坏行 → JSON_Invalid\nPASS: 重复认知仅 warning，check 仍 PASS\nPASS: 警告码为 Knowledge_Duplicate\nPASS: --json 输出为合法 JSON\n\n===================================\npassed: 22, failed: 0\nAll state store tests passed.\n---- test-author-memory-commit.py\nOK: author-memory transaction behavior\n---- test-flow-state.sh\nFlow State Tests\n===================================\nPASS: missing setting blocks long flow\nPASS: missing setting phase detected\nPASS: missing topic定位 recorded\nPASS: missing tracking state blocks long writing\nPASS: missing tracking requests init\nPASS: missing tracking recorded\nPASS: chapter writing phase detected\nPASS: first chapter selected\nPASS: skeleton action selected\nPASS: skeleton does not advance formal chapter\nPASS: skeleton-ready stage detected\nPASS: skeleton expansion action selected\nPASS: candidate does not advance formal chapter\nPASS: candidate review stage detected\nPASS: candidate review action selected\nPASS: missing next outline blocks chapter 2\nPASS: chapter 2 outline required\nPASS: second chapter selected\nPASS: chapter 2 ready after outline\nPASS: previous chapter artifact recorded\nPASS: nested volume chapter advances flow state\nPASS: nested volume artifact recorded\nPASS: flow state file written\nPASS: read returns persisted state\nPASS: update changes current stage\nPASS: schema version preserved\nPASS: legacy write action remains readable during migration\nPASS: update rejects unknown field\nPASS: update rejects unsafe artifact path\nPASS: .active-book selected\nPASS: .active-book parent traversal rejected\nPASS: .active-book internal parent traversal rejected\nPASS: .active-book absolute path rejected\nPASS: short mode detected\nPASS: short body routes to quality check\nPASS: short body with gaps still routes to quality check\nPASS: short body gaps are visible\nPASS: short body gaps list missing inputs\nPASS: update rejects unknown next_action\nPASS: update rejects internal parent artifact path\nPASS: update rejects Windows drive-relative artifact path\n\n===================================\npassed: 41, failed: 0\nAll flow state tests passed.\nNarrative gate regressions passed.\n",
+      "stderr": "test_complete_user_flow_without_persisted_approval_state (__main__.FinalChapterFlowTests.test_complete_user_flow_without_persisted_approval_state) ... ok\n\n----------------------------------------------------------------------\nRan 1 test in 7.592s\n\nOK\n.........\n----------------------------------------------------------------------\nRan 9 tests in 1.472s\n\nOK\n",
+      "executed_command": [
+        "bash",
+        "scripts/test-narrative-gates.sh"
+      ]
+    },
+    {
+      "name": "platform-gates",
+      "command": [
+        "bash",
+        "scripts/test-platform-gates.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 624654,
+      "stdout": "---- test-zcode-hooks.sh\nZCode hook synthetic tests\n==========================\nFixture: /tmp/tmp.0r12ouhLDn/project\n  OK outline-before-prose guard\n  OK post-write strict JSON + UTF-8 findings\n  OK Bash write post-check\n  OK session-start context\n  OK session-start continuity guard\n  OK commit advisory\n  OK malformed input + workspace self-location\n\nOK: ZCode hook synthetic tests passed\n---- test-codex-hooks.sh\nCodex hook synthetic tests\n==========================\nFixture: /tmp/tmp.XJLzV1iT7H/story-project\n  OK outline-before-prose guard\n  OK prose command-scan precision\n  OK commit advisory\n  OK session/compact/stop JSON\n  OK stop content sweep (git-changed only)\n  OK session-start continuity (追踪 staleness + dup-title)\n  OK bounded directory discovery (depth 4, hidden/node_modules pruned, Bash/JS/Python parity)\n  OK cwd-based root resolution\n  OK __file__ self-location (all platforms)\n  OK non-git deployment launcher root search\n  OK non-git nested root propagation\n  OK missing-deployment launcher no-op\n  OK bounded book discovery parity\n\nOK: Codex hook synthetic tests passed\n---- test-reasonix-adapter.sh\nPASS: Reasonix route-name contract rejects obsolete split Skill names\n---- test-skill-numbering.sh\n[1/8] dry-run, cascade-safe references, code fences, and parent grouping\n[2/8] write mode and exact non-mutation boundaries\n[3/8] idempotence\n[4/8] unbound and ambiguous references fail before every write\n[5/8] a reference inside one workflow never binds to another workflow\n[6/8] a mid-commit failure rolls every replaced file back\n[7/8] manual-only dotted labels block write mode without rewriting handbook numbering\n[8/8] affected Markdown anchors block every write, including subset-scope inbound links\nPASS: skill numbering regression\n---- test-storyctl.py\n---- test-current-skill-contracts.py\nOK: current-contract manifest, structure, and fallback regressions passed\n---- test-shared-assets.py\nOK: shared asset manifest detects drift and syncs atomically\n---- test-shared-references.py\nPASS: shared reference manifest and deployed consumer guards\n---- test-static-check.py\nnote: Windows WSL worktree marker regression case not applicable\nPASS: structured static-check regression\n---- test-hook-encoding-portable.sh\nHook encoding portability test (issue #164)\n===========================================\ninterpreter: python3\n--- Part 1: python stdout cp936 simulation (PYTHONIOENCODING=gbk) ---\n  PASS [default] long blocked, 细纲 missing\n  PASS [default] long allowed, 细纲 present\n  PASS [default] short blocked, 小节大纲 missing\n  PASS [default] short allowed, 小节大纲 present\n  PASS [gbk] long blocked, 细纲 missing\n  PASS [gbk] long allowed, 细纲 present\n  PASS [gbk] short blocked, 小节大纲 missing\n  PASS [gbk] short allowed, 小节大纲 present\n--- Part 1b: Windows drive-letter absolute path classification (issue #184) ---\n  PASS [win] forward-slash drive path treated as absolute (not root-joined)\n  PASS [win] backslash drive path treated as absolute (separators normalized)\n--- Part 1c: real Windows drive-letter path via cygpath (issue #184) ---\n  note: cygpath not available; Windows/MSYS drive-letter case not applicable\n--- Part 2: real GBK locale (LANG/LC_ALL=zh_CN.GBK) end-to-end ---\n  note: 系统无可用 zh_CN.GBK 类 locale（Part 1 已覆盖 python 那层；Part 2 不适用）\n\nPASS: hook 在 cp936 与真实 GBK 区域下都正确\n---- quality-gate.test.mjs\nTAP version 13\n# Subtest: all required checks must pass\nok 1 - all required checks must pass\n  ---\n  duration_ms: 1.637846\n  ...\n# Subtest: external E2E checks remain runnable without becoming local release requirements\nok 2 - external E2E checks remain runnable without becoming local release requirements\n  ---\n  duration_ms: 3.733473\n  ...\n# Subtest: every scripts/test-* file is reachable from a quality-gate profile\nok 3 - every scripts/test-* file is reachable from a quality-gate profile\n  ---\n  duration_ms: 207.903631\n  ...\n1..3\n# tests 3\n# suites 0\n# pass 3\n# fail 0\n# cancelled 0\n# skipped 0\n# todo 0\n# duration_ms 385.02431\nPlatform gate regressions passed.\n",
+      "stderr": ".............\n----------------------------------------------------------------------\nRan 13 tests in 5.603s\n\nOK\n",
+      "executed_command": [
+        "bash",
+        "scripts/test-platform-gates.sh"
+      ]
+    },
+    {
+      "name": "quality-lifecycle",
+      "command": [
+        "python",
+        "scripts/test-quality-lifecycle.py"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 84901,
+      "stdout": "",
+      "stderr": "test_accepted_p0_workflow_receipt_binds_final_generation (__main__.QualityLifecycleTests.test_accepted_p0_workflow_receipt_binds_final_generation) ... ok\r\ntest_all_deployed_lifecycle_copies_have_runtime_dependencies (__main__.QualityLifecycleTests.test_all_deployed_lifecycle_copies_have_runtime_dependencies) ... ok\r\ntest_atomic_accept_graph_and_projection_check (__main__.QualityLifecycleTests.test_atomic_accept_graph_and_projection_check) ... ok\r\ntest_author_voice_effect_freezes_conditions_and_waits_for_humans (__main__.QualityLifecycleTests.test_author_voice_effect_freezes_conditions_and_waits_for_humans) ... ok\r\ntest_benchmark_and_role_mutations_are_rejected (__main__.QualityLifecycleTests.test_benchmark_and_role_mutations_are_rejected) ... ok\r\ntest_blind_tie_keeps_previous_revision (__main__.QualityLifecycleTests.test_blind_tie_keeps_previous_revision) ... ok\r\ntest_cli_temporary_project_accepts_one_chapter_end_to_end (__main__.QualityLifecycleTests.test_cli_temporary_project_accepts_one_chapter_end_to_end) ... ok\r\ntest_failed_perspective_cannot_be_accepted (__main__.QualityLifecycleTests.test_failed_perspective_cannot_be_accepted) ... ok\r\ntest_fresh_reader_checkpoint_requires_replay_evidence (__main__.QualityLifecycleTests.test_fresh_reader_checkpoint_requires_replay_evidence) ... ok\r\ntest_legacy_tracking_fingerprint_and_pre_activation_policy_remain_compatible (__main__.QualityLifecycleTests.test_legacy_tracking_fingerprint_and_pre_activation_policy_remain_compatible) ... ok\r\ntest_longitudinal_contract_requires_human_cumulative_blind_read (__main__.QualityLifecycleTests.test_longitudinal_contract_requires_human_cumulative_blind_read) ... ok\r\ntest_malformed_derived_index_cannot_advance_head_on_failed_accept (__main__.QualityLifecycleTests.test_malformed_derived_index_cannot_advance_head_on_failed_accept) ... ok\r\ntest_old_chapter_revision_invalidates_then_replays_downstream (__main__.QualityLifecycleTests.test_old_chapter_revision_invalidates_then_replays_downstream) ... ok\r\ntest_outline_revision_cli_requires_authorized_real_change (__main__.QualityLifecycleTests.test_outline_revision_cli_requires_authorized_real_change) ... ok\r\ntest_p0_defect_repair_chain_preserves_every_body_version (__main__.QualityLifecycleTests.test_p0_defect_repair_chain_preserves_every_body_version) ... ok\r\ntest_p0_single_draft_run_is_immutable_and_stageable (__main__.QualityLifecycleTests.test_p0_single_draft_run_is_immutable_and_stageable) ... ok\r\ntest_p1_active_policy_rejects_calibration_tampering (__main__.QualityLifecycleTests.test_p1_active_policy_rejects_calibration_tampering) ... ok\r\ntest_p1_checkpoint_outline_search_benchmark_and_golden_plan (__main__.QualityLifecycleTests.test_p1_checkpoint_outline_search_benchmark_and_golden_plan) ... ok\r\ntest_p1_control_cannot_cite_nonexistent_reader_hashes (__main__.QualityLifecycleTests.test_p1_control_cannot_cite_nonexistent_reader_hashes) ... ok\r\ntest_p1_enforce_requires_two_independent_persona_readers (__main__.QualityLifecycleTests.test_p1_enforce_requires_two_independent_persona_readers) ... ok\r\ntest_p1_experiment_v2_preserves_negative_results_and_rejects_self_reported_formal_runs (__main__.QualityLifecycleTests.test_p1_experiment_v2_preserves_negative_results_and_rejects_self_reported_formal_runs) ... ok\r\ntest_p1_flat_cannot_mask_a_p0_correctness_failure (__main__.QualityLifecycleTests.test_p1_flat_cannot_mask_a_p0_correctness_failure) ... ok\r\ntest_p1_intentional_ambiguity_still_rejects_unplanned_hypotheses (__main__.QualityLifecycleTests.test_p1_intentional_ambiguity_still_rejects_unplanned_hypotheses) ... ok\r\ntest_p1_knowledge_source_order_is_a_correctness_gate (__main__.QualityLifecycleTests.test_p1_knowledge_source_order_is_a_correctness_gate) ... ok\r\ntest_p1_l3_requires_authorization_and_selected_outline_activation (__main__.QualityLifecycleTests.test_p1_l3_requires_authorization_and_selected_outline_activation) ... ok\r\ntest_p1_lifecycle_parser_rejects_scene_catalog_table_mismatch (__main__.QualityLifecycleTests.test_p1_lifecycle_parser_rejects_scene_catalog_table_mismatch) ... ok\r\ntest_p1_shadow_reopen_is_executable_but_cannot_advance_head (__main__.QualityLifecycleTests.test_p1_shadow_reopen_is_executable_but_cannot_advance_head) ... ok\r\ntest_p1_strength_requires_a_shared_delivery_region (__main__.QualityLifecycleTests.test_p1_strength_requires_a_shared_delivery_region) ... ok\r\ntest_p1_strength_shadow_enforce_and_l2_reopen_end_to_end (__main__.QualityLifecycleTests.test_p1_strength_shadow_enforce_and_l2_reopen_end_to_end) ... ok\r\ntest_p1_thresholds_use_directional_reader_story_quantiles (__main__.QualityLifecycleTests.test_p1_thresholds_use_directional_reader_story_quantiles) ... ok\r\ntest_p1_treatment_run_binds_two_pass_selection_before_stage (__main__.QualityLifecycleTests.test_p1_treatment_run_binds_two_pass_selection_before_stage) ... ok\r\ntest_pending_evidence_and_init_paths_are_immutable (__main__.QualityLifecycleTests.test_pending_evidence_and_init_paths_are_immutable) ... ok\r\ntest_reader_path_escape_and_ghost_corroboration_are_rejected (__main__.QualityLifecycleTests.test_reader_path_escape_and_ghost_corroboration_are_rejected) ... ok\r\ntest_reader_v3_preserves_natural_quit_during_study_continuation (__main__.QualityLifecycleTests.test_reader_v3_preserves_natural_quit_during_study_continuation) ... ok\r\ntest_revision_appeal_between_subject_contract_and_negative_boundaries (__main__.QualityLifecycleTests.test_revision_appeal_between_subject_contract_and_negative_boundaries) ... ok\r\ntest_revision_target_and_quality_regressions_cannot_advance (__main__.QualityLifecycleTests.test_revision_target_and_quality_regressions_cannot_advance) ... ok\r\ntest_rollback_creates_a_new_generation_without_overwriting_history (__main__.QualityLifecycleTests.test_rollback_creates_a_new_generation_without_overwriting_history) ... ok\r\ntest_structural_revision_and_dialogue_samples_cannot_self_exempt (__main__.QualityLifecycleTests.test_structural_revision_and_dialogue_samples_cannot_self_exempt) ... ok\r\ntest_suspense_debt_is_derived_for_a_nonempty_open_question (__main__.QualityLifecycleTests.test_suspense_debt_is_derived_for_a_nonempty_open_question) ... ok\r\n\r\n----------------------------------------------------------------------\r\nRan 39 tests in 84.595s\r\n\r\nOK\r\n",
+      "executed_command": [
+        "python",
+        "scripts/test-quality-lifecycle.py"
+      ]
+    },
+    {
+      "name": "antigravity-adapter",
+      "command": [
+        "bash",
+        "scripts/check-antigravity-adapter.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 8406,
+      "stdout": "Antigravity hook merge tests passed.\nAntigravity skill deployment tests passed.\nAntigravity hook contract tests passed.\nAntigravity adapter checks passed.\n",
+      "stderr": "",
+      "executed_command": [
+        "bash",
+        "scripts/check-antigravity-adapter.sh"
+      ]
+    },
+    {
+      "name": "hook-regex-sync",
+      "command": [
+        "bash",
+        "scripts/check-hook-regex-sync.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 1223,
+      "stdout": "Protocol defines status values: 已埋/已回收/已过期/放弃\n  OK no warn: header-only\n  OK no warn: plain-header\n  OK no warn: planned-unplanted\n  OK no warn: normal-open-planted\n  OK no warn: closed-recovered\n  OK warn: overdue\n  OK warn: unknown-status\n\nOK: hook foreshadow detection warns only on overdue/abnormal states\nOK: 毒句式正则/常量/功能复核文案 js↔py 逐字同步；风格 finding 不构成下一章前置门\n",
+      "stderr": "",
+      "executed_command": [
+        "bash",
+        "scripts/check-hook-regex-sync.sh"
+      ]
+    },
+    {
+      "name": "hook-locale-safety",
+      "command": [
+        "bash",
+        "scripts/check-hook-locale-safety.sh"
+      ],
+      "status": "PASS",
+      "exit_code": 0,
+      "duration_ms": 314,
+      "stdout": "Hook locale-safety Guard\n========================\nOK: locale 敏感 hook 均已 export LC_ALL=C\nOK: 未发现含全角字符的方括号字符组\nOK: hooks/lib 的 sed/grep 均已 LC_ALL=C\n",
+      "stderr": "",
+      "executed_command": [
+        "bash",
+        "scripts/check-hook-locale-safety.sh"
+      ]
+    }
+  ]
+}

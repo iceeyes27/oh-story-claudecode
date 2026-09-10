@@ -280,3 +280,25 @@ Removed OpenCode deployment support, added external E2E profile, restored Claude
 ### Status
 
 [OK] **Completed**
+
+
+## Session 13: 合并上游 v0.7.10
+
+**Date**: 2026-09-10
+**Task**: 合并上游 v0.7.10
+**Branch**: `main`
+
+### Summary
+
+受控合并上游 4 个提交，解决 56 个冲突并将 33 项拆分 Skill 语义适配到统一架构；发布验证 30/30 通过后推送 main。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `b3deb9d` | (see git log) |
+| `f9b6ff6` | (see git log) |
+
+### Status
+
+[OK] **Completed**

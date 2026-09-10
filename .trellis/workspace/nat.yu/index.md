@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 12
-- **Last Active**: 2026-09-08
+- **Total Sessions**: 13
+- **Last Active**: 2026-09-10
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~282 | Active |
+| `journal-1.md` | ~304 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 13 | 2026-09-10 | 合并上游 v0.7.10 | `b3deb9d`, `f9b6ff6` | `main` |
 | 12 | 2026-09-08 | Remove OpenCode platform and verify release | `675d53c` | `main` |
 | 11 | 2026-09-03 | 完成提质优先叙事门禁 | `b9b1fd1`, `caea546`, `a983df5`, `c856bdd`, `3b65153`, `508e0d2`, `e3ca4cf`, `afc978b` | `feat/quality-first-gates` |
 | 10 | 2026-09-02 | 完成 quality-gate 覆盖审计 | `4c55f7a`, `c7c61d6` | `feat/quality-first-gates` |

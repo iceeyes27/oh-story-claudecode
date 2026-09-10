@@ -77,6 +77,13 @@
       ]
     },
     {
+      "name": "story-volume-audit",
+      "source": "skills/story-write/scripts/volume-audit.py",
+      "targets": [
+        "skills/story/scripts/volume-audit.py"
+      ]
+    },
+    {
       "name": "story-hook-core",
       "source": "skills/story-setup/references/templates/hooks/story_hook_core.js",
       "targets": [

@@ -36,6 +36,7 @@ QUALITY_PROFILE = "fanqie-long-v2"
 BINDING_SCHEMA = 2
 RC_IDS = ("rc-01", "rc-02", "rc-03")
 ARC_IDS = ("arc-01", "arc-02")
+ARC_WINDOW = 15  # arc 连读每 15 章一次，窗口是 [N-14, N] 的不重叠连续块
 SEMANTIC_RECEIPT_IDS = ("rc-01", "rc-02", "rc-03", "arc-01")
 PHASES = ("prepared", "prose_moved", "tracking_committed", "done")
 CHAPTER_PREFIX = re.compile(r"^第0*(\d+)章")
@@ -44,6 +45,7 @@ SKELETON_TOOL = Path(__file__).resolve().parent / "check-chapter-skeleton.js"
 OUTLINE_CONTRACT_TOOL = Path(__file__).resolve().parent / "check-outline-contract.js"
 OUTLINE_COPY_TOOL = Path(__file__).resolve().parent / "check-outline-copy.js"
 CAUSAL_TOOL = Path(__file__).resolve().parent / "check-outline-causal.py"
+VOLUME_AUDIT_TOOL = Path(__file__).resolve().parent / "volume-audit.py"
 INTENT_FIELDS = ("目标情绪", "主角目标/关键选择", "结尾拍ID/类型", "期待ID/类型", "读者验收预期")
 SHARED_SCRIPTS = Path(__file__).resolve().parent.parent.parent / "_shared" / "scripts"
 EMOTION_RUN_TOOL = SHARED_SCRIPTS / "check-emotion-run.js"
@@ -371,6 +373,86 @@ def name_drift_gate(project: Path, chapter: int, state: dict[str, Any]) -> None:
         emit(f"专名漂移 advisory：{message}", error=True)
 
 
+def volume_gate(project: Path, chapter: int, prose: Path, binding: dict[str, Any]) -> dict[str, Any] | None:
+    """卷末采用门：本章是某卷声明的最后一章时，卷级审计必须先过。
+
+    只在卷纲显式声明了章节范围、且范围终止于本章时触发；其余章节静默放行。
+    blocking（卷纲缺失/不可读/无核心矛盾）拒绝采用，作者可按 arc-02 同款方式显式批准；
+    advisory（换卷动力、伏笔积压、战力通胀信号等启发式判断）只报告，不阻断。
+    """
+    lookup = run_python(
+        [str(VOLUME_AUDIT_TOOL), "--project", str(project), "--ends-at", str(chapter)],
+        "卷末反查",
+    )
+    require(lookup.returncode == 0, f"卷末反查无法执行：\n{(lookup.stdout or lookup.stderr).strip()}")
+    try:
+        volumes = json.loads(lookup.stdout).get("volumes")
+    except json.JSONDecodeError as exc:
+        raise CandidateError(f"卷末反查未返回合法 JSON：{(lookup.stdout or lookup.stderr).strip()}") from exc
+    require(isinstance(volumes, list), "卷末反查结果缺少 volumes")
+    if not volumes:
+        return None
+    require(
+        len(volumes) == 1,
+        f"多个卷纲把章节范围终止于第{chapter}章：{volumes}；先修正卷纲的章节范围声明",
+    )
+    volume = volumes[0]
+
+    # 待采用的候选章此刻还在 候选/ 下，用 --candidate 把它纳入本卷扫描；
+    # 不落盘报告——check 与 promote 共用本函数，采用前不得写项目文件。
+    result = run_python(
+        [
+            str(VOLUME_AUDIT_TOOL), "--project", str(project), "--volume", str(volume),
+            "--json", "--candidate", str(prose),
+        ],
+        "卷级审计",
+    )
+    require(
+        result.returncode in {0, 1},
+        f"卷级审计无法执行：\n{(result.stdout or result.stderr).strip()}",
+    )
+    try:
+        report = json.loads(result.stdout)
+    except json.JSONDecodeError as exc:
+        raise CandidateError(f"卷级审计未返回合法 JSON：{(result.stdout or result.stderr).strip()}") from exc
+    findings = [item for item in report.get("findings", []) if isinstance(item, dict)]
+    blocking = [item for item in findings if item.get("severity") == "blocking"]
+    advisory = [item for item in findings if item.get("severity") != "blocking"]
+    digest = sha256_bytes(canonical_json(report))
+
+    receipt: dict[str, Any] = {
+        "volume": volume,
+        "status": report.get("status"),
+        "result_sha256": digest,
+        "findings": findings,
+    }
+    if blocking:
+        override = binding.get("volume_gate")
+        message = "；".join(
+            f"{item.get('code')}：{item.get('message')}" for item in blocking
+        )
+        require(isinstance(override, dict), f"第{volume}卷卷末审计未通过，缺少作者批准：{message}")
+        require(override.get("volume") == volume, "volume_gate 作者批准的卷号不匹配")
+        require(override.get("approved_by_author") is True, "volume_gate 作者批准标记无效")
+        require(override.get("result_sha256") == digest, "volume_gate 作者批准未绑定当前审计结果")
+        require(
+            isinstance(override.get("reason"), str) and override["reason"].strip(),
+            "volume_gate 作者批准缺少理由",
+        )
+        receipt["override"] = {
+            "approved_by_author": True,
+            "reason": override["reason"].strip(),
+        }
+        emit(f"第{volume}卷卷末审计 blocking 已由作者批准：{message}", error=True)
+    if advisory:
+        emit(
+            f"第{volume}卷卷末审计 advisory：\n"
+            + "\n".join(f"{item.get('code')}：{item.get('message')}" for item in advisory),
+            error=True,
+        )
+    return receipt
+
+
 def scan_gate(prose: Path, *, project: Path | None = None, target: Path | None = None) -> str | None:
     blocked: list[str] = []
     for name in SCAN_SCRIPTS:
@@ -509,15 +591,26 @@ def rerun_rc01(project: Path, prose: Path) -> dict[str, Any]:
     return report
 
 
-def rerun_arc02(ledger: dict[str, Any]) -> dict[str, Any]:
+def arc_window(chapter: int) -> tuple[int, int]:
+    """本章 arc 连读窗口 [start, end]；只在 15 的整数倍触发，窗口是不重叠的连续 15 章。"""
+    return chapter - ARC_WINDOW + 1, chapter
+
+
+def rerun_arc02(ledger: dict[str, Any], start: int) -> dict[str, Any]:
     with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".json", delete=False) as handle:
         json.dump(ledger, handle, ensure_ascii=False)
         ledger_path = Path(handle.name)
     try:
-        result = run_node([str(ARC_LEDGER_TOOL), str(ledger_path), "--json", "--window=15"], "arc-02 开篇阈值检查")
+        result = run_node(
+            [
+                str(ARC_LEDGER_TOOL), str(ledger_path), "--json",
+                f"--start={start}", f"--window={ARC_WINDOW}",
+            ],
+            "arc 连读阈值检查",
+        )
     finally:
         ledger_path.unlink(missing_ok=True)
-    return parse_node_json(result, "arc-02 开篇阈值检查", {0, 1})
+    return parse_node_json(result, "arc 连读阈值检查", {0, 1})
 
 
 def validate_logic_checks(
@@ -525,7 +618,8 @@ def validate_logic_checks(
 ) -> dict[str, str]:
     logic = binding.get("logic_checks")
     require(isinstance(logic, dict), "candidate_binding.logic_checks 必须是对象")
-    required_ids = set(RC_IDS + (ARC_IDS if chapter == 15 else ()))
+    arc_due = chapter % ARC_WINDOW == 0
+    required_ids = set(RC_IDS + (ARC_IDS if arc_due else ()))
     require(set(logic) == required_ids, f"candidate_binding.logic_checks 必须精确包含：{', '.join(sorted(required_ids))}")
     expected_paths = reader_view_paths(project, prose)
 
@@ -539,24 +633,36 @@ def validate_logic_checks(
     require(logic["rc-01"].get("result_sha256") == rc_digest, "rc-01.result_sha256 与复验结果不一致")
     result = {"rc-01": rc_digest}
 
-    if chapter != 15:
+    if not arc_due:
         return result
 
+    start, end = arc_window(chapter)
     accepted_numbers = sorted(
         chapter_of(path.name) for path in body_root(project).glob("第*章*.md")
         if path.is_file() and chapter_of(path.name) is not None
     )
-    require(accepted_numbers == list(range(1, 15)), "第15章 arc 检查要求正文完整包含第1～14章")
+    require(
+        accepted_numbers == list(range(1, chapter)),
+        f"第{chapter}章 arc 检查要求正文完整包含第1～{chapter - 1}章",
+    )
     arc01 = validate_semantic_receipt(
         project, "arc-01", logic["arc-01"], prose, candidate_sha256, expected_paths,
     )
     ledger = arc01.get("ledger")
     require(isinstance(ledger, dict), "arc-01.ledger 必须是对象")
     ledger_chapters = ledger.get("chapters")
+    require(isinstance(ledger_chapters, list), "arc-01.ledger.chapters 必须是数组")
+    nums = [item.get("num") for item in ledger_chapters if isinstance(item, dict)]
+    require(len(nums) == len(ledger_chapters), "arc-01.ledger.chapters 每项必须是对象")
     require(
-        isinstance(ledger_chapters, list)
-        and [item.get("num") for item in ledger_chapters if isinstance(item, dict)] == list(range(1, 16)),
-        "arc-01.ledger 必须按顺序完整覆盖第1～15章",
+        all(isinstance(num, int) for num in nums) and nums == sorted(set(nums)),
+        "arc-01.ledger.chapters 必须按章号严格递增且不重复",
+    )
+    # 窗口必须整段覆盖；窗口前的章允许出现——本窗口闭掉旧环时要靠它们登记 open。
+    # 窗口后的章不属于这次连读，出现即视为 ledger 填错窗口。
+    require(
+        [num for num in nums if num >= start] == list(range(start, end + 1)),
+        f"arc-01.ledger 必须按顺序完整覆盖第{start}～{end}章",
     )
     ledger_digest = sha256_bytes(canonical_json(ledger))
     require(arc01.get("ledger_sha256") == ledger_digest, "arc-01.ledger_sha256 已过期")
@@ -568,7 +674,7 @@ def validate_logic_checks(
     require(isinstance(arc02.get("evidence"), list), "arc-02.evidence 必须是数组")
     require(arc02.get("candidate_sha256") == candidate_sha256, "arc-02.candidate_sha256 已过期")
     require(arc02.get("ledger_sha256") == ledger_digest, "arc-02.ledger_sha256 已过期")
-    arc_report = rerun_arc02(ledger)
+    arc_report = rerun_arc02(ledger, start)
     arc_digest = sha256_bytes(canonical_json(arc_report))
     require(arc02.get("result_sha256") == arc_digest, "arc-02.result_sha256 与复验结果不一致")
     if arc_report.get("blocking"):
@@ -699,6 +805,7 @@ def validate_binding(
     emotion_run_gate(project, chapter, state)
     causal_gate(project, chapter, state)
     name_drift_gate(project, chapter, state)
+    volume_receipt = volume_gate(project, chapter, prose, binding)
     validate_titles(project, prose)
     length = wordcount.fanqie_length(prose.read_text(encoding="utf-8-sig"))
     require(length["status"] == "pass", f"番茄长篇字数必须为 2200–2800，有效字数为 {length['actual']}")
@@ -766,6 +873,7 @@ def validate_binding(
         "logic_results": logic_results,
         "reader_view_binding": reader_view_binding,
         "scan_skip": scan_skip,
+        "volume_gate": volume_receipt,
     }
 
 
@@ -825,6 +933,7 @@ def create_journal(project: Path, chapter: int, prose: Path, transaction: Path, 
         "logic_results": preflight["logic_results"],
         "reader_view_binding": preflight["reader_view_binding"],
         "scan_skip": preflight["scan_skip"],
+        "volume_gate": preflight["volume_gate"],
         "created_at": datetime.now().astimezone().isoformat(),
         "updated_at": datetime.now().astimezone().isoformat(),
     }
@@ -1025,6 +1134,7 @@ def check_chapter(project: Path, chapter: int) -> dict[str, Any]:
         "outline": preflight["outline"],
         "skeleton": preflight["skeleton"],
         "expected_revision": preflight["expected_revision"],
+        "volume_gate": preflight["volume_gate"],
     }
 
 

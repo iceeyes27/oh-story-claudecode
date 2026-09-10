@@ -18,7 +18,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 ## 用法
 
 ```bash
-node ../_shared/scripts/arc-ledger.js <ledger.json> [--json] [--window=15] [--net-ratio=1] [--advance-floor=0.333]
+node ../_shared/scripts/arc-ledger.js <ledger.json> [--json] [--start=1] [--window=15] [--net-ratio=1] [--advance-floor=0.333]
 ```
 
 ledger 格式与一份可运行示例见 [references/ledger-example.json](references/ledger-example.json)（基于 demo 爽文前 15 章：开 9 闭 9、平均 1.44 章闭环、主线推进 14/15 → 健康、不 blocking，正好和「故弄玄虚」对照）。
@@ -37,7 +37,7 @@ ledger 格式与一份可运行示例见 [references/ledger-example.json](refere
 
 ## 工作流程
 
-1. 定窗口（默认前 15 章）。
+1. 定窗口（默认前 15 章）。体检连载中段用 `--start=N` 把窗口挪过去，例如 `--start=16 --window=15` 看第 16～30 章；窗口前埋的环仍可在本窗口正常闭掉，未闭的旧环单列 `carriedPending`，不参与阈值裁决。
 2. 按 arc-reading-protocol.md 分批连读，产出 ledger JSON。
 3. 跑 `arc-ledger.js` 得收支表与裁决。
 4. blocking 时把「悬而未决清单」交作者：优先闭掉几个早开的环、或让主线目标发生可指认推进。

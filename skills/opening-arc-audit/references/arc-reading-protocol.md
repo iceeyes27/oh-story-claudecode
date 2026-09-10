@@ -31,11 +31,12 @@
 较真两点：闭环——读者到这章真拿到答案了吗？主线——说得出这章把主角往目标推了哪一步吗？说不出就别记 true / 别记 close。
 
 输出：严格的 JSON，形如
-{"book":"书名","window":15,"chapters":[
+{"book":"书名","start":1,"window":15,"chapters":[
   {"num":1,"opens":[{"id":"Q1","q":"…"}],"closes":[],"mainAdvance":true},
   ...
 ]}
 只输出这个 JSON，不要额外解释。id 不许闭一个没开过的或未来才开的。
+体检连载中段时 start 写窗口首章（如 16），chapters 覆盖 start～start+window-1；本窗口闭掉更早埋的环是允许的，把那个环的开启章也一并列进 chapters，close 才引用得到。
 ```
 
 ## 产出后

@@ -163,6 +163,87 @@ ok('references/ledger-example.json 可计算', () => {
   assert.ok(report.window > 0);
 });
 
+// ---- 滚动窗口 ----
+const ROLLING = {
+  book: '滚动',
+  chapters: [
+    { num: 1, opens: [{ id: 'OLD1', q: '父亲为何离开' }, { id: 'OLD2', q: '玉佩来历' }], closes: [], mainAdvance: true },
+    { num: 2, opens: [], closes: ['OLD2'], mainAdvance: true },
+    { num: 16, opens: [{ id: 'N1', q: '新对手是谁' }], closes: [], mainAdvance: true },
+    { num: 17, opens: [], closes: ['OLD1'], mainAdvance: true },
+    { num: 18, opens: [], closes: ['N1'], mainAdvance: false },
+    { num: 30, opens: [{ id: 'N2', q: '账本在哪' }], closes: [], mainAdvance: true },
+  ],
+};
+
+ok('默认 start=1 与旧行为一致（只算前 WINDOW 章）', () => {
+  const { report } = computeLedger(ROLLING, { WINDOW: 15 });
+  assert.equal(report.start, 1);
+  assert.equal(report.end, 15);
+  assert.equal(report.openCount, 2);   // OLD1、OLD2
+  assert.equal(report.closeCount, 1);  // OLD2
+  assert.equal(report.mainAdvanceSteps, 2);
+});
+
+ok('滚动窗口只统计窗口内开的环与窗口内发生的闭环', () => {
+  const { report } = computeLedger(ROLLING, { START: 16, WINDOW: 15 });
+  assert.equal(report.start, 16);
+  assert.equal(report.end, 30);
+  assert.equal(report.openCount, 2);   // N1、N2；OLD* 是窗口前开的，不计入
+  assert.equal(report.closeCount, 2);  // OLD1、N1 都在窗口内闭
+  assert.equal(report.netOpen, 0);
+  assert.deepEqual(report.pending, ['账本在哪']);
+});
+
+ok('窗口内闭掉窗口前埋的旧环不算引用错误，延迟按真实跨度算', () => {
+  const { errors, report } = computeLedger(ROLLING, { START: 16, WINDOW: 15 });
+  assert.equal(errors.length, 0);
+  assert.ok(report.known.includes('父亲为何离开'));
+  assert.equal(report.avgCloseDelay, 9); // OLD1 延迟 16 章、N1 延迟 2 章
+});
+
+ok('carriedPending 只数窗口前埋下且至今未闭的环', () => {
+  const { report } = computeLedger(ROLLING, { START: 16, WINDOW: 15 });
+  assert.equal(report.carriedPending, 0); // OLD1 窗口内闭、OLD2 窗口前已闭
+  const withDebt = {
+    chapters: [
+      { num: 1, opens: [{ id: 'D1' }, { id: 'D2' }], closes: [], mainAdvance: true },
+      { num: 16, opens: [], closes: ['D1'], mainAdvance: true },
+    ],
+  };
+  assert.equal(computeLedger(withDebt, { START: 16, WINDOW: 15 }).report.carriedPending, 1);
+});
+
+ok('窗口后的章一律不参与本次连读', () => {
+  const { report } = computeLedger(ROLLING, { START: 16, WINDOW: 3 }); // [16,18]
+  assert.equal(report.end, 18);
+  assert.equal(report.openCount, 1); // N2 在第 30 章，窗口外
+  assert.deepEqual(report.pending, []);
+});
+
+ok('滚动窗口同样能判出故弄玄虚', () => {
+  const stuck = {
+    chapters: [
+      { num: 1, opens: [{ id: 'A' }], closes: [], mainAdvance: true },
+      ...[16, 17, 18].map((num) => ({ num, opens: [{ id: `S${num}` }], closes: [], mainAdvance: false })),
+    ],
+  };
+  assert.equal(computeLedger(stuck, { START: 16, WINDOW: 3 }).report.blocking, true);
+});
+
+ok('非法 start/window 报错而不是静默算错窗口', () => {
+  assert.match(computeLedger(ROLLING, { START: 0 }).errors[0], /--start/);
+  assert.match(computeLedger(ROLLING, { WINDOW: 0 }).errors[0], /--window/);
+  assert.equal(computeLedger(ROLLING, { START: 1.5 }).report, null);
+});
+
+ok('CLI 接受 --start 并保持退出码语义', () => {
+  const f = tmp(ROLLING);
+  assert.equal(run(f, ['--start=16', '--window=15']).code, 0);
+  assert.equal(run(f, ['--start=0']).code, 2);
+  assert.match(run(f, ['--start=16', '--window=15', '--json']).out, /"start": 16/);
+});
+
 console.log(`\n共通过 ${pass} 项。`);
 if (process.exitCode) console.error('测试未全绿。');
 else console.log('测试全绿。');

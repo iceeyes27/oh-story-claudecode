@@ -121,7 +121,7 @@ node .agents/skills/story-write/scripts/check-chapter-skeleton.js --dir "{书名
 1. 对照骨架与细纲检查语义点是否完整、是否新增剧情、是否提前释放信息。
 2. 检查章节标题和最终字数；普通候选按 `long-format.md` 的现行采用范围验收。
 3. 运行 AI 句式、退化、标点和细纲照抄检查。扫描结论只能说明已知确定性模式是否命中。
-   按 `reader-first-writing.md` 分开完成每章理解与趣味审读；第 3/5 章和单元结尾连读为建议，第 15 章仍执行既有 arc 采用门。未运行的部分写“未评估”。
+   按 `reader-first-writing.md` 分开完成每章理解与趣味审读；第 3/5 章和单元结尾连读为建议，每 15 章（15/30/45…）执行 arc 采用门。未运行的部分写“未评估”。
 4. 以实际候选正文为证据构造 `候选/第NNN章_追踪事务.json`，不得从骨架直接生成最终事务。
 5. 作者确认采用后，按 `candidate-workflow.md` 执行 promote；成功后才进入 `正文/` 并推进追踪。
 

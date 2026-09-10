@@ -154,11 +154,14 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertIn(completed.returncode, (0, 1), completed.stderr)
         return json.loads(completed.stdout)
 
-    def _arc_report(self, ledger: dict) -> dict:
+    def _arc_report(self, ledger: dict, start: int = 1) -> dict:
         path = Path(self.temporary.name) / f"ledger-{os.urandom(4).hex()}.json"
         path.write_text(json.dumps(ledger, ensure_ascii=False), encoding="utf-8")
         completed = subprocess.run(
-            ["node", str(ROOT / "skills/_shared/scripts/arc-ledger.js"), str(path), "--json", "--window=15"],
+            [
+                "node", str(ROOT / "skills/_shared/scripts/arc-ledger.js"), str(path),
+                "--json", f"--start={start}", "--window=15",
+            ],
             text=True, capture_output=True, check=False, encoding="utf-8",
         )
         self.assertIn(completed.returncode, (0, 1), completed.stderr)
@@ -182,25 +185,26 @@ class CandidateCommitTests(unittest.TestCase):
             for receipt_id in ("rc-01", "rc-02", "rc-03")
         }
         checks["rc-01"]["result_sha256"] = self._canonical_sha(report)
-        if chapter == 15:
+        if chapter % 15 == 0:
+            start = chapter - 14
             ledger = ledger or {
                 "book": "候选测试书",
                 "window": 15,
                 "chapters": [
                     {"num": number, "opens": [], "closes": [], "mainAdvance": True}
-                    for number in range(1, 16)
+                    for number in range(start, chapter + 1)
                 ],
             }
             ledger_sha = self._canonical_sha(ledger)
-            arc_report = self._arc_report(ledger)
+            arc_report = self._arc_report(ledger, start)
             checks["arc-01"] = {
                 **base,
-                "run_id": "test-arc-01-15",
+                "run_id": f"test-arc-01-{chapter}",
                 "ledger": ledger,
                 "ledger_sha256": ledger_sha,
             }
             checks["arc-02"] = {
-                "run_id": "test-arc-02-15",
+                "run_id": f"test-arc-02-{chapter}",
                 "status": "pass" if not arc_report["blocking"] else "blocking",
                 "findings": [],
                 "evidence": [{"anchor": "ledger threshold"}],
@@ -319,8 +323,27 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertIn("fanqie-long-v2", workflow)
         for receipt_id in ("rc-01", "rc-02", "rc-03", "arc-01", "arc-02"):
             self.assertIn(receipt_id, binding)
-        self.assertIn("第 3、5、10、14、16 章", binding)
+        # 滚动 arc：触发规则、窗口口径与非触发章都必须写死在契约文件里。
+        self.assertIn("15 的整数倍", binding)
+        self.assertIn("--start=N-14 --window=15", binding)
+        self.assertIn("第 3、5、10、14、16、29 章", binding)
         self.assertIn("blocking-approved", binding)
+
+    def test_candidate_workflow_documents_the_volume_end_gate(self) -> None:
+        """卷末门是采用路径上的 blocking 门，规则必须写在 candidate-workflow.md，不能只活在代码里。"""
+        workflow = (ROOT / "skills/story-write/references/candidate-workflow.md").read_text(encoding="utf-8")
+        self.assertIn("卷末采用门", workflow)
+        self.assertIn("--ends-at", workflow)
+        self.assertIn("candidate_binding.volume_gate", workflow)
+        for code in (
+            "Volume_Contract_Missing_Conflict",
+            "Power_Constraint_Missing",
+            "Foreshadow_Debt_Accumulation",
+        ):
+            self.assertIn(code, workflow)
+        # 批量定稿分支不过候选采用，必须自己说明卷末审计要手动跑。
+        daily = (ROOT / "skills/story-write/references/workflow-daily.md").read_text(encoding="utf-8")
+        self.assertIn("卷末采用门", daily)
 
     def test_promote_moves_prose_and_advances_tracking(self) -> None:
         self.make_candidate(1)
@@ -596,7 +619,7 @@ class CandidateCommitTests(unittest.TestCase):
                         binding["logic_checks"]["arc-02"]["ledger_sha256"] = digest
                     self._mutate_binding(15, invalidate)
                 result = self._candidate(["promote", "--chapter", "15"], expect=2)
-                self.assertIn("arc-01.ledger" if case == "missing" else "arc-02 开篇阈值检查", result.stderr)
+                self.assertIn("arc-01.ledger" if case == "missing" else "arc 连读阈值检查", result.stderr)
                 self.assertEqual(self.read_state()["last_committed_chapter"], 14)
 
     def test_arc02_blocking_requires_exact_author_approval(self) -> None:
@@ -617,6 +640,122 @@ class CandidateCommitTests(unittest.TestCase):
         self._mutate_binding(15, approve)
         self._candidate(["promote", "--chapter", "15"])
         self.assertEqual(self.read_state()["last_committed_chapter"], 15)
+
+    # ---- 滚动 arc 连读门 ----
+    def test_arc_gate_recurs_every_fifteen_chapters(self) -> None:
+        """第 30 章必须重跑 arc 连读；缺 arc receipt 不能采用。"""
+        self.temporary.cleanup()
+        self._reset_project(last_chapter=29)
+        self.make_candidate(30)
+        self._mutate_binding(30, lambda binding: binding["logic_checks"].pop("arc-01"))
+        result = self._candidate(["promote", "--chapter", "30"], expect=2)
+        self.assertIn("logic_checks 必须精确包含", result.stderr)
+        self.assertIn("arc-01", result.stderr)
+        self.assertEqual(self.read_state()["last_committed_chapter"], 29)
+
+    def test_arc_window_is_the_last_fifteen_chapters_not_the_opening(self) -> None:
+        self.temporary.cleanup()
+        self._reset_project(last_chapter=29)
+        self.make_candidate(30)
+
+        def use_opening_window(binding):
+            ledger = {
+                "book": "候选测试书",
+                "chapters": [
+                    {"num": number, "opens": [], "closes": [], "mainAdvance": True}
+                    for number in range(1, 16)
+                ],
+            }
+            digest = self._canonical_sha(ledger)
+            binding["logic_checks"]["arc-01"]["ledger"] = ledger
+            binding["logic_checks"]["arc-01"]["ledger_sha256"] = digest
+            binding["logic_checks"]["arc-02"]["ledger_sha256"] = digest
+        self._mutate_binding(30, use_opening_window)
+
+        result = self._candidate(["promote", "--chapter", "30"], expect=2)
+        self.assertIn("arc-01.ledger 必须按顺序完整覆盖第16～30章", result.stderr)
+        self.assertEqual(self.read_state()["last_committed_chapter"], 29)
+
+    def test_arc_gate_skips_chapters_off_the_fifteen_beat(self) -> None:
+        """第 16 章不是 15 的倍数：带 arc receipt 反而是非法键集。"""
+        self.temporary.cleanup()
+        self._reset_project(last_chapter=15)
+        self.make_candidate(16)
+        transaction_path = self._transaction_path(16)
+        document = json.loads(transaction_path.read_text(encoding="utf-8"))
+        self.assertEqual(
+            sorted(document["candidate_binding"]["logic_checks"]), ["rc-01", "rc-02", "rc-03"]
+        )
+        completed = self._candidate(["check", "--chapter", "16"])
+        self.assertTrue(json.loads(completed.stdout)["ok"])
+
+    def test_mid_book_window_blocks_even_when_the_opening_was_healthy(self) -> None:
+        """第 16～30 章只开环、主线不动就要拦——开篇多健康都不抵消，窗口只看这 15 章。"""
+        self.temporary.cleanup()
+        self._reset_project(last_chapter=29)
+        stuck = {
+            "book": "候选测试书",
+            "chapters": [
+                {
+                    "num": number,
+                    "opens": [{"id": f"S{number}", "q": f"第{number}章又抛一个问号"}],
+                    "closes": [],
+                    "mainAdvance": False,
+                }
+                for number in range(16, 31)
+            ],
+        }
+        self.make_candidate(30, ledger=stuck)
+        result = self._candidate(["promote", "--chapter", "30"], expect=2)
+        self.assertIn("缺少作者批准", result.stderr)
+        self.assertEqual(self.read_state()["last_committed_chapter"], 29)
+
+    def test_arc_ledger_may_carry_pre_window_chapters_to_close_old_rings(self) -> None:
+        """本窗口闭掉第 5 章埋的环是好事；ledger 得能带上第 5 章，否则闭不了。"""
+        self.temporary.cleanup()
+        self._reset_project(last_chapter=29)
+        carried = {
+            "book": "候选测试书",
+            "chapters": [
+                {"num": 5, "opens": [{"id": "OLD", "q": "玉佩来历"}], "closes": [], "mainAdvance": True},
+                *(
+                    {"num": number, "opens": [], "closes": [], "mainAdvance": True}
+                    for number in range(16, 30)
+                ),
+                {"num": 30, "opens": [], "closes": ["OLD"], "mainAdvance": True},
+            ],
+        }
+        self.make_candidate(30, ledger=carried)
+        self._candidate(["promote", "--chapter", "30"])
+        self.assertEqual(self.read_state()["last_committed_chapter"], 30)
+
+    def test_arc_ledger_rejects_chapters_past_the_window(self) -> None:
+        self.temporary.cleanup()
+        self._reset_project(last_chapter=29)
+        self.make_candidate(30)
+
+        def overshoot(binding):
+            ledger = binding["logic_checks"]["arc-01"]["ledger"]
+            ledger["chapters"].append(
+                {"num": 31, "opens": [], "closes": [], "mainAdvance": True}
+            )
+            digest = self._canonical_sha(ledger)
+            binding["logic_checks"]["arc-01"]["ledger_sha256"] = digest
+            binding["logic_checks"]["arc-02"]["ledger_sha256"] = digest
+        self._mutate_binding(30, overshoot)
+
+        result = self._candidate(["promote", "--chapter", "30"], expect=2)
+        self.assertIn("必须按顺序完整覆盖第16～30章", result.stderr)
+
+    def test_arc_gate_requires_every_prior_chapter_accepted(self) -> None:
+        self.temporary.cleanup()
+        self._reset_project(last_chapter=29)
+        # 先制造正文缺口，再生成候选，让 rc-01 的 prose_files 与磁盘一致——
+        # 否则先撞上的是绑定摘要过期，测不到 arc 的前置条件。
+        next(iter((self.project / "正文").glob("第028章_*.md"))).unlink()
+        self.make_candidate(30)
+        result = self._candidate(["promote", "--chapter", "30"], expect=2)
+        self.assertIn("第30章 arc 检查要求正文完整包含第1～29章", result.stderr)
 
     def test_no_scan_cannot_bypass_logic_receipts(self) -> None:
         self.make_candidate(1, body=f"# 第1章\n{self.TOXIC}\n")
@@ -948,6 +1087,132 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertTrue(json.loads(completed.stdout)["ok"])
         self.assertIn("专名漂移 advisory", completed.stderr)
         self.assertIn("抖音", completed.stderr)
+        self.assertEqual(self.final_files(), [])
+
+    # ---- 卷末采用门 ----
+    def _write_volume_outline(
+        self, volume: int, *, end_chapter: int, conflict: bool = True, start_chapter: int = 1,
+    ) -> Path:
+        outline_dir = self.project / "大纲"
+        outline_dir.mkdir(exist_ok=True)
+        path = outline_dir / f"卷纲_第{volume}卷.md"
+        body = f"# 第{volume}卷卷纲\n\n章节范围：第 {start_chapter}–{end_chapter} 章\n\n"
+        if conflict:
+            body += "## 核心矛盾\n主角要拿回被顶替的署名权。\n\n"
+        body += "下一卷主角将面对更大规模的对手。\n"
+        path.write_text(body, encoding="utf-8")
+        return path
+
+    def _volume_audit_sha(self, volume: int, candidate: Path) -> str:
+        completed = subprocess.run(
+            [
+                sys.executable, str(ROOT / "skills/story-write/scripts/volume-audit.py"),
+                "--project", str(self.project), "--volume", str(volume),
+                "--json", "--candidate", str(candidate),
+            ],
+            text=True, capture_output=True, check=False, encoding="utf-8",
+        )
+        self.assertIn(completed.returncode, (0, 1), completed.stderr)
+        return self._canonical_sha(json.loads(completed.stdout))
+
+    def test_no_volume_gate_when_no_volume_ends_at_this_chapter(self) -> None:
+        """没有卷纲、或卷纲范围不终止于本章时，卷末门必须静默放行。"""
+        self.make_candidate(1)
+        self._write_volume_outline(1, end_chapter=30)
+
+        completed = self._candidate(["check", "--chapter", "1"])
+        checked = json.loads(completed.stdout)
+        self.assertTrue(checked["ok"])
+        self.assertIsNone(checked["volume_gate"])
+        self.assertNotIn("卷末审计", completed.stderr)
+
+    def test_volume_end_blocking_rejects_adoption_before_any_write(self) -> None:
+        self.make_candidate(1)
+        self._write_volume_outline(1, end_chapter=1, conflict=False)
+
+        checked = self._candidate(["check", "--chapter", "1"], expect=1)
+        self.assertIn("第1卷卷末审计未通过", checked.stderr)
+        self.assertIn("Volume_Contract_Missing_Conflict", checked.stderr)
+        promoted = self._candidate(["promote", "--chapter", "1"], expect=2)
+        self.assertIn("第1卷卷末审计未通过", promoted.stderr)
+        self.assertEqual(self.final_files(), [])
+        self.assertEqual(self.read_state()["state_revision"], 0)
+
+    def test_volume_end_pass_records_receipt_and_reports_advisory(self) -> None:
+        self.make_candidate(1)
+        self._write_volume_outline(1, end_chapter=1)
+
+        completed = self._candidate(["check", "--chapter", "1"])
+        receipt = json.loads(completed.stdout)["volume_gate"]
+        self.assertEqual(receipt["volume"], 1)
+        self.assertEqual(receipt["status"], "PASS")
+        self.assertEqual(len(receipt["result_sha256"]), 64)
+        # 战力约束缺失是启发式 advisory：报告但不阻断。
+        self.assertIn("第1卷卷末审计 advisory", completed.stderr)
+        self.assertIn("Power_Constraint_Missing", completed.stderr)
+
+        self._candidate(["promote", "--chapter", "1"])
+        journals = list((self.candidate_dir / "_历史").glob("采用事务-*.json"))
+        self.assertEqual(len(journals), 1)
+        journal = json.loads(journals[0].read_text(encoding="utf-8"))
+        self.assertEqual(journal["volume_gate"]["volume"], 1)
+        self.assertEqual(journal["volume_gate"]["result_sha256"], receipt["result_sha256"])
+
+    def test_volume_end_audit_covers_the_candidate_chapter(self) -> None:
+        """候选章此刻还不在 正文/ 下；不带上它，卷末审计恰好漏掉最后一章。"""
+        self.temporary.cleanup()
+        self._reset_project(last_chapter=2)
+        prose = self.make_candidate(3)
+        self._write_volume_outline(1, end_chapter=3)
+
+        completed = self._candidate(["check", "--chapter", "3"])
+        self.assertTrue(json.loads(completed.stdout)["ok"])
+        audited = subprocess.run(
+            [
+                sys.executable, str(ROOT / "skills/story-write/scripts/volume-audit.py"),
+                "--project", str(self.project), "--volume", "1", "--json",
+                "--candidate", str(prose),
+            ],
+            text=True, capture_output=True, check=False, encoding="utf-8",
+        )
+        self.assertEqual(json.loads(audited.stdout)["metrics"]["existing_chapters_in_range"], 3)
+
+    def test_volume_end_blocking_admits_bound_author_override(self) -> None:
+        self.make_candidate(1)
+        self._write_volume_outline(1, end_chapter=1, conflict=False)
+        prose = self.candidate_dir / "第001章_测试章名.md"
+        digest = self._volume_audit_sha(1, prose)
+
+        def rebind(override: dict) -> None:
+            path = self.candidate_dir / "第001章_追踪事务.json"
+            doc = json.loads(path.read_text(encoding="utf-8"))
+            doc["candidate_binding"]["volume_gate"] = override
+            path.write_text(json.dumps(doc, ensure_ascii=False), encoding="utf-8")
+
+        rebind({
+            "volume": 1, "approved_by_author": True,
+            "result_sha256": "0" * 64, "reason": "作者已知卷纲待补",
+        })
+        stale = self._candidate(["check", "--chapter", "1"], expect=1)
+        self.assertIn("volume_gate 作者批准未绑定当前审计结果", stale.stderr)
+
+        rebind({
+            "volume": 1, "approved_by_author": True,
+            "result_sha256": digest, "reason": "卷纲核心矛盾下一轮补齐，本章先采用",
+        })
+        completed = self._candidate(["check", "--chapter", "1"])
+        checked = json.loads(completed.stdout)
+        self.assertTrue(checked["ok"])
+        self.assertTrue(checked["volume_gate"]["override"]["approved_by_author"])
+        self.assertIn("已由作者批准", completed.stderr)
+
+    def test_overlapping_volume_ranges_are_rejected_as_outline_data_error(self) -> None:
+        self.make_candidate(1)
+        self._write_volume_outline(1, end_chapter=1)
+        self._write_volume_outline(2, end_chapter=1)
+
+        checked = self._candidate(["check", "--chapter", "1"], expect=1)
+        self.assertIn("多个卷纲把章节范围终止于第1章", checked.stderr)
         self.assertEqual(self.final_files(), [])
 
 

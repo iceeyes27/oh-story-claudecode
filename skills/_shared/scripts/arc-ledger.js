@@ -9,15 +9,21 @@
  * 分工：悬念开/闭、主线推进/打转是语义判断（连读子代理产 ledger）；累计计算与阈值
  * 裁决是确定性的（本脚本），可回归测试。
  *
+ * 窗口可以滚动：`--start=N` 把窗口挪到第 N 章开始，`--window` 仍是窗口章数，
+ * 于是 `--start=16 --window=15` 体检第 16～30 章。默认 `--start=1` 与旧行为逐字节一致。
+ * 滚动窗口下，窗口前开的环仍会登记（否则「本窗口闭掉一个 30 章前埋的环」会被误判成
+ * 引用不存在的 open），但只有窗口内开的环计入 openCount/pending，只有窗口内发生的
+ * close 计入 closeCount——一个连载中期的窗口闭掉旧环越多，netOpen 越低，正是要的信号。
+ *
  * 用法:
- *   node arc-ledger.js <ledger.json> [--json] [--window=15] [--net-ratio=1] [--advance-floor=0.333]
+ *   node arc-ledger.js <ledger.json> [--json] [--start=1] [--window=15] [--net-ratio=1] [--advance-floor=0.333]
  *
  * 退出码：0 无 blocking / 1 arc 级故弄玄虚 blocking / 2 ledger 错误或参数错误
  */
 'use strict';
 const fs = require('fs');
 
-const DEFAULTS = { WINDOW: 15, NET_RATIO: 1, ADVANCE_FLOOR: 1 / 3 };
+const DEFAULTS = { START: 1, WINDOW: 15, NET_RATIO: 1, ADVANCE_FLOOR: 1 / 3 };
 
 /**
  * 核心：吃 ledger 对象，返回 { report, errors }。纯函数，供测试直接调用。
@@ -28,24 +34,34 @@ function computeLedger(ledger, opts = {}) {
     return { errors: ['ledger 缺少 chapters 数组'], report: null };
   }
   const WINDOW = opts.WINDOW ?? ledger.window ?? DEFAULTS.WINDOW;
+  const START = opts.START ?? ledger.start ?? DEFAULTS.START;
   const NET_RATIO = opts.NET_RATIO ?? DEFAULTS.NET_RATIO;
   const ADVANCE_FLOOR = opts.ADVANCE_FLOOR ?? DEFAULTS.ADVANCE_FLOOR;
+  if (!Number.isInteger(START) || START < 1) return { errors: [`--start 必须是 ≥1 的整数，收到「${START}」`], report: null };
+  if (!Number.isInteger(WINDOW) || WINDOW < 1) return { errors: [`--window 必须是 ≥1 的整数，收到「${WINDOW}」`], report: null };
+  const END = START + WINDOW - 1;
 
-  const chapters = [...ledger.chapters].sort((a, b) => a.num - b.num).filter((c) => c.num <= WINDOW);
+  const sorted = [...ledger.chapters].sort((a, b) => a.num - b.num);
+  // 窗口前的章要登记 open（否则本窗口闭掉旧环会被当成引用不存在的 id），
+  // 但窗口后的章不属于这次连读，一律不看。
+  const registered = sorted.filter((c) => c.num <= END);
+  const chapters = registered.filter((c) => c.num >= START);
   const window = Math.min(WINDOW, chapters.length);
 
   // 登记所有 open：id -> 开启章
   const openAt = new Map();
   const openQ = new Map();
-  for (const ch of chapters) {
+  const windowOpenIds = new Set();
+  for (const ch of registered) {
     for (const o of ch.opens || []) {
       if (openAt.has(o.id)) errors.push(`第${ch.num}章：open id「${o.id}」重复`);
       openAt.set(o.id, ch.num);
       openQ.set(o.id, o.q || o.id);
+      if (ch.num >= START) windowOpenIds.add(o.id);
     }
   }
 
-  // 处理 close，校验引用合法性，算延迟
+  // 处理 close，校验引用合法性，算延迟；只统计窗口内发生的 close
   const closedIds = new Set();
   let delaySum = 0;
   let closeCount = 0;
@@ -59,9 +75,16 @@ function computeLedger(ledger, opts = {}) {
       closeCount++;
     }
   }
+  // 窗口前发生的 close 不计入本窗口收支，但要知道哪些旧环已经了结，
+  // 否则 carriedPending 会把早就闭掉的环也算成欠账。
+  const everClosed = new Set(closedIds);
+  for (const ch of registered) {
+    if (ch.num >= START) continue;
+    for (const cid of ch.closes || []) everClosed.add(cid);
+  }
   if (errors.length) return { errors, report: null };
 
-  const openCount = openAt.size;
+  const openCount = windowOpenIds.size;
   const netOpen = openCount - closeCount;
   const avgCloseDelay = closeCount ? +(delaySum / closeCount).toFixed(2) : null;
   const mainAdvanceSteps = chapters.filter((c) => c.mainAdvance === true).length;
@@ -71,37 +94,43 @@ function computeLedger(ledger, opts = {}) {
   const blocking = netOpen > closeCount * NET_RATIO && mainAdvanceSteps < advanceFloor;
 
   const known = [...closedIds].map((id) => openQ.get(id));
-  const pending = [...openAt.keys()].filter((id) => !closedIds.has(id)).map((id) => openQ.get(id));
+  const pending = [...windowOpenIds].filter((id) => !closedIds.has(id)).map((id) => openQ.get(id));
+  // 窗口前埋下、到窗口末仍未闭的环：不参与阈值裁决（长线伏笔本就该跨卷悬着），
+  // 但读者感知得到，报出来供作者判断伏笔债务。
+  const carriedPending = [...openAt.keys()].filter((id) => !windowOpenIds.has(id) && !everClosed.has(id)).length;
 
   return {
     errors: [],
     report: {
       book: ledger.book || '(未命名)',
+      start: START, end: END,
       window, openCount, closeCount, netOpen, avgCloseDelay,
       mainAdvanceSteps, advanceFloor, blocking,
-      known, pending,
+      known, pending, carriedPending,
     },
   };
 }
 
 function renderText(r) {
   const L = [];
-  L.push(`开篇连读体检 · 《${r.book}》前 ${r.window} 章`);
+  const scope = r.start > 1 ? `第 ${r.start}–${r.end} 章` : `前 ${r.window} 章`;
+  L.push(`${r.start > 1 ? '连读体检' : '开篇连读体检'} · 《${r.book}》${scope}`);
   L.push('—'.repeat(60));
   L.push(`悬念开环累计   : ${r.openCount}`);
   L.push(`悬念闭环累计   : ${r.closeCount}`);
   L.push(`净悬空         : ${r.netOpen}`);
   L.push(`平均闭环延迟   : ${r.avgCloseDelay == null ? '—（无闭环）' : r.avgCloseDelay + ' 章'}`);
   L.push(`主线推进步数   : ${r.mainAdvanceSteps} / ${r.window}（打转判定下限 ${r.advanceFloor}）`);
+  if (r.start > 1) L.push(`窗口前未闭旧环 : ${r.carriedPending}（不参与阈值裁决，供伏笔债务判断）`);
   L.push('—'.repeat(60));
-  L.push(`读者到第 ${r.window} 章已掌握（闭环）：`);
+  L.push(`读者读完${scope}已掌握（闭环）：`);
   L.push(r.known.length ? r.known.map((q) => `  ✓ ${q}`).join('\n') : '  （无）');
   L.push(`仍悬而未决（净悬空）：`);
   L.push(r.pending.length ? r.pending.map((q) => `  ? ${q}`).join('\n') : '  （无）');
   L.push('—'.repeat(60));
   if (r.blocking) {
     L.push(`[blocking] arc 级故弄玄虚：净悬空(${r.netOpen}) > 已闭环(${r.closeCount}) 且 主线推进(${r.mainAdvanceSteps}) < 下限(${r.advanceFloor})。`);
-    L.push(`           读者连读到第 ${r.window} 章，悬念越攒越多、主线基本没动——这是「看了十几章看不下去」的量化信号。`);
+    L.push(`           读者连读第 ${r.start}–${r.end} 章，悬念越攒越多、主线基本没动——这是「看了十几章看不下去」的量化信号。`);
     L.push(`           修法方向：闭掉几个早开的环 / 让主线目标发生可指认的推进，别只加铺垫。`);
   } else {
     L.push(`[ok] 开篇悬念收支与主线推进未触发故弄玄虚阈值（信号，非「一定好看」）。`);
@@ -117,12 +146,13 @@ function main() {
   for (const a of args) {
     if (a === '--json') jsonMode = true;
     else if (a.startsWith('--window=')) opts.WINDOW = parseInt(a.slice(9), 10);
+    else if (a.startsWith('--start=')) opts.START = parseInt(a.slice(8), 10);
     else if (a.startsWith('--net-ratio=')) opts.NET_RATIO = parseFloat(a.slice(12));
     else if (a.startsWith('--advance-floor=')) opts.ADVANCE_FLOOR = parseFloat(a.slice(16));
     else if (!a.startsWith('--')) file = a;
   }
   if (!file) {
-    console.error('用法: node arc-ledger.js <ledger.json> [--json] [--window=15] [--net-ratio=1] [--advance-floor=0.333]');
+    console.error('用法: node arc-ledger.js <ledger.json> [--json] [--start=1] [--window=15] [--net-ratio=1] [--advance-floor=0.333]');
     process.exit(2);
   }
   let ledger;

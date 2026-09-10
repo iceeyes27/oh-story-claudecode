@@ -8,6 +8,8 @@
       "release-manifest",
       "doc-budget",
       "candidate-transaction",
+      "volume-audit",
+      "arc-ledger",
       "contracts"
     ],
     "affected": [
@@ -17,6 +19,8 @@
       "release-manifest",
       "doc-budget",
       "candidate-transaction",
+      "volume-audit",
+      "arc-ledger",
       "tracking",
       "author-voice-profile",
       "tracking-workflow",
@@ -38,6 +42,8 @@
       "release-manifest",
       "doc-budget",
       "candidate-transaction",
+      "volume-audit",
+      "arc-ledger",
       "tracking",
       "author-voice-profile",
       "tracking-workflow",
@@ -108,6 +114,18 @@
       "command": "python",
       "args": [
         "scripts/test-candidate-commit.py"
+      ]
+    },
+    "volume-audit": {
+      "command": "python",
+      "args": [
+        "scripts/test-volume-audit.py"
+      ]
+    },
+    "arc-ledger": {
+      "command": "node",
+      "args": [
+        "skills/opening-arc-audit/scripts/test-arc-ledger.js"
       ]
     },
     "tracking": {

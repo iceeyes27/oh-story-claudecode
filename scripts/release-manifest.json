@@ -14,8 +14,8 @@
     "scripts/upstream-integration.json": "45961e11c1d0b41c09ccceb768a6b2df35dac3c7534fdbc49d61f482cec18e52",
     "scripts/platform-capabilities.json": "869851d57f054125b10baf69413f520478a8405e7e1910ad628ae911261fb44c",
     "scripts/platform-skill-set.json": "84014f26bf0f265227e5168b3959f1305eb97729430982a35f3cf169397d857f",
-    "scripts/shared-assets.json": "520e04fda4e3633f1116c24249b68b8ae854839cac5f519179e46811ab1d0c1e",
-    "scripts/quality-gate.json": "757ba9377dafff5ab812f692a4fe22bb46d714cb78820dc8b8848f422e30d6c5"
+    "scripts/shared-assets.json": "059f44b3c2aeac464534753eefd6e6d5934154ce9a2f959bd095693e53e550d0",
+    "scripts/quality-gate.json": "888ee8de4ec827e1b2d3feb924148295738be099a38ca9d34fdf0777b31ce646"
   },
   "identity": {
     "fork_version": "0.8.1",

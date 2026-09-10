@@ -2,6 +2,7 @@
 'use strict';
 
 const fs = require('fs');
+const { styleWhitelistPath, loadStyleWhitelist, styleSpans } = require('./style-whitelist.js');
 const path = require('path');
 
 const USAGE = `Usage: node normalize-punctuation.js [--check] [--quote-mode keep|ascii|yan] <file...>
@@ -9,6 +10,7 @@ const USAGE = `Usage: node normalize-punctuation.js [--check] [--quote-mode keep
 Normalize正文 structure deterministically:
   - preserve ellipses, dashes, and double hyphens when they carry voice or meaning
   - remove markdown divider lines (---) from正文
+  - when a book-local .deslop-whitelist exists, preserve its approved pause punctuation and normalize other pause tokens
   - keep quote style by default; convert quotes only when explicitly requested
 `;
 
@@ -61,7 +63,10 @@ for (const file of options.files) {
     continue;
   }
 
-  const result = normalizeDocument(input, options.quoteMode);
+  let whitelist;
+  try { whitelist = loadStyleWhitelist(fullPath); }
+  catch (error) { die(`${file}: unable to read .deslop-whitelist (${error.message})`); }
+  const result = normalizeDocument(input, options.quoteMode, whitelist, fs.existsSync(styleWhitelistPath(fullPath)));
   totalFindings += result.findings.length;
 
   if (options.check) {
@@ -94,7 +99,7 @@ function die(message) {
   process.exit(2);
 }
 
-function normalizeDocument(input, quoteMode) {
+function normalizeDocument(input, quoteMode, whitelist, normalizePauses) {
   const { lines, endings } = splitLinesKeepingEndings(input);
 
   const findings = [];
@@ -159,8 +164,12 @@ function normalizeDocument(input, quoteMode) {
     }
 
     const commentOpenBefore = commentOpen;
-    const commentResult = htmlCommentSpans(line, commentOpen);
-    commentOpen = commentResult.open;
+    const punctuationResult = normalizePauses
+      ? normalizePausePunctuation(line, lineNo, commentOpen, whitelist)
+      : { line, findings: [], commentOpen: htmlCommentSpans(line, commentOpen).open };
+    findings.push(...punctuationResult.findings);
+    line = punctuationResult.line;
+    commentOpen = punctuationResult.commentOpen;
     if (!commentOpenBefore && commentOpen) {
       commentStart = { line: lineNo, column: Math.max(1, line.lastIndexOf('<!--') + 1) };
     } else if (!commentOpen) {
@@ -235,7 +244,7 @@ function isClosingFence(line, fence) {
 // 一遍归一化留不干净，再跑一遍还会改已定稿的正文；所以反复归一化到不动点。
 // 每遍至少把一个 `…/./—/-` 换成非停顿字符，字符数严格递减，必然收敛。
 // findings 只留第一遍：同一处不重复计数，column 也仍然是原行的偏移。
-function normalizePausePunctuation(line, lineNo, commentOpen) {
+function normalizePausePunctuation(line, lineNo, commentOpen, whitelist) {
   let current = line;
   let findings = null;
   let commentOpenAfter = commentOpen;
@@ -243,7 +252,7 @@ function normalizePausePunctuation(line, lineNo, commentOpen) {
   for (;;) {
     const comments = htmlCommentSpans(current, commentOpen);
     commentOpenAfter = comments.open;
-    const pass = normalizePausePunctuationPass(current, lineNo, comments.spans);
+    const pass = normalizePausePunctuationPass(current, lineNo, comments.spans.concat(styleSpans(current, whitelist)));
     if (findings === null) findings = pass.findings;
     if (pass.line === current) break;
     current = pass.line;

@@ -76,3 +76,15 @@ facts 的 check/accept 还需 `--transaction {修订追踪事务.json}`。按 [t
 仅已有研究 HEAD 或用户明确要求研究协议时，按 [quality-lifecycle.md](quality-lifecycle.md) 执行：先 `quality_lifecycle.py check` 定位父 revision，再 stage `--kind revision`，保留 finding、影响区和授权。该模式的六视角、盲 A/B、cohort、写后抽取和 certify/accept 不被普通入口弱化。
 
 接受第 X 章后，X..M 旧研究证书和 reader chain 按原协议失效；X+1..M 顺序 replay，重放不授权改文。正确性通过但强度不足时用显式 strength_reopen，不伪造 defect。未满足实际证据要求就保留 pending，模型意见不能写成真人认可。
+
+## 短篇 Phase 4：精修打磨
+
+Phase 3 写手负责内容覆盖与格式自检，不提前执行完整语义去味；该分工须随写作 prompt 传入。Phase 4 的 Gate 检查由一个执行者完成，一致性检查职责不变。最终扫描及 delivery 验收由主会话对最终文件执行；修改后只复核改动并重跑受影响检查，不另开整轮去味。
+
+1. 读取 `writing-workflow.md` 的精修清单与本次 `style_resolution`，检查开头钩子、情绪曲线、反转铺垫、句子功能、格式和 AI 腔；作者明确选定且有叙事功能的表达不因通用默认值判错。
+2. 依次运行 `_shared/scripts/check-ai-patterns.js --check --fail-on=blocking 正文.md`、`_shared/scripts/check-outline-copy.js --outline 小节大纲.md 正文.md`、`_shared/scripts/normalize-punctuation.js 正文.md`、`_shared/scripts/check-degeneration.js --check 正文.md`。blocking 或确属细纲照搬先改正文再复扫；其他提示通读后按功能判断。
+3. 修改完成后运行 `_shared/scripts/check-delivery-contract.js --json --min-chars {MIN} --max-chars {MAX} --sections {N} {短篇目录}`。exit 0 才可交付；exit 1 只按 `repair_scope` 最小修复，最多两轮；exit 2、脚本缺失或不可执行时不得声称通过。
+
+项目已部署 agent 时，可由一个 narrative-writer 执行本轮语义去味并接收与写作相同的 `style_resolution`、正文范围、`作者偏好：{query 命中的 prose_style/story_design 项}` 和检查职责，再由 consistency-checker 检查事实、伏笔与角色一致性。agent 不可用时由主线程执行。
+
+自检结果只在交付报告说明，不写入 `正文.md`；正文不得包含 `<!-- 自检 -->` 等检查标记。

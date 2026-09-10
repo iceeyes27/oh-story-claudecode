@@ -16,6 +16,7 @@ fs.mkdirSync(path.join(shared, 'references'), { recursive: true });
 const script = path.join(shared, 'scripts/check-ai-patterns.js');
 const rules = path.join(shared, 'references/banned-words.md');
 fs.copyFileSync(path.join(source, 'scripts/check-ai-patterns.js'), script);
+fs.copyFileSync(path.join(source, 'scripts/style-whitelist.js'), path.join(shared, 'scripts/style-whitelist.js'));
 const canonical = fs.readFileSync(path.join(source, 'references/banned-words.md'), 'utf8');
 fs.writeFileSync(rules, canonical);
 const chapter = path.join(temp, 'chapter.md');

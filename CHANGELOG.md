@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ### 变更
 
+- 合并上游 v0.7.10 的文风优先级：当前请求、本书文风、active 作者记忆、对标与通用参考按表达维度裁决；`check-ai-patterns.js`、标点整理器和写后 hook 共用书目录 `.deslop-whitelist`，不跨书继承。
+- `story-write` 统一入口增加长篇项目文件与主产物加载协议、对标召回索引和追踪初始化参考；缺少情绪/节奏主产物时返回 `missing_primary_contract` 与修复动作。
+- 短篇 Phase 3 与 Phase 4 分别读取 `workflow-draft.md`、`workflow-revision.md`，明确写手、语义去味、一致性检查、最终扫描与交付验收的职责。
+- 保持 fork v0.8.1、`story-setup` 1.2.11、`agents_version: 30`、18 个公开 skills，以及候选采用、追踪事务、质量生命周期和本地扫描策略。
 - 短篇改按场景功能分配篇幅与节奏：移除逐节最低字数、固定子事件数量、对白占比与话轮数、固定冲突间隔、钩子节距和高潮位置等机械配额，改为检查场景是否改变风险、信息、关系、资源、决定、行动或读者理解。Phase 2 新表头使用“情节推进 / 场景形态 / 对白作用”，并继续兼容旧项目表头。
 - 导语作为正文第一场：宅斗宫斗、民俗怪谈、沙雕脑洞的第 1 章从导语末尾的后果、选择或新行动继续，避免重复搭景或重演同一事件。
 - 短篇拆文的节奏与对白指标改为描述性观察，不设跨题材固定阈值。

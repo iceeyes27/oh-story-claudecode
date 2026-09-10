@@ -15,6 +15,7 @@ const {
   parseArgs,
   prepare,
   review,
+  validate,
 } = require('./sync-upstream.js');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -108,19 +109,19 @@ test('prepare uses a dedicated worktree and leaves dirty caller files untouched'
     git(repo, 'config', 'user.email', 'test@example.com');
     git(repo, 'config', 'user.name', 'Sync Test');
     write(path.join(repo, 'README.md'), 'base\n');
-    write(path.join(repo, 'scripts', 'quality-gate.mjs'), 'process.exit(0);\n');
+    write(path.join(repo, 'scripts', 'quality-gate.mjs'), [
+      "import fs from 'node:fs';",
+      "import path from 'node:path';",
+      "const outputIndex = process.argv.indexOf('--json-out');",
+      "if (outputIndex < 0 || !process.argv[outputIndex + 1]) process.exit(2);",
+      "const failed = fs.existsSync(path.join(process.cwd(), 'quality.fail'));",
+      "fs.writeFileSync(process.argv[outputIndex + 1], JSON.stringify({ status: failed ? 'FAIL' : 'PASS' }));",
+      "process.exit(failed ? 1 : 0);",
+      '',
+    ].join('\n'));
     git(repo, 'add', '.');
     git(repo, 'commit', '-qm', 'base');
     const base = git(repo, 'rev-parse', 'HEAD');
-    git(repo, 'checkout', '-qb', 'upstream-sim');
-    write(path.join(repo, 'skills', 'story-long-write', 'SKILL.md'), 'upstream split\n');
-    git(repo, 'add', '.');
-    git(repo, 'commit', '-qm', 'upstream change');
-    const target = git(repo, 'rev-parse', 'HEAD');
-    git(repo, 'checkout', '-q', 'master');
-    git(repo, 'remote', 'add', 'origin', repo);
-    git(repo, 'remote', 'add', 'upstream', repo);
-    git(repo, 'remote', 'set-url', '--push', 'upstream', 'DISABLED');
 
     const policy = {
       schema_version: 1,
@@ -139,11 +140,23 @@ test('prepare uses a dedicated worktree and leaves dirty caller files untouched'
     };
     const policyPath = path.join(repo, 'scripts', 'upstream-integration.json');
     write(policyPath, `${JSON.stringify(policy, null, 2)}\n`);
+    git(repo, 'add', 'scripts/upstream-integration.json');
+    git(repo, 'commit', '-qm', 'policy');
+    const originBase = git(repo, 'rev-parse', 'HEAD');
+    git(repo, 'checkout', '-qb', 'upstream-sim');
+    write(path.join(repo, 'skills', 'story-long-write', 'SKILL.md'), 'upstream split\n');
+    git(repo, 'add', '.');
+    git(repo, 'commit', '-qm', 'upstream change');
+    const target = git(repo, 'rev-parse', 'HEAD');
+    git(repo, 'checkout', '-q', 'master');
+    git(repo, 'remote', 'add', 'origin', repo);
+    git(repo, 'remote', 'add', 'upstream', repo);
+    git(repo, 'remote', 'set-url', '--push', 'upstream', 'DISABLED');
     write(path.join(repo, 'caller-wip.txt'), 'must remain\n');
 
     const options = parseArgs([
       'prepare', '--repo', repo, '--policy', policyPath, '--no-fetch',
-      '--origin-sha', base, '--upstream-sha', target, '--worktree', managed,
+      '--origin-sha', originBase, '--upstream-sha', target, '--worktree', managed,
     ]);
     state = prepare(options);
     assert.equal(state.phase, 'prepared');
@@ -156,11 +169,36 @@ test('prepare uses a dedicated worktree and leaves dirty caller files untouched'
       schema_version: 1,
       sync_id: state.id,
       decisions: state.changes
-        .filter((entry) => entry.category === 'unified')
-        .map((entry) => ({ id: entry.id, decision: 'adapt', reason: 'Ported into the unified Skill.' })),
+        .filter((entry) => entry.decision === null)
+        .map((entry) => ({
+          id: entry.id,
+          decision: entry.category === 'unified' ? 'adapt' : 'reject',
+          reason: entry.category === 'unified'
+            ? 'Ported into the unified Skill.'
+            : 'Preserved the fork-owned integration policy.',
+        })),
     }, null, 2)}\n`);
     state = review(parseArgs(['review', '--repo', repo, '--id', state.id, '--decision-file', decisionPath]));
     assert.equal(state.phase, 'reviewed');
+
+    const managedPolicy = path.join(managed, 'scripts', 'upstream-integration.json');
+    const policyBeforeValidation = fs.readFileSync(managedPolicy, 'utf8');
+    const indexBeforeValidation = git(managed, 'show', ':scripts/upstream-integration.json');
+    const failureMarker = path.join(managed, 'quality.fail');
+    write(failureMarker, 'fail\n');
+    assert.throws(
+      () => validate(parseArgs(['validate', '--repo', repo, '--id', state.id])),
+      /quality gate did not pass/,
+    );
+    assert.equal(fs.readFileSync(managedPolicy, 'utf8'), policyBeforeValidation);
+    assert.equal(git(managed, 'show', ':scripts/upstream-integration.json'), indexBeforeValidation);
+
+    fs.rmSync(failureMarker);
+    state = validate(parseArgs(['validate', '--repo', repo, '--id', state.id]));
+    assert.equal(state.phase, 'validated');
+    assert.equal(state.validation.status, 'PASS');
+    assert.equal(state.final_policy_hash.length, 64);
+    assert.equal(JSON.parse(fs.readFileSync(managedPolicy, 'utf8')).upstream.baseline, target);
     state = abort(parseArgs(['abort', '--repo', repo, '--id', state.id]));
     assert.equal(state.phase, 'aborted');
     assert.equal(fs.existsSync(managed), false);

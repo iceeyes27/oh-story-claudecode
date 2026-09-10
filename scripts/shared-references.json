@@ -285,6 +285,28 @@
       "targets": [
         "skills/story-setup/references/agent-references/reader-first-writing.md"
       ]
+    },
+    {
+      "name": "style-resolution",
+      "source": "skills/_shared/references/style-resolution.md",
+      "targets": [
+        "skills/story-setup/references/agent-references/style-resolution.md"
+      ]
+    },
+    {
+      "name": "deslop-gate-rules",
+      "source": "skills/story-deslop/references/deslop-gates.md",
+      "targets": [
+        "skills/story-setup/references/agent-references/deslop-gates.md"
+      ]
+    },
+    {
+      "name": "tracking-initialization",
+      "source": "skills/story-write/references/tracking-initialization.md",
+      "targets": [
+        "skills/story-import/references/tracking-initialization.md",
+        "skills/story-review/references/tracking-initialization.md"
+      ]
     }
   ],
   "derived_groups": [

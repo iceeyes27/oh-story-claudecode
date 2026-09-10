@@ -6,6 +6,8 @@
 
 A web novel writing skill pack with built-in adapters for Claude Code, ZCode, OpenClaw, Codex CLI, and Reasonix. Web AI / agent environments that can read project files can use the generic skills path. Covers the full pipeline for long-form and short-form Chinese web novels: trend scanning, deconstruction, writing, AI tone removal, and cover generation.
 
+> This fork remains at v0.8.1 with `story-setup 1.2.11`, `agents_version: 30`, and 18 published skills. It incorporates upstream v0.7.10's per-dimension style precedence, book-scoped `.deslop-whitelist`, long-form project/reference/tracking initialization loading, and the short-form Phase 3/4 reference split while preserving the existing candidate adoption, tracking transaction, and quality lifecycle contracts.
+
 ## Core Approach
 
 > **Tropes = deterministic emotional payoff**

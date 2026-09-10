@@ -15,6 +15,7 @@ suites=(
   "test-ai-patterns.sh bash scripts/test-ai-patterns.sh"
   "test-degeneration.sh bash scripts/test-degeneration.sh"
   "test-prose-policy.py $PYBIN scripts/test-prose-policy.py"
+  "test-style-precedence.py $PYBIN scripts/test-style-precedence.py"
   "test-normalize-punctuation.js node --test scripts/test-normalize-punctuation.js"
   "test-charcount-portable.sh bash scripts/test-charcount-portable.sh"
   "test-prose-backstop-hook.sh bash scripts/test-prose-backstop-hook.sh"

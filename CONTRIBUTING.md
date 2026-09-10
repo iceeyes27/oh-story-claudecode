@@ -58,6 +58,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 
 - `scripts/static-check.sh` — frontmatter、引用路径、死文件、references 交叉引用
 - `scripts/check-doc-budget.sh` — 热路径文档字符预算（防 skill/agent 模板无声膨胀，改动 story-write/_shared/narrative-writer 相关文档后必跑）
+- `python3 scripts/test-style-precedence.py` — 验证当前请求/书级文风裁决、书目录白名单、扫描器与多端 hook 行为
 - `scripts/check-hook-regex-sync.sh` — hook 伏笔状态检测行为
 - `scripts/check-shared-files.sh` — Shared File Governance Check（5 个 guard：runtime 副本、shared-references、reference similarity、agent reference consumers、short analysis scope）
 - `scripts/check-scan-runtime-policy.sh` — scraper 本地日期依赖与 CDP 源码策略守卫
@@ -96,6 +97,7 @@ bash scripts/test-prose-backstop-hook.sh
 bash scripts/test-prose-net-parity.sh
 bash scripts/test-story-continuity.sh
 python3 scripts/test-author-memory-commit.py
+python3 scripts/test-style-precedence.py
 bash scripts/check-story-setup-deployment.sh
 bash scripts/check-claude-adapter.sh
 bash scripts/check-codex-adapter.sh

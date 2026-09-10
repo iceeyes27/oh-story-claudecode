@@ -12,11 +12,7 @@
 # 说明文字（python3 后紧跟反斜杠引号、破折号、箭头等，无空白）不受影响。
 set -euo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
-if [ -z "$REPO_ROOT" ]; then
-  echo "Error: not in a git repository"
-  exit 1
-fi
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # 裸调用形态：python3 + 空白 + 任意非空白参数（覆盖 -c / -m / << / 脚本路径 / 引号），
 # 或 python3 紧跟 `<`（heredoc `python3<<'PY'` 与输入重定向 `python3<脚本`，无空白也照跑）。

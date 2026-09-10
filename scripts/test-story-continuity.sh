@@ -6,8 +6,7 @@
 # 与 codex story_codex_hook.py 的 continuity_findings 同触发条件（codex 侧由 test-codex-hooks.sh 覆盖）。
 set -euo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
-[ -z "$REPO_ROOT" ] && { echo "Error: not in a git repository" >&2; exit 1; }
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HOOK="$REPO_ROOT/skills/story-setup/references/templates/hooks/detect-story-gaps.sh"
 [ -f "$HOOK" ] || { echo "FAIL: hook not found: $HOOK" >&2; exit 1; }
 bash -n "$HOOK" || { echo "FAIL: hook has syntax errors" >&2; exit 1; }

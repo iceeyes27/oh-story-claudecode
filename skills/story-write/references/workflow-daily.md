@@ -8,6 +8,8 @@
 
 > **日更准备步骤**：每章写作前 4 步——状态筛选 + 题材正文提示卡召回 + 文风召回 + 意图确认，嵌入 Step 2 逐章循环。读者契约、主角代理权、期待债、终局储备统一参 `reader-contract-and-progression.md`。
 >
+> 写前资料结构、对标路径、主产物缺失处理和权威顺序统一按 [project-files.md](project-files.md) 执行；长篇对标与文风召回按 [benchmark-recall.md](benchmark-recall.md) 的 `mode=long` 执行。本文件保留的展开说明用于兼容历史调用，不另立规则。
+>
 > Step 2 必读 / 生成五类写前资料：
 > 1. `{对标书路径}/剧情/情绪模块.md`（读者需求 / 情绪引擎 + 可复现模块；缺失按下方「模块/节奏缺失」规则停下修复）
 > 2. `{对标书路径}/剧情/节奏.md`（关键信息推进 + 情绪触动点 + 爆发节奏；缺失按下方「模块/节奏缺失」规则停下修复）
@@ -72,7 +74,7 @@
 
 **首次初始化**：
 
-1. `_tracking-state.json` 不存在且项目尚无正文：构造 `last_chapter=0` 的初始化事务，执行 `tracking_commit.py init`。
+1. `_tracking-state.json` 不存在且项目尚无正文：先完整读取 [tracking-initialization.md](tracking-initialization.md)，构造 `last_chapter=0` 的初始化事务，执行 `tracking_commit.py init`。
 2. `_tracking-state.json` 不存在但项目已有正文：停止日更。该目录停在旧追踪结构上，走 `/story-import` 的「旧追踪项目迁移」重建 `追踪/`——**不用重跑全书拆解**，只按最后完整章号和现有追踪文件构造初始化事务。本 workflow 自己不解析旧追踪结构、不推测状态。`init` 会把旧结构按原样整体移入 `追踪/_旧追踪存档/` 再建当前协议——旧内容不删除也不参与解析。
 3. `tracking_commit.py check` 报告派生视图与 state 不一致：重新提交该章的 `mode=revision` 事务让工具整份重建（`expected_state_revision` 取 `追踪/_tracking-state.json` 的 `state_revision` 字段——`check` 失败时只往 stderr 打 ERROR，不输出 JSON）；不得手改 Markdown 或继续写下一章。手写出的逐章记录会让同章 append 永久报 `chapter delta N already exists with different content`，删掉那个手写文件后重跑原事务即可。
 

@@ -36,6 +36,8 @@
 | `check-zcode-adapter.sh` | ZCode plugin/marketplace、Skills/Commands/Hooks 与部署锚点 | 本地 |
 | `check-reasonix-adapter.sh` | Reasonix plugin manifest、公开 Skill 清单和 AGENTS 路由名一致性 | 本地 |
 
+`python scripts/test-style-precedence.py` 验证书级表达豁免在深扫、标点整理、写后和下一章门禁中一致生效，且不跨书、不豁免同一行其他问题或结构错误。
+
 ## 测试回归（test-*）
 
 `scripts/test-*` 必须被 `quality-gate.json` 的某个 profile 跑到（直接引用、聚合 runner 或适配器内部调用都算）。注释/文档里出现的名字不算运行时引用。新增 `test-*` 不接线会让 `scripts/quality-gate.test.mjs` 在 `platform-gates` 红掉。`fast` 的 check 集保持原样，不承担这张回归网。

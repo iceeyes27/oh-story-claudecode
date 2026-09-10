@@ -75,11 +75,15 @@ function sha256(data) {
   return crypto.createHash('sha256').update(data).digest('hex');
 }
 
-function writeJsonAtomic(file, value) {
+function writeFileAtomic(file, content) {
   fs.mkdirSync(path.dirname(file), { recursive: true });
   const temp = `${file}.${process.pid}.${crypto.randomBytes(4).toString('hex')}.tmp`;
-  fs.writeFileSync(temp, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
+  fs.writeFileSync(temp, content, 'utf8');
   fs.renameSync(temp, file);
+}
+
+function writeJsonAtomic(file, value) {
+  writeFileAtomic(file, `${JSON.stringify(value, null, 2)}\n`);
 }
 
 function loadPolicy(file = path.join(DEFAULT_ROOT, POLICY_NAME)) {
@@ -497,37 +501,60 @@ function validate(options) {
   if (forbidden.length) throw new SyncError(`forbidden or split paths remain:\n  ${forbidden.join('\n  ')}`);
 
   const policyPath = path.join(state.worktree, state.policy_path);
+  const indexLine = gitOutput(state.worktree, ['ls-files', '--stage', '--', state.policy_path]);
+  const indexEntry = indexLine.match(/^(\d+)\s+([0-9a-f]+)\s+0\t/);
+  if (!indexEntry) throw new SyncError(`cannot snapshot policy index entry: ${state.policy_path}`);
+  const policySnapshot = {
+    raw: loaded.raw,
+    mode: indexEntry[1],
+    object: indexEntry[2],
+  };
   const nextPolicy = loaded.policy;
   nextPolicy.upstream.baseline = state.target_upstream_main;
   writeJsonAtomic(policyPath, nextPolicy);
-  git(state.worktree, ['add', '--', state.policy_path]);
+  try {
+    git(state.worktree, ['add', '--', state.policy_path]);
 
-  const reportDir = stateDirectory(options.repo);
-  const reportPath = path.join(reportDir, `${state.id}.quality.json`);
-  const qualityScript = path.join(state.worktree, 'scripts', 'quality-gate.mjs');
-  if (!fs.existsSync(qualityScript)) throw new SyncError(`quality runner is missing: ${qualityScript}`);
-  const quality = run(process.execPath, [
-    qualityScript,
-    '--profile', options.qualityProfile || state.quality_profile,
-    '--json-out', reportPath,
-  ], { cwd: state.worktree, allowFail: true, inherit: true });
-  if (quality.status !== 0) throw new SyncError(`quality gate did not pass; report: ${reportPath}`);
-  const qualityReport = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
-  if (qualityReport.status !== 'PASS') {
-    throw new SyncError(`quality gate status is ${qualityReport.status}, expected PASS`);
+    const reportDir = stateDirectory(options.repo);
+    const reportPath = path.join(reportDir, `${state.id}.quality.json`);
+    const qualityScript = path.join(state.worktree, 'scripts', 'quality-gate.mjs');
+    if (!fs.existsSync(qualityScript)) throw new SyncError(`quality runner is missing: ${qualityScript}`);
+    const quality = run(process.execPath, [
+      qualityScript,
+      '--profile', options.qualityProfile || state.quality_profile,
+      '--json-out', reportPath,
+    ], { cwd: state.worktree, allowFail: true, inherit: true });
+    if (quality.status !== 0) throw new SyncError(`quality gate did not pass; report: ${reportPath}`);
+    const qualityReport = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+    if (qualityReport.status !== 'PASS') {
+      throw new SyncError(`quality gate status is ${qualityReport.status}, expected PASS`);
+    }
+    const finalPolicy = loadPolicy(policyPath);
+    state.final_policy_hash = finalPolicy.hash;
+    state.validation = {
+      status: 'PASS',
+      profile: options.qualityProfile || state.quality_profile,
+      report: reportPath,
+      tree: gitOutput(state.worktree, ['write-tree']),
+      validated_at: new Date().toISOString(),
+    };
+    state.phase = 'validated';
+    saveState(options.repo, state);
+    return state;
+  } catch (error) {
+    try {
+      writeFileAtomic(policyPath, policySnapshot.raw);
+      git(state.worktree, [
+        'update-index', '--cacheinfo',
+        `${policySnapshot.mode},${policySnapshot.object},${normalizePath(state.policy_path)}`,
+      ]);
+    } catch (rollbackError) {
+      throw new SyncError(
+        `validation failed (${error.message}) and policy rollback failed (${rollbackError.message})`,
+      );
+    }
+    throw error;
   }
-  const finalPolicy = loadPolicy(policyPath);
-  state.final_policy_hash = finalPolicy.hash;
-  state.validation = {
-    status: 'PASS',
-    profile: options.qualityProfile || state.quality_profile,
-    report: reportPath,
-    tree: gitOutput(state.worktree, ['write-tree']),
-    validated_at: new Date().toISOString(),
-  };
-  state.phase = 'validated';
-  saveState(options.repo, state);
-  return state;
 }
 
 function promote(options) {

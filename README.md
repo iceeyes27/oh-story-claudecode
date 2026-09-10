@@ -6,6 +6,8 @@
 
 网文写作 skill 包，覆盖长篇与短篇网络小说的扫榜、拆文、写作、去AI味、封面图全流程。内置适配 Claude Code、ZCode、OpenClaw、Codex CLI、Reasonix、workbuddy；能读取项目文件的 Web AI / Agent 环境也可按通用 skills 路径使用。
 
+> 当前 fork 版本为 v0.8.1，部署契约为 `story-setup 1.2.11` / `agents_version: 30`，公开集合为 18 个 skills。已吸收上游 v0.7.10 的逐维文风裁决、书级 `.deslop-whitelist`、长篇项目/对标/追踪初始化加载，以及短篇 Phase 3/4 参考拆分；候选采用、追踪事务与质量生命周期保持现有行为。
+
 ## 核心思路
 
 > **套路 = 确定性的情绪满足**

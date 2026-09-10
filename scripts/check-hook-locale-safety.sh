@@ -9,11 +9,7 @@
 # scripts/test-hook-encoding-portable.sh（在真实 GBK 区域下端到端跑 hook）互补。
 set -euo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
-if [ -z "$REPO_ROOT" ]; then
-  echo "Error: not in a git repository"
-  exit 1
-fi
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HOOKS_DIR="$REPO_ROOT/skills/story-setup/references/templates/hooks"
 
 echo "Hook locale-safety Guard"

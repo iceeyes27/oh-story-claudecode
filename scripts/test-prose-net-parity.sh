@@ -16,8 +16,7 @@
 #      一整版（issue #305），正是因为 bash 那一面没有任何跨端断言。
 set -euo pipefail
 
-ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
-[ -z "$ROOT" ] && { echo "Error: not in a git repository" >&2; exit 1; }
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # Windows 上裸 python3 落到 Microsoft Store 占位程序（exit 49、空输出），会让 codex python 网
 # 静默产出空结果、parity 假性 diff。shim 定义同名 shell 函数委托真 python（命令替换继承函数）。

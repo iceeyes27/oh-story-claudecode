@@ -4,14 +4,14 @@
 
 ## 短篇 Reference Gate
 
-进入阶段前完整读取该阶段必需文件直到 EOF；`rg` 检索或局部摘读不算读完。格式先读 `short-format.md`；构思必读 `references/workflow-design.md`（Phase 3/4 不预加载），按需读 `short-genre-formulas.md`、`short-reversal.md`、`short-suspense.md` 与题材包；正文读 `short-craft.md`、`short-prose-quality.md` 和已选题材包。任一必需路径缺失或不可读即停止，不混读长篇资料。Phase 2 与交付分别执行 `check-phase2-contract.js`、`check-delivery-contract.js`。
+进入阶段前完整读取该阶段必需文件直到 EOF；`rg` 检索或局部摘读不算读完。所有写作、改写和审稿先读 `../_shared/references/style-resolution.md`。格式先读 `short-format.md`；Phase 2 必读 `references/workflow-design.md`，Phase 3 必读 `references/workflow-draft.md`，Phase 4 必读 `references/workflow-revision.md`，其他阶段文件不预加载；按需读 `short-genre-formulas.md`、`short-reversal.md`、`short-suspense.md` 与题材包。任一必需路径缺失或不可读即停止，不混读长篇资料。Phase 2 与交付分别执行 `check-phase2-contract.js`、`check-delivery-contract.js`。
 
 **执行规则：短篇以情绪为目标，所有内容为情绪服务。**
 
 短篇专属执行规则（在通用执行规则基础上追加）：
 1. **一个核心支点撑一篇**。反转型围绕主反转安排铺垫；无反转型围绕报应兑现或甜度递进积累期待。不多线、不铺世界观。
 2. **开头 3 句定生死，结尾定传播**。开头必须包含钩子，结尾必须有余韵。
-3. **默认第一人称**。短篇网文（盐言/七猫短篇等）绝大多数用第一人称，代入感最强。除非题材明确需要第三人称（如多视角悬疑），否则一律用「我」。
+3. **默认第一人称**。当前请求、本篇文风或题材明确需要第三人称时按其执行，不因默认值改回「我」。
 
 ## 格式规范（最高优先级）
 
@@ -121,6 +121,8 @@
 ---
 
 ### Phase 3：逐场景写作
+
+进入正文写作前完整读取 `references/workflow-draft.md`；交付参数、写前验收、逐场景职责与完成门槛以该文件为准。本节保留的细则用于执行时定点查询，不替代阶段门禁。
 
 **项目文件结构**：文件结构见 Phase 2；设定.md/小节大纲.md 为 Phase 2 产出，正文.md 为 Phase 3 产出。
 
@@ -274,6 +276,8 @@
 ---
 
 ### Phase 4：精修打磨
+
+精修或质量自检前完整读取 `references/workflow-revision.md`；语义去味、一致性检查、最终文件扫描与交付验收按其中职责分工执行。
 
 加载 `references/writing-workflow.md` 中的精修清单完成检查。
 重点：开头钩子、情绪曲线、反转铺垫、每句话价值、格式规范、AI 腔排查。文件模式先运行 `node .agents/skills/_shared/scripts/check-ai-patterns.js --check --fail-on=blocking 正文.md`：blocking 先改正文并复扫；其他提示只作为读感风险，功能性写法标 `[需复核]`。再运行 `node .agents/skills/_shared/scripts/normalize-punctuation.js 正文.md` 做标点兜底，并运行 `node .agents/skills/_shared/scripts/check-degeneration.js --check 正文.md`；退化 blocking 要重新生成受影响段落，不靠润色。

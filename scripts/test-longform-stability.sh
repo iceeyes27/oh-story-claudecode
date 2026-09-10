@@ -4,11 +4,7 @@
 # 角色不变量 POV 感知扫描、Gate PASS 才交接、跨章继承关键词。
 set -euo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
-if [ -z "$REPO_ROOT" ]; then
-  echo "Error: not in a git repository" >&2
-  exit 1
-fi
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 AUDIT="$REPO_ROOT/skills/story-write/scripts/stability-audit.js"
 PACK="$REPO_ROOT/skills/story-write/scripts/handoff-pack.js"

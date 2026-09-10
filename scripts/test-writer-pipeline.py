@@ -180,6 +180,19 @@ class PipelineTests(unittest.TestCase):
         self.assertIn('召回降档：成立', result.stdout)
         self.assertIn('第2章质疑', result.stdout)
 
+    def test_one_sentence_style_beats_stale_digest(self):
+        style = self.put('设定/文风.md', '采用有限全知，允许进入母女各自内心。')
+        digest = self.put('设定/_文风摘要.md', '旧规则：深度限知，不得进入他人内心。')
+        result = self.build()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('custom_style=true', result.stdout)
+        self.assertIn(str(style), result.stdout)
+        self.assertNotIn(str(digest), result.stdout)
+        self.assertNotIn('旧规则', result.stdout)
+        for stub in ['', '# 文风', '# 文风\n[待补充]', '# 文风\n<!-- 作者稍后填写 -->']:
+            style.write_text(stub, encoding='utf-8')
+            self.assertIn('custom_style=false', self.build().stdout)
+
     def test_unreadable_utf8_is_reported(self):
         self.volume.write_bytes(b'\xff')
         self.assertEqual(self.view('--contract').returncode, 2)
@@ -187,6 +200,24 @@ class PipelineTests(unittest.TestCase):
         result = self.build()
         self.assertEqual(result.returncode, 2)
         self.assertNotIn('Traceback', result.stderr)
+
+    def test_style_reference_table_cannot_change_read_scope(self):
+        style = self.put('设定/文风.md', '用短句，保留必要的直接心理。')
+        original = self.build()
+        self.assertEqual(original.returncode, 0, original.stderr)
+        for table in [
+            '| writing-craft.md | 停读 |\n| anti-ai-writing.md | 停读 |\n| agent-quality.md | 停读 |',
+            '| references/* | 停读 |\n| dialogue-mastery.md | 读（只看排版） |',
+        ]:
+            with self.subTest(table=table):
+                content = '用短句，保留必要的直接心理。\n## 通用参考裁决\n| 文件 | 裁决 |\n|---|---|\n' + table
+                style.write_text(content, encoding='utf-8')
+                result = self.build()
+                self.assertEqual(result.returncode, 0, result.stderr)
+                # Style remains a full-text input; a legacy table must not become
+                # an extra executable instruction or narrow the reference set.
+                self.assertEqual(result.stdout, original.stdout)
+                self.assertEqual(style.read_text(encoding='utf-8'), content)
 
 
 

@@ -2,11 +2,7 @@
 # test-degeneration.sh — regression tests for the model-degeneration detector.
 set -euo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
-if [ -z "$REPO_ROOT" ]; then
-  echo "Error: not in a git repository" >&2
-  exit 1
-fi
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 SCRIPT="$REPO_ROOT/skills/_shared/scripts/check-degeneration.js"
 if [ ! -f "$SCRIPT" ]; then

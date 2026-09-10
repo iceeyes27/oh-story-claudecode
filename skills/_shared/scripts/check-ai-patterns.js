@@ -2,6 +2,7 @@
 'use strict';
 
 const fs = require('fs');
+const { loadStyleWhitelist, maskStyleText } = require('./style-whitelist.js');
 const path = require('path');
 
 const USAGE = `Usage: node check-ai-patterns.js [--check] [--json] [--fail-on=blocking|all] [--book-dir <book>] [--target-file <final-path>] <file...>
@@ -41,6 +42,7 @@ blocking 只用于有来源和作用域的作者禁令、能核算的指代字�
 不解析说明、括号或 skill-local 旧副本；作者禁令另读本书 .deslop-author-rules.json，
 须绑定已有来源原句及 scope，不继承其它书的要求。候选在书外时传 --book-dir。
 有功能的风格命中可保留，密度只定位复核窗口，不要求全篇删除或更换身体部位。
+Book-local .deslop-whitelist literal spans are excluded from style scanning (no regex or ancestor inheritance).
 --fail-on=blocking 只在出现 blocking finding 时退出 1；默认 --fail-on=all 有任何 finding 即退出 1。
 
 The script reports findings only. It never rewrites text, because the safe fix is
@@ -330,7 +332,12 @@ for (const file of options.files) {
     continue;
   }
 
-  const findings = scanDocument(input, fullPath).map((finding) => ({ file, ...finding }));
+  const styleContextPath = options.targetFile || (options.bookDir ? path.join(options.bookDir, '正文.md') : fullPath);
+  let whitelist;
+  try { whitelist = loadStyleWhitelist(styleContextPath); }
+  catch (error) { die(`${file}: unable to read .deslop-whitelist (${error.message})`); }
+  const findings = scanDocument(maskStyleText(input, whitelist), fullPath, input)
+    .map((finding) => ({ file, ...finding }));
   allFindings.push(...findings);
 }
 
@@ -370,13 +377,15 @@ function readUtf8(filePath) {
   return new TextDecoder('utf-8', { fatal: true }).decode(fs.readFileSync(filePath));
 }
 
-function scanDocument(input, filePath) {
+function scanDocument(input, filePath, authorInput = input) {
   const lines = input.split(/\r?\n/);
+  const authorLines = authorInput.split(/\r?\n/);
   const findings = [];
   let fence = null;
   let inFrontMatter = hasYamlFrontMatter(lines);
   let block = [];
   const proseLines = [];
+  const authorProseLines = [];
 
   const flushBlock = () => {
     if (block.length === 0) return;
@@ -409,11 +418,12 @@ function scanDocument(input, filePath) {
 
     block.push({ text: line, lineNo: index + 1 });
     proseLines.push({ text: line, lineNo: index + 1 });
+    authorProseLines.push({ text: authorLines[index] ?? line, lineNo: index + 1 });
   }
 
   flushBlock();
   findings.push(...scanProsePatterns(proseLines));
-  findings.push(...findAuthorBans(proseLines, filePath));
+  findings.push(...findAuthorBans(authorProseLines, filePath));
   for (const finding of findings) {
     if (!finding.category) finding.category = finding.type === 'rule-load-error' || finding.type === 'referential-count-mismatch' ? 'deterministic' : /-tic$/.test(finding.type) ? 'density' : 'contextual';
     if (!finding.source) finding.source = 'shared-system';

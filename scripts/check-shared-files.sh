@@ -2,11 +2,7 @@
 # check-shared-files.sh — validate explicit cross-skill runtime/reference manifests.
 set -euo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || true)"
-if [ -z "$REPO_ROOT" ]; then
-  echo "Error: not in a git repository" >&2
-  exit 1
-fi
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 PYTHON_BIN=""
 for candidate in python3 python py; do

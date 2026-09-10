@@ -7,6 +7,8 @@ sync-source: shared-banned-words-v3.0.0
 消费者必须直接读取 shared 路径，不得维护 skill-local 副本。
 -->
 
+> 本表记录通用默认风险，服从 [style-resolution.md](style-resolution.md) 的逐维裁决；文件结构、事实与授权边界不豁免。扫描器的作者级 blocking 规则仍按现有来源和作用域执行。
+
 ## 规则等级与作用域
 
 本文件记录共享系统的写作建议，不代表某位作者的禁令。`check-ai-patterns.js` 输出 `category`、`source`、`scope`，分四类：

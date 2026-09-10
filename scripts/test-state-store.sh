@@ -3,11 +3,7 @@
 # 分片路由、时点快照折叠、活跃/超期伏笔、矛盾检测（死亡后活动/未埋先收/重复回收/分片错位）。
 set -euo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
-if [ -z "$REPO_ROOT" ]; then
-  echo "Error: not in a git repository" >&2
-  exit 1
-fi
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 SQ="$REPO_ROOT/skills/story-write/scripts/state-query.js"
 TMP_DIR="$(mktemp -d)"

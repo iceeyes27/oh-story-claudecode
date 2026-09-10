@@ -42,6 +42,8 @@
 | 输出命中 `blocked_patterns` | BLOCKED |
 | runner 退出非 0 且未命中 blocked pattern | FAIL |
 
+`sync-upstream.js validate` 对策略基线的更新必须具备失败可重试性：在质量 runner 缺失、退出非零、报告非 PASS 或验证状态写入失败时，恢复验证前的策略文件内容与 Git 索引条目。同一 sync id 应可在修复质量问题后直接重试，不得要求仅为清除半次验证写入而重新 `prepare`。
+
 ### 5. Good / Base / Bad Cases
 
 - Good：GBK locale 不存在时输出 `note:`，cp936 等价测试通过，平台聚合结果为 PASS。
@@ -53,6 +55,7 @@
 - `node --test scripts/quality-gate.test.mjs`：验证状态聚合与全部 `test-*` 可达。
 - `bash scripts/test-platform-gates.sh`：在 WSL Node 18 和 Windows Node 22 路径下均通过，输出不得含意外的 check 级 `SKIP:`。
 - `node scripts/quality-gate.mjs --profile release`：零 FAIL；只允许 manifest 已声明的环境型 BLOCKED。
+- `node --test scripts/sync-upstream.test.js`：覆盖 `validate` 失败后策略内容与索引恢复，并证明同一 sync id 可重试成功。
 
 ### 7. Wrong vs Correct
 

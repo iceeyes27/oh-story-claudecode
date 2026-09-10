@@ -7,7 +7,7 @@
   "upstream": {
     "remote": "upstream",
     "branch": "main",
-    "baseline": "1e2488b80190197bc352bb3f5d852f5d7f251100"
+    "baseline": "fde17546758c58ad4d3306ef93d0db8ad28f9f3c"
   },
   "quality_profile": "release",
   "policy_priority": [

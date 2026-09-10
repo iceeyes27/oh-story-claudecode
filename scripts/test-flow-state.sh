@@ -2,11 +2,7 @@
 # test-flow-state.sh — regression tests for story-write progressive disclosure state.
 set -euo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
-if [ -z "$REPO_ROOT" ]; then
-  echo "Error: not in a git repository" >&2
-  exit 1
-fi
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 FLOW="$REPO_ROOT/skills/story-write/scripts/flow-state.js"
 TMP_DIR="$(mktemp -d)"

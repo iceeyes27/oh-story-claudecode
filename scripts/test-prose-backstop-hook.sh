@@ -5,8 +5,7 @@
 # 过度捕获用路径门验证（不依赖解释器）；内容网用内嵌 python（与 parity 测试同源）。
 set -euo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null)"
-[ -z "$REPO_ROOT" ] && { echo "Error: not in a git repository" >&2; exit 1; }
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 HOOK="$REPO_ROOT/skills/story-setup/references/templates/hooks/check-prose-after-write.sh"
 [ -f "$HOOK" ] || { echo "FAIL: hook not found: $HOOK" >&2; exit 1; }
 

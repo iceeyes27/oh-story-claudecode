@@ -5,6 +5,8 @@
 - `setup_skill_version: 1.2.11`
 - `agents_version: 30`
 
+本版已吸收上游 v0.7.10 中适用于统一 skill 架构的改动：写作、改写与审稿共用逐维文风裁决和书级 `.deslop-whitelist`；长篇增加项目文件、对标主产物与追踪初始化加载；短篇 Phase 3/4 分别读取写作与精修参考。升级仍保持 18 个公开 skills、统一 `story-write` 路径、候选采用/追踪/质量生命周期与现有本地扫描策略。
+
 本 fork 已移除 OpenCode 部署支持。旧 `.story-deployed` 的 `target_cli` 含 `opencode` 时（包括多端组合），重新部署会停止并要求选择受支持目标；不会自动删除旧平台目录，也不会在选择和部署验证完成前改写 sentinel。下列历史版本记录保留当时的平台名称，不代表当前支持范围。
 
 > **本 fork 的取值约定**：`setup_skill_version` 跟随上游 zenstory-ai/oh-story-claudecode，不另起 fork 自有版本线。本 fork 的架构差异由 `resolver_strategy: agents-canonical-v1` 连同 `canonical_skills_dir` / `adapter_manifest` 两个上游没有的字段标识，那几行远离上游高频改动区，能自动合并。

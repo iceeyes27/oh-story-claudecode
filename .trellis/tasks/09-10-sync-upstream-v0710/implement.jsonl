@@ -1,0 +1,5 @@
+{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file": ".trellis/spec/skills/index.md", "reason": "Skill repository entry rules"}
+{"file": ".trellis/spec/skills/canonical-assets.md", "reason": "Canonical, shared, unified and upstream mapping boundaries"}
+{"file": ".trellis/spec/skills/validation.md", "reason": "Required local quality checks"}
+{"file": ".trellis/tasks/09-10-sync-upstream-v0710/research/upstream-audit.md", "reason": "Pinned SHAs, upstream commits and classification evidence"}

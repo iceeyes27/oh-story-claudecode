@@ -154,6 +154,9 @@
         "path": "CONTRIBUTING.md"
       },
       {
+        "path": "docs/reference-workflow-cleanup.md"
+      },
+      {
         "path": "LICENSE"
       },
       {

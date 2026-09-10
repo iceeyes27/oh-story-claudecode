@@ -41,6 +41,17 @@ test('policy priority preserves fork boundaries and unified targets', () => {
   assert.equal(classifyPath('unexpected/new-root.txt', policy).category, 'unknown');
 });
 
+test('only the approved upstream workflow document is canonical', () => {
+  const { policy } = loadPolicy(path.join(ROOT, 'scripts', 'upstream-integration.json'));
+  assert.equal(classifyPath('docs/reference-workflow-cleanup.md', policy).category, 'canonical');
+  for (const file of [
+    'docs/reference-workflow-cleanup-notes.md',
+    'docs/unreviewed-upstream-document.md',
+  ]) {
+    assert.equal(classifyPath(file, policy).category, 'unknown', file);
+  }
+});
+
 test('CLI defaults to a read-only status command', () => {
   const options = parseArgs([]);
   assert.equal(options.command, 'status');

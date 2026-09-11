@@ -123,6 +123,8 @@
 | 大纲/卷纲_第X卷.md | 卷 | Phase 3 | 用 `scripts/outline_view.py --toc/--contract/--unit` 按作用域读取；写正文时加 `--stage write`，不整读卷纲 |
 | 追踪/写作流程状态.json | 书/流程 | Phase 1 推断后创建或更新 | 每轮开始按 `references/progressive-disclosure.md` 读取；只用于判断阶段和资料范围，不进正文 prompt |
 | 追踪/_tracking-state.json | 全书 | Phase 3 初始化 | 唯一结构化权威，不进正文 prompt；每章运行 `tracking_commit.py check` 读取章号和修订号 |
+| 追踪/设定兑现看板.md | 全书设定排期台账 | Phase 3 建纲时生成（模板见 `setting-payoff.md`） | Phase 4 每章写前核本章 SET 编号与三槽、写后核销改状态补简记；**人工回填的台账，不是 `tracking_commit.py` 的派生视图** |
+| 设定/_兑现豁免.txt | 全书 | 按需（发现组合技/上位概念误报时） | `check-setting-payoff.js` 运行时读取，声明不单独排期的条目 |
 | 追踪/伏笔.md | 全书当前视图 | Phase 3 初始化 | 续写状态卡缺项时按 ID 定点查询；每 ID 只一行 |
 | 追踪/时间线/{作者真相.md,读者已知.md} | 全书当前事实/认知派生视图 | Phase 3 初始化 | 按作者真相或读者认知的实际问题选择视图 |
 | 对标/{书名}/拆文报告.md | 对标书 | 用户手动+analyze | Phase 2 核心设定、Phase 3 大纲、Phase 4 写作 |

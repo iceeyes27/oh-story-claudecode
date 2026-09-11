@@ -194,14 +194,16 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
    node .agents/skills/_shared/scripts/check-degeneration.js --check <正文文件...>
    node .agents/skills/_shared/scripts/check-subject-switch.js <正文文件...>
    node .agents/skills/_shared/scripts/check-chapter-boundary.js <书目录>
+   node .agents/skills/_shared/scripts/check-setting-payoff.js <书目录>
    ```
    - `check-subject-switch.js` 是 advisory 级（段首"他/她"承接错位，输出上段末句+本段首行供复核），结果并入 `prose` 按 S4，人工复核后再定是否升级；正常承接（段首"他"就指上段主角）占绝大多数，不算病。
    - `check-chapter-boundary.js` 是 advisory 级（跨章信息续接：跨章复读/计划悬空/动作钩子收尾，输出上章尾句+下章头句供复核），结果并入「案件型/多章连续性专项检查」的跨章链路结论，按 S4；换场/跨天有明确标记的正常承接不算病。
+   - `check-setting-payoff.js` 检查设定兑现闭环（设定 → `追踪/设定兑现看板.md` → 细纲兑现槽）。项目没建看板时它自己 exit 0 跳过，存量书不受影响。结果并入 `consistency`：blocking（编号孤儿、看板与槽位脱钩、排期章与槽位章矛盾、三槽未填满、状态词非法、编号映射悬空）按 S2——台账断链会让后续章漏兑现；`setting.orphan-*` advisory 按 S4，复核时区分三种情况——本卷不碰（正常，建议补进中后期池）、组合技/上位概念（正常，建议写进 `设定/_兑现豁免.txt`）、**真漏排**（设定写了却没有任何一章用，按 S3 报）。零落点同时是「能力 A 被错记成能力 B」的主要信号：报出 A 零落点时，查一下是不是有别的条目在干 A 的活。本脚本只读，不改看板；核销是 `story-write` 日更流程的事。
    - 按格式工具实际结果合并 `format` findings，同处去重。省略号、破折号与其他标点先核对迟疑、打断、未尽和声线功能，不因符号出现就改写；工具建议不能替代语气判断。
    - `check-ai-patterns.js` 的 findings 合并进 `prose`，保留实际 severity、来源和作用域；确定性 blocking 与有来源的作者禁令按其原因处理，规则加载错误记录为检查受阻，不当成正文 S2。不得在 prompt 硬编码旧 blocking 类别或直接照搬统一修法。
    - advisory 初始按 S4 线索复核；只有正文证据表明具体阅读损失才按影响定级。有功能保留可记 `PRESERVED_WITH_FUNCTION` 及理由，普通审稿不为保留原句启动研究 A/B。误报与证据不足分别记录，不要求清零。
    - `check-degeneration.js` 报告模型退化（逐字复读/截断/占位符/工程词泄漏），每条带 `severity: blocking|advisory`：blocking（复读/截断/tier1 工程词）作为 S1/S2 `prose` findings，修复建议是「重新生成该段，不是改写」；advisory（tier2 章节/歧义词）作为 S4。
-   - 这三个预检脚本只读；`story-review` **不修改正文、设定或大纲文件**，需要自动修复正文时建议转 `/story-deslop`。full / lean 模式只有下方「追踪文件维护」允许修改 `追踪/`；分批审查的所有模式都可按上方契约写 **.story-review/state.md**，solo 除该状态外不写项目内容。
+   - 上述预检脚本全部只读；`story-review` **不修改正文、设定或大纲文件**，需要自动修复正文时建议转 `/story-deslop`。full / lean 模式只有下方「追踪文件维护」允许修改 `追踪/`；分批审查的所有模式都可按上方契约写 **.story-review/state.md**，solo 除该状态外不写项目内容。
    - 默认 `--quote-mode keep`，不把知乎盐言短篇的 `「」` 当作问题；只有项目明确指定引号风格时才检查对应转换建议。
    - 这些脚本都是 `story-review` 的本地副本，不引用其他 skill 的文件。
 

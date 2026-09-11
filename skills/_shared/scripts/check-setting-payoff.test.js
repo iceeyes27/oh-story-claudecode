@@ -303,3 +303,44 @@ test('已建看板但设定文件没有两位数字前缀 → blocking', () => {
   const r = analyze(dir);
   assert.ok(r.findings.some((f) => f.check === 'project.settings' && f.severity === 'blocking'));
 });
+
+// ---------- 布局 B：导入书的目录式设定 + 看板编号映射 ----------
+function importFixture(mapLine = '- **11** → 设定/世界观/App架构.md') {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'setting-payoff-import-'));
+  fs.mkdirSync(path.join(dir, '设定', '世界观'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '追踪'), { recursive: true });
+  fs.mkdirSync(path.join(dir, '大纲'), { recursive: true });
+  fs.writeFileSync(path.join(dir, '设定', '世界观', 'App架构.md'), '# 架构\n### 【天机】离线库\n');
+  fs.writeFileSync(path.join(dir, '追踪', '设定兑现看板.md'), `# 看板
+
+## 编号映射
+${mapLine}
+
+## 一、一次性交付设定排期表
+| 设定编号 | 模块 | 目标交付章节 | 兑现行为形态 | 当前状态 | 简记 |
+|---|---|---|---|---|---|
+| **SET-11A** | 天机首秀 | 第 01 章 | 翻出条款 | \`[已排期-第1章]\` | — |
+`);
+  fs.writeFileSync(path.join(dir, '大纲', '细纲_第01章_开机.md'), `# 细纲
+
+## 设定兑现槽
+
+| 设定编号 | 物证 | 动作 | 梗 |
+|---|---|---|---|
+| **SET-11A** | 【天机】条款 | 主角念条款 | 记小本本 |
+
+## 剧情流程
+1. 略
+`);
+  return dir;
+}
+
+test('导入书布局：看板「编号映射」把 NN 指到目录式设定文件，0 blocking', () => {
+  const r = analyze(importFixture());
+  assert.equal(r.findings.filter((f) => f.severity === 'blocking').length, 0);
+});
+
+test('编号映射指向不存在的文件 → blocking（防静默漏检）', () => {
+  const r = analyze(importFixture('- **11** → 设定/世界观/不存在.md'));
+  assert.ok(r.findings.some((f) => f.check === 'idmap.dangling' && f.severity === 'blocking'));
+});

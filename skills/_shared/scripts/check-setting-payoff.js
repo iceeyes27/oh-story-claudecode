@@ -24,7 +24,11 @@
  *   --strict：把「具名实体零落点」从 advisory 升为 blocking
  *
  * 约定（与 story-setup 的看板模板一致）：
- *   - 编号格式 `SET-NN[字母]`，NN 恒等于 `设定/NN_*.md` 的文件号
+ *   - 编号格式 `SET-NN[字母]`。设定源支持两种布局：
+ *       A 新书（story-write 建纲）：`设定/NN_名字.md`，NN 取文件名前缀，零配置
+ *       B 导入书（story-import 反推）：`设定/世界观/*.md` 等目录结构，没有前缀，
+ *         由看板的 `## 编号映射` 小节显式声明（`- **11** → 设定/世界观/App架构.md`）
+ *     两者可混用，同号时文件名前缀优先；映射指向不存在的文件报 blocking
  *   - 状态四态：[待排期] / [已排期-第N章] / [正文已兑现] / [贯穿循环]
  *   - 看板「一、…一次性交付…」表的编号集合，须与全部细纲「## 设定兑现槽」的编号集合逐项一致
  *   - 贯穿型设定登记在「二、…贯穿型…」表，中后期设定登记在「三、…中后期池」
@@ -52,6 +56,12 @@ function loadProject(root) {
   const outlineDir = path.join(root, '大纲');
   const boardPath = path.join(root, '追踪', '设定兑现看板.md');
 
+  const board0 = readIf(boardPath);
+
+  // 设定源有两种布局：
+  //   A. 新书（story-write 建纲）：设定/NN_名字.md，编号直接取文件名前缀，零配置
+  //   B. 导入书（story-import 反推）：设定/世界观/*.md、设定/角色/*.md 等目录结构，没有前缀
+  // 布局 B 由看板里的「## 编号映射」小节显式声明 NN → 路径，否则无从建立映射。
   const settings = new Map(); // '11' -> {file, name, text}
   for (const f of listDir(settingDir)) {
     const m = /^(\d{2})_(.+)\.md$/.exec(f);
@@ -61,6 +71,13 @@ function loadProject(root) {
       name: m[2],
       text: readIf(path.join(settingDir, f)) || '',
     });
+  }
+  for (const { num, rel } of parseIdMap(board0)) {
+    if (settings.has(num)) continue;              // 文件名前缀优先
+    const abs = path.join(root, rel);
+    const text = readIf(abs);
+    if (text == null) continue;                   // 指向不存在的文件 → 由 idmap.dangling 报
+    settings.set(num, { file: rel, name: path.basename(rel, '.md'), text, mapped: true });
   }
 
   const outlines = []; // {chapter, file, text, slotBlock}
@@ -78,6 +95,23 @@ function loadProject(root) {
   outlines.sort((a, b) => a.chapter - b.chapter);
 
   return { root, settings, outlines, board: readIf(boardPath), boardPath: '追踪/设定兑现看板.md' };
+}
+
+// 看板可选小节「## 编号映射」：给没有 NN_ 前缀的设定布局（story-import 产出）显式建映射。
+// 行格式：`- **11** → 设定/世界观/App架构.md`（箭头可用 → 或 -> ）
+function parseIdMap(board) {
+  const out = [];
+  if (!board) return out;
+  const i = board.search(/^##+\s*编号映射/m);
+  if (i < 0) return out;
+  const rest = board.slice(i);
+  const j = rest.slice(3).search(/\n##+\s/);
+  const block = j < 0 ? rest : rest.slice(0, j + 3);
+  for (const line of block.split('\n')) {
+    const m = /^\s*[-*+]\s*\*{0,2}(\d{2})\*{0,2}\s*(?:→|->)\s*(\S+\.md)\s*$/.exec(line);
+    if (m) out.push({ num: m[1], rel: m[2] });
+  }
+  return out;
 }
 
 // 截取细纲里的「## 设定兑现槽 … 」到下一个 `## ` 标题为止
@@ -246,8 +280,17 @@ function analyze(root, opts = {}) {
   // 存量项目和短篇不应被这道门拦住；启用与否由 Phase 3 建纲时决定。
   if (!p.board) return { findings, stats: { notApplicable: true }, notApplicable: true };
 
+  // 编号映射表指向的文件必须存在——悬空映射会让该设定整个漏检。
+  // 必须排在下面两个提前返回之前：悬空映射本身就会导致 settings 为空，
+  // 先返回「找不到设定」会把真正的原因盖掉。
+  for (const { num, rel } of parseIdMap(p.board)) {
+    if (!fs.existsSync(path.join(p.root, rel))) {
+      add('blocking', 'idmap.dangling', `看板「编号映射」把 ${num} 号指向 ${rel}，但该文件不存在`, p.boardPath);
+    }
+  }
+
   // 已建看板却拿不到设定/细纲，才是真的断链
-  if (!p.settings.size) { add('blocking', 'project.settings', `已有设定兑现看板，却找不到 设定/NN_*.md——设定文件须用两位数字前缀命名，否则编号建不起映射`, '设定/'); return { findings, stats: {} }; }
+  if (!p.settings.size) { add('blocking', 'project.settings', `已有设定兑现看板，却找不到设定源——新书用 设定/NN_*.md 两位数字前缀命名，导入书在看板加「## 编号映射」小节声明 NN → 路径`, '设定/'); return { findings, stats: {} }; }
   if (!p.outlines.length) { add('blocking', 'project.outlines', `已有设定兑现看板，却找不到 大纲/细纲_第N章_*.md`, '大纲/'); return { findings, stats: {} }; }
 
   const sec = splitBoard(p.board);
@@ -402,6 +445,6 @@ function main() {
   process.exit(blocking.length > 0 ? 1 : 0);
 }
 
-module.exports = { analyze, loadProject, splitBoard, parseOnceRows, parseSlotRows, namedEntities, characterNames, nameVariants, loadExempt, sliceSlotBlock, main };
+module.exports = { analyze, loadProject, splitBoard, parseIdMap, parseOnceRows, parseSlotRows, namedEntities, characterNames, nameVariants, loadExempt, sliceSlotBlock, main };
 
 if (require.main === module) main();

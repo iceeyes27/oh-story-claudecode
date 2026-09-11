@@ -14,8 +14,6 @@ disable: true
 
 **执行铁律：审查是找问题，不是验证正确性。**
 
-**文风裁决**：正文写作、改写或审稿前先读 [_shared/references/style-resolution.md](../_shared/references/style-resolution.md)，加载本书文风并形成 `style_resolution`；无作者记忆也执行。当前请求、本书文风和 active 偏好按维度覆盖通用 references；同一裁决交给后续执行者。
-
 ## 作者习惯边界
 
 若作者记忆 state 已存在，审查前用 `.agents/skills/_shared/scripts/author_memory_commit.py query` 获取本次相关 active 条目（总输出 ≤2KB）。它们只能帮助解释意图和组织报告，不能降低 rubric 严重度、把事实冲突判为无问题或跳过平台门禁；当前请求仍优先。完整规则见 [.agents/skills/_shared/references/author-memory.md](../_shared/references/author-memory.md)。
@@ -272,8 +270,6 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
   按本书承诺与当前章节功能找有证据的阅读损失，同时指出应保留的表达；可以没有问题，不以严苛或问题数量为目标。
   项目路径：{项目根}
   审查范围：{文件路径/章节/必要摘录}
-  文风路径：{本书文风全文路径，无则写无}
-  style_resolution：{本次生效要求及来源、被覆盖的默认条款、事实边界；文字风格判断共用}
   审查基准包摘要：{Phase 1 形成的 rubric / fallback 摘要，必须内联}
   Rubric Source: file | embedded fallback
   相关文件路径：{设定/大纲/细纲文件路径}
@@ -307,8 +303,6 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
   按本书承诺与当前章节功能找有证据的阅读损失，同时指出应保留的表达；可以没有问题，不以严苛或问题数量为目标。
   项目路径：{项目根}
   审查范围：{文件路径/章节/必要摘录}
-  文风路径：{本书文风全文路径，无则写无}
-  style_resolution：{本次生效要求及来源、被覆盖的默认条款、事实边界；文字风格判断共用}
   审查基准包摘要：{Phase 1 形成的 rubric / fallback 摘要，必须内联}
   Rubric Source: file | embedded fallback
   相关角色文件：{角色设定文件路径}
@@ -338,8 +332,6 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
   按本书承诺与当前章节功能找有证据的阅读损失，同时指出应保留的表达；可以没有问题，不以严苛或问题数量为目标。
   项目路径：{项目根}
   审查范围：{文件路径/章节/必要摘录}
-  文风路径：{本书文风全文路径，无则写无}
-  style_resolution：{本次生效要求及来源、被覆盖的默认条款、事实边界；文字风格判断共用}
   审查基准包摘要：{Phase 1 形成的 rubric / fallback 摘要，必须内联}
   Rubric Source: file | embedded fallback
   AI 味 / 禁用词摘要：{从 anti-ai-writing、banned-words 或内置 fallback 提取，必须内联}
@@ -373,8 +365,6 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
   审查范围：{文件路径/章节/必要摘录}
   已知角色：{从设定文件提取角色列表}
   继承的开放项（分批审查必填，无则写「无」）：{从 追踪/伏笔.md 提取的、预计回收章 ≤ 本批末章的已埋未回收伏笔，连同上一批未解决 findings 摘要}
-  文风路径：{本书文风全文路径，无则写无}
-  style_resolution：{本次生效要求及来源、被覆盖的默认条款、事实边界；文字风格判断共用}
   审查基准包摘要：{Phase 1 形成的 rubric / fallback 摘要，必须内联}
   Rubric Source: file | embedded fallback
   可选补充参考：如项目已部署 story-setup reference bundle，可读取质量检查清单；若不可读，不影响事实冲突扫描。

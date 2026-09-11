@@ -69,7 +69,7 @@ test('AI scanner flushes complete JSON before returning a blocking exit code', (
   const files = [];
   for (let index = 0; index < 240; index += 1) {
     const prose = path.join(temp, `chapter-${index}.md`);
-    fs.writeFileSync(prose, `第${index}段——这里故意触发 blocking。\n`, 'utf8');
+    fs.writeFileSync(prose, `第${index}段——醒来的，成了他。\n`, 'utf8');
     files.push(prose);
   }
   const scanner = path.join(SHARED, 'scripts', 'check-ai-patterns.js');

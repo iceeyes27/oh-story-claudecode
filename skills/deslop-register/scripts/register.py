@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Register phrases and regexes in this installed bundle's shared word list.
 
-Usage: register.py {phrase|syna|antithesis|dangling-identity|body-shell|scan|list} <value>
+Usage: register.py {phrase|syna|antithesis|expository|dangling-identity|body-shell|scan|list} <value>
 
 The scanner reads the shared word list at runtime, so a registration needs no
 JavaScript edit.
@@ -10,15 +10,17 @@ import os
 import sys
 import subprocess
 import argparse
+import json
+import re
 from pathlib import Path
 
 SKILLS_ROOT = Path(__file__).resolve().parents[2]
 REPO_ROOT = SKILLS_ROOT.parent
 BANNED_WORDS = SKILLS_ROOT / "_shared" / "references" / "banned-words.md"
 SCANNER = SKILLS_ROOT / "_shared" / "scripts" / "check-ai-patterns.js"
-EXPR_HEADING = "### 表情类"         # header preceding the 表情类 list line
 SYNA_HEADING = "## 通感隐喻"         # section header for synesthetic regexes
 ANTIT_HEADING = "## 对仗反义俏皮话"   # section header for antithetical aphorism regexes
+EXPOSITORY_HEADING = "## 说明文式感官对仗"  # section header for expository sensory-contrast regexes
 DANGLING_IDENTITY_HEADING = "## 双端悬空的“的”字身份跳转句"
 BODY_SHELL_HEADING = "## 空壳式人体失真比喻"
 
@@ -27,78 +29,72 @@ def banned_copies():
     return [BANNED_WORDS] if BANNED_WORDS.is_file() else []
 
 
-def _expr_line_index(lines):
-    """Index of the 表情类 list line. Anchor on the '### 表情类' heading, then the
-    next non-empty line. Fallback: a plain line containing both 眼中闪过 and 嘴角勾起
-    that is not a table row (some copies keep a table with those words in a cell)."""
-    for i, l in enumerate(lines):
-        if l.strip().startswith(EXPR_HEADING):
-            for j in range(i + 1, len(lines)):
-                if lines[j].strip():
-                    return j
-            break
-    for i, l in enumerate(lines):
-        if "眼中闪过" in l and "嘴角勾起" in l and not l.lstrip().startswith("|"):
-            return i
-    return -1
-
-
 def add_phrase(phrase):
     phrase = phrase.strip().strip("、")
+    if not phrase or re.search(r"[\r\n（）()、]", phrase):
+        raise ValueError("phrase must be one nonempty literal without annotations")
     copies = banned_copies()
     updated = skipped = 0
     for p in copies:
         t = p.read_text(encoding="utf-8")
-        if phrase in t:
+        fences = list(re.finditer(r"^```story-rules\r?\n([\s\S]*?)^```[ \t]*$", t, re.M))
+        if len(fences) != 1:
+            raise ValueError("expected exactly one story-rules data fence")
+        fence = fences[0]
+        data = json.loads(fence.group(1))
+        if (data.get("schema_version") != 1 or data.get("source") != "system"
+                or data.get("scope") != "narration" or not isinstance(data.get("contextual"), list)):
+            raise ValueError("invalid shared rule data")
+        if phrase in data["contextual"]:
             skipped += 1
             continue
-        lines = t.split("\n")
-        idx = _expr_line_index(lines)
-        if idx == -1:
-            lines.append(phrase)
-        else:
-            lines[idx] = lines[idx].rstrip() + "、" + phrase
-        p.write_text("\n".join(lines), encoding="utf-8")
+        data["contextual"].append(phrase)
+        payload = json.dumps(data, ensure_ascii=False, indent=2) + "\n"
+        p.write_text(t[:fence.start(1)] + payload + t[fence.end(1):], encoding="utf-8")
         updated += 1
     print(f"phrase '{phrase}': updated={updated} skipped(already)={skipped} (copies={len(copies)})")
 
 
 def add_regex_rule(command_name, regex_line, heading, error_example, create_heading):
     regex_line = regex_line.strip()
-    if not (regex_line.startswith("/") and regex_line.endswith("/")):
+    if not (regex_line.startswith("/") and regex_line.endswith("/")) or re.search(r"[\r\n]", regex_line):
         print(f"ERROR: {command_name} rule must be a /regex/ line (e.g. {error_example})")
         sys.exit(1)
+    # Validate with the same regex engine as the scanner before changing rules.
+    subprocess.run([os.environ.get("NODE_BIN") or "node", "-e",
+                    "const r = new RegExp(process.argv[1]); if (r.test('')) process.exit(1);",
+                    "--", regex_line[1:-1]], check=True, capture_output=True)
     copies = banned_copies()
     updated = skipped = 0
     for p in copies:
         t = p.read_text(encoding="utf-8")
-        if regex_line in t:
-            skipped += 1
-            continue
         lines = t.split("\n")
-        out, in_sec, inserted, heading_seen = [], False, False, False
-        for l in lines:
-            if l.startswith(heading):
-                heading_seen = True
-                in_sec = True
-                out.append(l)
+        sections = []
+        for start, line in enumerate(lines):
+            if not line.startswith(heading):
                 continue
-            if in_sec and l.startswith("## "):
-                if not inserted:
-                    out.append(regex_line)
-                    inserted = True
-                in_sec = False
-                out.append(l)
+            end = next((i for i in range(start + 1, len(lines)) if lines[i].startswith("## ")), len(lines))
+            fences = [i for i in range(start + 1, end) if lines[i].strip() == "```story-regex"]
+            if fences:
+                sections.append((end, fences))
+        if not any(line.startswith(heading) for line in lines):
+            lines.extend(["", create_heading, "", "```story-regex", regex_line, "```", ""])
+        else:
+            if len(sections) != 1:
+                raise ValueError("expected a section with story-regex data in " + heading)
+            end, fences = sections[0]
+            blocks = []
+            for opening in fences:
+                closing = next((i for i in range(opening + 1, end) if lines[i].strip() == "```"), None)
+                if closing is None or any(opening < other < closing for other in fences):
+                    raise ValueError("unclosed or nested story-regex fence in " + heading)
+                blocks.append((opening, closing))
+            if any(regex_line == lines[i].strip() for opening, closing in blocks
+                   for i in range(opening + 1, closing)):
+                skipped += 1
                 continue
-            out.append(l)
-        if not heading_seen:
-            if out and out[-1].strip():
-                out.append("")
-            out.append(create_heading)
-            out.append(regex_line)
-        elif in_sec and not inserted:
-            out.append(regex_line)
-        p.write_text("\n".join(out), encoding="utf-8")
+            lines.insert(blocks[0][1], regex_line)
+        p.write_text("\n".join(lines), encoding="utf-8")
         updated += 1
     print(f"{command_name} {regex_line}: updated={updated} skipped(already)={skipped} (copies={len(copies)})")
 
@@ -120,6 +116,16 @@ def add_antithesis(regex_line):
         ANTIT_HEADING,
         "/([一-鿿]{1,3})[，,]([^，。]{0,8})不\\1/",
         ANTIT_HEADING + "（工整对称反义金句，出现即改）",
+    )
+
+
+def add_expository(regex_line):
+    add_regex_rule(
+        "expository",
+        regex_line,
+        EXPOSITORY_HEADING,
+        "/还在眼前…，…闻到的却是…/",
+        EXPOSITORY_HEADING + "（记忆残留＋“却是”现实对照，出现即改）",
     )
 
 
@@ -163,7 +169,7 @@ def scan(book_dir):
         errors="replace",
     )
     out = res.stdout + res.stderr
-    for kind in ["banned-word-exact", "banned-word-syna", "banned-word-antithesis", "banned-word-dangling-identity", "banned-word-body-shell"]:
+    for kind in ["banned-word-exact", "banned-word-syna", "banned-word-antithesis", "banned-word-expository-contrast", "banned-word-dangling-identity", "banned-word-body-shell"]:
         print(f"{kind}: {out.count(kind)}")
     return res.returncode
 
@@ -177,6 +183,8 @@ def main():
     p2.add_argument("value")
     p4 = sub.add_parser("antithesis")
     p4.add_argument("value")
+    p4b = sub.add_parser("expository")
+    p4b.add_argument("value")
     p5 = sub.add_parser("dangling-identity")
     p5.add_argument("value")
     p6 = sub.add_parser("body-shell")
@@ -192,6 +200,8 @@ def main():
         add_syna(args.value)
     elif args.cmd == "antithesis":
         add_antithesis(args.value)
+    elif args.cmd == "expository":
+        add_expository(args.value)
     elif args.cmd == "dangling-identity":
         add_dangling_identity(args.value)
     elif args.cmd == "body-shell":

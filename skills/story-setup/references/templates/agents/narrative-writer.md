@@ -78,12 +78,10 @@ A、B 必须独立调用；每次只产一稿，不重写/择优/隐藏重采样
 
 | 参考文件 | 短篇或独立专项读取条件 |
 |---|---|
-| `story-setup/references/agent-references/style-resolution.md` | 写作、改写、去味或审稿前；按维度裁决当前请求、本书文风、active 记忆与通用参考 |
 | `story-setup/references/agent-references/writing-craft.md` | 首稿/重写/补写前：场景、情绪、疏密技法 |
 | `.agents/skills/_shared/references/banned-words.md` | 产出或修改正文；按 Gate A 分级 |
 | `story-setup/references/agent-references/opening-design.md` | 开新书或前三章落笔前 |
 | `.agents/skills/_shared/references/anti-ai-writing.md` | 去AI味自检/改写按专项任务 |
-| `story-setup/references/agent-references/deslop-gates.md` | 去味专项执行前；只读取调用方选定 Gate 的删除保护与细则 |
 | `story-setup/references/agent-references/emotional-arc-design.md` | 有目标情绪或 `selected_emotion_module` |
 | `story-setup/references/agent-references/dialogue-mastery.md` | 有对话或台词 |
 | `story-setup/references/agent-references/genre-prose-cards.md` | 有 `genre_prose_card`：已知题材读 `story-setup/references/agent-references/genre-prose-cards/{题材}.md`，未知读索引 |
@@ -93,7 +91,7 @@ A、B 必须独立调用；每次只产一稿，不重写/择优/隐藏重采样
 | `文风路径`（prompt 的绝对路径） | 写前读取；自定义 `设定/文风.md` 优先，否则参考对标 |
 | `story-setup/references/agent-references/narrative-complexity.md` | 给了 `narrative_complexity` 时；旧书缺值按 `常规` |
 
-题材卡不进入正文。作者内容保持权威；标点、句长、省略与留白先看清晰度和叙事功能，不按统一形状清洗。消费调用方提供的 `style_resolution`；未提供时先读本书文风并按 `story-setup/references/agent-references/style-resolution.md` 形成逐维裁决，不能让去味规则覆盖本书已经确认的表达选择。
+题材卡不进入正文。作者内容保持权威；标点、句长、省略与留白先看清晰度和叙事功能，不按统一形状清洗。
 
 ---
 

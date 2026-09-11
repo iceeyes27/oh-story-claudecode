@@ -10,8 +10,6 @@ disable: true
 
 把文本从「像模型在表演写作」拉回「像具体人在当前场景下表达」。本 skill 提供两种模式，按输入类型自动路由，也可由用户显式指定。
 
-小说正文开始检测或改写前，完整读取 [_shared/references/style-resolution.md](../_shared/references/style-resolution.md)，加载本书 `设定/文风.md` 并形成逐维 `style_resolution`。当前请求、本书文风与 active 作者记忆可覆盖通用表达默认值，但不改变剧情事实、信息边界、文件结构、授权范围或所选 Gate。
-
 - **`mode = novel`**：网文小说正文去 AI 味。走 7 Gate 系统（禁用词 / 句式 / 心理 / 节奏 / 对话 / 结尾 / 解释腔），配合本地脚本、禁用词表与白名单。
 - **`mode = general`**：通用文本处理。支持非小说正文的中英文改写、审稿，以及用户明确要求的结构保真翻译。
 
@@ -223,8 +221,6 @@ node .agents/skills/_shared/scripts/normalize-punctuation.js --check <已修改�
 
 | 资料 | 用途 |
 |------|------|
-| [.agents/skills/_shared/references/style-resolution.md](../_shared/references/style-resolution.md) | 写前、改写前与审稿前的文风冲突裁决；规定书级 `.deslop-whitelist` 的作用域 |
-| [references/deslop-gates.md](references/deslop-gates.md) | 删除保护与所选 Gate 的详细规则；只读取本轮选定范围 |
 | [.agents/skills/_shared/references/anti-ai-writing.md](../_shared/references/anti-ai-writing.md) | 按具体阅读问题查询技法；不默认加载整章三遍法 |
 | [.agents/skills/_shared/references/banned-words.md](../_shared/references/banned-words.md) | 规则来源、适用范围与例外 |
 | [.agents/skills/_shared/scripts/check-ai-patterns.js](../_shared/scripts/check-ai-patterns.js) | 实际分级的只读扫描 |

@@ -12,7 +12,7 @@ disable: true
 
 ## 阶段 Reference Gate
 
-先确定 mode。写作、改写、去味或审稿均先完整读取 `../_shared/references/style-resolution.md`。长篇从 `references/long-mode.md` 的场景路由定位当前阶段：创建/恢复项目时读 `references/project-files.md`，有对标或参考小说时读 `references/benchmark-recall.md`，初始化追踪前读 `references/tracking-initialization.md`；普通成稿写手只完整读取 `references/reader-first-writing.md` 与 `references/long-format.md`，其余按当前问题加载。短篇先读 `references/short-mode.md` 的 Reference Gate 和模式通则，Phase 2/3/4 再分别完整读取 `references/workflow-design.md`、`references/workflow-draft.md`、`references/workflow-revision.md`，不预加载其他阶段细则。只读本文件（SKILL.md）不算完成门禁；对明确要求完整读取的文件，`rg` 检索或局部摘读都不算完成门禁，必需路径缺失或不可读即停止。
+先确定 mode：长篇从 `references/long-mode.md` 的场景路由定位当前阶段，只读取该阶段执行段；普通成稿写手只完整读取 `references/reader-first-writing.md` 与 `references/long-format.md`，其余按阶段或具体问题加载。短篇完整读取 `references/short-mode.md` 直到 EOF。只读本文件（SKILL.md）不算完成门禁；对明确要求完整读取的核心文件，`rg` 检索或局部摘读都不算完成门禁，必需路径缺失或不可读即停止。
 
 短篇运行 `node .agents/skills/_shared/scripts/check-phase2-contract.js --json {短篇目录}`；最多做 2 轮定向 repair。交付时用户明确的字数范围优先；运行 `node .agents/skills/_shared/scripts/check-delivery-contract.js --json --min-chars {MIN} --max-chars {MAX} --sections {N} {短篇目录}`。
 
@@ -86,7 +86,7 @@ disable: true
 
 模式判定后**只加载对应 mode 参考文件**的适用阶段；不同时加载两种模式：
 
-- `mode = long` → 由 [references/long-mode.md](references/long-mode.md) 定位当前阶段；项目资料、对标召回和追踪初始化分别读取 [project-files.md](references/project-files.md)、[benchmark-recall.md](references/benchmark-recall.md)、[tracking-initialization.md](references/tracking-initialization.md)。普通候选写手的固定核心是 [reader-first-writing.md](references/reader-first-writing.md) 与 [long-format.md](references/long-format.md)，写后再由编排器执行 Phase 5。
-- `mode = short` → 由 [short-mode.md](references/short-mode.md) 识别当前 Phase；Phase 3 读取 [workflow-draft.md](references/workflow-draft.md)，Phase 4 读取 [workflow-revision.md](references/workflow-revision.md)。
+- `mode = long` → 由 [references/long-mode.md](references/long-mode.md) 定位当前阶段。普通候选写手的固定核心是 [references/reader-first-writing.md](references/reader-first-writing.md) 与 [references/long-format.md](references/long-format.md)，写后再由编排器执行 Phase 5。
+- `mode = short` → 读 [references/short-mode.md](references/short-mode.md)。
 
 mode 参考文件内的 `references/...`、`scripts/...` 路径均相对本 skill 根目录。

@@ -277,10 +277,10 @@ _TOXIC_TAG_PARTICLES = ("吗", "吧", "嘛")
 _TOXIC_AFFIRM_PARTICLES = ("的", "啊", "呀", "呢")
 _TOXIC_TRAILER_WINDOW = 600
 _TOXIC_SENTENCE_PATTERNS = [
-    (re.compile(r"声音(?:并)?不[大高响亮][^。！？!?\n]{0,16}[却但偏]"), "voice-contrast", "若只是模板反差就直写效果；承担人物声线或真实对照时可保留。"),
-    (re.compile(r"(?:没有[^。！？!?\n，,]{1,12}[，,]){2}"), "negation-parade", "复核否定排比是否递进新信息；重复铺陈才压缩，角色化节奏可保留。"),
-    (re.compile(r"是[^。！？!?\n，,]{1,12}[，,]\s*(?:而)?不是[^。！？!?\n]{1,20}"), "reverse-not-is", "复核否定对照的语义功能；模板铺垫才改，辩解、排除或反讽可保留。"),
-    (re.compile(r"不是[^。！？!?\n]{1,16}[，,]\s*(?:而)?是"), "not-is-comparison", "复核否定对照的语义功能；模板铺垫才改，辩解、排除或反讽可保留。"),
+    (re.compile(r"声音(?:并)?不[大高响亮][^。！？!?\n]{0,16}[却但偏]"), "voice-contrast", "删「不X…却Y」反差腔，直接写具体效果或动作。"),
+    (re.compile(r"(?:没有[^。！？!?\n，,]{1,12}[，,]){2}"), "negation-parade", "「没有…，没有…」排比删到只剩一个或全删，改写正面在场的细节。"),
+    (re.compile(r"是[^。！？!?\n，,]{1,12}[，,]\s*(?:而)?不是[^。！？!?\n]{1,20}"), "reverse-not-is", "删否定铺垫，直接写肯定项，或改成动作细节。"),
+    (re.compile(r"不是[^。！？!?\n]{1,16}[，,]\s*(?:而)?是"), "not-is-comparison", "删否定铺垫，直接写肯定项，或改成动作细节。"),
 ]
 # 「正式拉开序幕/帷幕」是场内事件的报幕式陈述，不是叙述者预告，lookbehind 排除（同 check-ai-patterns.js）。
 _TOXIC_TRAILER = re.compile(r"没人知道|谁也不知道|谁也没想到|殊不知|(?:这)?才刚刚开(?:始|头)|正(?:朝着|向着)[^。！？!?\n]{0,24}(?:压|涌|袭|逼)(?:了?过去|了?过来|来)|(?<!正式)拉开(?:序幕|帷幕)|即将(?:开始|来临|降临)")
@@ -351,34 +351,14 @@ def _toxic_match_sentence(line: str) -> tuple[str, str, str] | None:
     return None
 
 
-def load_style_whitelist(file: Path) -> list[str]:
-    parent = file.resolve().parent
-    book = parent.parent if parent.name == "正文" else parent
-    try:
-        lines = (book / ".deslop-whitelist").read_text(encoding="utf-8").splitlines()
-    except FileNotFoundError:
-        return []
-    return sorted((line.strip() for line in lines if line.strip() and not line.strip().startswith("#")), key=len, reverse=True)
-
-
-def mask_style_text(text: str, whitelist: list[str]) -> str:
-    chars = list(text)
-    for literal in whitelist:
-        at = text.find(literal)
-        while at != -1:
-            chars[at:at + len(literal)] = ["？"] * len(literal)
-            at = text.find(literal, at + 1)
-    return "".join(chars)
-
-
-def toxic_phrase_findings(text: str, whitelist=()) -> list[str]:
+def toxic_phrase_findings(text: str) -> list[str]:
     findings: list[str] = []
     content: list[tuple[int, str]] = []
     for i, raw in enumerate(text.split("\n"), 1):
         s = raw.strip()
         if _net_is_skippable(s):
             continue
-        masked = _toxic_mask_quoted(mask_style_text(s, whitelist))
+        masked = _toxic_mask_quoted(s)
         if any(ch in _TOXIC_QUOTE_CHARS for ch in masked):
             continue
         content.append((i, masked))
@@ -395,16 +375,16 @@ def toxic_phrase_findings(text: str, whitelist=()) -> list[str]:
     for line_no, masked in content[cut:]:
         m = _TOXIC_TRAILER.search(masked)
         if m:
-            findings.append(f"第{line_no}行 毒句式[trailer-ending]：『{m.group(0)[:20]}』——复核是否为空泛预告；有具体信息边界或人物声线时可保留。")
+            findings.append(f"第{line_no}行 毒句式[trailer-ending]：『{m.group(0)[:20]}』——删章尾预告腔，用正在发生的动作或画面收章。")
         ms = _TOXIC_TRAILER_SUMMARY.search(masked)
         if ms:
-            findings.append(f"第{line_no}行 毒句式[trailer-summary]：『{ms.group(0)[:20]}』——复核是否替读者空泛总结；承担人物判断或必要结算时可保留。")
+            findings.append(f"第{line_no}行 毒句式[trailer-summary]：『{ms.group(0)[:20]}』——删章尾状态总结句，收束状态是细纲的规划口径，正文落到具体动作、画面或台词上。")
     if findings:
         findings.append("句式命中只生成 finding：逐条复核清晰度、自然度与语义功能；无功能才改，有功能可在深审中保留。完整扫描：node <skill>/scripts/check-ai-patterns.js --check <正文文件>")
     return findings
 
 
-def prose_net_findings(text: str, whitelist=()) -> list[str]:
+def prose_net_findings(text: str) -> list[str]:
     findings: list[str] = []
     content: list[tuple[int, str]] = []
     for i, raw in enumerate(text.split("\n"), 1):
@@ -439,7 +419,7 @@ def prose_net_findings(text: str, whitelist=()) -> list[str]:
     # 其余网（元信息/占位/复读/截断）照常——否则按拦截提示加标记的那次 Edit 会把
     # 已豁免的毒句式再次当硬信号推回。
     if not re.search(r"去味(：|:)跳过", "\n".join(re.split(r"\r?\n", text)[:6])):
-        findings.extend(toxic_phrase_findings(text, whitelist))
+        findings.extend(toxic_phrase_findings(text))
     return findings
 
 
@@ -1441,7 +1421,7 @@ def prose_block_reason(root: Path, abs_path: Path) -> str | None:
             except OSError:
                 prev_text = None
             if prev_text is not None and not re.search(r"去味(：|:)跳过", "\n".join(re.split(r"\r?\n", prev_text)[:6])):
-                hits = [ln for ln in toxic_phrase_findings(prev_text, load_style_whitelist(prev_file)) if ln.startswith("第")]
+                hits = [ln for ln in toxic_phrase_findings(prev_text) if ln.startswith("第")]
                 if hits:
                     shown = hits[:6]
                     more = len(hits) - len(shown)
@@ -1686,7 +1666,7 @@ def stop_event() -> None:
                 text = abs_path.read_text(encoding="utf-8")
             except Exception:
                 continue
-            findings = prose_net_findings(text, load_style_whitelist(abs_path))
+            findings = prose_net_findings(text)
             wc = _wordcount_finding(abs_path, text)
             if wc:
                 findings.append(wc)

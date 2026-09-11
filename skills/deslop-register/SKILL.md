@@ -13,6 +13,12 @@ description: 网文去 AI 味「发现即注册」工作流。用于用户指出
 ## 不要用在
 - 合法台词的跨章重复（如"律师，有人拿视频逼我给钱"）——那不是 AI 腔，靠删重而非封词。判定见"类别 C"。
 
+## 规则分级与存储
+
+共享词形/句式登记生成 `contextual` advisory，先按语境复核；不自动等同作者禁令。作者明确要求的禁令继续优先，机械拦截需依照共享表的作者规则协议登记可验证的原句与作用域；本 helper 不会把系统建议自动升级为作者规则。实际扫描返回 blocking 必须修复后复扫。
+
+固定短语写入唯一 `story-rules` 数据区的 `contextual` 列表；正则写入对应章节的 `story-regex` 数据区。不要把规则追加在说明文字或数据区之外。
+
 ## 类别判定与处理
 
 运行 helper 前先选择可用解释器：
@@ -24,7 +30,7 @@ for PYBIN in python3 python py; do "$PYBIN" -c "" 2>/dev/null && break; done
 ### A. 固定短语 / 句式（精确匹配）
 例：`眼里全是乱`、`笑意却很冷`、`开口时声音很稳`、`声音很稳`。
 - **正文**：逐处读上下文，用动作 / 物件 / 对话 / 具体后果替换（Tell→Show），**不要同义词轮换**。
-- **注册**：把短语加入[共享禁用词表](../_shared/references/banned-words.md)的**一级禁用词·表情类**行。脚本 `findBannedWordsExact` 运行时读取该文件，自动精确匹配拦截，无需改 `.js`。
+- **注册**：把短语加入[共享禁用词表](../_shared/references/banned-words.md)的 **`story-rules` 数据区 `contextual` 列表**。脚本 `findBannedWordsExact` 运行时读取该文件，自动精确匹配拦截，无需改 `.js`。
 - **helper**：`"$PYBIN" scripts/register.py phrase "眼里全是乱"`
 - **注意**：精确短语只拦逐字 / 含该子串的变体（"他开口时声音很稳"能拦）；"开口时，声音很稳"（加逗号）或单独"声音很稳"仍漏——要覆盖就加更泛化的短语或转 B 类。
 
@@ -38,7 +44,7 @@ for PYBIN in python3 python py; do "$PYBIN" -c "" 2>/dev/null && break; done
 
 ### B2. 对仗反义俏皮话（正则匹配，机制同通感隐喻）
 工整对称的反义金句（如"这玩意儿轻，脸不轻""人老，眼不老"）是 AI 写作的典型俏皮话套路，与通感隐喻同一层级：正文用 Tell→Show 拆成自然口语 / 动作 / 物件，并注册成正则。
-- **注册**：往共享禁用词表的**对仗反义俏皮话**段追加一条 `/正则/`。helper `"$PYBIN" scripts/register.py antithesis "/正则/"`（段落不存在时自动建段）。脚本 `findAntithesis` 运行时加载并作为 blocking 拦截，无需改 `.js`。
+- **注册**：往共享禁用词表的**对仗反义俏皮话**段追加一条 `/正则/`。helper `"$PYBIN" scripts/register.py antithesis "/正则/"`（段落不存在时自动建段）。脚本 `findAntithesis` 运行时加载并作为 advisory 提示，无需改 `.js`。
 - **正则必须高精度**：中文里"不是A也不是A""X不X"是自然口语，遍地都是，**绝不能**用 `[一-鿿]{1,3}…不\1` 这种宽正则（会误伤 15+ 处正常对白）。正确做法：限定回文字为「评价性形容词」白名单（轻/重/大/小/快/慢/多/少/深/浅/满/空/真/假/硬/软/冷/热/高/低/厚/薄/长/短/远/近/宽/窄/老/新…），且后句"不X"前禁带「也」（排除"也不是/不X"自然并列）。示例：`/([轻重大小快慢多少深浅贵贱满空真假硬软冷热高低厚薄长短远近宽窄新老])[，,]([^，。也]{0,6})不\1/`。命中过少可补形容词；命中过多（自然口语）再收窄。
 
 ### B3. 双端悬空的“的”字身份跳转句（正则匹配）
@@ -52,7 +58,13 @@ for PYBIN in python3 python py; do "$PYBIN" -c "" 2>/dev/null && break; done
 用“骨头/骨架被抽走，只剩皮/皮囊/空壳撑着”表现疲惫、虚弱或绝望，是把角色身体拆成失真的空壳意象；若同段还写“坐得很僵、绷得笔直”，姿态与“没了骨架”会直接冲突。
 - **判定**：必须同时出现比喻标记（像/仿佛/如同等）、骨头或骨架被抽走/卸掉/消失、皮壳承担支撑三部分。只写“瘦得皮包骨”、医学骨骼描述或奇幻情节中的字面抽骨不封。
 - **正文**：删掉空壳比喻，按上下文写可见且互相一致的姿态、动作或生理反应，如肩塌、手撑扶手、脚趾不动、说话换气。不要换成“抽走灵魂”“掏空身体”等同类比喻。
-- **注册**：往共享禁用词表的**空壳式人体失真比喻**段追加高精度组合 `/正则/`。helper：`"$PYBIN" scripts/register.py body-shell "/正则/"`。扫描器以 `banned-word-body-shell` 单处 blocking 拦截。
+- **注册**：往共享禁用词表的**空壳式人体失真比喻**段追加高精度组合 `/正则/`。helper：`"$PYBIN" scripts/register.py body-shell "/正则/"`。扫描器以 `banned-word-body-shell` 单处 advisory 提示。
+
+### B5. 说明文式感官对仗（正则匹配，机制同通感隐喻）
+“X还在眼前/耳边…，…闻/看/听到的却是Y”——作者站在外部把角色的记忆残留与现实感官摆成对仗句，替读者总结“他还没回过神来”，是说明文式讲解而非角色当下体验。
+- **判定**：必须同句同时出现「还在+眼前/耳边/鼻尖/脑海」残留标记与「闻/看/听/感…到的却是」转折对照。只写“眼前还晃着X”或只用普通转折的不封。
+- **正文**：删掉对仗框架，用角色当下的动作带出感官（闭眼看见什么、睁眼闻到什么），直接并置两个感官，不做“还在…却是…”的转折解释。
+- **注册**：往共享禁用词表的**说明文式感官对仗**段追加高精度 `/正则/`。helper：`"$PYBIN" scripts/register.py expository "/正则/"`（段落不存在时自动建段）。扫描器 `findExpositoryContrast` 运行时加载并以 `banned-word-expository-contrast` advisory 提示，无需改 `.js`。
 
 ### C. 合法台词跨章重复（不封词）
 - **判定**：该句是角色合理台词（报案 / 陈述），全书仅因"章末钩子 = 开章重述"而重复。
@@ -61,12 +73,12 @@ for PYBIN in python3 python py; do "$PYBIN" -c "" 2>/dev/null && break; done
 ## 复扫确认
 `"$PYBIN" scripts/register.py scan "<active-book>/正文/第1卷…/"` 或手动：
 `node .agents/skills/_shared/scripts/check-ai-patterns.js --check <book>/**/*.md`
-确认 `banned-word-exact`、`banned-word-syna`、`banned-word-antithesis`、`banned-word-dangling-identity` 与 `banned-word-body-shell` 计数为 0。
+确认实际 blocking 为 0；上述共享词形和句式的 advisory 逐处读上下文，确有问题才改，有功能则保留并说明。用户明确要求清理的具体问题按授权范围处理。
 
 ## 同步范围约定
 共享禁用词表由 `_shared` 维护。helper 只修改当前安装包中的唯一共享副本；部署副本由仓库同步工具生成，不要手动逐份改。
 
 ## 别忘了
 - 改完只落盘正文源文件，**不要碰合并稿**（遵守"不用合并稿"约定）。
-- 加禁词后，模型驱动的 Gate A（deslop / review / 长写短写自检）和 `check-ai-patterns.js` 脚本**都**会拦——共享禁用词表是唯一真相源。
+- 加禁词后，模型驱动的 Gate A（deslop / review / 长写短写自检）和 `check-ai-patterns.js` 脚本**都**能读到新规则；严重度与作用域以实际扫描结果为准。
 - advisor 类（比喻密度、过度精炼短段、低连接密度）不是强制项，不在本工作流清零范围内。

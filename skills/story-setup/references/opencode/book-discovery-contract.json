@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "marker_max_depth": 4,
+  "ignore_dot_directories": true,
+  "ignored_directories": [
+    ".git",
+    "node_modules"
+  ],
+  "follow_symbolic_links": false,
+  "markers": [
+    {
+      "name": "追踪",
+      "kind": "directory",
+      "priority": 1
+    },
+    {
+      "name": "正文",
+      "kind": "directory",
+      "priority": 2
+    },
+    {
+      "name": "正文.md",
+      "kind": "file",
+      "priority": 3
+    }
+  ]
+}

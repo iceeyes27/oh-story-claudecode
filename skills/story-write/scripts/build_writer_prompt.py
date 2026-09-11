@@ -8,7 +8,7 @@
 （主会话照抄，空槽以外一字不改），以下是核对报告（不进 prompt）。
 
 职责边界:
-- 脚本做确定性部分：固定首行、定位、标题行字面量、细纲指针、文风全文路径与裁决、
+- 脚本做确定性部分：固定首行、定位、标题行字面量、细纲指针、文风三行与判读的通用参考、
   上一章结尾、降档判定与情绪/节奏槽、固定块指针。
 - 主会话填八槽：执行安排 / 本章意图 / 参考技法 / 本节速记 / 涉及角色 / genre_prose_card /
   必读设定 / author_preferences。降档不成立时情绪与节奏槽也归主会话。
@@ -49,8 +49,16 @@ def substantive(text):
 
 
 def has_custom_style(text):
-    # A single substantive sentence can express the author's choice.
-    return substantive(re.sub(r"<!--[\s\S]*?-->", "", text or ""))
+    if not substantive(text):
+        return False
+    if len(re.sub(r"\s", "", text)) >= 200:
+        return True
+    for section in re.split(r"(?=^#{1,6}\s)", text, flags=re.M):
+        heading, _, body = section.partition("\n")
+        if re.search(r"句长|标点|对话|锚点|笔调", heading) and substantive(body):
+            if re.search(r"\d|例如|例句|不用|禁止|避免|偏好|优先|保留|使用", body):
+                return True
+    return False
 
 
 def find_chapter_file(directory: Path, chapter: int, prefix: str):
@@ -162,6 +170,25 @@ def learn_heading_form(project: Path, chapter: int, title: str):
             f"照既有章形态（{level} ＋ 章号{how}）")
 
 
+def parse_reference_ruling(style_text: str):
+    """扫 设定/文风.md「通用参考裁决」表，返回 (停读清单, 判读的行)。"""
+    skips, reads = [], []
+    for line in style_text.splitlines():
+        cells = [c.strip() for c in line.strip().strip("|").split("|")]
+        if len(cells) < 2:
+            continue
+        name = re.sub(r"[`*]", "", cells[0]).strip()
+        if not name.endswith(".md") and not name.endswith("/*"):
+            continue
+        if re.match(r"^停读(?:$|[（(\s])", cells[1]):
+            skips.append(name)
+        elif "读" in cells[1]:
+            caveat = re.sub(r"[`*]", "", cells[1]).strip()
+            caveat = re.sub(r"^读\s*[（(]?", "", caveat).rstrip("）)").strip()
+            reads.append(f"{name}（{caveat}）" if caveat else name)
+    return skips, reads
+
+
 def build(project: Path, chapter: int, report: list):
     errors = []
 
@@ -220,15 +247,27 @@ def build(project: Path, chapter: int, report: list):
 
     # ---- 文风（本书自定义文风时由脚本全包）----
     style_file = project / "设定" / "文风.md"
+    style_digest = project / "设定" / "_文风摘要.md"
     style_text = read_text(style_file)
     custom_style = has_custom_style(style_text)
     if custom_style:
-        parts.append(f"文风路径：{style_file}（书级权威文风，写作与去味均读全文；摘要只作索引）")
+        if read_text(style_digest):
+            parts.append(
+                f"文风路径：{style_digest}（书级文风摘要卡，写作按它执行；"
+                f"与细纲或脚本读数冲突时再查全文 {style_file}）")
+        else:
+            parts.append(f"文风路径：{style_file}（书级权威文风，写前必读）")
         parts.append(
             "文风优先裁决：`设定/文风.md` 对句段／句法／对话落法／标点形态与删改取向的规定"
-            "按 style-resolution.md 裁决：当前请求 > 本书文风 > active 作者记忆 > 对标 > 通用参考；不覆盖细纲事实、信息边界、调用方所选 Gate 范围及文件结构。"
+            "优先于通用风格建议；不覆盖细纲事实、信息边界、调用方所选 Gate 范围及格式硬线。"
             "风格冲突按文风写，交付摘要列出「因文风优先而未执行的通用条款」。")
-        report.append("文风：custom_style=true，表达冲突按维度裁决；reference 读取仍按任务条件")
+        skips, reads = parse_reference_ruling(style_text)
+        if skips:
+            parts.append("本书停读清单（整行跳过、不判定不读取）：" + "、".join(skips))
+        if reads:
+            parts.append("本书判读的通用参考：" + "；".join(reads))
+        report.append(
+            f"文风：custom_style=true，停读 {len(skips)} 项、判读 {len(reads)} 项")
     else:
         parts.append(
             "——— 文风 ———\n"
@@ -313,7 +352,8 @@ def build(project: Path, chapter: int, report: list):
     parts.append(
         "——— 参考技法 ———\n"
         f"{SLOT_MARK} 步骤 3 三问的第 ②③ 问：借鉴哪个参考文件的哪个技法、用在哪些段落。"
-        "按 reference 表的任务条件读取；本书文风只覆盖冲突表达条款，不停读整份文件。")
+        "上面「判读的通用参考」是书级可读范围，不是本章取用；本书自定义文风优先，"
+        "通用参考只作技法示例、不给验收线。")
     parts.append(
         "——— 本节速记 ———\n"
         f"{SLOT_MARK} 按 long-mode.md Phase 4 步骤 3「状态筛选」产出（`追踪/上下文.md` 不注入"
@@ -328,11 +368,9 @@ def build(project: Path, chapter: int, report: list):
     parts.append("——— 题材正文提示卡（genre_prose_card，只含本章相关条目）———\n"
                  f"{SLOT_MARK} 主题材抽 3-5 条、辅题材 1-2 条；只作内部校准，不进正文")
     parts.append(slot_setting)
-    parts.append("——— style_resolution / author_preferences ———\n"
+    parts.append("——— author_preferences（低优先级倾向，自然吸收，不逐条展示）———\n"
                  f"{SLOT_MARK} author_memory query 命中本章的 prose_style/story_design 项；"
-                 "query 显式传本书/题材/流程；偏好是低优先级倾向，无则写「无」。附 style_resolution：生效要求及来源、被覆盖的默认条款和事实边界；同一裁决传去味与审稿，不逐条追求命中。")
-
-    parts.append("检查分工：写手负责编排、内容覆盖和格式自检；父流程质量阶段负责语义去味及最终文件扫描。写手不提前重复整轮去味或相同检查链，保留时空表、新增申报与原定交付。")
+                 "无则写「无」；不逐条展示或最大化命中，不牺牲连贯、节奏和字数。")
 
     # ---- 固定块：压成指针，不重述 agent 定义 ----
     parts.append(

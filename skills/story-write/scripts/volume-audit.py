@@ -260,14 +260,16 @@ def chapter_inventory(project_dir, start_ch, end_ch, extra_prose=None, projected
             paths.append(file)
     def walk_error(error):
         add_finding("Prose_Unreadable", str(error))
-    for directory, dirs, names in os.walk(project_dir / "正文", onerror=walk_error):
-        dirs[:] = sorted(name for name in dirs if not name.startswith((".", "_原稿"))
-                         and name not in {"候选", "_历史", "历史", "原稿", "归档", "node_modules"}
-                         and not (Path(directory) / name).is_symlink())
-        for name in sorted(names):
-            file = Path(directory) / name
-            if not file.is_symlink():
-                add_file(file)
+    prose_dir = project_dir / "正文"
+    if prose_dir.is_dir():
+        for directory, dirs, names in os.walk(prose_dir, onerror=walk_error):
+            dirs[:] = sorted(name for name in dirs if not name.startswith((".", "_原稿"))
+                             and name not in {"候选", "_历史", "历史", "原稿", "归档", "node_modules"}
+                             and not (Path(directory) / name).is_symlink())
+            for name in sorted(names):
+                file = Path(directory) / name
+                if not file.is_symlink():
+                    add_file(file)
     for file in extra_prose or []:
         add_file(file)
     state = projected_state

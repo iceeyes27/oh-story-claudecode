@@ -71,7 +71,9 @@ class CandidateCommitTests(unittest.TestCase):
         self.candidate_dir.mkdir(parents=True)
         (self.project / "正文").mkdir()
         # 初始化追踪状态（last_committed_chapter=0, state_revision=0）。
-        self._tracking("init", initial_document(last_chapter=last_chapter))
+        init_doc = initial_document(last_chapter=last_chapter)
+        init_doc["setting_payoff"] = {"enabled": False, "schema_version": 1, "since_chapter": None}
+        self._tracking("init", init_doc)
         for chapter in range(1, last_chapter + 1):
             first = chr(0x4E00 + chapter * 2)
             second = chr(0x4E00 + chapter * 2 + 1)
@@ -294,6 +296,7 @@ class CandidateCommitTests(unittest.TestCase):
                 "outline": {"path": f"大纲/{outline.name}", "sha256": digest(outline)},
                 "skeleton": {"path": f"骨架/{skeleton.name}", "sha256": digest(skeleton)},
                 "coverage": [{"id": "O1", "evidence": evidence}],
+                "setting_payoffs": [],
                 "logic_checks": self._logic_checks(chapter, prose, ledger=ledger),
             }
             (self.candidate_dir / f"第{chapter:03d}章_追踪事务.json").write_text(

@@ -50,7 +50,7 @@ class TestVolumeAudit(unittest.TestCase):
         outline_dir = self.temp_dir / "大纲"
         outline_dir.mkdir(parents=True)
         (outline_dir / "卷纲_第1卷.md").write_text(
-            "# 卷纲·第一卷\n\n章节范围：第 1–30 章\n\n## 核心矛盾\n\n主矛盾：对抗反派\n\n下一卷新周期规划...",
+            "# 卷纲·第一卷\n\n章节范围：第 1–1 章\n\n## 核心矛盾\n\n主矛盾：对抗反派\n\n下一卷新周期规划...",
             encoding="utf-8"
         )
         prose_dir = self.temp_dir / "正文"
@@ -74,7 +74,7 @@ class TestVolumeAudit(unittest.TestCase):
         outline_dir = self.temp_dir / "大纲"
         outline_dir.mkdir(parents=True)
         (outline_dir / "卷纲_第1卷.md").write_text(
-            "# 卷纲·第一卷\n\n章节范围：第 1–30 章\n\n## 核心矛盾\n\n主矛盾：搞钱\n\n下一卷新周期规划...",
+            "# 卷纲·第一卷\n\n章节范围：第 1–1 章\n\n## 核心矛盾\n\n主矛盾：搞钱\n\n下一卷新周期规划...",
             encoding="utf-8"
         )
         prose_dir = self.temp_dir / "正文"
@@ -113,9 +113,12 @@ class TestVolumeAudit(unittest.TestCase):
         outline_dir = self.temp_dir / "大纲"
         outline_dir.mkdir(parents=True)
         (outline_dir / "卷纲_第1卷.md").write_text(
-            "# 卷纲·第一卷\n\n章节范围：第 1–30 章\n\n- **核心冲突**：主角与门主争夺矿脉\n\n下一卷新周期规划...",
+            "# 卷纲·第一卷\n\n章节范围：第 1–1 章\n\n- **核心冲突**：主角与门主争夺矿脉\n\n下一卷新周期规划...",
             encoding="utf-8"
         )
+        prose_dir = self.temp_dir / "正文"
+        prose_dir.mkdir(parents=True)
+        (prose_dir / "第001章_开端.md").write_text("# 第001章\n\n正文开始。", encoding="utf-8")
         res = self.run_tool(["--project", str(self.temp_dir), "--volume", "1", "--json"], expected_code=0)
         data = json.loads(res.stdout)
         codes = [f["code"] for f in data["findings"]]
@@ -140,7 +143,7 @@ class TestVolumeAudit(unittest.TestCase):
         for i in range(1, 9):
             (prose_dir / f"第{i:03d}章_测试.md").write_text(f"# 第{i:03d}章\n\n正文。", encoding="utf-8")
 
-        res = self.run_tool(["--project", str(self.temp_dir), "--volume", "1", "--json"], expected_code=0)
+        res = self.run_tool(["--project", str(self.temp_dir), "--volume", "1", "--json"], expected_code=1)
         data = json.loads(res.stdout)
         self.assertEqual(data["metrics"]["chapter_range"], [None, None])
         self.assertEqual(data["metrics"]["existing_chapters_in_range"], 8)
@@ -151,17 +154,17 @@ class TestVolumeAudit(unittest.TestCase):
         outline_dir = self.temp_dir / "大纲"
         outline_dir.mkdir(parents=True)
         (outline_dir / "卷纲_第1卷.md").write_text(
-            "# 卷纲·第一卷\n\n- 第1-20章\n\n## 核心矛盾\n\n主矛盾：对抗反派\n\n下一卷新周期规划...",
+            "# 卷纲·第一卷\n\n- 第1-2章\n\n## 核心矛盾\n\n主矛盾：对抗反派\n\n下一卷新周期规划...",
             encoding="utf-8"
         )
         prose_dir = self.temp_dir / "正文"
         prose_dir.mkdir(parents=True)
-        for i in (1, 5, 25):
+        for i in (1, 2, 25):
             (prose_dir / f"第{i:03d}章_测试.md").write_text(f"# 第{i:03d}章\n\n正文。", encoding="utf-8")
 
         res = self.run_tool(["--project", str(self.temp_dir), "--volume", "1", "--json"], expected_code=0)
         data = json.loads(res.stdout)
-        self.assertEqual(data["metrics"]["chapter_range"], [1, 20])
+        self.assertEqual(data["metrics"]["chapter_range"], [1, 2])
         self.assertEqual(data["metrics"]["existing_chapters_in_range"], 2)
         codes = [f["code"] for f in data["findings"]]
         self.assertNotIn("Volume_Range_Unclear", codes)

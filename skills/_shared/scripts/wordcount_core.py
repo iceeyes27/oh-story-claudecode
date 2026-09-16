@@ -14,7 +14,7 @@ MEASUREMENT_SCHEMA = "story-wordcount-measurement/v1"
 CHECKPOINT_SCHEMA = "story-wordcount-checkpoint/v1"
 METRIC = "visible_chars_v1"
 FANQIE_MIN = 2200
-FANQIE_MAX = 2800
+FANQIE_MAX = 3500
 RESOLUTIONS = frozenset({"within_user_band", "accepted_current_length"})
 
 _WHITE_SPACE_CODEPOINTS = frozenset(

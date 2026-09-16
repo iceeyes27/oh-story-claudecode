@@ -904,7 +904,7 @@ def validate_binding(
     name_drift_gate(project, chapter, state)
     validate_titles(project, prose)
     length = wordcount.fanqie_length(prose.read_text(encoding="utf-8-sig"))
-    require(length["status"] == "pass", f"番茄长篇字数必须为 2200–2800，有效字数为 {length['actual']}")
+    require(length["status"] == "pass", f"番茄长篇字数必须为 {length['min']}–{length['max']}，有效字数为 {length['actual']}")
 
     coverage = binding.get("coverage")
     require(isinstance(coverage, list), "candidate_binding.coverage 必须是数组")

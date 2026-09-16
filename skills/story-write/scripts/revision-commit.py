@@ -204,7 +204,7 @@ def build_changes(project: Path, directory: Path, manifest: dict, review: dict, 
     valid_review(project, directory, manifest, review)
     text = (directory / "candidate.md").read_text(encoding="utf-8")
     length = candidate.wordcount.fanqie_length(text)
-    require(length["status"] == "pass", f"revision length must be 2200–2800, actual={length['actual']}")
+    require(length["status"] == "pass", f"revision length must be {length['min']}–{length['max']}, actual={length['actual']}")
     # Scan a correctly named file: title checking and author-rule scope remain intact.
     import tempfile
     with tempfile.TemporaryDirectory(prefix="ordinary-revision-check-") as temporary:

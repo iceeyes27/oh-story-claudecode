@@ -319,6 +319,20 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertEqual(self.read_state()["state_revision"], 0)
         self.assertEqual(self.read_state()["last_committed_chapter"], 0)
 
+    def test_check_accepts_3500_and_rejects_3501_without_adopting(self) -> None:
+        for actual, exit_code in [(3500, 0), (3501, 1)]:
+            with self.subTest(actual=actual):
+                body = "# 第1章 测试章名\n" + "".join(chr(0x6000 + n) for n in range(actual - 1))
+                self.make_candidate(1, body=body)
+                before = self.read_state()
+                result = self._candidate(["check", "--chapter", "1"], expect=exit_code)
+                if exit_code:
+                    self.assertIn("2200–3500", result.stderr)
+                else:
+                    self.assertTrue(json.loads(result.stdout)["ok"])
+                self.assertEqual(self.read_state(), before)
+                self.assertEqual(self.final_files(), [])
+
     def test_candidate_workflow_documents_v2_logic_contract(self) -> None:
         workflow = (ROOT / "skills/story-write/references/candidate-workflow.md").read_text(encoding="utf-8")
         binding = (ROOT / "skills/story-write/references/candidate-logic-binding.md").read_text(encoding="utf-8")

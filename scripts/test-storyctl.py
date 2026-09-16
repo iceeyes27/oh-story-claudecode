@@ -38,6 +38,15 @@ def run_cli(*arguments: str) -> tuple[subprocess.CompletedProcess[str], dict[str
 
 
 class VisibleCharsTests(unittest.TestCase):
+    def test_fanqie_length_boundaries(self) -> None:
+        for actual, expected in [(2199, "under"), (2200, "pass"), (2801, "pass"),
+                                 (3500, "pass"), (3501, "over")]:
+            with self.subTest(actual=actual):
+                result = storyctl.core.fanqie_length("# 标题\r\n" + "字" * actual + "\r\n \t")
+                self.assertEqual(result["actual"], actual)
+                self.assertEqual((result["min"], result["max"]), (2200, 3500))
+                self.assertEqual(result["status"], expected)
+
     def test_frozen_unicode_counting_contract(self) -> None:
         self.assertEqual(storyctl.count_visible_chars("甲\n乙"), 2)
         self.assertEqual(storyctl.count_visible_chars("甲\r\n乙"), 2)

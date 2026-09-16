@@ -7,7 +7,7 @@
   "upstream": {
     "remote": "upstream",
     "branch": "main",
-    "baseline": "735402840377c2c50173cc3cf92c4ff3ba56cc0d"
+    "baseline": "fe1c133167ae758663c69bd9e5198543958c8b35"
   },
   "quality_profile": "release",
   "policy_priority": [
@@ -194,6 +194,9 @@
       },
       {
         "path": ".agents/notes/implemented/process/2026-09-16-readme-for-readers-not-engines.md"
+      },
+      {
+        "path": ".agents/notes/implemented/process/2026-09-16-readme-masthead.md"
       }
     ]
   },

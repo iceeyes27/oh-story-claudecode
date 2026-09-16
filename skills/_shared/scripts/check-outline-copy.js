@@ -163,15 +163,36 @@ function findOutline(proseFile) {
   }
   const m = base.match(/^第\s*0*(\d+)\s*章/)
   if (!m) return null
-  const chapter = m[1]
-  const dir = path.join(path.dirname(path.dirname(proseFile)), '大纲')
+  // 2026-09-13 修：正文用三位补零（第001章_）、细纲用两位补零（细纲_第01章_），
+  // 旧版直接比字符串会让整本书静默 SKIP。改为按数值比较。
+  const chapter = parseInt(m[1], 10)
+  const dir = resolveOutlineDir(proseFile)
+  if (!dir) return null
   try {
     for (const file of fs.readdirSync(dir)) {
       const fm = file.match(/^细纲_第0*(\d+)章.*\.md$/)
-      if (fm && fm[1] === chapter) return path.join(dir, file)
+      if (fm && parseInt(fm[1], 10) === chapter) return path.join(dir, file)
     }
   } catch (error) {
     if (error.code !== 'ENOENT') throw error
+  }
+  return null
+}
+
+/**
+ * 向上逐级找 `大纲/` 目录。
+ * 2026-09-13 修：旧版写死 `dirname(dirname(proseFile))/大纲`，只在
+ * `正文/第N章.md`（无卷目录）的排布下成立；本书是 `正文/第1卷_x/第001章.md`
+ * 加一层卷目录，于是算出来的是 `正文/大纲`，全书静默 SKIP。
+ */
+function resolveOutlineDir(proseFile) {
+  let dir = path.dirname(proseFile)
+  for (let i = 0; i < 4; i++) {
+    const candidate = path.join(dir, '大纲')
+    if (fs.existsSync(candidate)) return candidate
+    const parent = path.dirname(dir)
+    if (parent === dir) break
+    dir = parent
   }
   return null
 }

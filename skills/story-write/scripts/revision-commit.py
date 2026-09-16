@@ -235,6 +235,29 @@ def build_changes(project: Path, directory: Path, manifest: dict, review: dict, 
             # Review binds the new quote to unchanged value and fact chapter.
             # This cannot update amounts, dates, or facts from other chapters.
             record["source_phrase"] = anchor
+    # 设定兑现记录的证据锚点必须仍能在修订后的正文里定位；找不到的只能重绑，不能改结论
+    # （改结论是 facts 修订的事）。facts 修订可随事务重交本章记录；没重交而锚点又失效则拒绝。
+    rebinds = review.get("setting_payoff_rebind", [])
+    require(isinstance(rebinds, list), "setting_payoff_rebind must be a list")
+    rebind_by_id: dict[str, dict] = {}
+    for row in rebinds:
+        require(isinstance(row, dict) and isinstance(row.get("id"), str) and row["id"], "setting_payoff_rebind rows need an id")
+        require(row["id"] not in rebind_by_id, f"setting_payoff_rebind has duplicate id {row['id']}")
+        rebind_by_id[row["id"]] = row
+    for identifier, row in next_state.get("setting_payoffs", {}).items():
+        for record in row["records"]:
+            if record["chapter"] != manifest["chapter"] or not record["evidence_anchor"]:
+                continue
+            if record["evidence_anchor"] in text:
+                continue
+            rebind = rebind_by_id.pop(identifier, None)
+            require(rebind is not None, f"setting payoff {identifier} evidence disappeared from the revised prose; add setting_payoff_rebind or revise facts")
+            anchor = rebind.get("evidence_anchor")
+            require(isinstance(anchor, str) and anchor.strip() and anchor in text, f"setting payoff {identifier} rebind anchor cannot be located")
+            require(isinstance(rebind.get("note"), str) and rebind["note"].strip(), f"setting payoff {identifier} rebind needs a note")
+            require("result" not in rebind, f"setting payoff {identifier}: a rebind cannot change result; prepare kind=facts")
+            record["evidence_anchor"] = anchor.strip()
+    require(not rebind_by_id, f"setting_payoff_rebind names records that did not need rebinding: {sorted(rebind_by_id)}")
     # Stale measurements must not survive changed prose. Semantic summaries stay
     # only after an explicit unchanged-facts review, or the facts transaction.
     next_state["wordcount_records"].pop(str(manifest["chapter"]), None)

@@ -58,6 +58,20 @@ TIMELINE_KINDS = (
 KNOWLEDGE_STATES = ("knows", "believes", "suspects", "misbelieves", "denies")
 INVALID_FILE_CHARS = re.compile(r"[<>:\"/\\|?*\x00-\x1f]")
 FORESHADOW_ID = re.compile(r"^F\d{3,}$")
+# 设定兑现（setting-payoff/v1）：登记表编号；v1 看板沿用的 SET-NN[字母] 也合法。
+SETTING_PAYOFF_ID = re.compile(r"^SET-\d{2,3}[A-Z]?$")
+SETTING_PAYOFF_SCHEMA = 1
+SETTING_PAYOFF_TYPES = ("payoff", "constraint", "recurring", "reserve")
+SETTING_PAYOFF_RELATIONS = ("兑现", "涉及", "不适用")
+# 关系决定合法结果：兑现→已兑现/部分兑现/未兑现；涉及→已遵守/违反；不适用→条件未触发
+SETTING_PAYOFF_RESULTS = {
+    "兑现": ("已兑现", "部分兑现", "未兑现"),
+    "涉及": ("已遵守", "违反"),
+    "不适用": ("条件未触发",),
+}
+SETTING_PAYOFF_EVIDENCE_REQUIRED = ("已兑现", "部分兑现")
+SETTING_PAYOFF_NOTE_REQUIRED = ("未兑现", "条件未触发", "违反")
+SETTING_PAYOFF_RISK_LINES_MAX = 3
 EVENT_ID = re.compile(r"^E\d{3,}$")
 WINDOWS_RESERVED_NAMES = {
     "CON",
@@ -586,6 +600,193 @@ def render_timeline_views(events: dict[str, dict[str, Any]], revision: int) -> t
     return "\n".join(author_lines) + "\n", "\n".join(reader_lines) + "\n"
 
 
+def default_setting_payoff_config() -> dict[str, Any]:
+    return {"enabled": False, "schema_version": SETTING_PAYOFF_SCHEMA, "since_chapter": None}
+
+
+def normalize_setting_payoff_config(value: object, label: str = "tracking state.setting_payoff") -> dict[str, Any]:
+    if value is None:
+        return default_setting_payoff_config()
+    config = as_mapping(value, label)
+    require_known_keys(config, {"enabled", "schema_version", "since_chapter"}, label)
+    enabled = config.get("enabled", False)
+    require(isinstance(enabled, bool), f"{label}.enabled must be true or false")
+    schema = config.get("schema_version", SETTING_PAYOFF_SCHEMA)
+    require(schema == SETTING_PAYOFF_SCHEMA, f"{label}.schema_version is unsupported")
+    since_raw = config.get("since_chapter")
+    since = None if since_raw is None else as_int(since_raw, f"{label}.since_chapter", minimum=1)
+    require(not enabled or since is not None, f"{label}.since_chapter is required when enabled")
+    return {"enabled": enabled, "schema_version": SETTING_PAYOFF_SCHEMA, "since_chapter": since}
+
+
+def normalize_setting_payoff_window(value: object, label: str) -> dict[str, int] | None:
+    if value is None:
+        return None
+    window = as_mapping(value, label)
+    require_known_keys(window, {"min", "max"}, label)
+    low = as_int(window.get("min"), f"{label}.min", minimum=1)
+    high = as_int(window.get("max"), f"{label}.max", minimum=1)
+    require(low <= high, f"{label}.min cannot exceed max")
+    return {"min": low, "max": high}
+
+
+def normalize_setting_payoff_record(value: object, label: str, *, chapter: int) -> dict[str, Any]:
+    record = as_mapping(value, label)
+    require_known_keys(record, {"chapter", "relation", "result", "evidence_anchor", "note"}, label)
+    record_chapter = as_int(record.get("chapter", chapter), f"{label}.chapter", minimum=1)
+    relation = clean_text(record.get("relation"), f"{label}.relation", max_bytes=12)
+    require(relation in SETTING_PAYOFF_RELATIONS, f"{label}.relation must be one of {SETTING_PAYOFF_RELATIONS}")
+    result = clean_text(record.get("result"), f"{label}.result", max_bytes=24)
+    allowed = SETTING_PAYOFF_RESULTS[relation]
+    require(result in allowed, f"{label}.result for relation {relation} must be one of {allowed}")
+    anchor = clean_text(record.get("evidence_anchor", ""), f"{label}.evidence_anchor", allow_empty=True, max_bytes=240)
+    note = clean_text(record.get("note", ""), f"{label}.note", allow_empty=True, max_bytes=360)
+    require(anchor or result not in SETTING_PAYOFF_EVIDENCE_REQUIRED, f"{label}: result {result} needs evidence_anchor")
+    require(note or result not in SETTING_PAYOFF_NOTE_REQUIRED, f"{label}: result {result} needs a note")
+    return {"chapter": record_chapter, "relation": relation, "result": result, "evidence_anchor": anchor, "note": note}
+
+
+def normalize_setting_payoff_change(
+    value: object, label: str, *, allow_delete: bool, through_chapter: int, chapter: int
+) -> dict[str, Any]:
+    row = as_mapping(value, label)
+    require_known_keys(
+        row, {"action", "id", "type", "title", "window", "relation", "result", "evidence_anchor", "note"}, label
+    )
+    action = clean_text(row.get("action", "upsert"), f"{label}.action", max_bytes=24)
+    require(action in ({"upsert", "delete"} if allow_delete else {"upsert"}), f"{label}.action is invalid")
+    identifier = clean_text(row.get("id"), f"{label}.id", max_bytes=24)
+    require(SETTING_PAYOFF_ID.fullmatch(identifier) is not None, f"{label}.id must look like SET-001")
+    if action == "delete":
+        return {"action": action, "id": identifier}
+    kind = clean_text(row.get("type"), f"{label}.type", max_bytes=24)
+    require(kind in SETTING_PAYOFF_TYPES, f"{label}.type must be one of {SETTING_PAYOFF_TYPES}")
+    window = normalize_setting_payoff_window(row.get("window"), f"{label}.window")
+    require(window is None or kind == "recurring", f"{label}.window is only meaningful for recurring settings")
+    require(chapter <= through_chapter, f"{label}: chapter {chapter} is in the future")
+    record = normalize_setting_payoff_record(
+        {key: row[key] for key in ("relation", "result", "evidence_anchor", "note") if key in row},
+        label,
+        chapter=chapter,
+    )
+    return {
+        "action": action,
+        "id": identifier,
+        "type": kind,
+        "title": clean_text(row.get("title"), f"{label}.title", max_bytes=120),
+        "window": window,
+        **record,
+    }
+
+
+def normalize_setting_payoff_state(value: object, last_chapter: int) -> dict[str, dict[str, Any]]:
+    rows = as_mapping(value, "tracking state.setting_payoffs")
+    normalized: dict[str, dict[str, Any]] = {}
+    for raw_identifier, raw_row in rows.items():
+        identifier = clean_text(raw_identifier, "tracking state.setting_payoffs ID", max_bytes=24)
+        label = f"tracking state.setting_payoffs.{identifier}"
+        row = as_mapping(raw_row, label)
+        require_known_keys(row, {"id", "type", "title", "window", "records"}, label)
+        require(row.get("id") == identifier, f"{label}.id does not match its key")
+        require(SETTING_PAYOFF_ID.fullmatch(identifier) is not None, f"{label}.id must look like SET-001")
+        kind = clean_text(row.get("type"), f"{label}.type", max_bytes=24)
+        require(kind in SETTING_PAYOFF_TYPES, f"{label}.type must be one of {SETTING_PAYOFF_TYPES}")
+        window = normalize_setting_payoff_window(row.get("window"), f"{label}.window")
+        records = []
+        seen: set[int] = set()
+        for index, raw_record in enumerate(as_list(row.get("records", []), f"{label}.records")):
+            record = normalize_setting_payoff_record(raw_record, f"{label}.records[{index}]", chapter=1)
+            require(record["chapter"] <= last_chapter, f"{label}.records[{index}] is after the current chapter")
+            require(record["chapter"] not in seen, f"{label}.records has two entries for chapter {record['chapter']}")
+            seen.add(record["chapter"])
+            records.append(record)
+        records.sort(key=lambda item: item["chapter"])
+        require(records, f"{label} has no records; delete the entry instead")
+        normalized[identifier] = {
+            "id": identifier,
+            "type": kind,
+            "title": clean_text(row.get("title"), f"{label}.title", max_bytes=120),
+            "window": window,
+            "records": records,
+        }
+    return normalized
+
+
+def apply_setting_payoff_change(
+    rows: dict[str, dict[str, Any]], change: dict[str, Any], chapter: int
+) -> None:
+    identifier = change["id"]
+    if change["action"] == "delete":
+        # 删除只撤掉本章的记录；其它章的历史不动，没有记录时整条移除。
+        current = rows.get(identifier)
+        if current is None:
+            return
+        current["records"] = [item for item in current["records"] if item["chapter"] != chapter]
+        if not current["records"]:
+            rows.pop(identifier)
+        return
+    record = {key: change[key] for key in ("chapter", "relation", "result", "evidence_anchor", "note")}
+    current = rows.get(identifier) or {"id": identifier, "records": []}
+    current["type"] = change["type"]
+    current["title"] = change["title"]
+    current["window"] = change["window"]
+    # 同章重复提交＝替换，不叠加；这是重复采用与修订都能幂等的前提。
+    current["records"] = [item for item in current["records"] if item["chapter"] != chapter] + [record]
+    current["records"].sort(key=lambda item: item["chapter"])
+    rows[identifier] = current
+
+
+def setting_payoff_last_record(row: dict[str, Any]) -> dict[str, Any]:
+    return row["records"][-1]
+
+
+def setting_payoff_risk_lines(state: dict[str, Any]) -> list[str]:
+    """recurring 超窗只提示，不阻断；按超出程度取前几条进续写状态卡。"""
+    if not state["setting_payoff"]["enabled"]:
+        return []
+    last_chapter = state["last_committed_chapter"]
+    overdue = []
+    for identifier, row in state["setting_payoffs"].items():
+        if row["type"] != "recurring" or row["window"] is None:
+            continue
+        last_hit = max((r["chapter"] for r in row["records"] if r["result"] == "已兑现"),
+                       default=state["setting_payoff"]["since_chapter"] - 1)
+        gap = last_chapter - last_hit
+        if gap > row["window"]["max"]:
+            overdue.append((gap - row["window"]["max"], identifier, row, gap))
+    overdue.sort(key=lambda item: (-item[0], item[1]))
+    return [
+        f"设定兑现 {identifier}「{row['title']}」已 {gap} 章未出现（窗口每 {row['window']['min']}–{row['window']['max']} 章）"
+        for _, identifier, row, gap in overdue[:SETTING_PAYOFF_RISK_LINES_MAX]
+    ]
+
+
+def render_setting_payoff_view(state: dict[str, Any]) -> str:
+    rows = state["setting_payoffs"]
+    lines = [
+        "# 设定兑现当前状态",
+        "",
+        f"> 状态修订：{state['state_revision']}。setting-payoff/v1，自第{state['setting_payoff']['since_chapter']}章起记账；"
+        "每个编号只保留当前状态，登记与排期见 设定/_设定登记.md 与各章细纲。",
+        "",
+        "| 编号 | 类型 | 一句话 | 最近记录章 | 关系 | 结果 | 记录数 | 证据 / 备注 |",
+        "|---|---|---|---:|---|---|---:|---|",
+    ]
+    for identifier in sorted(rows):
+        row = rows[identifier]
+        last = setting_payoff_last_record(row)
+        detail = last["evidence_anchor"] or last["note"]
+        lines.append(
+            f"| {identifier} | {row['type']} | {row['title']} | 第{last['chapter']}章 | {last['relation']} | "
+            f"{last['result']} | {len(row['records'])} | {detail} |"
+        )
+    risks = setting_payoff_risk_lines(state)
+    if risks:
+        lines.extend(["", "## 贯穿超窗提示", ""])
+        lines.extend(f"- {line}" for line in risks)
+    return "\n".join(lines) + "\n"
+
+
 def validate_context_input(value: object, *, include_initial_fields: bool) -> dict[str, Any]:
     context = as_mapping(value, "context")
     allowed = {"position", "long_term_constraints", "active_character_names", "continuity_risks"}
@@ -708,7 +909,7 @@ def render_context(state: dict[str, Any]) -> str:
         ("## 活跃伏笔", active_foreshadow_lines(state["foreshadow"])),
         ("## 近三章速记", [f"第{item['chapter']}章｜{item['summary']}" for item in context["recent_chapters"]]),
         ("## 下一章承诺", context["next_chapter_commitments"]),
-        ("## 连贯性风险", context["continuity_risks"]),
+        ("## 连贯性风险", context["continuity_risks"] + setting_payoff_risk_lines(state)),
     ]
     lines = [
         f"# 写作连续性上下文 — {state['book_title']}",
@@ -733,6 +934,7 @@ def normalize_delta(
     through_chapter: int,
     snapshots: dict[str, dict[str, Any]],
     existing_core_names: dict[str, str],
+    chapter: int | None = None,
 ) -> dict[str, Any]:
     delta = as_mapping(value, "delta")
     require_known_keys(
@@ -740,8 +942,20 @@ def normalize_delta(
         {
             "result", "character_changes", "foreshadow_changes", "timeline_events", "constraints",
             "next_chapter_commitments", "retired_context_items", "retired_characters",
+            "setting_payoff_changes",
         },
         "delta",
+    )
+    setting_payoff_changes = [
+        normalize_setting_payoff_change(
+            raw, f"delta.setting_payoff_changes[{index}]", allow_delete=True,
+            through_chapter=through_chapter, chapter=chapter or through_chapter,
+        )
+        for index, raw in enumerate(as_list(delta.get("setting_payoff_changes", []), "delta.setting_payoff_changes"))
+    ]
+    require(
+        len({item["id"] for item in setting_payoff_changes}) == len(setting_payoff_changes),
+        "delta.setting_payoff_changes contains duplicate IDs",
     )
     retired_characters = [
         safe_file_component(name, f"delta.retired_characters[{index}]")
@@ -804,6 +1018,7 @@ def normalize_delta(
             delta.get("retired_context_items", []), "delta.retired_context_items", maximum=11
         ),
         "retired_characters": retired_characters,
+        "setting_payoff_changes": setting_payoff_changes,
     }
 
 
@@ -841,6 +1056,13 @@ def render_delta(chapter: int, title: str, delta: dict[str, Any], core_names: se
             )
     if not delta["timeline_events"]:
         lines.append("- 无")
+    if delta.get("setting_payoff_changes"):
+        lines.extend(["", "## 设定兑现"])
+        for item in delta["setting_payoff_changes"]:
+            if item["action"] == "delete":
+                lines.append(f"- {item['id']}｜撤销本章记录")
+            else:
+                lines.append(f"- {item['id']}｜{item['relation']}｜{item['result']}")
     lines.extend(["", "## 连贯性约束"])
     lines.extend(f"- {item}" for item in delta["constraints"])
     if not delta["constraints"]:
@@ -881,7 +1103,7 @@ def normalize_state(document: object) -> dict[str, Any]:
         {
             "schema_version", "book_title", "last_committed_chapter", "imported_through_chapter",
             "state_revision", "chapter_gaps", "context", "characters", "foreshadow", "timeline",
-            "wordcount_records", "metrics",
+            "wordcount_records", "metrics", "setting_payoff", "setting_payoffs",
         },
         "tracking state",
     )
@@ -935,6 +1157,12 @@ def normalize_state(document: object) -> dict[str, Any]:
     metrics = normalize_metrics(
         root.get("metrics", {}), "tracking state.metrics", through_chapter=last_chapter
     )
+    setting_payoff = normalize_setting_payoff_config(root.get("setting_payoff"))
+    setting_payoffs = normalize_setting_payoff_state(root.get("setting_payoffs", {}), last_chapter)
+    require(
+        setting_payoff["enabled"] or not setting_payoffs,
+        "tracking state.setting_payoffs has records but setting_payoff is not enabled",
+    )
     return {
         "schema_version": TRACKING_SCHEMA_VERSION,
         "book_title": clean_text(root.get("book_title"), "tracking state.book_title", max_bytes=240),
@@ -948,6 +1176,8 @@ def normalize_state(document: object) -> dict[str, Any]:
         "timeline": timeline,
         "wordcount_records": wordcount_records,
         "metrics": metrics,
+        "setting_payoff": setting_payoff,
+        "setting_payoffs": setting_payoffs,
     }
 
 
@@ -963,7 +1193,7 @@ def normalize_initial_document(document: object) -> dict[str, Any]:
         root,
         {
             "schema_version", "book_title", "last_chapter", "context", "character_snapshots",
-            "foreshadow", "timeline_events", "metrics",
+            "foreshadow", "timeline_events", "metrics", "setting_payoff",
         },
         "init input",
     )
@@ -1006,6 +1236,10 @@ def normalize_initial_document(document: object) -> dict[str, Any]:
             "metrics": normalize_metrics(
                 root.get("metrics", {}), "init input.metrics", through_chapter=last_chapter
             ),
+            "setting_payoff": normalize_setting_payoff_config(
+                root.get("setting_payoff", {"enabled": True, "schema_version": SETTING_PAYOFF_SCHEMA, "since_chapter": 1}
+                         if last_chapter == 0 else None), "init input.setting_payoff"),
+            "setting_payoffs": {},
         }
     )
 
@@ -1077,7 +1311,17 @@ def normalize_transaction(project: Path, state: dict[str, Any], document: object
         through_chapter=through_chapter,
         snapshots=snapshots,
         existing_core_names=existing_names,
+        chapter=chapter,
     )
+    require(
+        state["setting_payoff"]["enabled"] or not delta["setting_payoff_changes"],
+        "delta.setting_payoff_changes requires setting_payoff to be enabled (run enable-setting-payoff first)",
+    )
+    if delta["setting_payoff_changes"]:
+        require(
+            chapter >= state["setting_payoff"]["since_chapter"],
+            f"setting payoff records start at chapter {state['setting_payoff']['since_chapter']}",
+        )
     wordcount = None
     if wordcount_input is not None:
         wordcount = wordcount_value(
@@ -1187,6 +1431,9 @@ def merge_transaction(state: dict[str, Any], transaction: dict[str, Any]) -> dic
                 change, chapter, next_state["timeline"].get(change["id"]), keep_first_chapter=True
             )
 
+    for change in transaction["delta"]["setting_payoff_changes"]:
+        apply_setting_payoff_change(next_state["setting_payoffs"], change, chapter)
+
     recent_by_chapter = {item["chapter"]: item for item in state["context"]["recent_chapters"]}
     if chapter in recent_by_chapter or transaction["mode"] == "append":
         recent_by_chapter[chapter] = {"chapter": chapter, "summary": transaction["delta"]["result"]}
@@ -1214,6 +1461,8 @@ def render_views(state: dict[str, Any]) -> dict[str, str]:
     author, reader = render_timeline_views(state["timeline"], revision)
     views["时间线/作者真相.md"] = author
     views["时间线/读者已知.md"] = reader
+    if state["setting_payoff"]["enabled"]:
+        views["设定兑现.md"] = render_setting_payoff_view(state)
     for name, snapshot in state["characters"].items():
         views[f"角色状态/{name}.md"] = render_snapshot(
             name, snapshot, state["last_committed_chapter"], revision
@@ -1311,6 +1560,28 @@ def _apply_transaction_locked(project: Path, document: object) -> dict[str, Any]
     return next_state
 
 
+def enable_setting_payoff(project: Path, since_chapter: int) -> dict[str, Any]:
+    """旧书启用设定兑现记账：只改开关与修订号，不动任何已有事实。"""
+    tracking = tracking_root(project)
+    require_no_retired_tracking_paths(tracking)
+    state = load_state(project)
+    require(not state["setting_payoff"]["enabled"], "setting payoff is already enabled")
+    require(
+        since_chapter >= state["last_committed_chapter"] + 1 or since_chapter >= 1,
+        "since_chapter must be a positive chapter number",
+    )
+    next_state = copy.deepcopy(state)
+    next_state["setting_payoff"] = {
+        "enabled": True, "schema_version": SETTING_PAYOFF_SCHEMA, "since_chapter": since_chapter,
+    }
+    next_state["state_revision"] += 1
+    next_state = normalize_state(next_state)
+    views = render_views(next_state)
+    write_views(tracking, views)
+    atomic_write_text(state_path(project), json_payload(next_state))
+    return next_state
+
+
 def require_direct_tracking_allowed(project: Path) -> None:
     require(
         not (project.resolve() / ".story-quality" / "HEAD.json").is_file(),
@@ -1375,17 +1646,23 @@ def build_parser() -> argparse.ArgumentParser:
         subparser.add_argument("--input", type=Path, required=True, help="UTF-8 JSON input document")
     check_parser = subparsers.add_parser("check")
     check_parser.add_argument("--project", type=Path, required=True, help="book project root containing 追踪/")
+    enable_parser = subparsers.add_parser("enable-setting-payoff")
+    enable_parser.add_argument("--project", type=Path, required=True, help="book project root containing 追踪/")
+    enable_parser.add_argument("--since-chapter", type=int, required=True, help="first chapter that records setting payoffs")
     return parser
 
 
 def _execute(args: argparse.Namespace) -> dict[str, Any]:
-    if args.command in {"init", "commit"} and os.environ.get("STORY_WRITE_LOCK_HELD") != "1":
+    if args.command in {"init", "commit", "enable-setting-payoff"} and os.environ.get("STORY_WRITE_LOCK_HELD") != "1":
         assert_no_unfinished_adoption(args.project)
     if args.command == "init":
         return initialize(args.project, read_json(args.input))
     if args.command == "commit":
         require_direct_tracking_allowed(args.project)
         return _apply_transaction_locked(args.project, read_json(args.input))
+    if args.command == "enable-setting-payoff":
+        require_direct_tracking_allowed(args.project)
+        return enable_setting_payoff(args.project, args.since_chapter)
     return check_project(args.project)
 
 

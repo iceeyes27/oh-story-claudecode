@@ -248,6 +248,23 @@ function validateFile(file) {
   }
   const duplicateIds = ids.filter((id, index) => ids.indexOf(id) !== index);
   for (const id of Array.from(new Set(duplicateIds))) add(blocking, 'duplicate-coverage-id', `细纲覆盖 ID 重复：${id}`);
+
+  // 设定兑现（setting-payoff/v1）：细纲「#### 设定兑现」里关系为「兑现」的编号，
+  // 必须落到且只落到一个场景（写在该场景「信息/伏笔」或任意行里）。没有登记表的项目静默。
+  const sourceOutline = contractFields.get('来源细纲');
+  const bookRoot = path.resolve(path.dirname(file), '..');
+  if (sourceOutline && fs.existsSync(path.join(bookRoot, '设定', '_设定登记.md'))) {
+    let outlineText = null;
+    try { outlineText = fs.readFileSync(path.join(bookRoot, sourceOutline.trim()), 'utf8').replace(/\r\n/g, '\n'); } catch { outlineText = null; }
+    if (outlineText !== null) {
+      const expected = settingPayoffIdsToRealize(outlineText);
+      for (const id of expected) {
+        const hits = scenes.filter((scene) => scene.body.includes(id)).map((scene) => scene.number);
+        if (hits.length === 0) add(blocking, 'setting-payoff-coverage', `细纲要求本章兑现 ${id}，但没有任何场景写到它（在承担它的场景「信息/伏笔」行里写上编号）`);
+        else if (hits.length > 1) add(blocking, 'setting-payoff-duplicate', `${id} 出现在场景 ${hits.join('、')}；一条设定只归一个主场景`);
+      }
+    }
+  }
   const uniqueCoverageNumbers = Array.from(new Set(ids.map((id) => Number(id.slice(1))))).sort((left, right) => left - right);
   for (let i = 0; i < uniqueCoverageNumbers.length; i += 1) {
     if (uniqueCoverageNumbers[i] !== i + 1) {
@@ -257,6 +274,23 @@ function validateFile(file) {
   }
 
   return { file, chapter, blocking, advisory };
+}
+
+function settingPayoffIdsToRealize(outlineText) {
+  const lines = outlineText.split('\n');
+  const start = lines.findIndex((line) => /^#{2,4}\s*设定兑现\s*$/.test(line));
+  if (start < 0) return [];
+  const level = (/^(#+)/.exec(lines[start]) || ['', '#'])[1].length;
+  const ids = [];
+  for (let i = start + 1; i < lines.length; i += 1) {
+    const heading = /^(#+)\s/.exec(lines[i]);
+    if (heading && heading[1].length <= level) break;
+    if (!lines[i].trim().startsWith('|')) continue;
+    const cells = lines[i].split('|').slice(1, -1).map((cell) => cell.replace(/\*\*/g, '').trim());
+    const id = (cells[0] || '').match(/SET-\d{2,3}[A-Z]?/);
+    if (id && cells[1] === '兑现' && !ids.includes(id[0])) ids.push(id[0]);
+  }
+  return ids;
 }
 
 const results = collectFiles().map(validateFile);

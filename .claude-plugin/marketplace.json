@@ -363,6 +363,25 @@
       "skills": [
         "./skills/humanizer"
       ]
+    },
+    {
+      "name": "story-micro-scan",
+      "description": "小说正文「挑剔真人读者」细读层扫描。检测数字与账目自洽、跨章时间线与承诺兑现、同类拟声/句式模板雷同、表述悬空、追踪台账-正文对账。",
+      "source": "./",
+      "strict": false,
+      "version": "1.0.0",
+      "category": "novel-quality",
+      "keywords": [
+        "micro-scan",
+        "fine-reading",
+        "novel",
+        "细读",
+        "自洽",
+        "chinese"
+      ],
+      "skills": [
+        "./skills/story-micro-scan"
+      ]
     }
   ]
 }

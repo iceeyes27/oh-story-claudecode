@@ -40,12 +40,15 @@ ARC_WINDOW = 15  # arc 连读每 15 章一次，窗口是 [N-14, N] 的不重叠
 SEMANTIC_RECEIPT_IDS = ("rc-01", "rc-02", "rc-03", "arc-01")
 PHASES = ("prepared", "prose_moved", "tracking_committed", "done")
 CHAPTER_PREFIX = re.compile(r"^第0*(\d+)章")
-TRACKING_TOOL = Path(__file__).resolve().parent / "tracking_commit.py"
-SKELETON_TOOL = Path(__file__).resolve().parent / "check-chapter-skeleton.js"
-OUTLINE_CONTRACT_TOOL = Path(__file__).resolve().parent / "check-outline-contract.js"
-OUTLINE_COPY_TOOL = Path(__file__).resolve().parent / "check-outline-copy.js"
-CAUSAL_TOOL = Path(__file__).resolve().parent / "check-outline-causal.py"
-VOLUME_AUDIT_TOOL = Path(__file__).resolve().parent / "volume-audit.py"
+# The Dashboard carries this entrypoint as a generated asset; all gates resolve
+# from story-write so it cannot run stale or missing sibling helpers.
+RUNTIME_DIR = Path(__file__).resolve().parent.parent.parent / "story-write" / "scripts"
+TRACKING_TOOL = RUNTIME_DIR / "tracking_commit.py"
+SKELETON_TOOL = RUNTIME_DIR / "check-chapter-skeleton.js"
+OUTLINE_CONTRACT_TOOL = RUNTIME_DIR / "check-outline-contract.js"
+OUTLINE_COPY_TOOL = RUNTIME_DIR / "check-outline-copy.js"
+CAUSAL_TOOL = RUNTIME_DIR / "check-outline-causal.py"
+VOLUME_AUDIT_TOOL = RUNTIME_DIR / "volume-audit.py"
 INTENT_FIELDS = ("目标情绪", "主角目标/关键选择", "结尾拍ID/类型", "期待ID/类型", "读者验收预期")
 SHARED_SCRIPTS = Path(__file__).resolve().parent.parent.parent / "_shared" / "scripts"
 EMOTION_RUN_TOOL = SHARED_SCRIPTS / "check-emotion-run.js"
@@ -53,6 +56,16 @@ NAME_DRIFT_TOOL = SHARED_SCRIPTS / "check-name-drift.js"
 TITLE_TOOL = SHARED_SCRIPTS / "check-chapter-titles.js"
 FIRST_MENTION_TOOL = SHARED_SCRIPTS / "check-first-mention.js"
 ARC_LEDGER_TOOL = SHARED_SCRIPTS / "arc-ledger.js"
+SETTING_PAYOFF_TOOL = SHARED_SCRIPTS / "check-setting-payoff.js"
+SETTING_PAYOFF_RELATIONS = ("兑现", "涉及", "不适用")
+SETTING_PAYOFF_RESULTS = {
+    "兑现": ("已兑现", "部分兑现", "未兑现"),
+    "涉及": ("已遵守", "违反"),
+    "不适用": ("条件未触发",),
+}
+SETTING_PAYOFF_EVIDENCE_REQUIRED = ("已兑现", "部分兑现")
+SETTING_PAYOFF_NOTE_REQUIRED = ("已兑现", "部分兑现", "未兑现", "已遵守", "条件未触发", "违反")
+SETTING_PAYOFF_ANCHOR_MAX_BYTES = 240
 SCAN_SCRIPTS = ("check-ai-patterns.js", "check-degeneration.js")
 
 
@@ -373,7 +386,7 @@ def name_drift_gate(project: Path, chapter: int, state: dict[str, Any]) -> None:
         emit(f"专名漂移 advisory：{message}", error=True)
 
 
-def volume_gate(project: Path, chapter: int, prose: Path, binding: dict[str, Any]) -> dict[str, Any] | None:
+def volume_gate(project: Path, chapter: int, prose: Path, binding: dict[str, Any], next_state: dict[str, Any]) -> dict[str, Any] | None:
     """卷末采用门：本章是某卷声明的最后一章时，卷级审计必须先过。
 
     只在卷纲显式声明了章节范围、且范围终止于本章时触发；其余章节静默放行。
@@ -398,23 +411,10 @@ def volume_gate(project: Path, chapter: int, prose: Path, binding: dict[str, Any
     )
     volume = volumes[0]
 
-    # 待采用的候选章此刻还在 候选/ 下，用 --candidate 把它纳入本卷扫描；
-    # 不落盘报告——check 与 promote 共用本函数，采用前不得写项目文件。
-    result = run_python(
-        [
-            str(VOLUME_AUDIT_TOOL), "--project", str(project), "--volume", str(volume),
-            "--json", "--candidate", str(prose),
-        ],
-        "卷级审计",
-    )
-    require(
-        result.returncode in {0, 1},
-        f"卷级审计无法执行：\n{(result.stdout or result.stderr).strip()}",
-    )
-    try:
-        report = json.loads(result.stdout)
-    except json.JSONDecodeError as exc:
-        raise CandidateError(f"卷级审计未返回合法 JSON：{(result.stdout or result.stderr).strip()}") from exc
+    # Audit the already validated transaction projection, without writing book state.
+    # Otherwise the final chapter can neither clear its own payoff nor become due.
+    auditor = _load_module("candidate_volume_audit", VOLUME_AUDIT_TOOL)
+    report = auditor.audit_volume(project, volume, extra_prose=[prose], projected_state=next_state)
     findings = [item for item in report.get("findings", []) if isinstance(item, dict)]
     blocking = [item for item in findings if item.get("severity") == "blocking"]
     advisory = [item for item in findings if item.get("severity") != "blocking"]
@@ -427,6 +427,10 @@ def volume_gate(project: Path, chapter: int, prose: Path, binding: dict[str, Any
         "findings": findings,
     }
     if blocking:
+        setting_debt = [item for item in blocking if item.get("code", "").startswith("Setting_Payoff_")]
+        require(not setting_debt,
+                "设定卷末关卡未通过：" + "；".join(str(item.get("message")) for item in setting_debt)
+                + "；通用 volume_gate 批准不能代替登记延期/退役及重新审查")
         override = binding.get("volume_gate")
         message = "；".join(
             f"{item.get('code')}：{item.get('message')}" for item in blocking
@@ -451,6 +455,99 @@ def volume_gate(project: Path, chapter: int, prose: Path, binding: dict[str, Any
             error=True,
         )
     return receipt
+
+
+def setting_payoff_gate(
+    project: Path, chapter: int, prose: Path, binding: dict[str, Any], document: dict[str, Any], state: dict[str, Any]
+) -> list[dict[str, Any]]:
+    """设定兑现举证门（setting-payoff/v1，规则见 references/setting-payoff.md 第 6 节）。
+
+    脚本只核"证据可定位、登记表版本一致、结论词合法、与细纲排期一一对应"；
+    兑现是否成立由复核方在 review 里签名，脚本不从原句推断。返回值是要并入
+    delta.setting_payoff_changes 的记账条目——由本函数生成，不允许作者手填。
+    """
+    delta = document.get("delta")
+    require(
+        not (isinstance(delta, dict) and "setting_payoff_changes" in delta),
+        "delta.setting_payoff_changes 由 candidate_binding.setting_payoffs 生成，不要手填",
+    )
+    config = state.get("setting_payoff") or {}
+    enabled = config.get("enabled") is True
+    since = config.get("since_chapter")
+    items = binding.get("setting_payoffs")
+    require(enabled or not ((project / "设定" / "_设定登记.md").is_file() and state.get("last_committed_chapter", 0) == 0),
+            "新书已有设定登记但未启用设定兑现记账；先 enable-setting-payoff，不能按旧书跳过")
+    if not enabled or (isinstance(since, int) and chapter < since):
+        require(items in (None, []), "追踪未启用设定兑现记账（或本章早于 since_chapter），candidate_binding.setting_payoffs 必须为空或省略")
+        return []
+    require(isinstance(items, list), "已启用设定兑现记账：candidate_binding.setting_payoffs 必须是数组（本章无设定时为空数组）")
+    result = run_node([str(SETTING_PAYOFF_TOOL), str(project), "--json", "--chapter", str(chapter), "--readiness"], "设定兑现检查")
+    if result.returncode == 2:
+        require(False, f"设定兑现检查无法执行：\n{(result.stdout or result.stderr).strip()}")
+    report = parse_node_json(result, "设定兑现检查", {0, 1})
+    require(not report.get("notApplicable"), "追踪已启用设定兑现记账，但找不到 设定/_设定登记.md")
+    blocking = [item for item in report.get("findings", []) if isinstance(item, dict) and item.get("severity") == "blocking"]
+    require(not blocking, "设定登记/排期未通过：" + "；".join(str(item.get("message") or item) for item in blocking))
+    registry = report.get("registry") or {}
+    entries = registry.get("entries") or {}
+    chapter_info = report.get("chapter") or {}
+    require(not chapter_info.get("missing"), f"第{chapter}章细纲缺「#### 设定兑现」小节（无设定时写一行「无」）")
+    outline_rows = {row["id"]: row for row in chapter_info.get("rows", []) if isinstance(row, dict)}
+    prose_text = prose.read_text(encoding="utf-8-sig")
+    changes: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for index, item in enumerate(items):
+        label = f"candidate_binding.setting_payoffs[{index}]"
+        require(isinstance(item, dict), f"{label} 必须是对象")
+        item_id = str(item.get("id", "")).strip()
+        require(item_id in entries, f"{label}.id {item_id!r} 不在登记表里")
+        require(item_id not in seen, f"{label}.id {item_id} 重复")
+        seen.add(item_id)
+        entry = entries[item_id]
+        require(entry.get("type") != "retired", f"{item_id} 已退役，不能举证")
+        require(item.get("registry_sha256") == registry.get("sha256"), f"{item_id} 的 registry_sha256 与当前登记表不一致，绑定已过期")
+        outline_row = outline_rows.get(item_id)
+        require(outline_row is not None, f"{item_id} 不在第{chapter}章细纲「设定兑现」小节里，先排期再举证")
+        relation = str(item.get("relation", "")).strip()
+        require(relation in SETTING_PAYOFF_RELATIONS, f"{item_id}.relation 非法")
+        require(relation == outline_row.get("relation"), f"{item_id} 绑定关系「{relation}」与细纲「{outline_row.get('relation')}」不一致")
+        review = item.get("review")
+        require(isinstance(review, dict), f"{item_id} 缺少 review 复核签名")
+        result_word = str(review.get("result", "")).strip()
+        allowed = SETTING_PAYOFF_RESULTS[relation]
+        require(result_word in allowed, f"{item_id}.review.result 对关系「{relation}」只能是 {allowed}")
+        note = str(review.get("note", "") or "").strip()
+        reviewer = str(review.get("reviewer", "") or "").strip()
+        require(reviewer, f"{item_id}.review.reviewer 必须写复核方（主会话或 agent 名）")
+        require(note or result_word not in SETTING_PAYOFF_NOTE_REQUIRED, f"{item_id} 结论「{result_word}」必须在 note 里写原因")
+        require(result_word != "违反", f"{item_id} 复核签了「违反」：本章违反了必须遵守的设定，先改正文")
+        evidence = item.get("evidence") or []
+        require(isinstance(evidence, list), f"{item_id}.evidence 必须是数组")
+        anchors: list[str] = []
+        for pos, ev in enumerate(evidence):
+            require(isinstance(ev, dict), f"{item_id}.evidence[{pos}] 必须是对象")
+            anchor = str(ev.get("anchor", "") or "").strip()
+            require(anchor, f"{item_id}.evidence[{pos}].anchor 为空")
+            require(len(anchor.encode("utf-8")) <= SETTING_PAYOFF_ANCHOR_MAX_BYTES, f"{item_id}.evidence[{pos}].anchor 超过 {SETTING_PAYOFF_ANCHOR_MAX_BYTES} 字节，截成可定位的短句")
+            require(anchor in prose_text, f"{item_id} 的证据未出现在候选正文：「{anchor}」")
+            anchors.append(anchor)
+        require(anchors or result_word not in SETTING_PAYOFF_EVIDENCE_REQUIRED, f"{item_id} 结论「{result_word}」必须给至少一段正文证据")
+        change: dict[str, Any] = {
+            "action": "upsert",
+            "id": item_id,
+            "type": entry.get("type"),
+            "title": entry.get("title") or item_id,
+            "relation": relation,
+            "result": result_word,
+            "evidence_anchor": anchors[0] if anchors else "",
+            "note": note,
+        }
+        if entry.get("type") == "recurring" and entry.get("window"):
+            change["window"] = {"min": int(entry["window"]["min"]), "max": int(entry["window"]["max"])}
+        changes.append(change)
+    missing = [item_id for item_id in outline_rows if item_id not in seen]
+    require(not missing, f"第{chapter}章细纲排了 {'、'.join(missing)}，但 candidate_binding.setting_payoffs 没有举证")
+    return changes
 
 
 def scan_gate(prose: Path, *, project: Path | None = None, target: Path | None = None) -> str | None:
@@ -805,7 +902,6 @@ def validate_binding(
     emotion_run_gate(project, chapter, state)
     causal_gate(project, chapter, state)
     name_drift_gate(project, chapter, state)
-    volume_receipt = volume_gate(project, chapter, prose, binding)
     validate_titles(project, prose)
     length = wordcount.fanqie_length(prose.read_text(encoding="utf-8-sig"))
     require(length["status"] == "pass", f"番茄长篇字数必须为 2200–2800，有效字数为 {length['actual']}")
@@ -836,8 +932,14 @@ def validate_binding(
         findings = scan_gate(prose, project=project)
         require(findings is None, f"候选未通过采用前确定性检查：\n{findings}")
 
+    setting_payoff_changes = setting_payoff_gate(project, chapter, prose, binding, document, state)
+
     tracking_payload = dict(document)
     tracking_payload.pop("candidate_binding", None)
+    if setting_payoff_changes:
+        # 记账条目由举证门生成后并入同一份事务：采用日志的 state_after 摘要天然覆盖它，
+        # recover / 重复采用都走同一条回放路径，不另开写入口。
+        tracking_payload["delta"] = {**tracking_payload.get("delta", {}), "setting_payoff_changes": setting_payoff_changes}
     try:
         normalized = tracking.normalize_transaction(project, state, tracking_payload)
         next_state = tracking.merge_transaction(state, normalized)
@@ -852,6 +954,7 @@ def validate_binding(
         next_state.get("metrics") or {},
         tracking_payload.get("metrics_unchanged_reason"),
     )
+    volume_receipt = volume_gate(project, chapter, prose, binding, next_state)
     hashes["tracking_payload"] = sha256_bytes(canonical_json(tracking_payload))
     hashes["state_after"] = sha256_bytes(tracking.json_payload(next_state).encode("utf-8"))
     hashes["candidate_after_checks"] = sha256_file(prose)
@@ -874,6 +977,7 @@ def validate_binding(
         "reader_view_binding": reader_view_binding,
         "scan_skip": scan_skip,
         "volume_gate": volume_receipt,
+        "setting_payoffs": [item["id"] for item in setting_payoff_changes],
     }
 
 

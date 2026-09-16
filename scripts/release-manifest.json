@@ -13,7 +13,7 @@
     "scripts/current-contract.json": "398b370789666ad973e58afb29d38afaa9832f67b3397b3317f425cf30767de3",
     "scripts/upstream-integration.json": "90ef81479c794947f0af934fa0270c12cff8830a43187e059b1dd406d48624ca",
     "scripts/platform-capabilities.json": "869851d57f054125b10baf69413f520478a8405e7e1910ad628ae911261fb44c",
-    "scripts/platform-skill-set.json": "84014f26bf0f265227e5168b3959f1305eb97729430982a35f3cf169397d857f",
+    "scripts/platform-skill-set.json": "4c465db3f8bcc8b2b7f38d9fc30916f4d5e7b82a82aad241fea83bbca2bf8014",
     "scripts/shared-assets.json": "059f44b3c2aeac464534753eefd6e6d5934154ce9a2f959bd095693e53e550d0",
     "scripts/quality-gate.json": "888ee8de4ec827e1b2d3feb924148295738be099a38ca9d34fdf0777b31ce646"
   },
@@ -22,6 +22,6 @@
     "setup_skill_version": "1.2.11",
     "agents_version": 30,
     "upstream_baseline": "907cde183368076a3bf97aa64f27d24c22504510",
-    "public_skill_count": 18
+    "public_skill_count": 19
   }
 }

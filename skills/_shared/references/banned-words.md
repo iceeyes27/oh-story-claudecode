@@ -18,7 +18,7 @@ sync-source: shared-banned-words-v3.0.0
 
 后文“问题例/改法”只在语境确认有问题时采用；不得把“知道/因为”、标点或正常动作强制改成身体反应。系统建议不能被登记成作者要求。
 
-作者禁令登记在本书根 `.deslop-author-rules.json`，只转录作者已明确的要求，不由系统推断。每条规则含唯一 `id`、`category:"author"`、原文 `source:{path,quote}`、范围 `scope:{path,surface}`、`match:{kind:"literal",value}`。路径相对于登记文件，禁止越界；`surface` 为 `narration` 或 `all`。原句必须在可读来源文件中存在。示例结构：`{"schema_version":1,"rules":[{"id":"author-term-1","category":"author","source":{"path":"创作偏好.md","quote":"正文不使用某词"},"scope":{"path":".","surface":"all"},"match":{"kind":"literal","value":"某词"}}]}`。这只是格式示例，不是默认禁令。
+作者禁令登记在**仓库根** `.deslop-author-rules.json`（**不是本书根**：`source.path` 相对登记文件解析且禁止越界，登记在本书根会导致引用仓库级 `创作偏好.md` 的规则因越界报错；只需对某一本书生效时用 `scope.path` 限定该书即可）。只转录作者已明确的要求，不由系统推断。每条规则含唯一 `id`、`category:"author"`、原文 `source:{path,quote}`、范围 `scope:{path,surface}`、`match:{kind:"literal",value}`。路径相对于登记文件，禁止越界；`surface` 为 `narration` 或 `all`。原句必须在可读来源文件中存在。示例结构：`{"schema_version":1,"rules":[{"id":"author-term-1","category":"author","source":{"path":"创作偏好.md","quote":"正文不使用某词"},"scope":{"path":"{书名}","surface":"all"},"match":{"kind":"literal","value":"某词"}}]}`。这只是格式示例，不是默认禁令。
 
 扫描器从稿件路径向上查找此登记；候选稿不在书目录内时传 `--book-dir <书根>`，按该书根执行全书规则。局部 `scope.path` 限定到具体目录/文件时，书外候选另传 `--target-file <计划正稿路径>`；缺失目标路径则阻断，不能绕过章级禁令。不存在登记即无作者词形禁令，已存在但损坏则阻断；白名单只能放行共享提示，不能覆盖作者禁令。
 
@@ -156,7 +156,11 @@ sync-source: shared-banned-words-v3.0.0
     "情不自禁",
     "自然而然",
     "话锋一转",
-    "避风换气"
+    "避风换气",
+    "冷水沫",
+    "两星水沫",
+    "一星水沫",
+    "两星冷水沫"
   ],
   "density": [
     "仿佛",

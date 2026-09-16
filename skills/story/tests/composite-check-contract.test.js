@@ -66,7 +66,7 @@ function publishedSkills() {
   );
 }
 
-test('generic novel check requires all ten stages and the manifest contract', () => {
+test('generic novel check requires all eleven stages and the manifest contract', () => {
   const expectedStages = [
     ['reader-comprehension', 'reader-comprehension-scan'],
     ['opening-arc', 'opening-arc-audit'],
@@ -78,10 +78,11 @@ test('generic novel check requires all ten stages and the manifest contract', ()
     ['legal-domain-veracity', 'legal-domain-veracity-scan'],
     ['general-deslop', 'story-deslop'],
     ['humanizer', 'humanizer'],
+    ['micro-scan', 'story-micro-scan'],
   ];
 
-  assert.equal(manifest.stages.length, 10);
-  assert.equal(manifest.completion.stageCount, 10);
+  assert.equal(manifest.stages.length, 11);
+  assert.equal(manifest.completion.stageCount, 11);
   assert.deepEqual(manifest.skipPolicy, {allowedOnlyWhen: 'not-applicable', requiresReason: true});
   assert.deepEqual(manifest.notApplicablePolicy, {
     status: 'NOT_APPLICABLE', requiresReason: true, excludedFromScenarioDenominator: true,
@@ -90,9 +91,9 @@ test('generic novel check requires all ten stages and the manifest contract', ()
     manifest.stages.map((stage) => [stage.id, stage.route]),
     expectedStages,
   );
-  assert.deepEqual(manifest.stages.map((stage) => stage.order), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  assert.deepEqual(manifest.stages.map((stage) => stage.order), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
   assert.equal(new Set(allItems().map((item) => item.id)).size, allItems().length);
-  assert.equal(allItems().length, 108, 'manifest and validation spec must update together');
+  assert.equal(allItems().length, 113, 'manifest and validation spec must update together');
 
   // 读者视角阶段的立身条件：只读正文。清单里丢了这条约束，阶段就退回作者视角。
   const readerStage = manifest.stages.find((stage) => stage.id === 'reader-comprehension');
@@ -114,8 +115,8 @@ test('generic novel check requires all ten stages and the manifest contract', ()
 
   assert.match(skill, /composite-check-manifest\.json/);
   assert.match(skill, /ai-flavor-scan.*正文十层/s);
-  assert.match(skill, /108 个目录项都有合法状态/);
-  assert.match(skill, /复合检查完成：10\/10，过滤项 M\/M/);
+  assert.match(skill, /113 个目录项都有合法状态/);
+  assert.match(skill, /复合检查完成：11\/11，过滤项 M\/M/);
   assert.match(skill, /不得静默跳过/);
 });
 
@@ -139,7 +140,7 @@ test('pure Chinese prose profile gives logic checks at least one quarter of appl
     'review-foreshadow-tracking',
   ];
 
-  assert.equal(applicable.length, 46);
+  assert.equal(applicable.length, 51);
   assert.equal(new Set(applicable).size, applicable.length);
   for (const id of applicable) assert.ok(catalog.has(id), `unknown profile filter: ${id}`);
   assert.equal(logicIds.filter((id) => applicable.includes(id)).length, 13);

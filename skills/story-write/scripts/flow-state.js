@@ -3,6 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const longform = require('../../story-review/scripts/longform-review.js');
 
 const USAGE = `Usage: node flow-state.js [--dir <workspace-or-book>] [--json] <command> [args]
 
@@ -59,6 +60,7 @@ const VALID_NEXT_ACTIONS = new Set([
   'expand_chapter_skeleton',
   'review_candidate',
   'quality_check',
+  'review_longform',
   'build_short_setting',
   'write_short_body',
   'revise_chapter',
@@ -138,29 +140,7 @@ function listMarkdownFiles(dir) {
 }
 
 function listChapterFiles(bodyDir) {
-  const chapters = [];
-  function walk(dir) {
-    let entries = [];
-    try {
-      entries = fs.readdirSync(dir, { withFileTypes: true });
-    } catch {
-      return;
-    }
-    for (const entry of entries) {
-      if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory() && !entry.isSymbolicLink()) {
-        if (entry.name === '候选' || entry.name === '_历史') continue;
-        walk(full);
-        continue;
-      }
-      if (!entry.isFile() || entry.name.includes('_原稿_')) continue;
-      const match = entry.name.match(/^第0*(\d{1,4})章.*\.md$/);
-      if (match) chapters.push({ chapter: Number(match[1]), file: full });
-    }
-  }
-  if (isDir(bodyDir)) walk(bodyDir);
-  return chapters.sort((left, right) => left.chapter - right.chapter || left.file.localeCompare(right.file));
+  return longform.chapterFiles(bodyDir);
 }
 
 function detectMode(book) {
@@ -173,16 +153,16 @@ function findHighestChapter(book) {
   return listChapterFiles(bodyDir).reduce((max, item) => Math.max(max, item.chapter), 0);
 }
 
-function hasOutlineFor(book, chapter) {
-  const outlineDir = path.join(book, '大纲');
-  if (!isDir(outlineDir)) return false;
-  const expected = `细纲_第${pad3(chapter)}章.md`;
-  return exists(path.join(outlineDir, expected));
+function outlineFor(book, chapter) {
+  const matches = longform.chapterFiles(path.join(book, '大纲'), true).filter(item => item.chapter === chapter);
+  if (matches.length > 1) die(`同章细纲歧义：${matches.map(item => item.file).join('、')}`);
+  return matches[0] || null;
 }
 
 function findChapterFile(root, chapter) {
   const matching = listChapterFiles(root).filter((item) => item.chapter === chapter);
-  return matching.length ? matching[matching.length - 1] : null;
+  if (matching.length > 1) die(`同章文件歧义：${matching.map(item => item.file).join('、')}`);
+  return matching[0] || null;
 }
 
 function detectLongState(book, activeBook) {
@@ -209,6 +189,7 @@ function detectLongState(book, activeBook) {
 
   const lastChapter = findHighestChapter(book);
   const currentChapter = lastChapter + 1;
+  const outline = outlineFor(book, currentChapter);
 
   let currentPhase = 'topic';
   let currentStage = 'detect';
@@ -219,7 +200,7 @@ function detectLongState(book, activeBook) {
     currentStage = 'plan';
     nextAction = 'build_setting';
     missing.push('题材定位');
-  } else if (!isDir(path.join(book, '大纲')) || !hasOutlineFor(book, currentChapter)) {
+  } else if (!outline) {
     currentPhase = 'outline';
     currentStage = 'plan';
     nextAction = 'build_outline';
@@ -232,7 +213,7 @@ function detectLongState(book, activeBook) {
   } else {
     currentPhase = 'chapter_writing';
     known.push(`第${pad3(currentChapter)}章细纲`);
-    artifacts.push(`大纲/细纲_第${pad3(currentChapter)}章.md`);
+    artifacts.push(toSlash(path.relative(book, outline.file)));
     if (lastChapter > 0) {
       const latest = findChapterFile(path.join(book, '正文'), lastChapter);
       artifacts.push(latest ? path.relative(book, latest.file).split(path.sep).join('/') : `正文/**/第${pad3(lastChapter)}章_*.md`);
@@ -316,7 +297,34 @@ function detectShortState(book, activeBook) {
 
 function detectState(bookInfo) {
   if (detectMode(bookInfo.book) === 'short') return detectShortState(bookInfo.book, bookInfo.activeBook);
-  return detectLongState(bookInfo.book, bookInfo.activeBook);
+  return applyReadingGate(bookInfo.book, detectLongState(bookInfo.book, bookInfo.activeBook));
+}
+
+function applyReadingGate(book, state, patch = null) {
+  // Derive from the book, not caller-supplied mode/chapter/done fields.
+  if (detectMode(book) === 'short') return state;
+  let result;
+  try { result = longform.gate(book); } catch (error) { die(`longform gate failed: ${error.message}`); }
+  if (!result.enabled) return state;
+  if (patch && !result.can_complete && patch.execution_status === 'done') die('pending/stale reading cannot be marked done');
+  const next = state.current_stage === 'pending_reading' || (!result.can_complete && state.execution_status === 'done')
+    ? { ...detectLongState(book, state.current_book) }
+    : { ...state };
+  if (!result.can_complete) {
+    next.current_stage = 'pending_reading';
+    // Planning may continue; the prose assembler separately enforces can_generate.
+    if (!['topic', 'setting', 'outline'].includes(next.current_phase)) {
+      next.current_phase = 'quality_check';
+      next.next_action = 'review_longform';
+    }
+    if (!result.can_generate) {
+      next.execution_status = 'blocked';
+      next.missing_inputs = [...new Set([...next.missing_inputs, '到期连读复核或作者继续授权'])];
+    }
+  }
+  // No second copy of mutable review status: persist only the authority pointer.
+  next.artifacts = [...new Set([...next.artifacts, result.source])];
+  return next;
 }
 
 function statePath(book) {
@@ -407,7 +415,7 @@ if (command === 'detect') {
 }
 
 if (command === 'read') {
-  printState(readState(bookInfo.book));
+  printState(applyReadingGate(bookInfo.book, readState(bookInfo.book)));
   process.exit(0);
 }
 
@@ -422,7 +430,7 @@ if (command === 'update') {
   if (typeof patch !== 'object' || patch === null || Array.isArray(patch)) die('update payload must be a JSON object');
   validateUpdatePatch(patch);
   const current = exists(statePath(bookInfo.book)) ? readState(bookInfo.book) : detectState(bookInfo);
-  const next = { ...current, ...patch, schema_version: 1 };
+  const next = applyReadingGate(bookInfo.book, { ...current, ...patch, schema_version: 1 }, patch);
   writeState(bookInfo.book, next);
   printState(next);
   process.exit(next.execution_status === 'blocked' ? 1 : 0);

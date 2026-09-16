@@ -116,7 +116,7 @@ def extract_chapter_range(outline_text: str) -> Tuple[Optional[int], Optional[in
     """从卷纲提取章节范围，如 第 1–约 30 章，第1-20章 等。
 
     只接受显式声明；无法确定时返回 (None, None)，由调用方降级为
-    Volume_Range_Unclear advisory + 全量章节扫描，不猜测范围。
+    完整审计报告范围不明，不能宣称整卷通过，不猜测范围。
     """
     m = RANGE_LABELED.search(outline_text)
     if m:
@@ -164,11 +164,184 @@ def find_volumes_ending_at(project_dir: Path, chapter: int) -> List[int]:
     return sorted(set(ending))
 
 
+def setting_payoff_due_findings(
+    project_dir: Path, start_ch: Optional[int], end_ch: Optional[int], metrics: Dict[str, Any],
+    projected_state: Optional[Dict[str, Any]] = None,
+) -> List[Dict[str, str]]:
+    """未启用（无登记表或追踪未开记账）→ 空；登记表损坏 → 直接把检查器的 blocking 带出。"""
+    registry = project_dir / "设定" / "_设定登记.md"
+    if start_ch is None or end_ch is None:
+        return []
+    state_path = project_dir / "追踪" / "_tracking-state.json"
+    try:
+        state = projected_state if projected_state is not None else json.loads(state_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        if not registry.is_file():
+            return []
+        return [{"severity":"blocking", "code":"Setting_Payoff_State", "message":"设定追踪状态无法读取，不能完成卷审计"}]
+    if not registry.is_file() and not (state.get("setting_payoff") or {}).get("enabled"):
+        return []
+    checker = Path(__file__).resolve().parent.parent.parent / "_shared" / "scripts" / "check-setting-payoff.js"
+    if not checker.is_file():
+        return [{"severity": "blocking", "code": "Setting_Payoff_Checker_Missing", "message": "找不到 _shared/scripts/check-setting-payoff.js，设定兑现到期未审"}]
+    try:
+        import subprocess
+        completed = subprocess.run(["node", str(checker), str(project_dir), "--json"], capture_output=True, text=True, encoding="utf-8", check=False)
+        data = json.loads(completed.stdout)
+    except (OSError, ValueError) as exc:
+        return [{"severity": "blocking", "code": "Setting_Payoff_Checker_Failed", "message": f"设定兑现检查器未能运行：{exc}"}]
+    out: List[Dict[str, str]] = []
+    for f in data.get("findings", []):
+        if f.get("severity") == "blocking":
+            out.append({"severity": "blocking", "code": "Setting_Payoff_Registry", "message": str(f.get("message"))})
+    tracking = data.get("tracking") or {}
+    if not tracking.get("enabled"):
+        return out
+    records = state.get("setting_payoffs") or {}
+    last = int(state.get("last_committed_chapter") or 0)
+    entries = ((data.get("registry") or {}).get("entries")) or {}
+    due, overdue_recurring = [], []
+    for sid, entry in entries.items():
+        if entry.get("type") == "payoff":
+            target = entry.get("target") or {}
+            to = target.get("to")
+            if to is None:
+                target_volume = parse_volume_number(str(target.get("volume") or ""))
+                current_volume = int(metrics.get("volume") or 0)
+                if target_volume is None or target_volume > current_volume:
+                    continue
+                # Keep the real volume boundary: an in-progress cutoff is not a volume end.
+                to = end_ch
+                if target_volume < current_volume:
+                    previous_outline = find_volume_outline(project_dir, target_volume)
+                    previous_end = extract_chapter_range(previous_outline.read_text(encoding="utf-8"))[1] if previous_outline else None
+                    to = previous_end if previous_end is not None else start_ch - 1
+                if last < to:
+                    continue
+            elif int(to) > min(end_ch, last) or int(to) < int(tracking.get("since") or 1):
+                continue
+            ok = any(r.get("result") == "已兑现" and int(r.get("chapter", 0)) <= min(last, end_ch) for r in (records.get(sid) or {}).get("records", []))
+            if not ok:
+                due.append(f"{sid}「{entry.get('title') or ''}」目标第{target.get('from')}–{to}章")
+        elif entry.get("type") == "recurring" and entry.get("window"):
+            recs = (records.get(sid) or {}).get("records", [])
+            last_hit = max((int(r["chapter"]) for r in recs if r.get("result") == "已兑现" and int(r["chapter"]) <= min(last, end_ch)), default=None)
+            gap = min(last, end_ch) - (last_hit if last_hit is not None else int(tracking.get("since") or 1) - 1)
+            if gap > int(entry["window"]["max"]):
+                overdue_recurring.append(f"{sid}「{entry.get('title') or ''}」已 {gap} 章未记录（窗口每 {entry['window']['min']}–{entry['window']['max']} 章）")
+    metrics["setting_payoff_due"] = len(due)
+    if due:
+        out.append({"severity": "blocking", "code": "Setting_Payoff_Due", "message": "截至本卷到期仍未完整兑现的设定：" + "；".join(due) + "。返回细纲补足剩余义务；延期须改登记目标并记录理由，放弃须改为 retired 并保留理由；部分兑现/条件未触发不销账"})
+    if overdue_recurring:
+        out.append({"severity": "advisory", "code": "Setting_Payoff_Recurring_Overdue", "message": "贯穿设定超窗：" + "；".join(overdue_recurring)})
+    return out
+
+
+def chapter_inventory(project_dir, start_ch, end_ch, extra_prose=None, projected_state=None, through_chapter=None):
+    """Inventory formal prose recursively; never count candidate/history directories."""
+    findings = []
+    by_chapter = {}
+    def add_finding(code, message):
+        findings.append({"severity": "blocking", "code": code, "message": message})
+    def add_file(file):
+        file = file.resolve()
+        if re.search(r"(?:_原稿(?:_|\.)|_历史_|_候选_)", file.name):
+            return
+        match = re.match(r"^第0*(\d+)章.*\.md$", file.name)
+        if not match:
+            return
+        chapter = int(match.group(1))
+        if chapter < 1:
+            return
+        if start_ch is not None and end_ch is not None and not start_ch <= chapter <= end_ch:
+            return
+        paths = by_chapter.setdefault(chapter, [])
+        if file.resolve() not in [old.resolve() for old in paths]:
+            paths.append(file)
+    def walk_error(error):
+        add_finding("Prose_Unreadable", str(error))
+    for directory, dirs, names in os.walk(project_dir / "正文", onerror=walk_error):
+        dirs[:] = sorted(name for name in dirs if not name.startswith((".", "_原稿"))
+                         and name not in {"候选", "_历史", "历史", "原稿", "归档", "node_modules"}
+                         and not (Path(directory) / name).is_symlink())
+        for name in sorted(names):
+            file = Path(directory) / name
+            if not file.is_symlink():
+                add_file(file)
+    for file in extra_prose or []:
+        add_file(file)
+    state = projected_state
+    state_path = project_dir / "追踪" / "_tracking-state.json"
+    try:
+        if state is None:
+            state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else {}
+        if not isinstance(state, dict):
+            raise ValueError("tracking state must be an object")
+        last = state.get("last_committed_chapter", 0)
+        if type(last) is not int or last < 0:
+            raise ValueError("last_committed_chapter invalid")
+        imported = state.get("imported_through_chapter", 0)
+        if type(imported) is not int or not 0 <= imported <= last:
+            raise ValueError("imported_through_chapter invalid")
+        excluded = set()
+        gaps = state.get("chapter_gaps", [])
+        if not isinstance(gaps, list):
+            raise ValueError("chapter_gaps invalid")
+        for gap in gaps:
+            lo, hi, declared = (gap.get(key) for key in ("start_chapter", "end_chapter", "declared_at_chapter"))
+            if (any(type(n) is not int for n in (lo, hi, declared)) or not 1 <= lo <= hi
+                    or lo <= imported or declared != hi + 1 or declared > last
+                    or not isinstance(gap.get("reason"), str) or not gap["reason"].strip()):
+                raise ValueError("chapter gap requires valid range, adoption point and reason")
+            numbers = set(range(lo, hi + 1))
+            if excluded.intersection(numbers):
+                raise ValueError("overlapping chapter gaps")
+            excluded.update(numbers)
+    except (OSError, ValueError, TypeError, AttributeError) as error:
+        add_finding("Prose_Tracking_Invalid", str(error))
+        last, excluded = 0, set()
+    for chapter, files in by_chapter.items():
+        if len(files) > 1:
+            add_finding("Prose_Chapter_Duplicate", f"第{chapter}章有多个文件：{', '.join(str(f) for f in files)}")
+        if chapter in excluded:
+            add_finding("Prose_Gap_Conflict", f"第{chapter}章同时存在正文与缺章声明")
+    expected, future = set(), set()
+    if start_ch is not None and end_ch is not None and 1 <= start_ch <= end_ch:
+        if through_chapter is not None and (type(through_chapter) is not int or through_chapter < 0):
+            raise ValueError("through_chapter must be a nonnegative integer")
+        # Already adopted chapters remain required even when an earlier cutoff is requested.
+        cutoff = end_ch if through_chapter is None else min(end_ch, max(through_chapter, last))
+        expected = set(range(start_ch, cutoff + 1)) - excluded
+        future = set(range(max(start_ch, cutoff + 1), end_ch + 1)) - excluded
+    else:
+        add_finding("Prose_Coverage_Unknown", "卷纲范围不明，不能声明完整卷审计")
+    missing = sorted(expected - by_chapter.keys())
+    if missing:
+        add_finding("Prose_Chapter_Missing", f"应有正文缺失：{missing}")
+    selected = [(ch, files[0]) for ch, files in sorted(by_chapter.items())
+                if through_chapter is None or ch <= max(through_chapter, last)]
+    for chapter, file in selected:
+        try:
+            file.read_text(encoding="utf-8")
+        except (OSError, UnicodeError) as error:
+            add_finding("Prose_Unreadable", f"第{chapter}章无法读取：{error}")
+    return selected, findings, {
+        "audit_scope": "complete_volume" if through_chapter is None else "in_progress",
+        "existing_chapters_in_range": len(selected),
+        "expected_chapters": sorted(expected), "missing_chapters": missing,
+        "future_chapters": sorted(future),
+        "excluded_chapters": sorted(n for n in excluded if start_ch is not None and end_ch is not None and start_ch <= n <= end_ch),
+        "scanned_files": [str(file) for _, file in selected],
+    }
+
+
 def audit_volume(
     project_dir: Path,
     vol_num: int,
     strict: bool = False,
     extra_prose: Optional[List[Path]] = None,
+    projected_state: Optional[Dict[str, Any]] = None,
+    through_chapter: Optional[int] = None,
 ) -> Dict[str, Any]:
     findings: List[Dict[str, str]] = []
     metrics: Dict[str, Any] = {
@@ -234,37 +407,12 @@ def audit_volume(
             "message": "卷纲中未明确标出规范的章节范围（建议在核心信息中注明，如：第 1–30 章）"
         })
 
-    # 3. 检查正文章节存在性与字数
-    prose_dir = project_dir / "正文"
-    prose_files = []
-    if prose_dir.is_dir():
-        for f in prose_dir.glob("*.md"):
-            m = re.match(r"^第0*(\d+)章", f.name)
-            if m:
-                ch = int(m.group(1))
-                if start_ch is not None and end_ch is not None:
-                    if start_ch <= ch <= end_ch:
-                        prose_files.append((ch, f))
-                else:
-                    prose_files.append((ch, f))
-
-    # 采用门在正文写入之前运行：待采用的候选章还在 候选/ 下，正文里没有它。
-    # 不把它纳进来，卷末审计就恰好漏掉本卷最后一章——即最该看的那一章。
-    seen_chapters = {ch for ch, _ in prose_files}
-    for f in extra_prose or []:
-        m = re.match(r"^第0*(\d+)章", f.name)
-        if not m:
-            continue
-        ch = int(m.group(1))
-        if ch in seen_chapters:
-            continue
-        if start_ch is not None and end_ch is not None and not (start_ch <= ch <= end_ch):
-            continue
-        prose_files.append((ch, f))
-        seen_chapters.add(ch)
-    prose_files.sort(key=lambda item: item[0])
-
-    metrics["existing_chapters_in_range"] = len(prose_files)
+    # The declared range is an audit obligation, not a list inferred from files.
+    prose_files, inventory_findings, inventory_metrics = chapter_inventory(
+        project_dir, start_ch, end_ch, extra_prose, projected_state, through_chapter,
+    )
+    findings.extend(inventory_findings)
+    metrics.update(inventory_metrics)
 
     # 4. 检查下一卷承接动力
     has_next_drive = bool(re.search(
@@ -340,6 +488,10 @@ def audit_volume(
             "code": "Power_Economic_Inflation_Signal",
             "message": f"正文检测到 {len(inflation_hits)} 处疑似极端通胀信号：{'; '.join(inflation_hits[:3])}"
         })
+
+    # 7. 设定兑现到期（setting-payoff.md 第 6 节）：判截至本卷到期的 payoff，
+    #    追踪里没有 已兑现 记录的条目（包括以前卷到期但未清的债） → blocking；recurring 超窗只 advisory。
+    findings.extend(setting_payoff_due_findings(project_dir, start_ch, end_ch, metrics, projected_state))
 
     # 判定整体状态
     blocking_count = sum(1 for f in findings if f["severity"] == "blocking")
@@ -418,9 +570,12 @@ def main():
     )
     parser.add_argument("--write", "-w", action="store_true", help="将审计报告落盘至 追踪/稳定性审计/")
     parser.add_argument("--json", action="store_true", help="输出机器可读 JSON")
+    parser.add_argument("--through-chapter", type=int, help="卷中检查截止章；省略即要求完整卷正文")
     parser.add_argument("--strict", action="store_true", help="严格模式（advisory 亦导致 FAIL）")
 
     args = parser.parse_args()
+    if args.through_chapter is not None and args.through_chapter < 0:
+        parser.error("--through-chapter must be nonnegative")
 
     project_dir = Path(args.project).resolve()
     if not project_dir.is_dir():
@@ -457,7 +612,7 @@ def main():
             sys.exit(2)
         extra_prose.append(path)
 
-    result = audit_volume(project_dir, vol_num, strict=args.strict, extra_prose=extra_prose)
+    result = audit_volume(project_dir, vol_num, strict=args.strict, extra_prose=extra_prose, through_chapter=args.through_chapter)
 
     if args.write:
         report_dir = project_dir / "追踪" / "稳定性审计"

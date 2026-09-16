@@ -249,6 +249,7 @@ function parseCli(argv) {
 function readBatch(file) { const value = readJson(path.resolve(file), "batch"); if (!value) fail("missing-batch", `批次文件不存在：${file}`); return value }
 
 function main(argv) {
+  if (argv[0] === "longform") return require("./longform-review.js").main(argv.slice(1))
   try {
     const { command, values, flags } = parseCli([...argv])
     if (!values.book) fail("cli", "缺少 --book")
@@ -268,6 +269,8 @@ function main(argv) {
   }
 }
 
-if (require.main === module) process.exitCode = main(process.argv.slice(2))
-
 module.exports = { ReviewStateError, SCHEMA_VERSION, completeReview, initReview, normalizeBatch, releaseClaim, resetReview, statusReview, updateReview }
+// Shared persistence primitives; longform uses a separate file and claim namespace.
+module.exports.storage = { readJson, atomicWrite, ownClaim }
+
+if (require.main === module) process.exitCode = main(process.argv.slice(2))

@@ -1,5 +1,7 @@
 # 候选工作流（Candidate Workflow）
 
+启用设定兑现的长篇必须按 [setting-payoff.md](setting-payoff.md) 完成完善性写前关卡、正文语义及读者复核，填写 `candidate_binding.setting_payoffs`。check/promote 复验审查记录与证据；部分兑现不销账，采用后才记正式事实。
+
 候选模式下，作者或独立模型扩写的正文先写入书根 `候选/`，作者显式采用后才并入正稿 `正文/` 并推进追踪。追踪只在采用时推进——`_tracking-state.json` 永远只反映已批准正文。
 
 本流程完全在 SKILL 层编排：正文来源可以是作者、独立模型或 narrative-writer；追踪事务始终由主会话根据实际候选正文构造。不改 agent 定义，不提升 `agents_version`。
@@ -69,6 +71,9 @@
 **触发条件**：`大纲/卷纲_第N卷.md` 显式声明的章节范围正好终止于本章。范围没写、或本章不是卷末时静默放行——不靠猜测的卷边界阻断作者。反查用 `volume-audit.py --project {书名} --ends-at {章号}`，输出 `{"chapter": N, "volumes": [...]}`。多个卷纲把范围终止于同一章是卷纲数据错误，直接拒绝，先修范围声明。
 
 **审计范围**：待采用的候选章此刻还在 `候选/` 下，门内用 `--candidate {候选正文}` 把它纳入本卷扫描，否则卷末审计恰好漏掉最该看的那一章。门只读，不落盘报告（`check` 不得写项目文件）；要留报告仍用 `volume-audit.py --volume N --write` 单独跑。
+
+完整卷审计递归读取正式 `正文/`（排除隐藏目录、候选、历史与原稿），将卷纲声明范围与采用状态中的 `chapter_gaps` 对账。应有正文缺失、同章多文件、缺章声明与正文冲突或状态不可读均为 blocking；候选末章与已有同章正文不能被静默去重。指标中的 `scanned_files`、`missing_chapters`、`excluded_chapters` 分别表示实际读取、缺失和已声明排除。卷中预检显式传 `--through-chapter N`，后续未到期章列为 `future_chapters`，报告 `audit_scope=in_progress`，不能当成换卷验收；已经采用的章节仍需存在，不能通过较小截止章隐藏缺失。
+
 
 **判定分级**：
 

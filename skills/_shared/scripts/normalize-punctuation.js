@@ -49,6 +49,7 @@ if (options.files.length === 0) {
 let totalFindings = 0;
 let changedFiles = 0;
 let failed = false;
+const fileQuoteStyles = []; // {file, curly, straight}：跨文件引号风格一致性提示用
 
 for (const file of options.files) {
   const fullPath = path.resolve(file);
@@ -60,6 +61,12 @@ for (const file of options.files) {
     console.error(`${file}: unable to read (${error.message})`);
     continue;
   }
+
+  fileQuoteStyles.push({
+    file,
+    curly: (input.match(/[“”]/g) || []).length,
+    straight: (input.match(/"/g) || []).length,
+  });
 
   const result = normalizeDocument(input, options.quoteMode);
   totalFindings += result.findings.length;
@@ -81,6 +88,24 @@ for (const file of options.files) {
 if (failed) {
   process.exit(2);
 }
+
+// 跨文件引号风格分歧提示（advisory，不改变 exit code）：同一批正文里既有纯弯引号文件
+// 又有纯直引号文件，通常是一本书的引号风格没统一。单文件混用已在 normalizeDocument
+// 内作为 finding 计入 --check 退出码；此处只管"章与章之间风格分家"。
+if (options.check && fileQuoteStyles.length >= 2) {
+  const pureCurly = fileQuoteStyles.filter((s) => s.curly > 0 && s.straight === 0);
+  const pureStraight = fileQuoteStyles.filter((s) => s.straight > 0 && s.curly === 0);
+  if (pureCurly.length >= 1 && pureStraight.length >= 1) {
+    console.error(
+      `[advisory] 引号风格跨文件不一致：${pureCurly
+        .map((s) => path.basename(s.file))
+        .join('、')} 用弯引号，${pureStraight
+        .map((s) => path.basename(s.file))
+        .join('、')} 用直引号；同一本书建议统一为中文弯引号。`
+    );
+  }
+}
+
 if (options.check && totalFindings > 0) {
   process.exit(1);
 }
@@ -104,6 +129,9 @@ function normalizeDocument(input, quoteMode) {
   let quoteOpen = false;
   let commentOpen = false;
   let commentStart = null;
+  // 引号风格一致性（advisory）：统计非代码行里的弯/直引号字符数，判断同文件是否混用。
+  let curlyQuoteChars = 0;
+  let straightQuoteChars = 0;
   const commentCloseAhead = new Array(lines.length + 1).fill(false);
   for (let index = lines.length - 1; index >= 0; index -= 1) {
     commentCloseAhead[index] = lines[index].includes('-->') || commentCloseAhead[index + 1];
@@ -167,6 +195,10 @@ function normalizeDocument(input, quoteMode) {
       commentStart = null;
     }
 
+    // 引号风格统计：fence 内代码/示例、frontMatter 均已 continue，此处只统计正文行
+    curlyQuoteChars += (line.match(/[“”]/g) || []).length;
+    straightQuoteChars += (line.match(/"/g) || []).length;
+
     const quoteResult = normalizeQuotes(line, quoteMode, quoteOpen, lineNo);
     findings.push(...quoteResult.findings);
     line = quoteResult.line;
@@ -181,6 +213,18 @@ function normalizeDocument(input, quoteMode) {
       column: commentStart?.column || 1,
       type: 'html-comment-unclosed',
       message: 'HTML 注释未闭合；后续内容仍按正文检查。',
+    });
+  }
+
+  // 引号风格一致性（advisory）：同一文件内弯引号与直引号混用是排版事故信号
+  // （代码块/示例已被 fence 排除，此处只反映正文行）。不足 2 个字符的一方忽略，
+  // 避免英文撇号、英寸标记等零星直引号误报。
+  if (curlyQuoteChars >= 2 && straightQuoteChars >= 2) {
+    findings.push({
+      line: 1,
+      column: 1,
+      type: 'quote-style-mixed',
+      message: `引号风格混用：弯引号 ${curlyQuoteChars} 个、直引号 ${straightQuoteChars} 个；建议统一为中文弯引号。`,
     });
   }
 

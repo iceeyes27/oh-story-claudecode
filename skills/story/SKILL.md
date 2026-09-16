@@ -15,7 +15,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 
 | 用户意图 | 关键词示例 | 路由到 |
 |---|---|---|
-| 长篇规划/写作 | 讨论长篇结构、规划剧情、开书、写大纲、补细纲、长篇、连载 | `/story-write` (mode=long) |
+| 写长篇 | 开书、写大纲、长篇、连载 | `/story-write` (mode=long) |
 | 写短篇 | 短篇、盐言、一万字 | `/story-write` (mode=short) |
 | 长篇拆文 | 拆文、分析这本书、黄金三章 | `/story-analyze` (mode=long) |
 | 短篇拆文 | 拆短篇、分析这个故事 | `/story-analyze` (mode=short) |
@@ -23,7 +23,8 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 | 选题决策 | 写什么能爆、帮我选题、选题方向 | `/story-scan` (mode=long) |
 | 短篇扫榜 | 短篇排行、知乎盐言排行 | `/story-scan` (mode=short) |
 | 去 AI 味 | 去 AI 味、太 AI、去味、说人话 | `/story-deslop` |
-| 小说复合检查 | 检查、检查这本小说、帮我检查、检查一下当前书 | 依次执行 `reader-comprehension-scan` → `opening-arc-audit`（章节数达窗口） → `story-review` → `ai-flavor-scan` → `story-deslop` (mode=novel) → `dialogue-naturalness-scan` → `jargon-verb-scan` → `legal-domain-veracity-scan`（涉司法实务题材） → `story-deslop` (mode=general) → `humanizer` |
+| 章末钩子替换 | 章末钩子、钩子替换、章末口号、章末精修、换章末收尾、口号腔收尾 | `/story-hook-refine` |
+| 小说复合检查 | 检查、检查这本小说、帮我检查、检查一下当前书 | 依次执行 `reader-comprehension-scan` → `opening-arc-audit`（章节数达窗口） → `story-review` → `ai-flavor-scan` → `story-deslop` (mode=novel) → `dialogue-naturalness-scan` → `jargon-verb-scan` → `legal-domain-veracity-scan`（涉司法实务题材） → `story-deslop` (mode=general) → `humanizer` → `story-micro-scan` |
 | 律政专业度 | 检查律政专业度、证据合法性、取证程序、司法硬伤 | `/legal-domain-veracity-scan` |
 | 封面 | 封面、封面图 | `/story-cover` |
 | 环境部署 | 准备写书、搭环境、初始化 | `/story-setup` |
@@ -94,10 +95,11 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 8. `legal-domain-veracity-scan`：律政实务与证据合规专项，检查取证程序、证明力背书和庭审规范硬伤；题材完全不涉司法实务时整阶段按清单标 `SKIPPED` 并写明判断依据。
 9. `story-deslop`（mode=general）：正文及对外文案的套路腔、空话和模板感。
 10. `humanizer`：通用 AI 痕迹复核；纯中文正文只作模式复核。
+11. `story-micro-scan`：挑剔真人读者逐段通读，查数字与账目自洽（可复现计算、跨章并排）、跨章时间线与承诺兑现、同类拟声/句式/数量模板雷同、表述悬空（无主因"被 X"）、追踪台账-正文对账（冲突以正文为准，细纲未兑现不许预支）；只读 `正文/` + `追踪/`，不注入设定与大纲。
 
 前两个阶段是读者视角，先于一切文字层清洗执行：逻辑看不懂的稿子，把 AI 味洗干净也还是弃书。
 
-开始前输出当前书名、正文目录、章节总数、十阶段识别结果、完整目录项数和当前场景适用项数。纯中文小说正文使用 manifest 的 `pure-chinese-prose` profile；该 profile 之外的 filter 记 `NOT_APPLICABLE` 并说明场景原因，不进入适用分母。每完成一个阶段，立即输出执行状态、实际范围、目录项数、适用项数、已返回结果数、问题数量和关键发现。阶段内部逐项登记：
+开始前输出当前书名、正文目录、章节总数、十一阶段识别结果、完整目录项数和当前场景适用项数。纯中文小说正文使用 manifest 的 `pure-chinese-prose` profile；该 profile 之外的 filter 记 `NOT_APPLICABLE` 并说明场景原因，不进入适用分母。每完成一个阶段，立即输出执行状态、实际范围、目录项数、适用项数、已返回结果数、问题数量和关键发现。阶段内部逐项登记：
 
 ```text
 filter_id | status | scope | findings | reason
@@ -105,7 +107,7 @@ filter_id | status | scope | findings | reason
 
 `PASS` 表示已执行且无发现，`FAIL` 表示已执行且有发现，`BLOCKED` 表示无法执行，`SKIPPED` 只用于阶段运行条件不满足，`NOT_APPLICABLE` 只用于当前 profile 排除的 filter；后二者都要写明原因。普通发现不能中断后续过滤器；输入不可读、范围不完整或没有等价执行器时必须报告阻断，不得静默跳过。Reviewer agent 不可用但 `story-review` 完成 solo 降级时必须标明。
 
-只有十个阶段全部有结论、108 个目录项都有合法状态、当前场景 M 个适用项全部返回且没有未说明的 `BLOCKED`/`SKIPPED`/`NOT_APPLICABLE` 时，才允许输出 `复合检查完成：10/10，过滤项 M/M（完整目录 108 项）`。
+只有十一个阶段全部有结论、113 个目录项都有合法状态、当前场景 M 个适用项全部返回且没有未说明的 `BLOCKED`/`SKIPPED`/`NOT_APPLICABLE` 时，才允许输出 `复合检查完成：11/11，过滤项 M/M（完整目录 113 项）`。
 
 用户未明确要求修改时，复合检查只读，不写正文文件。
 

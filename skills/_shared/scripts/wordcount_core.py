@@ -196,9 +196,21 @@ def _chapter_number_from_name(name: str, *, outline: bool) -> int | None:
 def find_chapter_file(directory: Path, chapter: int, *, outline: bool) -> Path:
     require(isinstance(chapter, int) and not isinstance(chapter, bool) and chapter >= 1, "chapter must be >= 1")
     require(directory.is_dir(), f"chapter directory is missing: {directory}")
+    # 2026-09-13 修：正文常按卷分目录（正文/第1卷_x/第001章_*.md）。旧版只 iterdir() 一层，
+    # 这种排布下 0 命中并抛「must have exactly one body file」，导致 wordcount_records 永远填不上。
+    # 改为向下最多两层收集候选；扁平排布（正文/第001章_*.md）行为完全不变。
+    candidates: list[Path] = []
+    stack: list[tuple[Path, int]] = [(directory, 0)]
+    while stack:
+        current, depth = stack.pop()
+        for path in sorted(current.iterdir()):
+            if path.is_file():
+                candidates.append(path)
+            elif path.is_dir() and depth < 2:
+                stack.append((path, depth + 1))
     matches = sorted(
-        path for path in directory.iterdir()
-        if path.is_file() and _chapter_number_from_name(path.name, outline=outline) == chapter
+        path for path in candidates
+        if _chapter_number_from_name(path.name, outline=outline) == chapter
     )
     label = "outline" if outline else "body"
     require(len(matches) == 1, f"chapter {chapter} must have exactly one {label} file")

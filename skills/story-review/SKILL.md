@@ -12,7 +12,13 @@ disable: true
 
 你是审查协调器。你的职责是找出小说文本中的结构、角色、文字、设定问题，并给出可执行修改建议。
 
-**执行铁律：审查是找问题，不是验证正确性。**
+**执行铁律：审查基于实际证据定位问题；没有问题可以无 finding，证据不足据实说明，不为填表凑问题。**
+
+## 长篇累计连读入口
+
+写作流程到达已启用的单元末/十五章检查点时，先读取 [references/longform-reading.md](references/longform-reading.md)。本入口独立于普通 full/lean/solo 作者视角审查：未参与该段创作/规划的读者先顺序读正文，不看设计卡或未来答案，再比较此前相似单元；父流程只汇总、后置对照设计及安排处置。普通审查的设定、追踪和作者偏好资料不得注入盲读。没有独立审读者不能用 solo 自评代替，保留待审原因。
+
+本协议的长篇流程记录由 `review-state.js` 的独立命名空间管理，不覆盖普通 `latest.json`，不写故事事实台账。实际入口为 `review-state.js longform init/status/gate/start/read/finish/fail/authorize`，状态位于 `.story-review/longform-v1.json`；写命令采用 expected-revision CAS，参数与最小操作例见 longform-reading.md。以下普通模式的状态规则不充当长篇完成证明；累计阅读范围、证据、授权、失效及旧书启用边界以 longform-reading.md 为准。用户明确只读时不写任何状态或收据。
 
 ## 作者习惯边界
 
@@ -102,6 +108,7 @@ Rubric Source: file | embedded fallback
 | 质量代际协议 | `story-review/references/quality-lifecycle.md` |
 | 显式 P0/P1 treatment | `story-review/references/quality-p1.md` |
 | 顺序读者与盲评链 | `story-review/references/reader-chain-and-graph.md` |
+| 普通长篇累计连读与前文回查边界 | `story-review/references/longform-reading.md` |
 | 去 AI 味方法 | `.agents/skills/_shared/references/anti-ai-writing.md` |
 | 剧情循环/高潮公式 | `story-review/references/plot-core-methods.md` |
 | 角色关系/好感度 | `story-review/references/character-relations.md` |
@@ -155,14 +162,11 @@ AI 味 / 禁用词 fallback 速查：
 
 full/lean 模式下，主会话必须把“审查基准包摘要”直接写进每个 Agent prompt。**不要要求子 Agent 必须读取 `story-review/references/*` 才能完成任务**；子 Agent 可读取已部署的 story-setup 参考包作为补充，但最终必须遵守本 skill 注入的 rubric 摘要和统一 Findings Schema。
 
-### 跨批审查落盘契约（所有模式）
+### 普通跨批审查落盘契约
 
-只要多章/整卷/整本审查被拆成两批及以上，full、lean、solo 都维护 **{项目根}/.story-review/state.md**：
+普通 full/lean 分批审查遵守上方「跨批 findings 状态」：只通过 `review-state.js` 管理 `{书目录}/.story-review/latest.json`，不再另写 state.md 或自行原子替换文件。保留完整范围、已完成/下一批和未解决 findings；输入变化须复核。solo 或明确只读仅查询及输出，不创建持久状态。
 
-1. 首批确定本次完整审查范围和批次顺序。每批综合裁决后，用同目录临时文件 + rename 原子重写 state.md，不能只把结果留在对话里。
-2. state.md 只记录完整审查范围、已完成范围、下一批，以及“上一批未解决 findings 摘要”。摘要项保留 location、issue 和预计核查/兑现范围。
-3. 下一批开始前先读取 state.md，把未解决摘要注入 reviewer prompt；已解决或用户明确不处理的项不再继承，但须在本批输出中说明。
-4. 每个项目同时只维护一条跨批审查；若新一轮与 state.md 中未完成范围不同，先说明会丢弃的旧进度并征得用户确认，确认后在首批完成时覆盖。续接时 state.md 缺失、损坏或本批超出既定范围，应明确报告并停止，不猜测旧内容；非分批审查不创建它。
+下一批读取普通审查的开放项并在结果中说明处理；状态损坏、冲突或范围变更按运行器契约处理，不猜旧内容、不静默覆盖。累计连读另走 longform-reading.md 的独立命名空间；普通报告及其完成状态不能替代独立阅读收据，旧问题仅在盲读完成后核对。
 
 **.story-review/** 只保存审查状态，不属于小说事实追踪；不得借此修改正文、设定、大纲或 `追踪/`。
 
@@ -177,7 +181,7 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
    - 优先把文件路径、章节名、行号范围传给 reviewer，不要把整本或大量章节完整复制进每个 prompt。
    - 单文件或短片段可附 300-1200 字关键摘录。
    - 多章/整卷/整本审查必须分批：按章节或文件组拆分，每批输出独立 findings，再综合。
-   - **跨批连续性（分批必做）**：审每一批前，先读 `追踪/伏笔.md` 中状态为 `已埋` 且计划回收章 ≤ 本批末章的当前行，再按需读取相关 `追踪/逐章记录/第NNN章.md` 查变更原因；同时读取涉及角色的独立快照，并按上方契约把 state.md 的上一批未解决 findings 摘要作为「继承的开放项」注入 reviewer / consistency-checker prompt。新发现但尚未登记的开放钩子先列为维护候选，收尾时必须有正文证据才能进入修订事务。
+   - **跨批连续性（分批必做）**：审每一批前，先读 `追踪/伏笔.md` 中状态为 `已埋` 且计划回收章 ≤ 本批末章的当前行，再按需读取相关 `追踪/逐章记录/第NNN章.md` 查变更原因；同时读取涉及角色的独立快照，并按上方普通模式契约把 latest.json 中上一批未解决 findings 摘要作为「继承的开放项」注入 reviewer / consistency-checker prompt。新发现但尚未登记的开放钩子先列为维护候选，收尾时必须有正文证据才能进入修订事务。
    - **乱序/重叠审查提醒**：若已审过靠后的范围（如先审 300-400），之后审靠前的范围（200-300）时，只有当本批**新增/改动了一个开放项、且其预计兑现章落在已审过的靠后范围内**，才提醒用户「200-300 的改动可能影响已审的 300-400」，并让用户选择复审受影响章节 / 全量复审 / 仅记为待办——**默认记为待办，不盲目全量重跑**。无具体跨范围依赖时不提醒。
 3. **读取相关支撑材料**：正文、相关设定、角色档案、大纲、追踪/上下文、伏笔文件；缺失时在报告中标记证据不足。
 4. **按题材与章节功能选择 rubric**：
@@ -198,12 +202,12 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
    ```
    - `check-subject-switch.js` 是 advisory 级（段首"他/她"承接错位，输出上段末句+本段首行供复核），结果并入 `prose` 按 S4，人工复核后再定是否升级；正常承接（段首"他"就指上段主角）占绝大多数，不算病。
    - `check-chapter-boundary.js` 是 advisory 级（跨章信息续接：跨章复读/计划悬空/动作钩子收尾，输出上章尾句+下章头句供复核），结果并入「案件型/多章连续性专项检查」的跨章链路结论，按 S4；换场/跨天有明确标记的正常承接不算病。
-   - `check-setting-payoff.js` 检查设定兑现闭环（设定 → `追踪/设定兑现看板.md` → 细纲兑现槽）。项目没建看板时它自己 exit 0 跳过，存量书不受影响。结果并入 `consistency`：blocking（编号孤儿、看板与槽位脱钩、排期章与槽位章矛盾、三槽未填满、状态词非法、编号映射悬空）按 S2——台账断链会让后续章漏兑现；`setting.orphan-*` advisory 按 S4，复核时区分三种情况——本卷不碰（正常，建议补进中后期池）、组合技/上位概念（正常，建议写进 `设定/_兑现豁免.txt`）、**真漏排**（设定写了却没有任何一章用，按 S3 报）。零落点同时是「能力 A 被错记成能力 B」的主要信号：报出 A 零落点时，查一下是不是有别的条目在干 A 的活。本脚本只读，不改看板；核销是 `story-write` 日更流程的事。
+   - `check-setting-payoff.js` 核查新版登记与细纲；legacy/未启用须如实报告，不能当作通过。设定完善性、兑现语义与返回阶段按 `../story-write/references/setting-payoff.md` 执行：复核规则与正文事件是否匹配、兑现是否完整；原句存在不等于兑现。部分兑现保留剩余义务；只读正文的读者复核隔离设定资料。报告证据、影响、返回设定/细纲/正文哪一层，不手改追踪。
    - 按格式工具实际结果合并 `format` findings，同处去重。省略号、破折号与其他标点先核对迟疑、打断、未尽和声线功能，不因符号出现就改写；工具建议不能替代语气判断。
    - `check-ai-patterns.js` 的 findings 合并进 `prose`，保留实际 severity、来源和作用域；确定性 blocking 与有来源的作者禁令按其原因处理，规则加载错误记录为检查受阻，不当成正文 S2。不得在 prompt 硬编码旧 blocking 类别或直接照搬统一修法。
    - advisory 初始按 S4 线索复核；只有正文证据表明具体阅读损失才按影响定级。有功能保留可记 `PRESERVED_WITH_FUNCTION` 及理由，普通审稿不为保留原句启动研究 A/B。误报与证据不足分别记录，不要求清零。
    - `check-degeneration.js` 报告模型退化（逐字复读/截断/占位符/工程词泄漏），每条带 `severity: blocking|advisory`：blocking（复读/截断/tier1 工程词）作为 S1/S2 `prose` findings，修复建议是「重新生成该段，不是改写」；advisory（tier2 章节/歧义词）作为 S4。
-   - 上述预检脚本全部只读；`story-review` **不修改正文、设定或大纲文件**，需要自动修复正文时建议转 `/story-deslop`。full / lean 模式只有下方「追踪文件维护」允许修改 `追踪/`；分批审查的所有模式都可按上方契约写 **.story-review/state.md**，solo 除该状态外不写项目内容。
+   - 上述预检脚本全部只读；`story-review` **不修改正文、设定或大纲文件**，需要自动修复正文时建议转 `/story-deslop`。full / lean 模式只有下方「追踪文件维护」允许修改 `追踪/`；普通 full/lean 分批状态只由 `review-state.js` 管理，solo 或明确只读不写项目内容；长篇连读另遵守独立入口。
    - 默认 `--quote-mode keep`，不把知乎盐言短篇的 `「」` 当作问题；只有项目明确指定引号风格时才检查对应转换建议。
    - 这些脚本都是 `story-review` 的本地副本，不引用其他 skill 的文件。
 
@@ -513,7 +517,7 @@ Rubric Source: file | embedded fallback
 
 ## 追踪文件维护（长篇工程，审查收尾时执行）
 
-新追踪协议只有一个写入口：本 skill 的 `scripts/tracking_commit.py`；完整事务字段和命令见 `references/tracking-transaction.md`。**full / lean 模式只允许通过该工具修改 `追踪/`；solo 模式不修改任何 `追踪/` 文件。** 分批审查的所有模式仍可写 **.story-review/state.md**，它不是追踪事实。不得直接 Edit/Write/追加 `伏笔.md`、角色快照、时间线视图、摘要或 `上下文.md`。
+新追踪协议只有一个写入口：本 skill 的 `scripts/tracking_commit.py`；完整事务字段和命令见 `references/tracking-transaction.md`。**full / lean 模式只允许通过该工具修改 `追踪/`；solo 模式不修改任何 `追踪/` 文件。** 普通 full/lean 分批状态按 `review-state.js` 契约处理；solo 不写状态。长篇独立连读记录另按 longform-reading.md 执行，均不是追踪事实。不得直接 Edit/Write/追加 `伏笔.md`、角色快照、时间线视图、摘要或 `上下文.md`。
 
 1. **先检查状态**：执行 `tracking_commit.py check --project {项目根}`，确认 `_tracking-state.json` 与全部派生视图一致。失败时重跑产生当前目标状态的原事务，不得猜测、手改 Markdown 或另造事务覆盖。
 2. **判定是否需要修订**：只有正文证据表明现有追踪事实错误或缺失时才维护。过期伏笔、漏登记开放钩子、角色当前状态、客观时间线、读者认知都归入其证据所在章的 `mode=revision` 事务。普通审查意见和未来写作建议不进追踪。

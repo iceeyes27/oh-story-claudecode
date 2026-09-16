@@ -22,7 +22,7 @@
     },
     {
       "path": "skills/story-write/references/long-mode.md",
-      "budget": 28200,
+      "budget": 28400,
       "why": "长篇编排参考，按当前阶段定位；正文写手不读取整份流程；补入规划范围、续接和候选切换约束，避免只规划时越权生成。"
     },
     {
@@ -37,7 +37,7 @@
     },
     {
       "path": "skills/story-write/references/workflow-setup.md",
-      "budget": 17100,
+      "budget": 17300,
       "why": "开书 Phase 1-3，与 long-mode.md 叠加；包括供给自查、创作自主权分级、故事线、空间属性和建纲追加。"
     },
     {
@@ -62,7 +62,7 @@
     },
     {
       "path": "skills/story-write/references/reader-first-writing.md",
-      "budget": 2600,
+      "budget": 2650,
       "why": "普通长篇写手的紧凑规则；替代默认完整技法读取，新增预算由旧热路径减少抵消。"
     },
     {
@@ -79,7 +79,7 @@
   "paths": [
     {
       "label": "长篇日更主会话",
-      "budget": 50100,
+      "budget": 50500,
       "files": [
         "skills/story-write/SKILL.md",
         "skills/story-write/references/long-mode.md",
@@ -88,7 +88,7 @@
     },
     {
       "label": "长篇开书",
-      "budget": 48700,
+      "budget": 50200,
       "files": [
         "skills/story-write/SKILL.md",
         "skills/story-write/references/long-mode.md",

@@ -8,6 +8,41 @@ A web novel writing skill pack with built-in adapters for Claude Code, ZCode, Op
 
 > This fork remains at v0.8.1 with `story-setup 1.2.11`, `agents_version: 30`, and 18 published skills. It incorporates upstream v0.7.10's per-dimension style precedence, book-scoped `.deslop-whitelist`, long-form project/reference/tracking initialization loading, and the short-form Phase 3/4 reference split while preserving the existing candidate adoption, tracking transaction, and quality lifecycle contracts.
 
+## Start with Your Writing Task
+
+This repository is a skill pack installed in a compatible agent host. It is separate from the hosted ZenStory writing workbench: project files, settings and progress do not sync automatically between the two products. Use these guides to define the task before running it in your installed host:
+
+| What you want to do | Practical guide | Focus |
+|---|---|---|
+| Understand writing skills first | [Prompts, skill packs, plugins and MCP](https://zenstory.ai/oh-story/agent-skills-for-writers) | Choose the writing job before the host and workflow |
+| Import an existing novel | [Import 10–20 chapters and continue](https://zenstory.ai/oh-story/import-and-continue) | Review inferred structure; treat the manuscript as evidence |
+| Keep a long novel consistent | [Separate character knowledge, promises and clues](https://zenstory.ai/oh-story/long-novel-continuity) | Do not turn future plans into past events |
+| Turn an outline into a chapter | [Write plot specifications as visible change](https://zenstory.ai/oh-story/outline-to-chapter) | Advance through action, choice, cost and result |
+| Revise formulaic prose | [Reduce "AI-sounding" prose with concrete edits](https://zenstory.ai/oh-story/revise-ai-prose) | Improve the reading experience, not a detector score |
+| Preserve author voice in continuation | [Separate voice choices from book facts](https://zenstory.ai/oh-story/preserve-author-voice) | Use authorized samples without copying phrases |
+
+### Direct answers to common questions
+
+These documents answer the questions writers ask most, describing the mechanism as shipped in the current version:
+
+| Question | Document |
+|---|---|
+| How do I stop an AI writing agent from breaking character over 100+ chapters? | [Keep an AI-written novel consistent over 100+ chapters](docs/keep-ai-novel-consistent-over-100-chapters.md) |
+| What can Claude Code skills do besides code? | [Claude Code skills that are not for coding: a fiction-writing pack as the worked example](docs/claude-code-skills-for-writers.md) |
+| How do I remove AI flavor from prose? | [去AI味的具体做法](docs/how-to-remove-ai-flavor-from-web-fiction.md) (Chinese) |
+| How do I scan charts and deconstruct bestsellers? | [扫榜和拆文的自动化做法](docs/scan-charts-and-deconstruct-bestsellers.md) (Chinese) |
+
+## Your First Request after Setup
+
+First follow the instructions below to install and run setup in your chosen host. Choose the brief that fits your current task and replace the 〈placeholders〉. These are not installation commands or a required sequence; review the output, and do not expect automatic synchronization with the hosted ZenStory workbench.
+
+1. **Start a new book**
+   > I want to start a new 〈genre/premise〉 book. First separate fixed facts in my material from decisions that remain open. Plan only a bounded opening and deliver the central conflict, viewpoint/information-release limits, changes across the first three chapters and open decisions. Do not draft prose automatically; leave genre tradeoffs, character motives and the long-term direction for me to confirm.
+2. **Import an existing manuscript**
+   > Organize this manuscript as a continuable project. Chapters 1–〈N〉 are complete; 〈filename〉 is a partial chapter 〈N+1〉. Preserve the source prose, do not overwrite complete chapters, and do not count the fragment as a complete chapter, and separate inferred settings for confirmation. First deliver the detected range, reconstructed facts, conflicts/ambiguities and decisions requiring my confirmation for review; do not continue the story yet.
+3. **Fix an unsatisfactory passage**
+   > This passage reads as 〈vague/repetitive/over-explained〉. First name the specific reading problem while preserving story facts, character knowledge and unrevealed information. Deliver only a proposed revision of this passage, a before/after comparison and reasons—not a book-wide rewrite. I will decide which suggestions to accept.
+
 ## Core Approach
 
 > **Tropes = deterministic emotional payoff**
@@ -20,30 +55,7 @@ Professional authors follow a three-step method:
 
 Built around four pillars: reverse-engineering hits · plot modularization · layered state management · human-AI collaboration.
 
-> Starting in v0.8.1: inspired by [narralume](https://github.com/abligail/narralume)'s "AI proposes candidates, the author decides", `story-write` (long-form) gains an opt-in **candidate system**. In candidate mode prose lands under the book-root `候选/` directory and tracking does NOT advance early; on the author's "adopt" the new `candidate-commit.py` atomically merges the candidate into the final `正文/` and replays the tracking transaction, passing a quality gate first (blocking hits are refused), while "rewrite/discard" archives instead of hard-deleting. Pure SKILL-level orchestration — no change to narrative-writer, no cross-platform hook surgery, `agents_version` stays 25, and with candidate mode off behavior is byte-identical to v0.8.0. See `skills/story-write/references/candidate-workflow.md`.
->
-> Starting in v0.8.0: the complete novel check's three specialist dependencies — `ai-flavor-scan`, `dialogue-naturalness-scan`, and `jargon-verb-scan` — are included in the cross-platform public release, bringing the published Skill/Command set to 14. The Claude marketplace and release metadata now use 0.8.0, and local adapter drift, stale test paths, and Node 18/22 OpenCode checks are repaired.
-> The current public set also includes `batch-pollution-detector`, for 15 total, so `story-deslop` file-mode pollution checks remain available after cross-platform deployment.
->
-> Starting in v0.7.6: the focus is the prose stage. Three rules in `narrative-writer` had been running on empty. "Count the words immediately after writing" hands the agent a Bash command, but Bash was never in its tool allowlist — and the same sentence forbids the only alternative, model estimation — so "hitting the word target is a hard requirement" rested on nothing executable. "Report the sentence-length distribution before returning" was equally uncomputable and could only be invented, while the main session was using that number as a quality check. And "expand every outline item in order" sat under a top-priority heading, while the half that loosens it — you may freely rearrange, merge, and interleave plot points — lived only in the main skill, never entered the spawn prompt, and was never read by the subagent; seeing only the restriction, it flattened the chapter into one paragraph per plot point. All three are fixed; in a live run the first draft landed inside the acceptance range (the control group came in under 73% of the floor). New outline-copy detection catches prose that has degenerated into transcription when outline items are written as finished prose sentences, with a companion "verbatim anchor" field so lines that must appear word-for-word (oaths, system panels, case-file quotes) are not flagged. Also: writing prose via a Bash redirect on Claude Code now hits the outline/tracking guard, and the text loaded on every session drops another fifth (book-opening −30%, revision −41%). **This release ships `agents_version` 25** — deployed projects must rerun `/story-setup` and start a new session.
->
-> Starting in v0.7.5: a stability release. The prose-write guard on Claude Code gains the tracking checkpoint the other three CLIs have had since v0.7.3 — the primary CLI previously let you silently write chapters with no tracking at all. `story-long-write`'s SKILL.md, the one file loaded in full every time the skill fires, drops from 82 KB to 54 KB (the three book-opening phases move into an on-demand `workflow-setup.md`, so daily-update sessions stop paying for outlining steps they never use). And a batch of over-accumulated restriction rules is cleared out — one of which flagged an ordinary "he said" in prose as a violation. **This release ships `agents_version` 24** — deployed projects must rerun `/story-setup` and start a new session.
->
-> Upstream v0.7.5 is now integrated: Claude's prose-write guard gains the missing tracking checkpoint; long-form book-opening phases 1-3 move to `story-write/references/workflow-setup.md` for on-demand loading; and over-restrictive prose rules such as treating ordinary “said” as a violation are removed. **The deployment contract is now `agents_version: 24`; deployed projects must rerun `/story-setup` and start a new session.**
->
-> Upstream v0.7.3/v0.7.4 fixes are now integrated: imported works are separated from external benchmarks; long-form tracking uses `_tracking-state.json` plus `tracking_commit.py` as one transaction model; platform detection, multi-target reference checks, Windows style sampling, TOC chapter slicing, review-rubric parity, chapter-length contracts, and Heiyan channel output are repaired. Changes from upstream split skills were ported into this fork's unified `story-write`, `story-analyze`, and `story-scan` entries.
->
-> Starting in v0.7.2: a local workbench `/story dashboard` — zero production dependencies, bound to `127.0.0.1` only, showing `拆文库/` and writing projects as separate file trees with search, Markdown preview, lightweight editing and conflict protection; a fix for stiff prose and summary-style chapter endings caused by copying the outline's shape (an outline specifies *what happens*, not the shape of the prose); and two long-standing session-start false alarms fixed (finished deconstructions repeatedly reported as unfinished, version reminders firing every session). **This release ships `agents_version` 21** — deployed projects must rerun `/story-setup` and start a new session, otherwise neither v0.7.1's nor this release's prose and hook changes take effect.
->
-> Starting in v0.7.1: a thorough fix for choppy "telegraph" prose — sentences read more naturally (subtractive write-time rules + story-deslop de-resistance + a suite-wide short-sentence-cult sweep, calibrated against real bestseller corpus and multi-genre tests), plus a fanfic / existing-worldview naming guardrail. Deployed projects should rerun `/story-setup` and start a new session.
->
-> Starting in v0.7.0: two more runtimes — native ZCode 3.3.4 (install the repo as a marketplace/plugin, `story-setup target_cli=zcode`) and Reasonix Phase 1 (skills + native plugin manifest); hook cores unified onto a shared node core with a six-runtime parity lock; long-form unifies the five old names (plot-strand / loop-card / …) into "剧情单元" (plot unit) and feeds decomposition output into volume/chapter outlines; the anti-AI-tone gate is now mechanized — the post-write prose net auto-scans deterministic toxic phrasings, and a "toxic-phrase debt gate" blocks the next chapter until the previous one is cleared (stateless, node-missing fails open, opt out explicitly with `<!-- 去味:跳过 -->`). Deployed projects should rerun `/story-setup` and start a new session.
->
-> Starting in v0.6.22: long-form prose gains per-genre "prose prompt cards" — 32 番茄-genre voice cards recalled into the writer at draft time (card text never leaks into prose), plus outline-boundary and per-chapter formula gates against padding; short-form adds a submission layer `submission-craft` (Zhihu Yanyan / mini-program / Fanqie platform tones, lead-in polish, paywall breakpoint design); suite-wide skill docs deduplicated by ~33KB; story-setup adds generic Web AI deployment. Deployed projects should rerun `/story-setup` and start a new session.
->
-> Starting in v0.6.21: short-form writing reference cleanup — `story-write` drops stale long-form inherited references and now uses `short-format` / `short-craft` / `short-deslop` plus four genre packs (wife-chasing crematorium, revenge face-slap, CEO/wealthy family, domestic/palace intrigue) for short-story format, direct emotion, pacing density, and AI-tone cleanup; existing deployed projects should rerun `/story-setup` and start a new session to pick up the updated narrative-writer short-story exception.
->
-> For earlier versions, see [CHANGELOG.md](CHANGELOG.md).
+> Current fork version: **v0.8.1**, with `story-setup 1.2.11` / `agents_version: 30`. See [CHANGELOG.md](CHANGELOG.md); rerun `/story-setup` and start a new session after upgrading.
 
 ## Pipeline Overview
 
@@ -408,6 +420,54 @@ Real output samples are in [demo/](demo/): short-form deconstruction 《曾将�
 
 I built this skill pack to help me through a job-hunting transition :joy:, and I hope it can help others too.
 
+## FAQ
+
+### Does it work in Codex, or only in Claude Code?
+
+oh-story-claudecode ships adapters for Claude Code, ZCode, OpenClaw, Codex CLI and Reasonix. Codex discovers the 18 skills by scanning `.agents/skills` in the repo and invokes them with `$story-setup`. Any Web AI or agent environment that can read project files can use the generic skills path.
+
+### Do I need a GPU or to host a model?
+
+No. oh-story-claudecode is a set of skills that runs inside the coding agent you already use, so the writing model is that agent's model; only deterministic check scripts (Node / Python) run locally. The one exception is `story-cover`, which calls GPT-Image-2 (Codex built-in quota or an API fallback).
+
+### Chapter lengths are inconsistent or the word count is off. What do I do?
+
+Since v0.7.7 long-form prose uses a single machine-counted length metric: every chapter blueprint must state a valid word target, and a missing target stops the run instead of falling back to 3,000; under-length chapters are not padded with new plot, and over-length chapters get at most one compression pass. `check-prose-after-write.sh` flags length debt after each write. Rerun `/story-setup` and start a new session after upgrading an older project.
+
+### After de-AI editing, detectors such as Zhuque still flag the text as AI. Why?
+
+`story-deslop` (`/去AI味`) is a writing lint: it deterministically detects and removes known AI sentence patterns, punctuation habits and degeneration artifacts. Its target is how the prose reads, not evading detectors. External detectors are a self-check reference only, and oh-story-claudecode makes no promise of passing any AI detector.
+[This concrete revision guide](https://zenstory.ai/oh-story/revise-ai-prose) separates vague emotion, repeated syntax, unearned commentary and over-explaining while preserving the scene's job and the author's facts.
+
+### I already have part of a novel written. Can I import it and continue?
+
+Yes. Run `/story-setup` in the project root, start or refresh a session, run `/story-import` to reverse-parse the existing novel into the standard project layout, review its inferences, then continue with `/story-write long 日更` or `/story-write long 写第N章`. The [import-and-continue guide](https://zenstory.ai/oh-story/import-and-continue) explains why manuscript evidence should take priority over model guesses.
+
+### How do I reduce forgotten clues or characters knowing answers too early in a long continuation?
+
+Before continuing, separate objective story facts, character knowledge and what readers have seen; carry only the relevant current state and unfinished commitments into the chapter. The [long-novel continuity guide](https://zenstory.ai/oh-story/long-novel-continuity) gives a three-chapter example. Structured records can help organize the handoff, but do not promise error-free writing over hundreds of chapters.
+
+### My chapter outline is complete. Why does the prose still summarize the setup?
+
+Treat the outline as a specification for what must change, then turn its goal, obstacle, evidence, choice and cost into actions and results the viewpoint character can perceive. The [outline-to-chapter guide](https://zenstory.ai/oh-story/outline-to-chapter) is an editorial example, not a recorded tool run or model-quality claim.
+
+### How do I keep my voice without carrying plot facts over from another book?
+
+Describe the dimensions of a short sample you wrote or may use, separately from the current book's facts; sample inference does not automatically establish an enduring preference. The [author-voice guide](https://zenstory.ai/oh-story/preserve-author-voice) explains how to resolve the current request, book style and author preferences; it does not promise automatic style matching or encourage copied phrases.
+
+### On Windows the install prints `ENOENT ... mkdir` but ends with Done. Is that normal?
+
+It means some skills were not fully installed. Rerun the same install command, with or without the error, and it repairs itself; if a reference-material directory is missing, `/story-setup` reports the reference pack as incomplete. Codex users on Windows also need `core.symlinks` enabled in git.
+
+### What do I do after upgrading?
+
+Rerun `/story-setup` and start a new session. The seven agents (story-architect, narrative-writer, consistency-checker and others) are written into the project by `/story-setup`; multi-agent collaboration only takes effect after deploying and opening a fresh session.
+
+### What is the difference between the short-form and long-form entry points?
+
+Long-form: `/story-scan long` (chart scanning) → `/story-analyze long` (deconstruction) → `/story-write long` (outline, volume outline, chapter blueprints, prose). Short-form: `/story-scan short` → `/story-analyze short` → `/story-write short`. Both share `/story-setup`, `/story-deslop`, `/story-review` and `/story-cover`.
+
+
 ## Star History
 
 <a href="https://www.star-history.com/?repos=iceeyes27%2Foh-story-claudecode&type=date&legend=top-left">
@@ -432,3 +492,16 @@ Contributions are welcome — new skills, knowledge base additions, market data 
 - [LINUX DO - The New Ideal Community](https://linux.do) — Community support
 - [FanqieRankTracker](https://github.com/wen1701/FanqieRankTracker) — Fanqie Novels font obfuscation decoding reference
 - [Zhuque AIGC Detector CLI](https://github.com/Sophomoresty/zhuque) — External retest reference used during anti-AI-writing experiments
+
+## Part of ZenStory AI
+
+Oh Story is part of [ZenStory AI](https://zenstory.ai) — open-source, agent-native tools for creating, adapting and producing stories (GitHub org: [zenstory-ai](https://github.com/zenstory-ai)). Sibling projects:
+
+| Project | What it does |
+| --- | --- |
+| [oh-story-claudecode](https://github.com/zenstory-ai/oh-story-claudecode) | Web-fiction writing skill pack (this repo) |
+| [drama-skills](https://github.com/zenstory-ai/drama-skills) | AI short-drama / motion-comic suite: scripts, assets, storyboards, image & video prompts, independent review |
+| [novel-to-game](https://github.com/zenstory-ai/novel-to-game) | Agent skills for source-grounded novel adaptation, target-runtime builds, and evidence-based QA |
+| [video-recap-skills](https://github.com/zenstory-ai/video-recap-skills) | Create Chinese-narration recaps from supported video files, with optional editable JianYing/CapCut draft export |
+| [oh-story-dsh](https://github.com/zenstory-ai/oh-story-dsh) | Community DeepSeek Harness plugin with novel, short-drama, game and video-recap workbenches |
+| [zenstory](https://github.com/zenstory-ai/zenstory) | Chat-to-create AI novel-writing workbench ([app.zenstory.ai](https://app.zenstory.ai)) |

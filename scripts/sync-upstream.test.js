@@ -65,7 +65,6 @@ test('removed OpenCode assets are forbidden without excluding other platforms or
   const { policy } = loadPolicy(path.join(ROOT, 'scripts', 'upstream-integration.json'));
   for (const file of [
     '.opencode/plugins/story-hooks.ts',
-    'skills/story-setup/references/opencode/agents/narrative-writer.md',
     'scripts/check-opencode-adapter.sh',
     'scripts/sync-opencode.py',
     'scripts/test-opencode-cli-e2e.sh',
@@ -73,6 +72,7 @@ test('removed OpenCode assets are forbidden without excluding other platforms or
   ]) {
     assert.equal(classifyPath(file, policy).category, 'forbidden', file);
   }
+  assert.equal(classifyPath('skills/story-setup/references/opencode/agents/narrative-writer.md', policy).category, 'protected');
   assert.equal(classifyPath('skills/story-setup/references/codex/AGENTS.md.tmpl', policy).category, 'generated');
   assert.equal(classifyPath('skills/trellis-start/SKILL.md', policy).category, 'canonical');
   assert.equal(classifyPath('scripts/test-opencode-plugin.mjs.notes', policy).category, 'canonical');

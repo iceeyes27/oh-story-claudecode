@@ -15,7 +15,7 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 
 | 用户意图 | 关键词示例 | 路由到 |
 |---|---|---|
-| 写长篇 | 开书、写大纲、长篇、连载 | `/story-write` (mode=long) |
+| 长篇规划/写作 | 讨论长篇结构、规划剧情、开书、写大纲、补细纲、长篇、连载 | `/story-write` (mode=long) |
 | 写短篇 | 短篇、盐言、一万字 | `/story-write` (mode=short) |
 | 长篇拆文 | 拆文、分析这本书、黄金三章 | `/story-analyze` (mode=long) |
 | 短篇拆文 | 拆短篇、分析这个故事 | `/story-analyze` (mode=short) |

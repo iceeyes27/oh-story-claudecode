@@ -22,8 +22,8 @@
     },
     {
       "path": "skills/story-write/references/long-mode.md",
-      "budget": 27500,
-      "why": "长篇编排参考，按当前阶段定位；正文写手不读取整份流程"
+      "budget": 28200,
+      "why": "长篇编排参考，按当前阶段定位；正文写手不读取整份流程；补入规划范围、续接和候选切换约束，避免只规划时越权生成。"
     },
     {
       "path": "skills/story-write/references/short-mode.md",
@@ -32,8 +32,8 @@
     },
     {
       "path": "skills/story-write/references/workflow-daily.md",
-      "budget": 17500,
-      "why": "日更/单章正文与质量检查，日更/单章路径与 long-mode.md 叠加"
+      "budget": 17900,
+      "why": "日更/单章正文与质量检查，日更/单章路径与 long-mode.md 叠加；保留既有设定兑现约束并补入规划切换停点。"
     },
     {
       "path": "skills/story-write/references/workflow-setup.md",
@@ -47,8 +47,8 @@
     },
     {
       "path": "skills/_shared/references/banned-words.md",
-      "budget": 15600,
-      "why": "跨 skill 共享禁用词表，写作/审查/去AI味都读；新增跨段肯定排比、语流身份匹配与文风裁决声明后显式调整预算"
+      "budget": 18500,
+      "why": "跨 skill 共享禁用词表，写作/审查/去AI味都读；新增跨段肯定排比、语流身份匹配与文风裁决声明后显式调整预算；登记此前已提交的规则增长，本次不删除作者确认的禁用规则。"
     },
     {
       "path": "skills/_shared/references/anti-ai-writing.md",
@@ -71,25 +71,15 @@
       "why": "短篇 Phase 2 按阶段读取；从 short-mode 移出构思模板与完成门禁，减少正文阶段上下文。"
     },
     {
-      "path": "skills/story-write/references/workflow-draft.md",
-      "budget": 5200,
-      "why": "短篇 Phase 3 按阶段读取；包含写前参数、职责分工与逐场景执行。"
-    },
-    {
       "path": "skills/story-write/references/workflow-revision.md",
       "budget": 4600,
       "why": "长篇普通修订与短篇 Phase 4 共用；保留候选采用边界和最终检查职责。"
-    },
-    {
-      "path": "skills/_shared/references/style-resolution.md",
-      "budget": 1700,
-      "why": "写作、改写、去味和审稿共同读取的逐维文风裁决。"
     }
   ],
   "paths": [
     {
       "label": "长篇日更主会话",
-      "budget": 49000,
+      "budget": 50100,
       "files": [
         "skills/story-write/SKILL.md",
         "skills/story-write/references/long-mode.md",
@@ -98,7 +88,7 @@
     },
     {
       "label": "长篇开书",
-      "budget": 47600,
+      "budget": 48700,
       "files": [
         "skills/story-write/SKILL.md",
         "skills/story-write/references/long-mode.md",
@@ -119,9 +109,7 @@
       "budget": 32000,
       "files": [
         "skills/story-write/SKILL.md",
-        "skills/story-write/references/short-mode.md",
-        "skills/story-write/references/workflow-draft.md",
-        "skills/_shared/references/style-resolution.md"
+        "skills/story-write/references/short-mode.md"
       ]
     },
     {
@@ -130,8 +118,7 @@
       "files": [
         "skills/story-write/SKILL.md",
         "skills/story-write/references/short-mode.md",
-        "skills/story-write/references/workflow-revision.md",
-        "skills/_shared/references/style-resolution.md"
+        "skills/story-write/references/workflow-revision.md"
       ]
     },
     {

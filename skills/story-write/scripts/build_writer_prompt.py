@@ -247,16 +247,10 @@ def build(project: Path, chapter: int, report: list):
 
     # ---- 文风（本书自定义文风时由脚本全包）----
     style_file = project / "设定" / "文风.md"
-    style_digest = project / "设定" / "_文风摘要.md"
     style_text = read_text(style_file)
     custom_style = has_custom_style(style_text)
     if custom_style:
-        if read_text(style_digest):
-            parts.append(
-                f"文风路径：{style_digest}（书级文风摘要卡，写作按它执行；"
-                f"与细纲或脚本读数冲突时再查全文 {style_file}）")
-        else:
-            parts.append(f"文风路径：{style_file}（书级权威文风，写前必读）")
+        parts.append(f"文风路径：{style_file}（书级权威文风，写前必读；派生摘要不得覆盖原文）")
         parts.append(
             "文风优先裁决：`设定/文风.md` 对句段／句法／对话落法／标点形态与删改取向的规定"
             "优先于通用风格建议；不覆盖细纲事实、信息边界、调用方所选 Gate 范围及格式硬线。"

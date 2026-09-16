@@ -233,7 +233,8 @@
       "name": "long-format",
       "source": "skills/story-write/references/long-format.md",
       "targets": [
-        "skills/story-setup/references/agent-references/long-format.md"
+        "skills/story-setup/references/agent-references/long-format.md",
+        "skills/story-import/references/long-format.md"
       ]
     },
     {
@@ -283,29 +284,16 @@
       "name": "reader-first-writing",
       "source": "skills/story-write/references/reader-first-writing.md",
       "targets": [
-        "skills/story-setup/references/agent-references/reader-first-writing.md"
+        "skills/story-setup/references/agent-references/reader-first-writing.md",
+        "skills/story-import/references/reader-first-writing.md"
       ]
     },
     {
-      "name": "style-resolution",
-      "source": "skills/_shared/references/style-resolution.md",
+      "name": "setting-payoff-import",
+      "source": "skills/story-write/references/setting-payoff.md",
       "targets": [
-        "skills/story-setup/references/agent-references/style-resolution.md"
-      ]
-    },
-    {
-      "name": "deslop-gate-rules",
-      "source": "skills/story-deslop/references/deslop-gates.md",
-      "targets": [
-        "skills/story-setup/references/agent-references/deslop-gates.md"
-      ]
-    },
-    {
-      "name": "tracking-initialization",
-      "source": "skills/story-write/references/tracking-initialization.md",
-      "targets": [
-        "skills/story-import/references/tracking-initialization.md",
-        "skills/story-review/references/tracking-initialization.md"
+        "skills/story-import/references/setting-payoff.md",
+        "skills/story-setup/references/agent-references/setting-payoff.md"
       ]
     }
   ],

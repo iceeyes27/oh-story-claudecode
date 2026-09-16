@@ -1,49 +1,24 @@
-<!-- Last synced with README.md: 2026-08-21 -->
+<!-- Last synced with README.md: 2026-09-16 -->
 
 **English** | [中文](README.md)
 
 # oh-story-claudecode
 
-A web novel writing skill pack with built-in adapters for Claude Code, ZCode, OpenClaw, Codex CLI, and Reasonix. Web AI / agent environments that can read project files can use the generic skills path. Covers the full pipeline for long-form and short-form Chinese web novels: trend scanning, deconstruction, writing, AI tone removal, and cover generation.
+**A skill pack for writing Chinese web fiction: chart scanning, deconstruction, drafting, de-AI-ify and cover art, running inside the coding agent you already use.**
 
-> This fork remains at v0.8.1 with `story-setup 1.2.11`, `agents_version: 30`, and 18 published skills. It incorporates upstream v0.7.10's per-dimension style precedence, book-scoped `.deslop-whitelist`, long-form project/reference/tracking initialization loading, and the short-form Phase 3/4 reference split while preserving the existing candidate adoption, tracking transaction, and quality lifecycle contracts.
+Project page: https://zenstory.ai/oh-story
 
-## Start with Your Writing Task
+![OH STORY local writing desk](demo/story-dashboard.png)
 
-This repository is a skill pack installed in a compatible agent host. It is separate from the hosted ZenStory writing workbench: project files, settings and progress do not sync automatically between the two products. Use these guides to define the task before running it in your installed host:
+## What it is
 
-| What you want to do | Practical guide | Focus |
-|---|---|---|
-| Understand writing skills first | [Prompts, skill packs, plugins and MCP](https://zenstory.ai/oh-story/agent-skills-for-writers) | Choose the writing job before the host and workflow |
-| Import an existing novel | [Import 10–20 chapters and continue](https://zenstory.ai/oh-story/import-and-continue) | Review inferred structure; treat the manuscript as evidence |
-| Keep a long novel consistent | [Separate character knowledge, promises and clues](https://zenstory.ai/oh-story/long-novel-continuity) | Do not turn future plans into past events |
-| Turn an outline into a chapter | [Write plot specifications as visible change](https://zenstory.ai/oh-story/outline-to-chapter) | Advance through action, choice, cost and result |
-| Revise formulaic prose | [Reduce "AI-sounding" prose with concrete edits](https://zenstory.ai/oh-story/revise-ai-prose) | Improve the reading experience, not a detector score |
-| Preserve author voice in continuation | [Separate voice choices from book facts](https://zenstory.ai/oh-story/preserve-author-voice) | Use authorized samples without copying phrases |
+This is the [iceeyes27 unified-name fork](https://github.com/iceeyes27/oh-story-claudecode), using `story-write` / `story-analyze` / `story-scan` with mode selecting long or short form. Earlier split names remain in tag [`pre-unified-split-naming`](../../tree/pre-unified-split-naming).
 
-### Direct answers to common questions
+oh-story-claudecode covers the full pipeline for long-form serials and short stories: scanning bestseller charts to choose genre, cast and angle; deconstructing top-ranked works into outline rhythm and reusable plot modules; drafting with hooks and payoff pacing; removing AI-flavored prose; and generating covers. It installs as 19 skills into Claude Code, ZCode, OpenClaw, Codex CLI and Reasonix, so the writing model is whatever model that agent runs; Web AI / agent environments that can read project files can use the generic skills path.
 
-These documents answer the questions writers ask most, describing the mechanism as shipped in the current version:
-
-| Question | Document |
-|---|---|
-| How do I stop an AI writing agent from breaking character over 100+ chapters? | [Keep an AI-written novel consistent over 100+ chapters](docs/keep-ai-novel-consistent-over-100-chapters.md) |
-| What can Claude Code skills do besides code? | [Claude Code skills that are not for coding: a fiction-writing pack as the worked example](docs/claude-code-skills-for-writers.md) |
-| How do I remove AI flavor from prose? | [去AI味的具体做法](docs/how-to-remove-ai-flavor-from-web-fiction.md) (Chinese) |
-| How do I scan charts and deconstruct bestsellers? | [扫榜和拆文的自动化做法](docs/scan-charts-and-deconstruct-bestsellers.md) (Chinese) |
-
-## Your First Request after Setup
-
-First follow the instructions below to install and run setup in your chosen host. Choose the brief that fits your current task and replace the 〈placeholders〉. These are not installation commands or a required sequence; review the output, and do not expect automatic synchronization with the hosted ZenStory workbench.
-
-1. **Start a new book**
-   > I want to start a new 〈genre/premise〉 book. First separate fixed facts in my material from decisions that remain open. Plan only a bounded opening and deliver the central conflict, viewpoint/information-release limits, changes across the first three chapters and open decisions. Do not draft prose automatically; leave genre tradeoffs, character motives and the long-term direction for me to confirm.
-2. **Import an existing manuscript**
-   > Organize this manuscript as a continuable project. Chapters 1–〈N〉 are complete; 〈filename〉 is a partial chapter 〈N+1〉. Preserve the source prose, do not overwrite complete chapters, and do not count the fragment as a complete chapter, and separate inferred settings for confirmation. First deliver the detected range, reconstructed facts, conflicts/ambiguities and decisions requiring my confirmation for review; do not continue the story yet.
-3. **Fix an unsatisfactory passage**
-   > This passage reads as 〈vague/repetitive/over-explained〉. First name the specific reading problem while preserving story facts, character knowledge and unrevealed information. Deliver only a proposed revision of this passage, a before/after comparison and reasons—not a book-wide rewrite. I will decide which suggestions to accept.
-
-## Core Approach
+- **Checks and gates**: the skills ship with deterministic verifiers, an outline-before-prose gate, layered context and state management, 7 specialist agents, 8 automation hooks and 100+ methodology files.
+- **The file system is the memory**: settings, outlines, prose and tracking live in separate files, so a novel hundreds of chapters long does not depend on conversation memory.
+- **Target platforms**: Qidian, Fanqie, Jinjiang, Qimao and Zhihu Yanyan, for both long-form and short-form.
 
 > **Tropes = deterministic emotional payoff**
 
@@ -56,6 +31,63 @@ Professional authors follow a three-step method:
 Built around four pillars: reverse-engineering hits · plot modularization · layered state management · human-AI collaboration.
 
 > Current fork version: **v0.8.1**, with `story-setup 1.2.11` / `agents_version: 30`. See [CHANGELOG.md](CHANGELOG.md); rerun `/story-setup` and start a new session after upgrading.
+
+## Installation
+
+```bash
+npx skills add iceeyes27/oh-story-claudecode -y -g
+```
+
+`-g` installs globally (available in every directory); drop `-g` to install only into the current directory. Re-run the same command to update.
+
+You can also tell Claude Code / ZCode / OpenClaw / Codex / Reasonix, or another Web AI / agent platform that can import a GitHub repo or skill:
+
+```
+Install this skill https://github.com/iceeyes27/oh-story-claudecode
+```
+
+To upgrade, repeat the same instruction.
+
+Once installed, run `/story-setup` (`$story-setup` in Codex) from the root of your writing project to deploy hooks / agents / references, then start a new session.
+
+<details>
+<summary>Codex / ZCode / OpenClaw / Reasonix / Web AI usage notes</summary>
+
+**Codex users:** Use it in-place: Codex scans `$REPO_ROOT/.agents/skills` (a symlink to `skills/`) and discovers all 31 repository Skills; invoke via `$story`, `$story-setup`, or `/skills`. On Windows, enable git `core.symlinks=true` or the symlink breaks — then use the `$story-setup` deployment below.
+
+After `$story-setup` deploys into a writing project, it creates `.codex/agents/*.toml`, `.codex/hooks.json`, `.codex/hooks/{story_codex_hook.py,run-story-hook.sh,run-story-hook.cmd}`, and `.codex/skills/story-setup/references/agent-references/`. Trust the project `.codex/` layer, review/trust hooks in `/hooks`, and open a fresh Codex session so custom agents load.
+
+**ZCode users:** Add this repository as a marketplace in Plugin Management and install `oh-story`; then invoke the 16 published Skills/Commands through `$story`, `$story-setup`, or the `/` panel. With `target_cli=zcode`, `$story-setup` deploys `.zcode/skills/`, `.zcode/commands/`, and `.zcode/hooks/story_zcode_hook.js`, then safely merges `.zcode/config.json` and the root `AGENTS.md`. Hooks require `node` on PATH. ZCode 3.3.4 does not execute project/plugin custom agents and has no `PreCompact` or `SessionEnd`; affected workflows report a solo/direct fallback, while `SessionStart` restores context after compaction.
+
+
+**OpenClaw users:** Current support is skills-only. OpenClaw can discover the 16 published Skills from workspace `skills/`, `.agents/skills`, `~/.agents/skills`, `~/.openclaw/skills`, or configured extra skill roots. `SKILL.md` files use OpenClaw-compatible single-line `name` / `description` plus single-line JSON `metadata.openclaw`. When `story-setup` targets OpenClaw, it copies those published Skills into project `skills/` and writes an OpenClaw `AGENTS.md`; agents/hooks are intentionally deferred, so outline-before-prose guards are soft skill checks rather than runtime enforcement. If new skills do not appear immediately, open a fresh OpenClaw session or wait for the skills watcher to refresh.
+
+**Reasonix users:** Current support is Skills + a native plugin manifest. Reasonix natively scans project skill roots (`.agents/skills` etc., a symlink to `skills/`) and discovers all 31 repository Skills — verify with `reasonix doctor capabilities`; you can also `reasonix plugin install` via the root `reasonix-plugin.json`. When `story-setup` targets `target_cli=reasonix`, it copies the 16 published Skills into project `skills/` and writes a Reasonix `AGENTS.md`; hooks/custom agents are intentionally deferred, so skills needing specialist agents fall back to solo/direct. If Windows symlinks are disabled, use the native plugin instead.
+
+**Generic Web AI / agent users:** If your platform can read a GitHub repo or project files, have the agent read `skills/*/SKILL.md` plus the relevant `references/`. For local project copies, run `story-setup` with `target_cli=generic`; it only writes a generic `AGENTS.md` and `skills/`. Without this project's hooks/custom agents, checks run as skill-level soft constraints or solo/direct fallbacks.
+
+**OpenClaw / Reasonix / generic paths need manual cleanup of nested directories:** these three keep their skill copy inside the project's `skills/`, so re-running `/story-setup` executes that project-local copy and the automatic cleanup never reaches them. If the project contains `skills/story-setup/references/agent-references/agent-references/` (possibly nested several levels deep) or `skills/story-setup/skills/`, delete them by hand. To update the skill text itself, reinstall this project and overwrite the public skill directories declared by `scripts/platform-skill-set.json` under the project's `skills/` from the new package.
+
+</details>
+
+After updating, if a project has already run `/story-setup`, re-run `/story-setup` from the project root to sync hooks / agents / references. Per-version changes are in [CHANGELOG.md](CHANGELOG.md) and [Releases](https://github.com/iceeyes27/oh-story-claudecode/releases).
+
+**Multi-agent collaboration needs setup + a fresh session:** the 7 specialist agents (story-architect, narrative-writer, consistency-checker, etc.) are written into your project's `.claude/agents/` by `/story-setup`, or into `.codex/agents/*.toml` by `$story-setup`. Claude Code and Codex register custom agents most reliably at session start; ZCode 3.3.4, OpenClaw Phase 1, Reasonix Phase 1, and the generic path default to skills + solo fallback. To check Claude/Codex agents: run `/story-review` in the new session — `Effective Mode: full/lean` means agents registered, `Fallback: ... -> solo` means they are unavailable.
+
+**Import and continuation order:** run `/story-setup` from the writing-project root first to deploy hooks, agents, and `AGENTS.md`; start or refresh the session, then run `/story-import` for the existing novel and continue with `/story-write 日更` or `/story-write 写第N章`. You can also run `/story-import` directly; if setup is missing, it offers to run setup first or continue with a serial import.
+
+**Author preferences persist across sessions:** tell `/story` to remember a writing habit; the write counts as successful only when it returns an `Author Memory Receipt`. Normal writing queries only relevant confirmed items with a hard 2 KB output cap, rather than injecting the full profile, candidates, and history into the prose prompt. This memory stays separate from per-book continuity tracking, and current instructions, book settings, and hard gates always take priority.
+
+## Your First Request
+
+Copy one, tweak it and send it: pick the brief that fits your task and replace the 〈placeholders〉.
+
+1. **Start a new book**
+   > I want to start a new 〈genre/premise〉 book. First separate fixed facts in my material from decisions that remain open. Plan only a bounded opening and deliver the central conflict, viewpoint/information-release limits, changes across the first three chapters and open decisions. Do not draft prose automatically; leave genre tradeoffs, character motives and the long-term direction for me to confirm.
+2. **Import an existing manuscript**
+   > Organize this manuscript as a continuable project. Chapters 1–〈N〉 are complete; 〈filename〉 is a partial chapter 〈N+1〉. Preserve the source prose, do not overwrite complete chapters, and do not count the fragment as a complete chapter, and separate inferred settings for confirmation. First deliver the detected range, reconstructed facts, conflicts/ambiguities and decisions requiring my confirmation for review; do not continue the story yet.
+3. **Fix an unsatisfactory passage**
+   > This passage reads as 〈vague/repetitive/over-explained〉. First name the specific reading problem while preserving story facts, character knowledge and unrevealed information. Deliver only a proposed revision of this passage, a before/after comparison and reasons—not a book-wide rewrite. I will decide which suggestions to accept.
 
 ## Pipeline Overview
 
@@ -114,52 +146,6 @@ flowchart LR
     write_s --> deslop
 ```
 
-## Installation
-
-**Option 1** Tell Claude Code / ZCode / OpenClaw / Codex / Reasonix, or another Web AI / agent platform that can import a GitHub repo or skill:
-
-```
-Install this skill https://github.com/iceeyes27/oh-story-claudecode
-```
-
-**Option 2** Command line:
-
-```bash
-npx skills add iceeyes27/oh-story-claudecode -y -g
-```
-
-`-g` installs globally (available in every directory); drop `-g` to install only into the current directory. Re-run the same command to update.
-
-To diagnose an installed writing environment, invoke story-setup with `check`. This mode inspects the existing deployment and reports findings without modifying the project.
-
-<details>
-<summary>Codex / ZCode / OpenClaw / Reasonix / Web AI usage notes</summary>
-
-**Codex users:** Use it in-place: Codex scans `$REPO_ROOT/.agents/skills` (a symlink to `skills/`) and discovers all 31 repository Skills; invoke via `$story`, `$story-setup`, or `/skills`. On Windows, enable git `core.symlinks=true` or the symlink breaks — then use the `$story-setup` deployment below.
-
-After `$story-setup` deploys into a writing project, it creates `.codex/agents/*.toml`, `.codex/hooks.json`, `.codex/hooks/{story_codex_hook.py,run-story-hook.sh,run-story-hook.cmd}`, and `.codex/skills/story-setup/references/agent-references/`. Trust the project `.codex/` layer, review/trust hooks in `/hooks`, and open a fresh Codex session so custom agents load.
-
-**ZCode users:** Add this repository as a marketplace in Plugin Management and install `oh-story`; then invoke the 16 published Skills/Commands through `$story`, `$story-setup`, or the `/` panel. With `target_cli=zcode`, `$story-setup` deploys `.zcode/skills/`, `.zcode/commands/`, and `.zcode/hooks/story_zcode_hook.js`, then safely merges `.zcode/config.json` and the root `AGENTS.md`. Hooks require `node` on PATH. ZCode 3.3.4 does not execute project/plugin custom agents and has no `PreCompact` or `SessionEnd`; affected workflows report a solo/direct fallback, while `SessionStart` restores context after compaction.
-
-
-**OpenClaw users:** Current support is skills-only. OpenClaw can discover the 16 published Skills from workspace `skills/`, `.agents/skills`, `~/.agents/skills`, `~/.openclaw/skills`, or configured extra skill roots. `SKILL.md` files use OpenClaw-compatible single-line `name` / `description` plus single-line JSON `metadata.openclaw`. When `story-setup` targets OpenClaw, it copies those published Skills into project `skills/` and writes an OpenClaw `AGENTS.md`; agents/hooks are intentionally deferred, so outline-before-prose guards are soft skill checks rather than runtime enforcement. If new skills do not appear immediately, open a fresh OpenClaw session or wait for the skills watcher to refresh.
-
-**Reasonix users:** Current support is Skills + a native plugin manifest. Reasonix natively scans project skill roots (`.agents/skills` etc., a symlink to `skills/`) and discovers all 31 repository Skills — verify with `reasonix doctor capabilities`; you can also `reasonix plugin install` via the root `reasonix-plugin.json`. When `story-setup` targets `target_cli=reasonix`, it copies the 16 published Skills into project `skills/` and writes a Reasonix `AGENTS.md`; hooks/custom agents are intentionally deferred, so skills needing specialist agents fall back to solo/direct. If Windows symlinks are disabled, use the native plugin instead.
-
-**Generic Web AI / agent users:** If your platform can read a GitHub repo or project files, have the agent read `skills/*/SKILL.md` plus the relevant `references/`. For local project copies, run `story-setup` with `target_cli=generic`; it only writes a generic `AGENTS.md` and `skills/`. Without this project's hooks/custom agents, checks run as skill-level soft constraints or solo/direct fallbacks.
-
-**OpenClaw / Reasonix / generic paths need manual cleanup of nested directories:** these three keep their skill copy inside the project's `skills/`, so re-running `/story-setup` executes that project-local copy and the automatic cleanup never reaches them. If the project contains `skills/story-setup/references/agent-references/agent-references/` (possibly nested several levels deep) or `skills/story-setup/skills/`, delete them by hand. To update the skill text itself, reinstall this project and overwrite the public skill directories declared by `scripts/platform-skill-set.json` under the project's `skills/` from the new package.
-
-</details>
-
-After updating, if a project has already run `/story-setup`, re-run `/story-setup` from the project root to sync hooks / agents / references. Per-version changes are in [CHANGELOG.md](CHANGELOG.md) and [Releases](https://github.com/iceeyes27/oh-story-claudecode/releases).
-
-**Multi-agent collaboration needs setup + a fresh session:** the 7 specialist agents (story-architect, narrative-writer, consistency-checker, etc.) are written into your project's `.claude/agents/` by `/story-setup`, or into `.codex/agents/*.toml` by `$story-setup`. Claude Code and Codex register custom agents most reliably at session start; ZCode 3.3.4, OpenClaw Phase 1, Reasonix Phase 1, and the generic path default to skills + solo fallback. To check Claude/Codex agents: run `/story-review` in the new session — `Effective Mode: full/lean` means agents registered, `Fallback: ... -> solo` means they are unavailable.
-
-**Import and continuation order:** run `/story-setup` from the writing-project root first to deploy hooks, agents, and `AGENTS.md`; start or refresh the session, then run `/story-import` for the existing novel and continue with `/story-write 日更` or `/story-write 写第N章`. You can also run `/story-import` directly; if setup is missing, it offers to run setup first or continue with a serial import.
-
-**Author preferences persist across sessions:** tell `/story` to remember a writing habit; the write counts as successful only when it returns an `Author Memory Receipt`. Normal writing queries only relevant confirmed items with a hard 2 KB output cap, rather than injecting the full profile, candidates, and history into the prose prompt. This memory stays separate from per-book continuity tracking, and current instructions, book settings, and hard gates always take priority.
-
 ## Skills
 
 | Skill | Trigger | Description |
@@ -192,8 +178,6 @@ Run `/story dashboard` (`$story dashboard` in Codex) to open the local writing d
 deconstruction libraries and long/short project trees, then search, preview Markdown, edit text,
 save with conflict protection, or confirm a file deletion. It listens only on `127.0.0.1` and never
 uploads story content.
-
-![OH STORY local writing desk](demo/story-dashboard.png)
 
 <details>
 <summary>Cover generation example</summary>
@@ -424,7 +408,7 @@ I built this skill pack to help me through a job-hunting transition :joy:, and I
 
 ### Does it work in Codex, or only in Claude Code?
 
-oh-story-claudecode ships adapters for Claude Code, ZCode, OpenClaw, Codex CLI and Reasonix. Codex discovers the 18 skills by scanning `.agents/skills` in the repo and invokes them with `$story-setup`. Any Web AI or agent environment that can read project files can use the generic skills path.
+oh-story-claudecode ships adapters for Claude Code, ZCode, OpenClaw, Codex CLI and Reasonix. Codex discovers the 19 skills by scanning `.agents/skills` in the repo and invokes them with `$story-setup`. Any Web AI or agent environment that can read project files can use the generic skills path.
 
 ### Do I need a GPU or to host a model?
 
@@ -436,8 +420,8 @@ Since v0.7.7 long-form prose uses a single machine-counted length metric: every 
 
 ### After de-AI editing, detectors such as Zhuque still flag the text as AI. Why?
 
-`story-deslop` (`/去AI味`) is a writing lint: it deterministically detects and removes known AI sentence patterns, punctuation habits and degeneration artifacts. Its target is how the prose reads, not evading detectors. External detectors are a self-check reference only, and oh-story-claudecode makes no promise of passing any AI detector.
-[This concrete revision guide](https://zenstory.ai/oh-story/revise-ai-prose) separates vague emotion, repeated syntax, unearned commentary and over-explaining while preserving the scene's job and the author's facts.
+`story-deslop` (`/去AI味`) is a writing lint: it deterministically detects and removes known AI sentence patterns, punctuation habits and degeneration artifacts. Its target is how the prose reads, not evading detectors. External detectors are a self-check reference only.
+[This concrete revision guide](https://zenstory.ai/oh-story/revise-ai-prose) separates vague emotion, repeated syntax, unearned commentary and over-explaining while preserving the scene's job and the author's facts; this repository's own mechanism is described in [去AI味的具体做法](docs/how-to-remove-ai-flavor-from-web-fiction.md) (Chinese).
 
 ### I already have part of a novel written. Can I import it and continue?
 
@@ -445,15 +429,15 @@ Yes. Run `/story-setup` in the project root, start or refresh a session, run `/s
 
 ### How do I reduce forgotten clues or characters knowing answers too early in a long continuation?
 
-Before continuing, separate objective story facts, character knowledge and what readers have seen; carry only the relevant current state and unfinished commitments into the chapter. The [long-novel continuity guide](https://zenstory.ai/oh-story/long-novel-continuity) gives a three-chapter example. Structured records can help organize the handoff, but do not promise error-free writing over hundreds of chapters.
+Before continuing, separate objective story facts, character knowledge and what readers have seen; carry only the relevant current state and unfinished commitments into the chapter. The [long-novel continuity guide](https://zenstory.ai/oh-story/long-novel-continuity) gives a three-chapter example; [Keep an AI-written novel consistent over 100+ chapters](docs/keep-ai-novel-consistent-over-100-chapters.md) describes how this repository tracks continuity.
 
 ### My chapter outline is complete. Why does the prose still summarize the setup?
 
-Treat the outline as a specification for what must change, then turn its goal, obstacle, evidence, choice and cost into actions and results the viewpoint character can perceive. The [outline-to-chapter guide](https://zenstory.ai/oh-story/outline-to-chapter) is an editorial example, not a recorded tool run or model-quality claim.
+Treat the outline as a specification for what must change, then turn its goal, obstacle, evidence, choice and cost into actions and results the viewpoint character can perceive. The [outline-to-chapter guide](https://zenstory.ai/oh-story/outline-to-chapter) walks through an editorial example.
 
 ### How do I keep my voice without carrying plot facts over from another book?
 
-Describe the dimensions of a short sample you wrote or may use, separately from the current book's facts; sample inference does not automatically establish an enduring preference. The [author-voice guide](https://zenstory.ai/oh-story/preserve-author-voice) explains how to resolve the current request, book style and author preferences; it does not promise automatic style matching or encourage copied phrases.
+Describe the dimensions of a short sample you wrote or may use, separately from the current book's facts; sample inference does not automatically establish an enduring preference. The [author-voice guide](https://zenstory.ai/oh-story/preserve-author-voice) explains how to resolve the current request, book style and author preferences; use samples as a reference for expression and never copy sentences.
 
 ### On Windows the install prints `ENOENT ... mkdir` but ends with Done. Is that normal?
 
@@ -467,6 +451,18 @@ Rerun `/story-setup` and start a new session. The seven agents (story-architect,
 
 Long-form: `/story-scan long` (chart scanning) → `/story-analyze long` (deconstruction) → `/story-write long` (outline, volume outline, chapter blueprints, prose). Short-form: `/story-scan short` → `/story-analyze short` → `/story-write short`. Both share `/story-setup`, `/story-deslop`, `/story-review` and `/story-cover`.
 
+## Further reading
+
+- [Prompts, skill packs, plugins and MCP](https://zenstory.ai/oh-story/agent-skills-for-writers) — choose the writing job before the host and workflow
+- [Import 10–20 chapters and continue](https://zenstory.ai/oh-story/import-and-continue) — review inferred structure; treat the manuscript as evidence
+- [Separate character knowledge, promises and clues](https://zenstory.ai/oh-story/long-novel-continuity) — do not turn future plans into past events
+- [Write plot specifications as visible change](https://zenstory.ai/oh-story/outline-to-chapter) — advance through action, choice, cost and result
+- [Reduce "AI-sounding" prose with concrete edits](https://zenstory.ai/oh-story/revise-ai-prose) — improve the reading experience, not a detector score
+- [Separate voice choices from book facts](https://zenstory.ai/oh-story/preserve-author-voice) — use authorized samples without copying phrases
+- [Keep an AI-written novel consistent over 100+ chapters](docs/keep-ai-novel-consistent-over-100-chapters.md) — in-repo doc
+- [Claude Code skills that are not for coding: a fiction-writing pack as the worked example](docs/claude-code-skills-for-writers.md) — in-repo doc
+- [去AI味的具体做法](docs/how-to-remove-ai-flavor-from-web-fiction.md) — in-repo doc (Chinese)
+- [扫榜和拆文的自动化做法](docs/scan-charts-and-deconstruct-bestsellers.md) — in-repo doc (Chinese)
 
 ## Star History
 
@@ -505,3 +501,5 @@ Oh Story is part of [ZenStory AI](https://zenstory.ai) — open-source, agent-na
 | [video-recap-skills](https://github.com/zenstory-ai/video-recap-skills) | Create Chinese-narration recaps from supported video files, with optional editable JianYing/CapCut draft export |
 | [oh-story-dsh](https://github.com/zenstory-ai/oh-story-dsh) | Community DeepSeek Harness plugin with novel, short-drama, game and video-recap workbenches |
 | [zenstory](https://github.com/zenstory-ai/zenstory) | Chat-to-create AI novel-writing workbench ([app.zenstory.ai](https://app.zenstory.ai)) |
+
+The upstream repository moved from worldwonderer/oh-story-claudecode to zenstory-ai; old links redirect.

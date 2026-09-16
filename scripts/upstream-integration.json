@@ -7,7 +7,7 @@
   "upstream": {
     "remote": "upstream",
     "branch": "main",
-    "baseline": "907cde183368076a3bf97aa64f27d24c22504510"
+    "baseline": "735402840377c2c50173cc3cf92c4ff3ba56cc0d"
   },
   "quality_profile": "release",
   "policy_priority": [
@@ -191,6 +191,9 @@
       },
       {
         "path": "docs/scan-charts-and-deconstruct-bestsellers.md"
+      },
+      {
+        "path": ".agents/notes/implemented/process/2026-09-16-readme-for-readers-not-engines.md"
       }
     ]
   },

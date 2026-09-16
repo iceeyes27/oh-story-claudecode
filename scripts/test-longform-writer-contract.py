@@ -9,7 +9,7 @@ import tempfile
 import unittest
 
 sys.dont_write_bytecode = True
-SCRIPTS = Path(__file__).resolve().parents[2] / 'story-write/scripts'
+SCRIPTS = Path(__file__).resolve().parent.parent / 'skills/story-write/scripts'
 sys.path.insert(0, str(SCRIPTS))
 spec = importlib.util.spec_from_file_location('local_writer', SCRIPTS / 'build_writer_prompt.py')
 writer = importlib.util.module_from_spec(spec)

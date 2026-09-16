@@ -52,7 +52,7 @@ disable: true
 
 ## 长篇持续验收
 
-单元建纲、单元收口、每十五章连读、扩卷或挤占收束空间时，按 `references/workflow-setup.md`、`references/workflow-daily.md` 的对应步骤执行，并读取 [长篇连读协议](../story-review/references/longform-reading.md)。设计对照用于发现风险，独立正文连读用于核查实际效果；新书默认启用检查点，旧书明确起点后启用。到期漏审或证据失效时不得直接推进下一章正文生成；作者继续或豁免须保留范围与原因。检查完成不等于作者认可，更不等于文学问题已解决。
+单元建纲、单元收口、每十五章连读、扩卷或挤占收束空间时，按 `references/workflow-setup.md`、`references/workflow-daily.md` 的对应步骤执行，并读取 [长篇连读协议](references/longform-reading.md)。设计对照用于发现风险，独立正文连读用于核查实际效果；新书默认启用检查点，旧书明确起点后启用。到期漏审或证据失效时不得直接推进下一章正文生成；作者继续或豁免须保留范围与原因。检查完成不等于作者认可，更不等于文学问题已解决。
 
 ## 核心方法（长篇 / 短篇共享）
 

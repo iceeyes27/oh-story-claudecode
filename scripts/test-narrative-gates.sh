@@ -12,6 +12,9 @@ for c in python3 python py; do "$c" -c "" >/dev/null 2>&1 && { PYBIN="$c"; break
 [ -z "$PYBIN" ] && { echo "FAIL: python interpreter not found" >&2; exit 1; }
 
 suites=(
+  "test-longform-review.js node --test scripts/test-longform-review.js"
+  "test-longform-writer-contract.py $PYBIN scripts/test-longform-writer-contract.py"
+  "test-longform-journey.js node --test skills/story-write/scripts/test-longform-journey.js"
   "test-outline-causal.py $PYBIN scripts/test-outline-causal.py"
   "test-outline-contract.js node --test scripts/test-outline-contract.js"
   "test-emotion-run.js node scripts/test-emotion-run.js"

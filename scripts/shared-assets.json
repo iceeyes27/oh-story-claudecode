@@ -98,6 +98,34 @@
         "skills/story-setup/references/codex/hooks/book-discovery-contract.json",
         "skills/story-setup/references/zcode/hooks/book-discovery-contract.json"
       ]
+    },
+    {
+      "name": "outline-view",
+      "source": "skills/story-write/scripts/outline_view.py",
+      "targets": [
+        "skills/story-review/scripts/outline_view.py"
+      ]
+    },
+    {
+      "name": "longform-review-state.js",
+      "source": "skills/story-review/scripts/review-state.js",
+      "targets": [
+        "skills/story-write/scripts/review-state.js"
+      ]
+    },
+    {
+      "name": "longform-longform-review.js",
+      "source": "skills/story-review/scripts/longform-review.js",
+      "targets": [
+        "skills/story-write/scripts/longform-review.js"
+      ]
+    },
+    {
+      "name": "longform-longform-units.py",
+      "source": "skills/story-review/scripts/longform-units.py",
+      "targets": [
+        "skills/story-write/scripts/longform-units.py"
+      ]
     }
   ]
 }

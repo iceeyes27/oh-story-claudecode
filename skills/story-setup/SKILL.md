@@ -37,9 +37,9 @@ disable: true
 
 ## Phase 1：检测项目状态
 
-**先自检参考目录**：以正在执行的本 `SKILL.md` 所在目录为准，列出与它同级的 `references/` 下的子目录，核对下面 8 个名字是否都在**且都非空**——`agent-references`、`templates`、`codex`、`antigravity`、`zcode`、`openclaw`、`reasonix`、`generic`；同级 `scripts/merge-claude-settings.py`、`scripts/merge-codex-hooks.py`、`scripts/merge-antigravity-hooks.py`、`scripts/generate-antigravity-agents.mjs`、`scripts/deploy-antigravity-skills.py` 与 `scripts/copy-path-safety.py` 也必须存在。有缺即 skill 包没装全，**立即停止，不写任何部署文件**，报告里区分「缺目录」「目录为空」和「缺脚本」，并给修复指令：「story-setup 参考资料包不完整，缺 {路径}。按你的安装方式重装 oh-story-claudecode（命令行装的重跑 `npx skills add iceeyes27/oh-story-claudecode -y -g`，marketplace / Plugin Management 装的在面板里重装），再执行 /story-setup。」
+**先自检参考目录**：以正在执行的本 `SKILL.md` 所在目录为准，列出与它同级的 `references/` 下的子目录，核对下面 9 个名字是否都在**且都非空**——`agent-references`、`templates`、`codex`、`antigravity`、`opencode`、`zcode`、`openclaw`、`reasonix`、`generic`；同级 `scripts/merge-claude-settings.py`、`scripts/merge-codex-hooks.py`、`scripts/merge-antigravity-hooks.py`、`scripts/generate-antigravity-agents.mjs`、`scripts/deploy-antigravity-skills.py` 与 `scripts/copy-path-safety.py` 也必须存在。有缺即 skill 包没装全，**立即停止，不写任何部署文件**，报告里区分「缺目录」「目录为空」和「缺脚本」，并给修复指令：「story-setup 参考资料包不完整，缺 {路径}。按你的安装方式重装 oh-story-claudecode（命令行装的重跑 `npx skills add iceeyes27/oh-story-claudecode -y -g`，marketplace / Plugin Management 装的在面板里重装），再执行 /story-setup。」
 
-> 判据是「有没有 `SKILL.md`」：只看正在执行的 `SKILL.md` 同级的 `references/`。项目内 `.claude/skills/story-setup/` 和 `.codex/skills/story-setup/` 只有 `references/agent-references/`、不含 `SKILL.md`，不会是执行目录，也不要拿它们核对。Antigravity / ZCode / OpenClaw / Reasonix / generic 的项目副本是整份 skill 拷贝、自带 `SKILL.md`，8 个子目录本就齐全，照常核对即可。
+> 判据是「有没有 `SKILL.md`」：只看正在执行的 `SKILL.md` 同级的 `references/`。项目内 `.claude/skills/story-setup/` 和 `.codex/skills/story-setup/` 只有 `references/agent-references/`、不含 `SKILL.md`，不会是执行目录，也不要拿它们核对。Antigravity / ZCode / OpenClaw / Reasonix / generic 的项目副本是整份 skill 拷贝、自带 `SKILL.md`，9 个子目录本就齐全，照常核对即可。
 
 1. 检查当前目录是否已部署过（存在 `.story-deployed`）
    - 先校验非空 `target_cli`：按逗号拆分并去除各项首尾空白，每项必须属于 `claude-code,codex,antigravity,zcode,openclaw,reasonix,generic`。任一目标不受支持（含多端组合中的单项）就立即停止部署，报告具体值并要求用户重新选择受支持目标；不得自动删除原平台目录、过滤该项后继续部署或改写 `.story-deployed`。用户确认新目标后才重新执行部署，全部验证通过后再写 sentinel。

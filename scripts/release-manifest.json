@@ -11,17 +11,17 @@
   "source_hashes": {
     "skills/story/VERSION": "aaf6721dc37c40b4233accfc081f25776ff3bd1d2a4b9d5cea760d1c2cf86665",
     "scripts/current-contract.json": "398b370789666ad973e58afb29d38afaa9832f67b3397b3317f425cf30767de3",
-    "scripts/upstream-integration.json": "90ef81479c794947f0af934fa0270c12cff8830a43187e059b1dd406d48624ca",
+    "scripts/upstream-integration.json": "b9d4393bf6a563a88c09f01dbc5363c304012c5a11fce1d90c324f577ddc1b6b",
     "scripts/platform-capabilities.json": "869851d57f054125b10baf69413f520478a8405e7e1910ad628ae911261fb44c",
     "scripts/platform-skill-set.json": "4c465db3f8bcc8b2b7f38d9fc30916f4d5e7b82a82aad241fea83bbca2bf8014",
-    "scripts/shared-assets.json": "059f44b3c2aeac464534753eefd6e6d5934154ce9a2f959bd095693e53e550d0",
+    "scripts/shared-assets.json": "e3c14d2f7549d58949a02117574deda45172f09286fdc7d2ce32d450b47a314a",
     "scripts/quality-gate.json": "888ee8de4ec827e1b2d3feb924148295738be099a38ca9d34fdf0777b31ce646"
   },
   "identity": {
     "fork_version": "0.8.1",
     "setup_skill_version": "1.2.11",
     "agents_version": 30,
-    "upstream_baseline": "907cde183368076a3bf97aa64f27d24c22504510",
+    "upstream_baseline": "735402840377c2c50173cc3cf92c4ff3ba56cc0d",
     "public_skill_count": 19
   }
 }

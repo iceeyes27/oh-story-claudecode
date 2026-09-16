@@ -3,7 +3,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const longform = require('../../story-review/scripts/longform-review.js');
+const longform = require('./longform-review.js');
 
 const USAGE = `Usage: node flow-state.js [--dir <workspace-or-book>] [--json] <command> [args]
 

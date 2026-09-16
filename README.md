@@ -2,52 +2,21 @@
 
 # oh-story-claudecode
 
-> **2026-07 起本仓库为统一命名版**（story-write / story-analyze / story-scan，mode 区分长短篇）。拆分命名的历史版本见 tag [`pre-unified-split-naming`](../../tree/pre-unified-split-naming)。
+**网文写作 skill 包：扫榜、拆文、写作、去AI味、封面图一套流程，装进你正在用的编程 Agent。**
 
-网文写作 skill 包，覆盖长篇与短篇网络小说的扫榜、拆文、写作、去AI味、封面图全流程。内置适配 Claude Code、ZCode、OpenClaw、Codex CLI、Reasonix、workbuddy；能读取项目文件的 Web AI / Agent 环境也可按通用 skills 路径使用。
+项目主页：https://zenstory.ai/zh/oh-story
 
-> 当前 fork 版本为 v0.8.1，部署契约为 `story-setup 1.2.11` / `agents_version: 30`，公开集合为 18 个 skills。已吸收上游 v0.7.10 的逐维文风裁决、书级 `.deslop-whitelist`、长篇项目/对标/追踪初始化加载，以及短篇 Phase 3/4 参考拆分；候选采用、追踪事务与质量生命周期保持现有行为。
+![OH STORY 本地写作工作台](demo/story-dashboard.png)
 
-**Oh Story** is an open-source skill pack that turns coding agents — Claude Code, Codex CLI, ZCode, OpenClaw, Reasonix and workbuddy — into a complete workflow for writing Chinese web fiction (网文), both long-form serials and short stories. It covers the professional author's method end to end: **扫榜** (scanning bestseller charts to choose genre, cast and angle), **拆文** (deconstructing top-ranked works into outline rhythm and reusable plot modules), commercial drafting with hooks and payoff pacing, **去AI味** (removing AI-flavored prose), and cover generation. It is not a prompt collection: the 18 skills ship with deterministic verifiers, blocking reference gates, layered context and state management, and per-harness deployers (`/story-setup`). Built for authors publishing on 起点, 番茄, 晋江, 七猫 and 知乎盐言. MIT licensed. Full English README: [README_EN.md](README_EN.md). Install: `npx skills add iceeyes27/oh-story-claudecode -y -g`.
+## 这是什么
 
-本仓库是 [iceeyes27 维护的统一命名 fork](https://github.com/iceeyes27/oh-story-claudecode)。上游由 [ZenStory AI](https://zenstory.ai/zh) 维护，原仓库名为 `worldwonderer/oh-story-claudecode`。
+本仓库是 [iceeyes27 维护的统一命名 fork](https://github.com/iceeyes27/oh-story-claudecode)，使用 `story-write` / `story-analyze` / `story-scan`，以 mode 区分长短篇。拆分命名的历史版本见 tag [`pre-unified-split-naming`](../../tree/pre-unified-split-naming)。
 
-## 按写作任务开始
+oh-story-claudecode 覆盖长篇与短篇网络小说的全流程：扫榜选材、拆解爆款、搭大纲写正文、去AI味、生成封面图。它以 19 个 skill 的形式安装到 Claude Code、ZCode、OpenClaw、Codex CLI、Reasonix 中，写作用的模型就是该 Agent 的模型；能读取项目文件的 Web AI / Agent 环境也可按通用 skills 路径使用。
 
-本仓库是安装到兼容 Agent 宿主中的 skill 包；它与 ZenStory 托管写作工作台是两个独立产品，项目文件、设定和进度不会自动同步。下列指南帮你先理清任务，再在已安装的宿主里执行：
-
-| 你要做什么 | 实用指南 | 重点 |
-|---|---|---|
-| 先看懂写作 Skill | [提示词、技能包、插件与 MCP 怎么分](https://zenstory.ai/zh/oh-story/agent-skills-for-writers) | 先选写作任务，再选宿主与流程 |
-| 导入已写小说 | [导入 10–20 章后接着写](https://zenstory.ai/zh/oh-story/import-and-continue) | 审阅反推结果，以书稿证据为准 |
-| 维持长篇连续性 | [分开角色已知、承诺与线索](https://zenstory.ai/zh/oh-story/long-novel-continuity) | 别把未来计划当成已发生事实 |
-| 把章纲写成章节 | [把剧情规格写成可见变化](https://zenstory.ai/zh/oh-story/outline-to-chapter) | 用行动、选择、代价和结果推进 |
-| 修改套路化表达 | [用具体改稿减少“AI 味”](https://zenstory.ai/zh/oh-story/revise-ai-prose) | 改读感，不追求鉴定分数 |
-| 续写时保持自己的文风 | [分开文风选择与本书事实](https://zenstory.ai/zh/oh-story/preserve-author-voice) | 用自有或获准样本，不复制原句 |
-
-### 常见问题的直接回答
-
-这些文档直接回答写作者最常问的几个问题，描述的是本仓库当前版本的实际机制：
-
-| 问题 | 文档 |
-|---|---|
-| AI 写长篇怎么不崩人设、不忘伏笔？ | [AI 写长篇小说怎么不崩人设：Oh Story 的做法](docs/ai-long-novel-character-consistency.md) |
-| AI 写的小说 AI 味太重怎么办？ | [去AI味的具体做法](docs/how-to-remove-ai-flavor-from-web-fiction.md) |
-| 怎么拆解榜单爆款、学它的结构？ | [扫榜和拆文的自动化做法](docs/scan-charts-and-deconstruct-bestsellers.md) |
-| Claude Code skills 不写代码能干什么？ | [Claude Code skills for writers](docs/claude-code-skills-for-writers.md)（英文） |
-
-## 安装后的第一条请求
-
-先按下文说明在选定宿主中完成安装与 setup，再按当前任务选一条，把〈占位内容〉换成自己的信息。这些是任务简报，不是安装命令，也不要求把所有阶段跑完；输出仍需审阅，不会与 ZenStory 托管工作台自动同步。
-
-1. **开一本新书**
-   > 我想开一部〈类型/题材〉新书。先从我提供的材料中分开已确定事实与待决问题；只规划一个有边界的开篇，交付核心冲突、视角/信息释放限制、前三章变化和待决项。不要自动写正文；题材取舍、角色动机和长期方向留给我确认。
-2. **导入已有书稿**
-   > 请把这份书稿整理成可续写项目。第 1–〈N〉章完整，〈文件名〉是第〈N+1〉章残稿；保留原文，不覆盖完整章节，不把残稿算作完整章，推断出的设定单列待确认。先交付识别范围、重建事实、冲突/歧义和待我确认的决定，供我审阅；暂不续写。
-3. **修一段不满意的正文**
-   > 这段读起来〈空泛/重复/过度解释〉。先指出具体读感问题，保留故事事实、角色已知和未揭示边界；只交付这一段的修订建议、前后对照与理由，不全书改写。哪些建议采用由我决定。
-
-## 核心思路
+- **检查与门禁**：skill 自带确定性检查脚本、写正文前的大纲门禁、分层的上下文与状态管理，以及 7 个专业 Agent、8 个自动化 hook 和 100+ 份写作方法论。
+- **用文件系统当记忆**：设定、大纲、正文、追踪各自独立维护，几百章的长篇也不靠对话记忆硬撑。
+- **面向的平台**：起点、番茄、晋江、七猫、知乎盐言等长短篇平台。
 
 > **套路 = 确定性的情绪满足**
 
@@ -60,6 +29,61 @@
 围绕四条线展开：爆款逆向 · 剧情模块化重组 · 上下文状态分层管理 · 人机协同。
 
 > 当前 fork 版本 **v0.8.1**，部署契约为 `story-setup 1.2.11` / `agents_version: 30`。完整变更见 [CHANGELOG.md](CHANGELOG.md)；升级后重跑 `/story-setup` 并新开会话。
+
+## 安装
+
+```bash
+npx skills add iceeyes27/oh-story-claudecode -y -g
+```
+
+`-g` 全局安装，所有目录可用；去掉 `-g` 则只装到当前目录。更新时重新执行同一条命令即可。
+
+也可以直接告诉 Claude Code / ZCode / OpenClaw / Codex / Reasonix，或其他支持导入 GitHub 仓库/skill 的 Web AI / Agent 平台：
+
+```
+安装这个 skill https://github.com/iceeyes27/oh-story-claudecode
+```
+
+升级时再说一次同一句话即可。
+
+装好后，在写作项目根运行 `/story-setup`（Codex 用 `$story-setup`）部署 hooks / agents / references，然后新开会话。
+
+<details>
+<summary>Codex / ZCode / OpenClaw / Reasonix / Web AI 使用说明</summary>
+
+> **Codex 用户：** repo 内直接使用：Codex 会扫描 `$REPO_ROOT/.agents/skills`（指向 `skills/` 的 symlink）发现仓库 Skill；用 `$story`、`$story-setup` 或 `/skills` 调用。Windows 上 git 需开 `core.symlinks=true`，否则 symlink 失效，改走下方 `$story-setup` 部署。
+> 跑 `$story-setup` 部署到写作项目后，会写入 `.codex/agents/*.toml`、`.codex/hooks.json`、`.codex/hooks/{story_codex_hook.py,run-story-hook.sh,run-story-hook.cmd}` 和 `.codex/skills/story-setup/references/agent-references/`；请信任项目 `.codex/` 配置层并在 `/hooks` review/trust hooks、新开 Codex 会话，让 custom agents 生效。
+>
+> **ZCode 用户：** 在 Plugin Management 中把本仓库加入 marketplace，安装 `oh-story` 后可用 `$story`、`$story-setup` 或 `/` 面板调用公开 Skills/Commands；实际集合以 `scripts/platform-skill-set.json` 为准。`$story-setup` 选择 `target_cli=zcode` 会部署 `.zcode/skills/`、`.zcode/commands/`、`.zcode/hooks/story_zcode_hook.js`，安全合并 `.zcode/config.json` 与根 `AGENTS.md`；Hook 依赖 PATH 中的 `node`。ZCode 3.3.4 不执行项目/plugin custom agents，也没有 `PreCompact` / `SessionEnd`，相关流程会明确降级 solo/direct，compact 后由 `SessionStart` 恢复上下文。
+>
+>
+> **OpenClaw 用户：** 当前支持 skills-only：OpenClaw 可从 workspace `skills/`、`.agents/skills`、`~/.agents/skills`、`~/.openclaw/skills` 等 skill root 发现清单中的公开 Skill；`SKILL.md` 已按 OpenClaw 要求使用单行 `name` / `description` 与单行 JSON `metadata.openclaw`。`story-setup` 选择 `target_cli=openclaw` 时会把这些公开 Skill 复制到项目 `skills/` 并写入 OpenClaw 版 `AGENTS.md`；agents/hooks 暂不部署，写正文前大纲守卫在 OpenClaw 下是 skill 内软约束。部署后如未显示新 skills，请新开 OpenClaw session 或等待 watcher 刷新。
+>
+> **Reasonix 用户：** 当前支持 skills + 原生 plugin manifest：Reasonix 原生扫描项目 skill root（`.agents/skills` 等，指向 `skills/` 的 symlink）发现仓库 Skill，用 `reasonix doctor capabilities` 校验；也可用根 `reasonix-plugin.json` 走 `reasonix plugin install`。`story-setup` 选择 `target_cli=reasonix` 时会复制公开清单中的 Skill 到项目 `skills/` 并写入 Reasonix 版 `AGENTS.md`；hooks/custom agents 暂不部署，涉及专业 Agent 的 skill 走 solo/direct fallback。Windows 未启用 symlink 时改走原生 plugin。
+>
+> **Web AI / 通用 Agent 用户：** 平台能读取 GitHub 仓库或项目文件时，可让 Agent 读取 `skills/*/SKILL.md` 与对应 `references/`；需要本地副本时，`story-setup` 可选 `target_cli=generic`，只写通用 `AGENTS.md` 和 `skills/`。无本项目 hooks/custom agents 的环境按 skill 内软约束或 solo/direct fallback 执行。
+>
+> 升级后如果项目里已经跑过 `/story-setup`，建议在项目根重跑一次 `/story-setup`，同步 hooks / agents / references。每版变更见 [CHANGELOG.md](CHANGELOG.md) 与 [Releases](https://github.com/iceeyes27/oh-story-claudecode/releases)。
+
+> **导入续写顺序：** 推荐先在写作项目根运行 `/story-setup`（部署 hooks/agents/AGENTS），新开/刷新会话后运行 `/story-import` 导入已有小说，再用 `/story-write 日更` 或 `/story-write 写第N章` 续写。也可以直接运行 `/story-import`；它会先检测是否已 setup，未部署时让你选择先去 setup 或继续串行导入。
+
+> **OpenClaw / Reasonix / 通用路径的目录残留：** 项目里若出现 `skills/story-setup/references/agent-references/agent-references/`（可能嵌了多层）或 `skills/story-setup/skills/`，先手动删除这些自嵌套残留，再用新版 `/story-setup` 重部署。新版会在每次递归复制前按 realpath / samefile 检查同对象和目标落入源目录的风险。
+</details>
+
+**多 agent 协作要先部署再新开会话：** 7 个专业 agent（story-architect、narrative-writer、consistency-checker 等）由 `/story-setup` 写入项目 `.claude/agents/`，或由 `$story-setup` 写入 `.codex/agents/*.toml`。Claude Code / Codex 都在会话启动时更稳定地注册 custom agent；ZCode 3.3.4、OpenClaw Phase 1、Reasonix Phase 1 与 generic 路径默认走 skills + solo fallback。判断是否生效：新会话里跑 `/story-review`，报告头是 `Effective Mode: full/lean` 即注册成功，是 `Fallback: ... -> solo` 说明当前运行时未暴露该 agent。
+
+**作者习惯会跨会话延续：** 对 `/story` 说“记住我的写作习惯”，稳定偏好会进入工作区 `.story/作者记忆/`；看到 `Author Memory Receipt` 才算写入成功。普通写作只查询本次相关的已确认条目，输出硬上限 2KB，不把完整画像、候选和历史塞进正文 prompt。它与每本书的剧情追踪分开，当前要求、本书设定和硬性门禁始终优先。
+
+## 安装后的第一条请求
+
+复制、改一改就能用：按当前任务选一条，把〈占位内容〉换成自己的信息。
+
+1. **开一本新书**
+   > 我想开一部〈类型/题材〉新书。先从我提供的材料中分开已确定事实与待决问题；只规划一个有边界的开篇，交付核心冲突、视角/信息释放限制、前三章变化和待决项。不要自动写正文；题材取舍、角色动机和长期方向留给我确认。
+2. **导入已有书稿**
+   > 请把这份书稿整理成可续写项目。第 1–〈N〉章完整，〈文件名〉是第〈N+1〉章残稿；保留原文，不覆盖完整章节，不把残稿算作完整章，推断出的设定单列待确认。先交付识别范围、重建事实、冲突/歧义和待我确认的决定，供我审阅；暂不续写。
+3. **修一段不满意的正文**
+   > 这段读起来〈空泛/重复/过度解释〉。先指出具体读感问题，保留故事事实、角色已知和未揭示边界；只交付这一段的修订建议、前后对照与理由，不全书改写。哪些建议采用由我决定。
 
 ## 流程总览
 
@@ -118,50 +142,6 @@ flowchart LR
     write_s --> deslop
 ```
 
-## 安装
-
-**方式一** 直接告诉 Claude Code / ZCode / OpenClaw / Codex / Reasonix，或其他支持导入 GitHub 仓库/skill 的 Web AI / Agent 平台：
-
-```
-安装这个 skill https://github.com/iceeyes27/oh-story-claudecode
-```
-
-**方式二** 命令行：
-
-```bash
-npx skills add iceeyes27/oh-story-claudecode -y -g
-```
-
-`-g` 全局安装，所有目录可用；去掉 `-g` 则只装到当前目录。更新时重新执行同一条命令即可。
-
-排查已安装环境时，向 Agent 说「用 story-setup 检查写作环境」，或传入 `check` 参数；该模式只读检查并报告。
-
-<details>
-<summary>Codex / ZCode / OpenClaw / Reasonix / Web AI 使用说明</summary>
-
-> **Codex 用户：** repo 内直接使用：Codex 会扫描 `$REPO_ROOT/.agents/skills`（指向 `skills/` 的 symlink）发现仓库 Skill；用 `$story`、`$story-setup` 或 `/skills` 调用。Windows 上 git 需开 `core.symlinks=true`，否则 symlink 失效，改走下方 `$story-setup` 部署。
-> 跑 `$story-setup` 部署到写作项目后，会写入 `.codex/agents/*.toml`、`.codex/hooks.json`、`.codex/hooks/{story_codex_hook.py,run-story-hook.sh,run-story-hook.cmd}` 和 `.codex/skills/story-setup/references/agent-references/`；请信任项目 `.codex/` 配置层并在 `/hooks` review/trust hooks、新开 Codex 会话，让 custom agents 生效。
->
-> **ZCode 用户：** 在 Plugin Management 中把本仓库加入 marketplace，安装 `oh-story` 后可用 `$story`、`$story-setup` 或 `/` 面板调用公开 Skills/Commands；实际集合以 `scripts/platform-skill-set.json` 为准。`$story-setup` 选择 `target_cli=zcode` 会部署 `.zcode/skills/`、`.zcode/commands/`、`.zcode/hooks/story_zcode_hook.js`，安全合并 `.zcode/config.json` 与根 `AGENTS.md`；Hook 依赖 PATH 中的 `node`。ZCode 3.3.4 不执行项目/plugin custom agents，也没有 `PreCompact` / `SessionEnd`，相关流程会明确降级 solo/direct，compact 后由 `SessionStart` 恢复上下文。
->
->
-> **OpenClaw 用户：** 当前支持 skills-only：OpenClaw 可从 workspace `skills/`、`.agents/skills`、`~/.agents/skills`、`~/.openclaw/skills` 等 skill root 发现清单中的公开 Skill；`SKILL.md` 已按 OpenClaw 要求使用单行 `name` / `description` 与单行 JSON `metadata.openclaw`。`story-setup` 选择 `target_cli=openclaw` 时会把这些公开 Skill 复制到项目 `skills/` 并写入 OpenClaw 版 `AGENTS.md`；agents/hooks 暂不部署，写正文前大纲守卫在 OpenClaw 下是 skill 内软约束。部署后如未显示新 skills，请新开 OpenClaw session 或等待 watcher 刷新。
->
-> **Reasonix 用户：** 当前支持 skills + 原生 plugin manifest：Reasonix 原生扫描项目 skill root（`.agents/skills` 等，指向 `skills/` 的 symlink）发现仓库 Skill，用 `reasonix doctor capabilities` 校验；也可用根 `reasonix-plugin.json` 走 `reasonix plugin install`。`story-setup` 选择 `target_cli=reasonix` 时会复制公开清单中的 Skill 到项目 `skills/` 并写入 Reasonix 版 `AGENTS.md`；hooks/custom agents 暂不部署，涉及专业 Agent 的 skill 走 solo/direct fallback。Windows 未启用 symlink 时改走原生 plugin。
->
-> **Web AI / 通用 Agent 用户：** 平台能读取 GitHub 仓库或项目文件时，可让 Agent 读取 `skills/*/SKILL.md` 与对应 `references/`；需要本地副本时，`story-setup` 可选 `target_cli=generic`，只写通用 `AGENTS.md` 和 `skills/`。无本项目 hooks/custom agents 的环境按 skill 内软约束或 solo/direct fallback 执行。
->
-> 升级后如果项目里已经跑过 `/story-setup`，建议在项目根重跑一次 `/story-setup`，同步 hooks / agents / references。每版变更见 [CHANGELOG.md](CHANGELOG.md) 与 [Releases](https://github.com/iceeyes27/oh-story-claudecode/releases)。
-
-> **导入续写顺序：** 推荐先在写作项目根运行 `/story-setup`（部署 hooks/agents/AGENTS），新开/刷新会话后运行 `/story-import` 导入已有小说，再用 `/story-write 日更` 或 `/story-write 写第N章` 续写。也可以直接运行 `/story-import`；它会先检测是否已 setup，未部署时让你选择先去 setup 或继续串行导入。
-
-> **OpenClaw / Reasonix / 通用路径的目录残留：** 项目里若出现 `skills/story-setup/references/agent-references/agent-references/`（可能嵌了多层）或 `skills/story-setup/skills/`，先手动删除这些自嵌套残留，再用新版 `/story-setup` 重部署。新版会在每次递归复制前按 realpath / samefile 检查同对象和目标落入源目录的风险。
-</details>
-
-**多 agent 协作要先部署再新开会话：** 7 个专业 agent（story-architect、narrative-writer、consistency-checker 等）由 `/story-setup` 写入项目 `.claude/agents/`，或由 `$story-setup` 写入 `.codex/agents/*.toml`。Claude Code / Codex 都在会话启动时更稳定地注册 custom agent；ZCode 3.3.4、OpenClaw Phase 1、Reasonix Phase 1 与 generic 路径默认走 skills + solo fallback。判断是否生效：新会话里跑 `/story-review`，报告头是 `Effective Mode: full/lean` 即注册成功，是 `Fallback: ... -> solo` 说明当前运行时未暴露该 agent。
-
-**作者习惯会跨会话延续：** 对 `/story` 说“记住我的写作习惯”，稳定偏好会进入工作区 `.story/作者记忆/`；看到 `Author Memory Receipt` 才算写入成功。普通写作只查询本次相关的已确认条目，输出硬上限 2KB，不把完整画像、候选和历史塞进正文 prompt。它与每本书的剧情追踪分开，当前要求、本书设定和硬性门禁始终优先。
-
 ## Skills
 
 | Skill | 触发 | 说明 |
@@ -199,8 +179,6 @@ npx skills add iceeyes27/oh-story-claudecode -y -g
 运行 `/story dashboard`（Codex 用 `$story dashboard`）打开本地写作工作台，浏览拆文库与
 长/短篇项目文件树，并完成搜索、Markdown 预览、文本编辑、冲突保护保存和确认删除。
 服务仅监听 `127.0.0.1`，小说内容不会上传。
-
-![OH STORY 本地写作工作台](demo/story-dashboard.png)
 
 <details>
 <summary>封面生成示例</summary>
@@ -431,7 +409,7 @@ Agent 按需加载 `references/` 中的写作理论（角色设计、对话技�
 
 ### 能在 Codex 里用吗，还是只支持 Claude Code？
 
-oh-story-claudecode 内置适配 Claude Code、ZCode、OpenClaw、Codex CLI、Reasonix 和 workbuddy。Codex 会直接扫描仓库内 `.agents/skills` 发现 18 个 skill，用 `$story-setup` 调用；能读取项目文件的 Web AI / Agent 环境也可以按通用 skills 路径使用。
+oh-story-claudecode 内置适配 Claude Code、ZCode、OpenClaw、Codex CLI、Reasonix 和 workbuddy。Codex 会直接扫描仓库内 `.agents/skills` 发现 19 个 skill，用 `$story-setup` 调用；能读取项目文件的 Web AI / Agent 环境也可以按通用 skills 路径使用。
 
 ### 需要 GPU 或自己部署模型吗？
 
@@ -443,8 +421,8 @@ oh-story-claudecode 内置适配 Claude Code、ZCode、OpenClaw、Codex CLI、Re
 
 ### 去AI味之后，朱雀等 AI 检测还是判定为 AI 怎么办？
 
-`story-deslop`（`/去AI味`）是写作 lint：它确定性地检测并清除已知的 AI 句式、标点和退化痕迹，目标是读感，不是绕过检测器。朱雀等外部检测只作自测参考，不替代人工读感；oh-story-claudecode 不承诺通过任何 AI 检测。
-可按[这份具体改稿指南](https://zenstory.ai/zh/oh-story/revise-ai-prose)把空泛情绪、重复句式、拔高议论和过度解释分别处理，同时保留场景任务与作者设定。
+`story-deslop`（`/去AI味`）是写作 lint：它确定性地检测并清除已知的 AI 句式、标点和退化痕迹，目标是读感，不是绕过检测器。朱雀等外部检测只作自测参考，不替代人工读感。
+可按[这份具体改稿指南](https://zenstory.ai/zh/oh-story/revise-ai-prose)把空泛情绪、重复句式、拔高议论和过度解释分别处理，同时保留场景任务与作者设定；本仓库的实现细节见[去AI味的具体做法](docs/how-to-remove-ai-flavor-from-web-fiction.md)。
 
 ### 已经写了一部分的小说，能导入后继续写吗？
 
@@ -452,15 +430,15 @@ oh-story-claudecode 内置适配 Claude Code、ZCode、OpenClaw、Codex CLI、Re
 
 ### 长篇续写怎样减少忘伏笔或角色提前知道答案？
 
-续写前分开故事客观事实、角色已知和读者已见，只带上本章相关的当前状态与未完承诺。[长篇连续性指南](https://zenstory.ai/zh/oh-story/long-novel-continuity)给出三章示例；结构化记录能帮助交接，但不代表几百章都不会出错。
+续写前分开故事客观事实、角色已知和读者已见，只带上本章相关的当前状态与未完承诺。[长篇连续性指南](https://zenstory.ai/zh/oh-story/long-novel-continuity)给出三章示例，[AI 写长篇小说怎么不崩人设：Oh Story 的做法](docs/ai-long-novel-character-consistency.md)说明本仓库的连续性机制。
 
 ### 章纲齐全，为什么写出来还是在复述设定？
 
-把章纲当作“本章必须发生什么变化”的规格，再把目标、阻碍、证据、选择和代价转成视角人物可感知的行动与结果。[章纲到章节指南](https://zenstory.ai/zh/oh-story/outline-to-chapter)是编辑示例，不是工具实测或模型质量承诺。
+把章纲当作“本章必须发生什么变化”的规格，再把目标、阻碍、证据、选择和代价转成视角人物可感知的行动与结果。[章纲到章节指南](https://zenstory.ai/zh/oh-story/outline-to-chapter)给出编辑示例。
 
 ### 怎样保留我的文风，又不把另一本书的情节带进来？
 
-把你自己写的或获准使用的短样本拆成表达维度，与当前书的事实分开讨论；样本推断不自动成为长期偏好。[作者文风指南](https://zenstory.ai/zh/oh-story/preserve-author-voice)说明如何裁决当前要求、本书文风与作者偏好；它不承诺自动匹配文风，也不鼓励复制原句。
+把你自己写的或获准使用的短样本拆成表达维度，与当前书的事实分开讨论；样本推断不自动成为长期偏好。[作者文风指南](https://zenstory.ai/zh/oh-story/preserve-author-voice)说明如何裁决当前要求、本书文风与作者偏好；样本只作表达参考，不复制原句。
 
 ### Windows 上安装报 `ENOENT ... mkdir`，但末尾显示 Done，正常吗？
 
@@ -474,6 +452,18 @@ oh-story-claudecode 内置适配 Claude Code、ZCode、OpenClaw、Codex CLI、Re
 
 长篇：`/story-scan long`（扫榜）→ `/story-analyze long`（拆文）→ `/story-write long`（写作，含大纲、卷纲、细纲、正文）。短篇：`/story-scan short` → `/story-analyze short` → `/story-write short`。两条线共用 `/story-setup`、`/story-deslop`、`/story-review` 和 `/story-cover`。
 
+## 延伸阅读
+
+- [提示词、技能包、插件与 MCP 怎么分](https://zenstory.ai/zh/oh-story/agent-skills-for-writers) — 先选写作任务，再选宿主与流程
+- [导入 10–20 章后接着写](https://zenstory.ai/zh/oh-story/import-and-continue) — 审阅反推结果，以书稿证据为准
+- [分开角色已知、承诺与线索](https://zenstory.ai/zh/oh-story/long-novel-continuity) — 别把未来计划当成已发生事实
+- [把剧情规格写成可见变化](https://zenstory.ai/zh/oh-story/outline-to-chapter) — 用行动、选择、代价和结果推进
+- [用具体改稿减少“AI 味”](https://zenstory.ai/zh/oh-story/revise-ai-prose) — 改读感，不追求鉴定分数
+- [分开文风选择与本书事实](https://zenstory.ai/zh/oh-story/preserve-author-voice) — 用自有或获准样本，不复制原句
+- [AI 写长篇小说怎么不崩人设：Oh Story 的做法](docs/ai-long-novel-character-consistency.md) — 仓库内文档
+- [去AI味的具体做法](docs/how-to-remove-ai-flavor-from-web-fiction.md) — 仓库内文档
+- [扫榜和拆文的自动化做法](docs/scan-charts-and-deconstruct-bestsellers.md) — 仓库内文档
+- [Claude Code skills for writers](docs/claude-code-skills-for-writers.md) — 仓库内文档（英文）
 
 ## Star History
 
@@ -512,3 +502,5 @@ Oh Story 是 [ZenStory AI](https://zenstory.ai/zh) 的一部分——一组开�
 | [video-recap-skills](https://github.com/zenstory-ai/video-recap-skills) | 将支持的视频文件制作成中文解说，可选导出可编辑的剪映/CapCut 草稿 |
 | [oh-story-dsh](https://github.com/zenstory-ai/oh-story-dsh) | DeepSeek Harness 社区插件，提供小说、短剧、游戏和视频解说工作台 |
 | [zenstory](https://github.com/zenstory-ai/zenstory) | 对话即创作的 AI 小说写作工作台（[app.zenstory.ai](https://app.zenstory.ai)） |
+
+上游仓库从 worldwonderer/oh-story-claudecode 迁入 zenstory-ai，旧链接自动跳转。

@@ -105,7 +105,7 @@ def find_chapter_file(directory: Path, chapter: int, prefix: str, recursive=Fals
 
 
 def longform_gate(project: Path, chapter: int):
-    tool = Path(__file__).resolve().parents[2] / "story-review/scripts/review-state.js"
+    tool = Path(__file__).resolve().parent / "review-state.js"
     try:
         result = subprocess.run(["node", str(tool), "longform", "gate", "--book", str(project),
                                  "--chapter", str(chapter)], capture_output=True, text=True, timeout=30)

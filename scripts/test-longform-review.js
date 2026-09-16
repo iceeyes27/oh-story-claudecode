@@ -6,9 +6,9 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 const { spawnSync } = require('node:child_process');
-const runtime = require('./longform-review.js');
-const CLI = path.join(__dirname, 'review-state.js');
-const WRITE = path.resolve(__dirname, '../../story-write/scripts');
+const runtime = require('../skills/story-review/scripts/longform-review.js');
+const CLI = path.join(__dirname, '../skills/story-review/scripts/review-state.js');
+const WRITE = path.resolve(__dirname, '../skills/story-write/scripts');
 function put(book, name, value) {
   const file = path.join(book, name); fs.mkdirSync(path.dirname(file), { recursive: true });
   fs.writeFileSync(file, typeof value === 'string' ? value : JSON.stringify(value)); return file;
@@ -192,7 +192,7 @@ test('flow detect/update/read and writer enforce same pending gate, including pr
   put(book, '追踪/写作流程状态.json', { ...pending, current_stage: 'done', execution_status: 'done' });
   const read = flow(book, 'read'); assert.equal(read.current_stage, 'pending_reading'); assert.notEqual(read.execution_status, 'done');
   const continuation = runtime.readState(book); continuation.authorizations = []; put(book, runtime.FILE, continuation);
-  const writer = spawnSync('python3', [path.join(WRITE, 'build_writer_prompt.py'), '--project', book, '--chapter', '4'], { encoding: 'utf8', env: { ...process.env, PYTHONDONTWRITEBYTECODE: '1' } });
+  const writer = spawnSync(process.platform === 'win32' ? 'python' : 'python3', [path.join(WRITE, 'build_writer_prompt.py'), '--project', book, '--chapter', '4'], { encoding: 'utf8', env: { ...process.env, PYTHONDONTWRITEBYTECODE: '1' } });
   assert.equal(writer.status, 2); assert.match(writer.stderr, /连读写前门/);
 });
 test('ordinary latest and CAS remain independent; revision conflicts preserve evidence', t => {

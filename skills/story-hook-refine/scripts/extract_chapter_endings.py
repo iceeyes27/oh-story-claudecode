@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-extract_chapter_endings.py — 批量提取每章最后一段（章末钩子精修用）
+extract_chapter_endings.py — 批量提取指定范围的章末段落（只报告，不要求修改钩子）
 
 用法：
   python .agents/skills/story-hook-refine/scripts/extract_chapter_endings.py [--dir 正文根] [--from N] [--to N] [--words 词表文件] [--lines N]

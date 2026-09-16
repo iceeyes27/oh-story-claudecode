@@ -324,7 +324,7 @@ story-architect 属于高层级结构设计 agent。轻量题材定位优先由�
 - **设定登记与审查**：新长篇默认创建 `设定/_设定登记.md`、`设定/_设定审查.json`，初始化追踪时启用设定兑现；详见 [setting-payoff.md](setting-payoff.md)。编号独立分配；规划登记与正式事实分离，正式兑现视图由采用事务派生。
 - **追踪事务初始状态**：按 `references/tracking-transaction.md` 构造第 0 章初始化 JSON，执行 `scripts/tracking_commit.py init`，生成检查点、续写状态卡（固定 7 栏）、空的伏笔/时间线视图与目录；紧接着运行 `check`，通过后删除初始化事务 JSON；核心角色动态快照可在第一次正文事务中创建
 
-**新书连读策略初始化**：完成 Phase 3 单元规划并初始化追踪到第 0 章、尚无正式正文时，运行 `node .agents/skills/story-review/scripts/review-state.js longform init --book "{书目录}" --expected-revision 0 --new-book`。只在尚无策略时执行；已存在则读取 status 续用，不重复初始化。随后按 [长篇连读协议](../../story-review/references/longform-reading.md) 检查首章写前 gate。旧书不套用 new-book；作者明确启用与起始章后才按协议迁入，不追罚历史漏审。
+**新书连读策略初始化**：完成 Phase 3 单元规划并初始化追踪到第 0 章、尚无正式正文时，运行 `node .agents/skills/{本 skill 根}/scripts/review-state.js longform init --book "{书目录}" --expected-revision 0 --new-book`。只在尚无策略时执行；已存在则读取 status 续用，不重复初始化。随后按 [长篇连读协议](longform-reading.md) 检查首章写前 gate。旧书不套用 new-book；作者明确启用与起始章后才按协议迁入，不追罚历史漏审。
 
 前 3 章细纲额外加载 [references/opening-design.md](opening-design.md)（黄金三章法则+六大标准）。
 

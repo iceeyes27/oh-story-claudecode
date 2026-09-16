@@ -234,7 +234,9 @@
       "source": "skills/story-write/references/long-format.md",
       "targets": [
         "skills/story-setup/references/agent-references/long-format.md",
-        "skills/story-import/references/long-format.md"
+        "skills/story-import/references/long-format.md",
+        "skills/reader-comprehension-scan/references/long-format.md",
+        "skills/story-review/references/long-format.md"
       ]
     },
     {
@@ -285,7 +287,9 @@
       "source": "skills/story-write/references/reader-first-writing.md",
       "targets": [
         "skills/story-setup/references/agent-references/reader-first-writing.md",
-        "skills/story-import/references/reader-first-writing.md"
+        "skills/story-import/references/reader-first-writing.md",
+        "skills/reader-comprehension-scan/references/reader-first-writing.md",
+        "skills/story-review/references/reader-first-writing.md"
       ]
     },
     {
@@ -293,7 +297,45 @@
       "source": "skills/story-write/references/setting-payoff.md",
       "targets": [
         "skills/story-import/references/setting-payoff.md",
-        "skills/story-setup/references/agent-references/setting-payoff.md"
+        "skills/story-setup/references/agent-references/setting-payoff.md",
+        "skills/story-review/references/setting-payoff.md"
+      ]
+    },
+    {
+      "name": "longform-reading",
+      "source": "skills/story-review/references/longform-reading.md",
+      "targets": [
+        "skills/story-write/references/longform-reading.md"
+      ]
+    },
+    {
+      "name": "reading-protocol",
+      "source": "skills/reader-comprehension-scan/references/reading-protocol.md",
+      "targets": [
+        "skills/story-write/references/reading-protocol.md",
+        "skills/story-review/references/reading-protocol.md"
+      ]
+    },
+    {
+      "name": "candidate-logic-binding",
+      "source": "skills/story-write/references/candidate-logic-binding.md",
+      "targets": [
+        "skills/reader-comprehension-scan/references/candidate-logic-binding.md",
+        "skills/story-review/references/candidate-logic-binding.md"
+      ]
+    },
+    {
+      "name": "long-story-design-review",
+      "source": "skills/story-write/references/long-story-design-review.md",
+      "targets": [
+        "skills/story-setup/references/agent-references/long-story-design-review.md"
+      ]
+    },
+    {
+      "name": "longform-reading-scenarios",
+      "source": "skills/story-review/references/longform-reading-scenarios.md",
+      "targets": [
+        "skills/story-write/references/longform-reading-scenarios.md"
       ]
     }
   ],

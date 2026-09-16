@@ -7,7 +7,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
 const {spawnSync} = require('node:child_process');
-const tool = path.resolve(__dirname, '../../story-review/scripts/review-state.js');
+const tool = path.join(__dirname, 'review-state.js');
 const audit = path.join(__dirname, 'volume-audit.py');
 
 test('15 simulated adopted chapters, 3 units, 2 volumes, deferred response and stale evidence', () => {
@@ -54,7 +54,7 @@ test('15 simulated adopted chapters, 3 units, 2 volumes, deferred response and s
       assert.equal(call('gate').can_complete,true);
     }
     for (const volume of [1,2]) {
-      const result=spawnSync('python3',[audit,'--project',book,'--volume',String(volume),'--json'],{encoding:'utf8'});
+      const result=spawnSync(process.platform === 'win32' ? 'python' : 'python3',[audit,'--project',book,'--volume',String(volume),'--json'],{encoding:'utf8'});
       assert.equal(result.status,0,result.stderr||result.stdout);
       assert.equal(JSON.parse(result.stdout).metrics.audit_scope,'complete_volume');
     }

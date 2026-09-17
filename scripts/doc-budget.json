@@ -47,8 +47,8 @@
     },
     {
       "path": "skills/_shared/references/banned-words.md",
-      "budget": 18500,
-      "why": "跨 skill 共享禁用词表，写作/审查/去AI味都读；新增跨段肯定排比、语流身份匹配与文风裁决声明后显式调整预算；登记此前已提交的规则增长，本次不删除作者确认的禁用规则。"
+      "budget": 20400,
+      "why": "跨 skill 共享禁用词表，写作/审查/去AI味都读；新增跨段肯定排比、语流身份匹配与文风裁决声明后显式调整预算；同步写作项目新增的肢体主客、时间锚点及感官语义规则与正则；保留规则解释以支持语境复核，不将 advisory 当作自动改写指令。"
     },
     {
       "path": "skills/_shared/references/anti-ai-writing.md",

@@ -44,6 +44,24 @@ class PreflightTests(unittest.TestCase):
     def test_duplicate_outline_is_explicit_error(self):
         self.put('大纲/细纲_第1章_另稿.md','### 第 1 章：船票\n')
         result=self.build();self.assertEqual(result.returncode,2);self.assertIn('歧义',result.stderr)
+    def test_scene_view_mode_hides_budgets_and_keeps_obligations(self):
+        self.put('大纲/细纲_第001章.md','### 第 1 章：船票\n## 章节蓝图\n- 核心事件：借船\n- 单元ID/位置：U1；第1拍\n- 目标情绪：决定帮忙\n- 本章禁止提前释放：船主的身份\n'
+            '### 因果链\n- 前因：开篇无前因\n### 情节细化\n| # | 情节点（谁做了什么） | 功能标签 | 分辨率 | 目标字数 | 执行边界 |\n|---|---|---|---|---|---|\n'
+            '| 1 | 主角去码头找船 | 铺垫 | 密 | 250-320 | 禁：不揭船主。放：允许砍价 |\n\n目标字数合计：下限2200字（章目标2500，范围2200-2800）\n')
+        full=self.build();self.assertEqual(full.returncode,0,full.stderr)
+        self.assertIn('细纲文件（动笔前完整读到 EOF）',full.stdout)
+        result=subprocess.run([sys.executable,str(SCRIPT),'--project',str(self.book),'--chapter','1','--packet-mode','scene-view','--candidate-tag','B'],capture_output=True,text=True)
+        self.assertEqual(result.returncode,0,result.stderr)
+        out=result.stdout
+        self.assertNotIn('细纲文件（动笔前完整读到 EOF）',out)
+        self.assertIn('——— 首要目标',out);self.assertIn('——— 场景视图',out)
+        self.assertIn('主角去码头找船｜禁：不揭船主。放：允许砍价',out)
+        self.assertNotIn('250-320',out);self.assertNotIn('目标字数合计',out);self.assertNotIn('单元ID/位置',out)
+        self.assertIn('禁止提前释放：船主的身份',out)
+        self.assertIn('第001章_船票_B.md',out)
+        self.assertIn('状态卡不适用于本章',out)
+        self.assertIn('材料包模式：scene-view',out)
+        self.assertIn('全章一次成文',out);self.assertIn('≤10 行申报',out)
     def test_invalid_existing_reading_policy_cannot_be_legacy(self):
         self.put('.story-review/longform-v1.json','null')
         result=self.build();self.assertEqual(result.returncode,2);self.assertIn('连读写前门',result.stderr)

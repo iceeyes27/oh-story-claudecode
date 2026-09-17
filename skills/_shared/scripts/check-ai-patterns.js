@@ -33,6 +33,7 @@ Detect high-risk AI-flavor prose patterns that need human rewrite:
   - 引号强调滥用 (叙述里 1-4 字短词加引号强调，密度型)
   - 双端悬空的“的”字身份跳转句 (动作/状态+的，成了+代词)
   - 空壳式人体失真比喻 (骨头/骨架被抽走，只剩皮壳支撑)
+  - 施力肢体与触碰客体颠倒 (摸到/掏出一双不属于他的手，躯体感知错位与惊悚断肢错觉)
 
 规则按 category 分 author / deterministic / contextual / density。
 blocking 只用于有来源和作用域的作者禁令、能核算的指代字数错误、规则/输入损坏。
@@ -487,6 +488,11 @@ function scanProsePatterns(proseLines) {
   findings.push(...findAbstractObjectForced(proseLines));
   findings.push(...findPainAsObject(proseLines));
   findings.push(...findPathologicalMetaphor(proseLines));
+  findings.push(...findInvertedLimbPerception(proseLines));
+  findings.push(...findDiagnosticLabel(proseLines));
+  findings.push(...findOmniscientTime(proseLines));
+  findings.push(...findMelodramaticFlashback(proseLines));
+  findings.push(...findViolentSensoryAndDeformity(proseLines));
   findings.push(...findGreyCrackInHead(proseLines));
   findings.push(...findSummarySlogan(proseLines));
   findings.push(...findNarrationSlogan(proseLines));
@@ -1722,6 +1728,26 @@ function loadPathologicalMetaphorPatterns() {
   return loadRegexSectionPatterns('pathological-metaphor', /^##\s*病理器官抽象隐喻/);
 }
 
+function loadInvertedLimbPatterns() {
+  return loadRegexSectionPatterns('inverted-limb', /^##\s*施力肢体与触碰客体颠倒/);
+}
+
+function loadDiagnosticLabelPatterns() {
+  return loadRegexSectionPatterns('diagnostic-label', /^##\s*独立成段死因/);
+}
+
+function loadOmniscientTimePatterns() {
+  return loadRegexSectionPatterns('omniscient-time', /^##\s*刚醒来的上帝视角时间刺客/);
+}
+
+function loadMelodramaticFlashbackPatterns() {
+  return loadRegexSectionPatterns('melodramatic-flashback', /^##\s*散文腔生前\/临终回忆倒叙/);
+}
+
+function loadViolentSensoryAndDeformityPatterns() {
+  return loadRegexSectionPatterns('violent-sensory-deformity', /^##\s*谜语人感官暴力与失真残疾描写/);
+}
+
 var _whitelistCache = null;
 function loadWhitelist() {
   if (_whitelistCache) return _whitelistCache;
@@ -2168,6 +2194,154 @@ function findPathologicalMetaphor(proseLines) {
           type: 'banned-word-pathological',
           severity: 'advisory',
           message: '病理器官抽象隐喻[' + hit + ']：把旧怨、秘密把柄或心理负担比喻成生理病变（脓疮/烂肉/毒瘤），用重口味病理代替具体利害与心理算计，确认语境问题后修改；还原为当年的具体屈辱、夺财深仇、隐忍权衡或真实动作，不要同义词轮换。',
+          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+// 施力肢体与触碰客体颠倒：正在施力探摸的肢体被写成探摸客体（如“摸到一双不属于他的手”），advisory。
+function findInvertedLimbPerception(proseLines) {
+  const { patterns, error } = loadInvertedLimbPatterns();
+  if (error || patterns.length === 0) return ruleLoadFailure('施力肢体与触碰客体颠倒', error);
+  const whitelist = loadWhitelist();
+  const findings = [];
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const narrative = maskQuoted(text);
+    for (const re of patterns) {
+      re.lastIndex = 0;
+      let match;
+      while ((match = re.exec(narrative)) !== null) {
+        const hit = match[0];
+        const idx = match.index;
+        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
+        findings.push({
+          line: lineNo,
+          column: idx + 1,
+          type: 'banned-word-inverted-limb',
+          severity: 'advisory',
+          message: '施力肢体与触碰客体颠倒[' + hit + ']：正在施力探摸的肢体被当成摸出的客体（惊悚断肢错觉/躯体感知错位）；改按「伸手动作 ➔ 视线异样 ➔ 活动手指确认神经控制 ➔ 身体整体感知」时序分拆。',
+          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+// 独立成段死因/定性标签：如「猝死。」「心梗。」「绝望。」单独成段，advisory。
+function findDiagnosticLabel(proseLines) {
+  const { patterns, error } = loadDiagnosticLabelPatterns();
+  if (error || patterns.length === 0) return ruleLoadFailure('独立成段死因/定性标签', error);
+  const findings = [];
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed) continue;
+    for (const re of patterns) {
+      if (re.test(trimmed)) {
+        findings.push({
+          line: lineNo,
+          column: 1,
+          type: 'banned-word-diagnostic-label',
+          severity: 'advisory',
+          message: '独立成段死因/定性标签[' + trimmed + ']：上帝视角假深沉短段；濒死或受挫时写当下真实生理体感与困惑，避免在独立段落给自己下诊断书或情绪定性。',
+          excerpt: trimmed,
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+// 刚醒来的上帝视角时间刺客：刚醒来未看日历却断言「十几个小时前/三天前还在」，advisory。
+function findOmniscientTime(proseLines) {
+  const { patterns, error } = loadOmniscientTimePatterns();
+  if (error || patterns.length === 0) return ruleLoadFailure('刚醒来的上帝视角时间刺客', error);
+  const whitelist = loadWhitelist();
+  const findings = [];
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const narrative = maskQuoted(text);
+    for (const re of patterns) {
+      re.lastIndex = 0;
+      let match;
+      while ((match = re.exec(narrative)) !== null) {
+        const hit = match[0];
+        const idx = match.index;
+        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
+        findings.push({
+          line: lineNo,
+          column: idx + 1,
+          type: 'banned-word-omniscient-time',
+          severity: 'advisory',
+          message: '刚醒来的上帝视角时间刺客[' + hit + ']：主角刚苏醒未看钟表日历，不可能知晓精准时空跨度；大纲时间设定泄露，改写为「最后的记忆是……」或「恍惚中记得……」。',
+          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+// 散文腔生前/临终回忆倒叙：快节奏中套用中高考散文回忆模板「昨夜高烧闭眼前，听见……」，advisory。
+function findMelodramaticFlashback(proseLines) {
+  const { patterns, error } = loadMelodramaticFlashbackPatterns();
+  if (error || patterns.length === 0) return ruleLoadFailure('散文腔生前/临终回忆倒叙', error);
+  const whitelist = loadWhitelist();
+  const findings = [];
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const narrative = maskQuoted(text);
+    for (const re of patterns) {
+      re.lastIndex = 0;
+      let match;
+      while ((match = re.exec(narrative)) !== null) {
+        const hit = match[0];
+        const idx = match.index;
+        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
+        findings.push({
+          line: lineNo,
+          column: idx + 1,
+          type: 'banned-word-melodramatic-flashback',
+          severity: 'advisory',
+          message: '散文腔生前/临终回忆倒叙[' + hit + ']：避免使用「闭眼前听见/想起」等慢节奏抒情散文倒叙，转化为此时此刻正在发生的现场冲突。',
+          excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
+        });
+      }
+    }
+  }
+  return findings;
+}
+
+// 谜语人感官暴力与失真残疾描写：掐断耳膜/腿短得不像话/手能熬出来，advisory。
+function findViolentSensoryAndDeformity(proseLines) {
+  const { patterns, error } = loadViolentSensoryAndDeformityPatterns();
+  if (error || patterns.length === 0) return ruleLoadFailure('谜语人感官暴力与失真残疾描写', error);
+  const whitelist = loadWhitelist();
+  const findings = [];
+  for (const { text, lineNo } of proseLines) {
+    const trimmed = text.trim();
+    if (!trimmed || isDivider(trimmed) || isStructural(trimmed)) continue;
+    const narrative = maskQuoted(text);
+    for (const re of patterns) {
+      re.lastIndex = 0;
+      let match;
+      while ((match = re.exec(narrative)) !== null) {
+        const hit = match[0];
+        const idx = match.index;
+        if (whitelist.has(hit) || isWhitelistedOverlap(narrative, idx, hit.length, whitelist)) continue;
+        findings.push({
+          line: lineNo,
+          column: idx + 1,
+          type: 'banned-word-violent-sensory-deformity',
+          severity: 'advisory',
+          message: '谜语人感官暴力与失真残疾描写[' + hit + ']：禁止抽象声光物理掐断耳膜、少年体型写成残疾侏儒、或身体局部借代人格主体。',
           excerpt: compact(narrative.slice(Math.max(0, idx - 8), idx + hit.length + 8)),
         });
       }

@@ -71,7 +71,14 @@
         "micro-02-timeline-promise",
         "micro-03-template-repetition",
         "micro-04-dangling-expression",
-        "micro-05-tracking-ledger"
+        "micro-05-tracking-ledger",
+        "reader-engagement",
+        "reader-expectation",
+        "editor-language",
+        "editor-reference",
+        "editor-causality",
+        "editor-description",
+        "editor-coherence"
       ]
     }
   },
@@ -79,7 +86,8 @@
     "stageCount": 11,
     "requiredResultForEveryItem": true,
     "successText": "复合检查完成：11/11，过滤项 {completed}/{required}",
-    "blockedText": "复合检查未完成：{completed}/{required}，原因：{reason}"
+    "blockedText": "复合检查未完成：{completed}/{required}，原因：{reason}",
+    "catalogCount": 120
   },
   "triggers": {
     "full": [
@@ -112,7 +120,7 @@
       "dependencies": [
         "reader-comprehension-scan"
       ],
-      "readerViewOnly": "本阶段只读 正文/，不得读取 设定/、大纲/、追踪/、对标/；注入其中任何一项即退回作者视角，等于没查",
+      "readerViewOnly": "只读 正文/；独立新会话，不继承作者规划、设定、追踪、后文答案或已知问题；按正文顺序初读。",
       "filters": [
         {
           "id": "rc-01-first-mention",
@@ -137,8 +145,25 @@
           "scope": "仅正文，连续章节读者信息量",
           "required": true,
           "report": "findings"
+        },
+        {
+          "id": "reader-engagement",
+          "label": "读者跳读与阅读阻力",
+          "executor": "skills/story-write/references/reader-first-writing.md#写后分开看理解与趣味",
+          "scope": "正文顺序初读",
+          "required": true,
+          "report": "阅读证据、跳读位置、期待及原因；趣味意见不阻止作者采用"
+        },
+        {
+          "id": "reader-expectation",
+          "label": "读者期待与实际推进",
+          "executor": "skills/story-write/references/reader-first-writing.md#写后分开看理解与趣味",
+          "scope": "正文顺序初读",
+          "required": true,
+          "report": "阅读证据、跳读位置、期待及原因；趣味意见不阻止作者采用"
         }
-      ]
+      ],
+      "independentReviewRequired": true
     },
     {
       "id": "opening-arc",
@@ -283,8 +308,54 @@
           "scope": "题材定位、目标平台、正文",
           "required": true,
           "report": "findings"
+        },
+        {
+          "id": "editor-language",
+          "label": "字词病句与表达准确",
+          "executor": "skills/story-write/references/copy-editor-specification.md",
+          "scope": "正文全文及已读相邻章节",
+          "required": true,
+          "report": "独立编辑两遍通读证据、问题处置及修后全文复核",
+          "independentReviewRequired": true
+        },
+        {
+          "id": "editor-reference",
+          "label": "主语指代与动作归属",
+          "executor": "skills/story-write/references/copy-editor-specification.md",
+          "scope": "正文全文及已读相邻章节",
+          "required": true,
+          "report": "独立编辑两遍通读证据、问题处置及修后全文复核",
+          "independentReviewRequired": true
+        },
+        {
+          "id": "editor-causality",
+          "label": "时空因果与跨章承接",
+          "executor": "skills/story-write/references/copy-editor-specification.md",
+          "scope": "正文全文及已读相邻章节",
+          "required": true,
+          "report": "独立编辑两遍通读证据、问题处置及修后全文复核",
+          "independentReviewRequired": true
+        },
+        {
+          "id": "editor-description",
+          "label": "身体动作与描写合理性",
+          "executor": "skills/story-write/references/copy-editor-specification.md",
+          "scope": "正文全文及已读相邻章节",
+          "required": true,
+          "report": "独立编辑两遍通读证据、问题处置及修后全文复核",
+          "independentReviewRequired": true
+        },
+        {
+          "id": "editor-coherence",
+          "label": "段落连贯与全文理解",
+          "executor": "skills/story-write/references/copy-editor-specification.md",
+          "scope": "正文全文及已读相邻章节",
+          "required": true,
+          "report": "独立编辑两遍通读证据、问题处置及修后全文复核",
+          "independentReviewRequired": true
         }
-      ]
+      ],
+      "independentEditorRequired": true
     },
     {
       "id": "ai-flavor",

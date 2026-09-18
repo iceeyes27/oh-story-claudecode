@@ -93,6 +93,7 @@ A、B 必须独立调用；每次只产一稿，不重写/择优/隐藏重采样
 | `story-setup/references/agent-references/genre-prose-cards.md` | 有 `genre_prose_card`：已知题材读 `story-setup/references/agent-references/genre-prose-cards/{题材}.md`，未知读索引 |
 | `story-setup/references/agent-references/style-genre-modules.md` | 题材卡无匹配时兜底 |
 | `story-setup/references/agent-references/agent-reference-profiles.md` | 审查前选 long / short；不明则 unresolved |
+| `story-setup/references/agent-references/setting-payoff.md` | 涉及设定呈现时读取目标、规则与剩余义务 |
 | `story-setup/references/agent-references/agent-quality.md` | 评分时读五维核心及当前 quality，禁止混读 |
 | `文风路径`（prompt 的绝对路径） | 写前读取；自定义 `设定/文风.md` 优先，否则参考对标 |
 | `story-setup/references/agent-references/narrative-complexity.md` | 给了 `narrative_complexity` 时；旧书缺值按 `常规` |

@@ -30,12 +30,12 @@ disable: true
 
 ## Review Mode 选择
 
-- `/story-review` 或 `/story-review full` → 优先 spawn 全部 4 个 Agent；如果当前已经在子代理内，核心 Agent 未部署/异常，或 spawn 失败，自动降级为 solo。
-- `/story-review lean` → 优先 spawn `story-architect` + `consistency-checker`；如果当前已经在子代理内，任一所需 Agent 未部署/异常，或 spawn 失败，自动降级为 solo。
+- `/story-review` 或 `/story-review full` → 优先 spawn 全部 5 个 Agent；如果当前已经在子代理内，核心 Agent 未部署/异常，或非容量原因 spawn 失败，自动降级为 solo；会话/线程容量限制先按 Phase 2 有限调度处理，不能直接认定角色缺失。
+- `/story-review lean` → 优先 spawn `story-architect` + `consistency-checker`；如果当前已经在子代理内，任一所需 Agent 未部署/异常，或非容量原因 spawn 失败，自动降级为 solo；会话/线程容量限制先按 Phase 2 有限调度处理，不能直接认定角色缺失。
 - `/story-review solo` → 不 spawn Agent，由当前会话执行基础审查。
 - 未指定 → 默认 full，并在报告里写明最终实际执行模式。
 
-> AI味 / 文字自然度这一维度只有 `narrative-writer` 审，仅 full 模式覆盖。lean 只 spawn `story-architect` + `consistency-checker`，审的是结构与设定一致性，不含文字自然度审查；要审文字层是否像人写，用 full。
+> AI味 / 文字自然度由 `narrative-writer` 审，语文准确、指代、因果、描写与连贯由独立 `copy-editor` 审，仅 full 模式覆盖。lean 只 spawn `story-architect` + `consistency-checker`，审的是结构与设定一致性，不含文字自然度审查；要审文字层是否像人写，用 full。
 
 ### 跨批 findings 状态
 
@@ -48,6 +48,8 @@ disable: true
 
 ---
 
+独立编辑状态：full 必须实际调用未参与该稿写作的 `copy-editor`；不得继承写手上下文。总体模式与单角色状态分别记录：没有成功完成独立编辑时记 `Editor Review: NOT_EVALUATED`，自查不得代签独立通过；复合检查中未执行的编辑项记 `BLOCKED`。若独立编辑已在本次相同输入范围成功完成，即使其他角色缺失使总体降级 lean/solo，也保留其真实结果及证据，复合编辑项按自身实际执行结果记 `PASS`/`FAIL`，不能因总体模式清除结果。已完成一个角色仍不能将总体宣称为 full；其他可执行项继续。普通 full 报告不自动充当候选采用凭证。
+
 ## Phase 0：预检与降级（必须先执行）
 
 1. **确定请求模式**：解析用户输入中的 `full`、`lean`、`solo`；未指定时目标模式为 `full`。
@@ -55,15 +57,16 @@ disable: true
 3. **识别 ZCode 能力边界**：如果当前运行于 ZCode 且项目使用 `.zcode/`，ZCode 3.3.4 不执行项目/plugin custom agents；不要因为磁盘上存在其他端的 agent 文件就尝试同名 spawn，直接降级 `solo` 并报告 `Fallback: project custom agents unavailable -> solo`。
 4. **检查核心 Agent 部署状态**（检查项目内 agents，同时兼容 Claude Code 和 Codex）：
    - 优先检查 `.claude/agents/`，其次检查 `.codex/agents/`；两个目录任一存在即视为已部署
-    - full 必需：Claude 为 `story-architect.md`、`character-designer.md`、`narrative-writer.md`、`consistency-checker.md`；Codex 为同名 `.toml`
+    - full 必需：Claude 为 `story-architect.md`、`character-designer.md`、`narrative-writer.md`、`consistency-checker.md`、`copy-editor.md`；Codex 为同名 `.toml`
     - lean 必需：Claude 为 `story-architect.md`、`consistency-checker.md`；Codex 为同名 `.toml`
     - 对每个必需 Agent 文件：
       - **Claude Code agent（`.claude/agents/`）**：读取 frontmatter，确认 `name:` 与 subagent_type 完全一致；frontmatter 缺失、不可解析或 name 不匹配时视为 malformed agent。
       - **Codex agent（`.codex/agents/`）**：文件名为 `{agent}.toml`，TOML 必须可解析，且包含 `name`、`description`、`developer_instructions`；`name` 必须与目标 agent 完全一致。
+    - **copy-editor 协议预检**：full 的同名文件还必须同时包含 `Review Protocol: independent-editor-v1` 、`Review Process: review-quality-v2` 和 `copy-editor-specification.md` 规范引用（路径必须可解析）。缺任一项即旧版或不完整角色，不能算当前独立编辑覆盖；报告 `Editor Review: NOT_EVALUATED`，提示按 story-setup 独立编辑定向部署更新该角色，当前 full 降级 solo。名称存在或 bundle 版本相同不能代替本项，不改写 `.story-deployed` 的整包版本。
     - `agents_version` 与本版不一致不影响本步：照常检查下列 agent 文件结构并 spawn，只按顶部规则附带版本提示。文件缺失或 malformed 才降级。
    - 如果目标模式所需任一文件缺失或 malformed，**不要尝试 spawn 缺失/异常 Agent**；自动降级为 `solo`，并在报告开头写明：`Fallback: missing agents -> solo` 或 `Fallback: malformed agents -> solo`，列出问题文件，建议用户运行 `/story-setup`。
 5. **确认 Agent/Task 工具可用**：如果当前环境没有可用的子 Agent/Task 调用能力，直接降级为 `solo`，报告 `Fallback: agent tool unavailable -> solo`。
-6. **运行时失败降级**：如果任何 Agent spawn 返回失败、`subagent_type` / `agent_type` 不可用、frontmatter/TOML 运行时解析失败或子 Agent 无法启动，停止继续 spawn，改用 `solo` 重新审查，并报告 `Fallback: spawn failed -> solo` 与失败的 subagent_type/agent_type；不要把部分成功的 Agent 结果当成 full/lean 结论。
+6. **运行时失败降级**：会话/线程容量限制先按 Phase 2 的有限调度规则处理，只有支持的实际释放或独立新会话执行成功才可继续 full；没有这两类能力就停止容量重试并保留已完成独立审读结果。其他 Agent spawn 返回失败、`subagent_type` / `agent_type` 不可用、frontmatter/TOML 运行时解析失败或子 Agent 无法启动，停止继续 spawn，改用 `solo` 重新审查，并报告 `Fallback: spawn failed -> solo` 与失败的 subagent_type/agent_type；不要把部分成功的 Agent 结果当成 full/lean 结论。
 7. **确定实际模式**：报告中必须同时列出 `Requested Mode` 与 `Effective Mode`。
 8. **禁止把 `.active-book` 当作平台来源**：`.active-book` 只表示当前书名/目录名，不代表目标平台。
 
@@ -161,7 +164,7 @@ AI 味 / 禁用词 fallback 速查：
 
 ### 传给子 Agent 的规则
 
-full/lean 模式下，主会话必须把“审查基准包摘要”直接写进每个 Agent prompt。**不要要求子 Agent 必须读取 `story-review/references/*` 才能完成任务**；子 Agent 可读取已部署的 story-setup 参考包作为补充，但最终必须遵守本 skill 注入的 rubric 摘要和统一 Findings Schema。
+full/lean 模式下，主会话仅向实际执行的作者视角角色（story-architect、character-designer、narrative-writer、consistency-checker）注入“审查基准包摘要”；copy-editor 明确排除，不接收本书承诺、章节设计功能或作者答案，只接收独立正文输入和唯一编辑规范。**不要要求子 Agent 必须读取 `story-review/references/*` 才能完成任务**；子 Agent 可读取已部署的 story-setup 参考包作为补充，但最终必须遵守本 skill 注入的 rubric 摘要和统一 Findings Schema。
 
 ### 普通跨批审查落盘契约
 
@@ -191,7 +194,7 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
    - 再识别目标平台：用户显式指定优先，其次项目 `目标平台` / `平台` 字段；`.active-book` 只定位书名，不提供平台或题材。
    - 番茄 / 起点 / 知乎盐言分别补读 `story-review/references/rubrics/fanqie.md`、`story-review/references/rubrics/qidian.md`、`story-review/references/rubrics/zhihu.md`；不可读时用对应内置摘要。平台未知用 generic web-fiction，不默认玄幻升级或强冲突。
    - 报告 `Rubric` 与 `Rubric Source: file | embedded fallback`，并写明题材、当前功能及适用范围。不从规则满足情况推断真实留存数据。
-5. **形成审查基准包摘要**：写明本书承诺、当前章节功能、适用维度、N/A 原因与 5–12 条证据判断标准。solo 和子 Agent 使用同一份摘要，不重建固定比例或风格禁令。
+5. **形成审查基准包摘要**：写明本书承诺、当前章节功能、适用维度、N/A 原因与 5–12 条证据判断标准。solo 和实际执行的作者视角子 Agent 使用同一份摘要，不重建固定比例或风格禁令；copy-editor 不接收该摘要。
 6. **确定性预检（只报告，不修改）**：当审查范围包含本地正文文件路径时，运行本 skill 自带脚本：
    ```bash
    node .agents/skills/_shared/scripts/normalize-punctuation.js --check <正文文件...>
@@ -264,7 +267,7 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
 
 ## Phase 2：并行 Spawn Agent（full/lean 模式）
 
-使用 Agent/Task 工具并行调用（Codex 原生子代理使用 `agent_type`，Claude Code 兼容面使用 `subagent_type`；实际字段以当前 CLI 暴露的工具为准）。每个 Agent 不继承父对话上下文，prompt 必须自包含项目路径、审查范围、文件路径、必要摘录、审查基准包摘要、Rubric Source 和统一 Findings Schema。
+使用 Agent/Task 工具按实际可用并发槽及会话总数限制分批调用，父会话也计入平台限制。先调用能容纳的角色并保存实际结果；完成不等于释放会话。有受支持的 close/release 工具时，保存结果后显式释放，再执行下一批；仅 interrupt 或等待不能视为释放。没有释放能力，但有受支持的无历史隔离调用（例如 CLI 新会话）时，可由主协调器用真实新会话执行完整角色协议，记录工具来源、调用身份、实际输入及结果；不得伪装成原生角色调用。该新会话只执行所分配角色，不再启动外部子会话，禁止无限外部递归。两者都不可用时停止重试，不得只等待或循环重试永久会话上限；缺失角色记 BLOCKED/NOT_EVALUATED，普通综合降级 solo，并保留已完成独立审读的真实状态与证据，不把其清除或冒充全套通过。只有五角色全部真实返回后才汇总 full，任何角色未执行不得宣称 full 完成；平台限制不降低完成条件。调用接口说明（Codex 原生子代理使用 `agent_type`，Claude Code 兼容面使用 `subagent_type`；实际字段以当前 CLI 暴露的工具为准）。每个 Agent 不继承父对话上下文。前四个作者视角角色的 prompt 自包含项目路径、审查范围、文件路径、必要摘录、审查基准包摘要、Rubric Source 和统一 Findings Schema；copy-editor 只接收其下方独立正文输入，不注入作者视角基准包。
 
 **调用规则**：执行 Phase 0 后，只有实际模式仍是 full/lean 时才 spawn。不要 spawn 缺失 Agent。
 
@@ -395,10 +398,21 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
 
 ---
 
+### Agent 5: copy-editor（独立文字编辑）
+
+当前过程标记为 `Review Process: review-quality-v2`；行为唯一规范仍为 copy-editor-specification.md，机器过程规范从项目根 `references/review-process.md` 定位。编辑覆盖准确、清楚、自然、连贯及句段节奏；有据的别扭、拖沓和语气失真不能因不妨碍理解而忽略，须与硬伤、待核实、个人偏好和建议保留分开。
+
+只读检查按原 11 阶段编排，读者先自然首读实际返回后再七问回查，编辑随后诊断；不写生产凭证或修改正文。需要授权改稿时转生产/修订流程：重要意见沿用 ID 按根因登记处置理由，实质理解、信息、动机、场景节奏或兑现改动须新读者盲读新版；纯不改意的错字标点仅编辑及必要定向复核。一次修后仍在则重诊，第二次无改善停止自动改；硬伤不因此通过，趣味分歧交作者，不投票。报告分列审核完成、底线通过、体验改善证据，不把调用成功或代理分数当成满意度。
+
+
+使用 `copy-editor` 的只读角色和独立新会话（不继承父对话）。只传项目路径、明确的正文/已读相邻章路径、审查范围及 `references/copy-editor-specification.md`；不得传写手解释、未来答案或预设问题。先全文理解，再逐句逐段与跨章检查。按规范输出五项覆盖证据、原文位置、实际阅读损失、严重度及最小修改建议。合理省略、悬念、概数及功能性复述不机械判错。关键待核实不签通过；修改后全文复核；本角色不改正文。
+
+角色引用不可读或阅读范围不完整时报告 NOT_EVALUATED，不得靠内置 rubric 生成编辑通过。需要候选采用时由候选流程保存并验证独立编辑凭证；报告文本不是身份或真实阅读的密码学证明。
+
 ## Phase 3：综合裁决
 
 1. 收集实际执行的 reviewer VERDICT 和 FINDINGS。
-2. 合并去重：按 `severity` 排序（S1 > S2 > S3 > S4），同级按实际阅读损失排序；列全硬问题，首轮建议只选 1～2 个最高阅读损失，并列出应保留表达。N/A、误报与证据不足不计作问题数量，不从建议多推导全章重写。
+2. 合并去重：按 `severity` 排序（S1 > S2 > S3 > S4），同级按实际阅读损失排序；硬伤全量处理，重要意见全量登记；体验修改每轮优先 1～2 个根因，并列出应保留表达。N/A、误报与证据不足不计作问题数量，不从建议多推导全章重写。
 3. **可选事实核查**：如果审查内容涉及需要验证的外部事实（历史年代、地理方位、职业细节等），只有在 `Effective Mode` 仍为 `full`/`lean`、当前不是子 Agent、Agent/Task 工具可用且 agent 目录（优先 `.claude/agents/`，其次 `.codex/agents/`）下的 `story-researcher.md` 或 `story-researcher.toml` 已部署时，才可额外 spawn `story-researcher` 搜索验证；`solo`、missing/malformed/stale/spawn failed 降级或子代理递归保护场景下不得 spawn，只能在报告中标记“需人工事实核查”。
 4. **分歧呈现**：如果 reviewer 间有冲突意见，明确呈现分歧让用户裁决；不要自动妥协。
 5. 输出综合审查报告。报告必须列出实际模式、fallback 原因、使用的 rubric、Rubric Source、审查范围和证据不足项。
@@ -425,6 +439,8 @@ Rubric Source: file | embedded fallback
 - character-designer: APPROVE / CONCERNS(n) / REJECT / NOT_RUN
 - narrative-writer: APPROVE / CONCERNS(n) / REJECT / NOT_RUN
 - consistency-checker: APPROVE / CONCERNS(n) / REJECT / NOT_RUN
+- copy-editor: APPROVE / CONCERNS(n) / REJECT / NOT_EVALUATED
+Editor Review: {独立执行范围及真实状态；未完成独立编辑为 NOT_EVALUATED，总体降级不清除已完成结果}
 
 > `NOT_RUN` 只用于 lean 模式排除的 reviewer 或可选 reviewer；如果 full/lean 必需 reviewer 缺失或 spawn 失败，应降级 solo，而不是在 full/lean 报告中标记 NOT_RUN 后继续综合。
 
@@ -447,7 +463,7 @@ APPROVE(通过) / CONCERNS(有具体阅读损失) / REJECT(存在阻断问题)
 {缺失设定、缺失大纲、无法核查事实等}
 
 ## 修改建议
-{列全硬问题，首轮编辑选 1～2 个最高阅读损失；写明范围及需保留的表达，不从 REJECT 自动推导整章重写}
+{硬伤全量处理，重要意见全量登记；体验修改每轮优先 1～2 个根因；写明范围及需保留的表达，不从 REJECT 自动推导整章重写}
 
 ## 继承到下一批
 {仅分批审查填写：逐条列 location、issue、预计核查/兑现范围；无则写“无”}

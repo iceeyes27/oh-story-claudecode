@@ -16,6 +16,15 @@ disable: true
 
 短篇运行 `node .agents/skills/_shared/scripts/check-phase2-contract.js --json {短篇目录}`；最多做 2 轮定向 repair。交付时用户明确的字数范围优先；运行 `node .agents/skills/_shared/scripts/check-delivery-contract.js --json --min-chars {MIN} --max-chars {MAX} --sections {N} {短篇目录}`。
 
+## 独立编辑与读者审阅
+
+长篇候选与修订先独立编辑、后独立读者；自查不得签独立通过。正文修改使旧凭证失效，实质修改须新读者。完整执行与分派边界见下方必读契约。
+
+## 审阅效果执行契约
+
+生产与修订编排器必读 [review-execution.md](references/review-execution.md)；正文写手不加载此审阅编排协议。
+
+
 ---
 
 > 运行环境兼容性：Claude Code / Codex / ZCode / OpenClaw 是内置适配目标。检查专业 agent 时按 `.claude/agents/{agent}.md` → `.codex/agents/{agent}.toml` 查找；找不到、Codex 返回 `unknown agent_type`，或检测到 `.zcode/`（ZCode 3.3.4 不执行项目 custom agents）时，直接 solo/direct 执行并报告 fallback。

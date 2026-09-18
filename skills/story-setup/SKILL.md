@@ -119,7 +119,7 @@ disable: true
 | `skills/story-setup/references/codex/hooks/story_codex_hook.py` + `book-discovery-contract.json` + runner scripts | `.codex/hooks/` | story-setup managed | replace | Python syntax与契约 JSON 有效；runner scripts exist | target_cli 含 codex |
 | `.agents/skills/story-setup/references/agent-references/` | Codex agent canonical reference path | canonical | direct read | every reference resolves | target_cli 含 codex |
 | current package skill root + `scripts/deploy-antigravity-skills.py` | `.agents/skills/` | story-setup managed public Skills + `_shared` | replace known dirs | deployed Skills and shared assets are complete | target_cli 含 antigravity |
-| `scripts/generate-antigravity-agents.mjs` + agent templates | `.agents/agents/{name}/` | story-setup managed | generate + replace known definitions | 7 Antigravity agent definitions parse and preserve user agents | target_cli 含 antigravity |
+| `scripts/generate-antigravity-agents.mjs` + agent templates | `.agents/agents/{name}/` | story-setup managed | generate + replace known definitions | 8 Antigravity agent definitions parse and preserve user agents | target_cli 含 antigravity |
 | `references/antigravity/rules/oh-story.md` | `.agents/rules/oh-story.md` | story-setup managed | replace | always-on rule is valid and below 12,000 characters | target_cli 含 antigravity |
 | `references/antigravity/hooks/{story_antigravity_hook.js,story_hook_core.js}` | `.agents/hooks/` | story-setup managed | replace | Node syntax valid and shared core current | target_cli 含 antigravity |
 | `scripts/merge-antigravity-hooks.py` + `references/antigravity/hooks/hooks.json` | `.agents/hooks.json` | user+managed | replace only `oh-story` group | user groups preserved and merge is idempotent | target_cli 含 antigravity |
@@ -217,7 +217,7 @@ Codex 项目 hooks 部署到 `.codex/hooks.json`，hook 脚本部署到 `.codex/
 
 1. 确认 Node 与 Python 3 可用；任一缺失就停止该目标，不留下部分部署。
 2. 运行 `deploy-antigravity-skills.py --source {skill包根} --dest {项目}/.agents/skills`，只替换公开 Skill 与 `_shared`，保留用户 Skill；已有 `.agents/skills` symlink 时必须显式确认后才加 `--migrate-symlink`，不得沿 symlink 写出项目。
-3. 运行 `generate-antigravity-agents.mjs --source {skill包}/references/templates/agents --dest {项目}/.agents/agents`；生成 7 个按名称分组的 Agent 定义，保留其他用户 agent，失败时保持旧目录完整。
+3. 运行 `generate-antigravity-agents.mjs --source {skill包}/references/templates/agents --dest {项目}/.agents/agents`；生成 8 个按名称分组的 Agent 定义，保留其他用户 agent，失败时保持旧目录完整。
 4. 复制 `references/antigravity/rules/oh-story.md` 与两个 hook runtime 到 `.agents/rules/`、`.agents/hooks/`，再运行 `merge-antigravity-hooks.py {项目}/.agents/hooks.json {skill包}/references/antigravity/hooks/hooks.json`；只替换顶层 `oh-story` 组。
 5. 校验 hooks 仅注册 `PreToolUse`、`PostToolUse`、`PreInvocation`、`Stop`，共享 core 与模板一致；不写 `~/.gemini/`，临时文件只放当前工作区 `scratch/`。
 6. 安装报告提示新开 Antigravity conversation；custom agent 通过 `invoke_subagent` 的同名 `TypeName` 调用，能力不可用时按 Skill 规则降级 solo/direct。
@@ -298,7 +298,7 @@ Reasonix（DeepSeek-Reasonix CLI）当前只部署 skills 与 `AGENTS.md`，不�
 2. 验证 rules 路径：
    - 检查 `.claude/rules/` 下的规则文件是否存在且包含 `paths` frontmatter
 3. 验证 agents：
-   - 检查 `.claude/agents/` 下的 7 个 agent 定义文件是否存在
+   - 检查 `.claude/agents/` 下的 8 个 agent 定义文件是否存在
 4. 验证 adapter 与 agent references：
    - 运行 `manage-skill-adapters.js check`，确认平台入口全部解析到 `.agents/skills/`
    - 检查 `.agents/skills/story-setup/references/agent-references/` 完整，且共享资源只存在于 `_shared`
@@ -311,13 +311,13 @@ Reasonix（DeepSeek-Reasonix CLI）当前只部署 skills 与 `AGENTS.md`，不�
     - 重启后即可使用 `/story-write`（长/短篇统一入口）
 7. 验证 Codex 部署（仅当 target_cli 含 codex 时）：
     - 检查 `AGENTS.md` 含 Codex story skill routing sections
-    - 检查 `.codex/agents/` 下 7 个 `.toml` agent 定义文件存在并可解析
+    - 检查 `.codex/agents/` 下 8 个 `.toml` agent 定义文件存在并可解析
     - 检查 `.codex/hooks.json` 存在且 JSON 有效，包含 `.codex/hooks/story_codex_hook.py` command
     - 检查 `.codex/hooks/story_codex_hook.py` 与同目录 `book-discovery-contract.json` 存在且有效
     - 检查 `.agents/skills/story-setup/references/agent-references/` 下 reference 文件完整
     - 安装报告必须提示：Codex 需要 trust 项目 `.codex/` 配置层，并在 `/hooks` review/trust 非 managed hooks；部署后新开 Codex 会话让 custom agents 生效；若当前运行时仍返回 `unknown agent_type`，按各 skill 的 fallback 规则降级 solo/direct
 8. 验证 Antigravity 部署（仅当 target_cli 含 antigravity 时）：
-    - 检查 `.agents/skills/` 中公开 Skill 与 `_shared` 完整，`.agents/agents/` 中 7 个受管 agent 的 frontmatter、工具名与 `TypeName` 有效
+    - 检查 `.agents/skills/` 中公开 Skill 与 `_shared` 完整，`.agents/agents/` 中 8 个受管 agent 的 frontmatter、工具名与 `TypeName` 有效
     - 检查 `.agents/rules/oh-story.md`、`.agents/hooks.json` 与两个 hook runtime 存在；`oh-story` 组事件和 matcher 符合模板，共享 core 与源文件一致
     - 用 helper 夹具验证 Skills、Agents 与 hooks 的替换不修改用户定义或 symlink 外部目标
     - 安装报告必须提示新开 Antigravity conversation；不声明 PreCompact/PostCompact 能力，压缩恢复由 always-on rule 读取追踪上下文
@@ -410,3 +410,7 @@ Reasonix（DeepSeek-Reasonix CLI）当前只部署 skills 与 `AGENTS.md`，不�
 | 需要浏览器登录态（扫榜/拆文取原文） | browser-cdp | `/browser-cdp`；generic 需平台允许本地脚本/浏览器控制 |
 
 各端调用语法：Claude `/名`、Codex/ZCode `$名`、OpenClaw `/skill 名`、Reasonix / generic 直接点名 skill。
+
+## 独立编辑定向部署
+
+受管角色集合新增 `copy-editor`；其唯一角色源是 `references/templates/agents/copy-editor.md`，规范仅引用 `references/agent-references/copy-editor-specification.md`。维护仓库 `scripts/generate-codex-agents.py` 生成预制 Codex TOML，`scripts/generate-antigravity-agents.mjs` 生成 Antigravity 定义。专项升级只同步该角色到 `.claude/agents/copy-editor.md` 与 `.codex/agents/copy-editor.toml`，保留其他 Agent、hooks 和用户配置。生成两次必须一致，并验证角色名称、只读权限及规范引用；部署后在新会话验证实际调用。磁盘生成、适配检查及运行验证分别报告；未刷新完整 bundle 时不得改写 `.story-deployed` 为完整升级。

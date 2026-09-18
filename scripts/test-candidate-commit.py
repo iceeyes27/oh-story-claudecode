@@ -36,6 +36,23 @@ initial_document = _fixtures.initial_document
 transaction = _fixtures.transaction
 metric = _fixtures.metric
 
+# These declarations are synthetic engineering fixtures, never real reading evidence.
+sys.path.insert(0, str(ROOT / "skills/story-write/scripts"))
+from test_review_process import make_process
+
+
+def synthetic_editor(project, prose, files):
+    relative = prose.relative_to(project).as_posix()
+    digest = hashlib.sha256(prose.read_bytes()).hexdigest()
+    evidence = [{"path": relative, "anchor": prose.read_text(encoding="utf-8-sig").rstrip().splitlines()[-1][:12]}]
+    return dict(schema_version=1, policy_version="independent-editor-v1", status="PASS",
+                source="independent", writer_run_id="synthetic-writer", reviewer_run_id="synthetic-editor",
+                candidate_sha256=digest, context_files=files,
+                passes=[dict(kind=kind, files=[row["path"] for row in files],
+                             assessment="Synthetic coverage, not actual reading", evidence=evidence)
+                        for kind in ("comprehension", "sentence")], findings=[],
+                signoff=dict(candidate_sha256=digest, limitations=[]))
+
 
 def run(
     tool: Path,
@@ -290,7 +307,7 @@ class CandidateCommitTests(unittest.TestCase):
             evidence = content.splitlines()[-1][:8]
             digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
             doc["candidate_binding"] = {
-                "schema_version": 2,
+                "schema_version": 4,
                 "quality_profile": "fanqie-long-v2",
                 "prose": {"path": f"候选/{prose.name}", "sha256": digest(prose)},
                 "outline": {"path": f"大纲/{outline.name}", "sha256": digest(outline)},
@@ -299,6 +316,18 @@ class CandidateCommitTests(unittest.TestCase):
                 "setting_payoffs": [],
                 "logic_checks": self._logic_checks(chapter, prose, ledger=ledger),
             }
+            binding = doc["candidate_binding"]
+            # Reader entity registries are not prose and must not enter editor coverage.
+            files = [row for row in binding["logic_checks"]["rc-01"]["prose_files"]
+                     if row["path"] == binding["prose"]["path"] or Path(row["path"]).name.startswith("第")]
+            binding["editor_review"] = synthetic_editor(self.project, prose, files)
+            readers = [binding["logic_checks"][key] for key in ("rc-02", "rc-03")]
+            for reader in readers:
+                reader.update(source="independent", reviewer_run_id="synthetic-reader", reading_kind="first_read",
+                              chapter=chapter, candidate_path=binding["prose"]["path"])
+            binding["review_process"] = make_process(
+                self.project, chapter, prose, binding["editor_review"], readers,
+                prefix=f"审核/chapter-{chapter}")
             (self.candidate_dir / f"第{chapter:03d}章_追踪事务.json").write_text(
                 json.dumps(doc, ensure_ascii=False), encoding="utf-8"
             )
@@ -333,10 +362,10 @@ class CandidateCommitTests(unittest.TestCase):
                 self.assertEqual(self.read_state(), before)
                 self.assertEqual(self.final_files(), [])
 
-    def test_candidate_workflow_documents_v2_logic_contract(self) -> None:
+    def test_candidate_workflow_documents_v4_logic_contract(self) -> None:
         workflow = (ROOT / "skills/story-write/references/candidate-workflow.md").read_text(encoding="utf-8")
         binding = (ROOT / "skills/story-write/references/candidate-logic-binding.md").read_text(encoding="utf-8")
-        self.assertIn("candidate_binding` v2", workflow)
+        self.assertIn("candidate_binding` v4", workflow)
         self.assertIn("fanqie-long-v2", workflow)
         for receipt_id in ("rc-01", "rc-02", "rc-03", "arc-01", "arc-02"):
             self.assertIn(receipt_id, binding)
@@ -518,8 +547,8 @@ class CandidateCommitTests(unittest.TestCase):
             "schema_version": 1, "quality_profile": "fanqie-long-v1",
         }))
         result = self._candidate(["promote", "--chapter", "1"], expect=2)
-        self.assertIn("v1", result.stderr)
-        self.assertIn("重新生成", result.stderr)
+        self.assertIn("升级至 v4", result.stderr)
+        self.assertIn("真实审核过程", result.stderr)
 
     def test_promote_rejects_missing_or_unknown_logic_id(self) -> None:
         for case in ("missing", "unknown"):
@@ -553,6 +582,11 @@ class CandidateCommitTests(unittest.TestCase):
         self.make_candidate(2)
         accepted = next((self.project / "正文").glob("第001章_*.md"))
         accepted.write_text(accepted.read_text(encoding="utf-8") + "正文后来改变。\n", encoding="utf-8")
+        # Keep the editor current to exercise the reader hash rejection specifically.
+        def refresh_editor(binding):
+            for row in binding["editor_review"]["context_files"]:
+                row["sha256"] = hashlib.sha256((self.project / row["path"]).read_bytes()).hexdigest()
+        self._mutate_binding(2, refresh_editor)
         result = self._candidate(["promote", "--chapter", "2"], expect=2)
         self.assertIn("prose_files", result.stderr)
         self.assertIn("sha256 已过期", result.stderr)
@@ -816,6 +850,37 @@ class CandidateCommitTests(unittest.TestCase):
                     self.assertTrue((self.candidate_dir / "第002章_暗门2.md").is_file())
                 else:
                     self.assertTrue((self.project / "正文/第002章_暗门2.md").is_file())
+
+    def test_binding_v4_requires_editor_and_process(self) -> None:
+        for field in ("editor_review", "review_process"):
+            with self.subTest(field=field):
+                self.make_candidate(1)
+                self._mutate_binding(1, lambda binding: binding.pop(field))
+                result = self._candidate(["check", "--chapter", "1"], expect=1)
+                self.assertIn(field, result.stderr)
+                self.assertEqual(self.read_state()["state_revision"], 0)
+                self.assertEqual(self.final_files(), [])
+
+    def test_recover_rejects_tampered_process_and_report(self) -> None:
+        for phase in ("prepared", "prose_moved"):
+            for target in ("process", "natural"):
+                with self.subTest(phase=phase, target=target):
+                    self.temporary.cleanup()
+                    self._reset_project()
+                    self.make_candidate(1)
+                    binding = json.loads(self._transaction_path(1).read_text(encoding="utf-8"))["candidate_binding"]
+                    process_path = self.project / binding["review_process"]["path"]
+                    process = json.loads(process_path.read_text(encoding="utf-8"))
+                    changed = process_path if target == "process" else self.project / process["reports"]["natural"]["path"]
+                    env = os.environ.copy()
+                    env["STORY_CANDIDATE_FAIL_AFTER"] = phase
+                    self._candidate(["promote", "--chapter", "1"], expect=97, env=env)
+                    changed.write_bytes(changed.read_bytes() + b"\n")
+                    result = self._candidate(["recover", "--chapter", "1"], expect=2)
+                    self.assertIn("stale reference", result.stderr)
+                    self.assertEqual(self.read_state()["state_revision"], 0)
+                    expected = self.candidate_dir if phase == "prepared" else self.project / "正文"
+                    self.assertTrue((expected / "第001章_测试章名.md").is_file())
 
     def test_recover_validates_transaction_digest_before_moving_prose(self) -> None:
         self.make_candidate(1)
@@ -1269,6 +1334,20 @@ class OrdinaryRevisionTests(unittest.TestCase):
         for row in review["context"]:
             row["anchor"] = (self.project / row["path"]).read_text(encoding="utf-8").splitlines()[-1]
             row["assessment"] = "synthetic unaffected context"
+        candidate = self.directory / "candidate.md"
+        files = sorted((self.project / "正文").rglob("第001章*.md"))
+        files.append(candidate)
+        rows = [{"path": p.relative_to(self.project).as_posix(), "sha256": hashlib.sha256(p.read_bytes()).hexdigest()} for p in files]
+        review["editor_review"] = synthetic_editor(self.project, candidate, rows)
+        evidence = [{"path": rows[-1]["path"], "anchor": review["candidate_anchor"]}]
+        reader = dict(schema_version=1, source="independent", status="PASS", chapter=2,
+                      reviewer_run_id="synthetic-reader", reading_kind="first_read",
+                      candidate_path=rows[-1]["path"], candidate_sha256=rows[-1]["sha256"], prose_files=rows,
+                      observations={key: dict(assessment="Synthetic observation", evidence=evidence)
+                                    for key in ("understanding", "friction", "reward", "read_on")}, findings=[])
+        review["reader_review"] = reader
+        review["review_process"] = make_process(self.project, 2, candidate, review["editor_review"], [reader],
+                                               prefix="审核/revision-" + self.operation)
         self.review_path.write_text(json.dumps(review, ensure_ascii=False), encoding="utf-8")
         return result
 

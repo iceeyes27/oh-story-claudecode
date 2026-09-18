@@ -1,5 +1,7 @@
 # 长篇写作流程（mode = long）
 
+生产与修订统一执行 [story-write 审阅效果执行契约](../SKILL.md#审阅效果执行契约) 和 [review-process.md](review-process.md)：扫描→独立编辑修正及复核→自然首读实际返回→七问回查→按根因处置→作者决定。过程状态由 check/promote/recover 或修订等价入口一致核验，不能只在报告宣称完成；具体字段以唯一协议为准。
+
 > 本文件是 story-write 的 mode 参考，由 SKILL.md 按模式路由加载；文中 `references/...` 与 `scripts/...` 路径均相对 story-write skill 根目录。
 
 ## 长篇 Reference Gate
@@ -277,7 +279,7 @@
 
 检查三个维度：(1) **情绪交付**——每章是否交付了细纲中规划的目标情绪？(2) **契约风险**——按 `references/reader-contract-and-progression.md` 检查因果权 + 结算权、关键节点四问、期待所有权、期待债、终局储备（透支两问）与换书债；章级推进按权威文件的七类状态分档（快节奏保留可见事件/爽点下限），强弱相对本书题材与对标判断，标记 契约安全 / 需补强 / 契约破坏；契约破坏 先修正文或修后续纲。(3) **技术质量**——一致性、格式、禁用词。参考 [references/long-chapter-quality.md](long-chapter-quality.md) 中的通用检查和长篇专项清单。
 
-**每章轻量审读与编辑**：按 `reader-first-writing.md` 分开做理解与趣味审读，只读截至当前章的正式正文及候选，保存既有 rc receipt。趣味意见引用原句、标明代理/真人来源，未运行记“未评估”。只选影响阅读最大的 1～2 处做一轮局部编辑：压重复验收、清点和双重解释，展开关系、认识或处境变化；有用心理、生活细节与认可表达保留。改后核对保留段落并重建受影响凭证，未改善先重新诊断。第 3/5 章建议连读；已启用累计策略后，单元末必须连读整个单元，每到十五章整数倍另审最近十五章，重合时取必读范围并集，按 [longform-reading.md](longform-reading.md) 执行。当前章采用后、下一章正文生成前核对 longform gate；有效已审或明确适用的作者继续/豁免授权才能继续，现有 arc 采用门不变。
+**每章轻量审读与编辑**：先执行下方 copy-editor 独立两遍通读及修后复核，再另派无历史的独立 reader；按 `reader-first-writing.md` 分开做理解与趣味审读，只读截至当前章的正式正文及候选，保存既有 rc receipt。趣味意见引用原句、标明代理/真人来源，未运行记“未评估”。硬伤全量处理；体验问题每轮优先影响阅读最大的 1～2 个根因做局部编辑，重要意见全部登记并说明处置：压重复验收、清点和双重解释，展开关系、认识或处境变化；有用心理、生活细节与认可表达保留。改后核对保留段落并重建受影响凭证，未改善先重新诊断。第 3/5 章建议连读；已启用累计策略后，单元末必须连读整个单元，每到十五章整数倍另审最近十五章，重合时取必读范围并集，按 [longform-reading.md](longform-reading.md) 执行。当前章采用后、下一章正文生成前核对 longform gate；有效已审或明确适用的作者继续/豁免授权才能继续，现有 arc 采用门不变。
 
 **能力边界**：确定性扫描器只能识别已注册的词句、结构和退化模式。全部通过只表示“未发现已知 blocking 模式”，不能据此断言成稿自然、没有 AI 味或已经达到出版质量；候选仍须由作者审读后采用。
 
@@ -297,19 +299,29 @@
 **退化防护**：候选成稿生成后运行 `node ../_shared/scripts/check-degeneration.js --check 候选/第XXX章_*.md`。blocking（复读、截断、拒绝语、tier1 工程词泄漏）只重写受影响章节，最多 2 次；仍失败就报告证据让用户定夺。
 advisory 只提示可疑处，先看脚本给出的例外；故事内系统/界面用语、弹幕刷屏、重复台词等有功能则保留。
 
+#### Agent 调用：copy-editor（专业文字编辑两遍通读与复核签发）
+
+质量检查阶段完整执行 [copy-editor-specification.md](copy-editor-specification.md)。优先调用实际可用的 `copy-editor`；角色名不可用但存在通用子代理时，将完整规范传给无历史的新调用（支持时 `fork_turns="none"`）。只给当前候选、前一章及可向前回查的正文路径，不继承规划、未来信息或预设答案。
+
+- 第一遍整章理解与连续性，第二遍在上下文内逐句精读，保留自然省略、悬念及功能性复述。确认硬伤、关键待核实未解决不得签通过；非关键待核实带限制报告。
+- 编排器采纳修改建议前，按 copy-editor-specification.md 核对本书明确禁令、作者保护段与授权；写入新句后执行既有扫描门禁。
+- 修改后编辑复查新全文、差异与影响前文，并按 [editor-review-receipt.md](editor-review-receipt.md) 签发真实版本凭证；无修改也记录实际两遍结果，不制造修改。
+- 无独立调用能力时可由主会话自查，但独立项记 `NOT_EVALUATED`，不出具独立通过；作者豁免另记 WAIVED。
+- 随后的首读 reader 与编辑、写手分开，使用无历史的新调用。reader 导致正文再修改时，旧相关凭证失效，编辑重审；原 reader 保留首读结果仅作定向复核，实质理解、信息、动机、场景节奏或兑现修改必须另派未见旧稿与问题答案的新 reader；纯错字标点且不改意可只做编辑及必要定向复核。
+
 #### Agent 调用：consistency-checker
 
 质量检查阶段，如果项目已部署 consistency-checker agent（优先检查 `.claude/agents/consistency-checker.md` 是否存在；不存在时再检查 `.codex/agents/`），spawn `Agent(subagent_type: "consistency-checker", prompt: "项目目录：{dir}\n检查范围：{本次写作的章节}\n检查类型：事实冲突+伏笔断线+角色属性不一致")` 执行一致性检查，获取 S1-S4 分级报告。如 agent 不可用，由主线程参照 long-chapter-quality.md 直接检查。
 
 #### Agent 调用：narrative-writer（定向文字复核）
 
-质量检查阶段需要独立文字判断时，可调用已部署的 narrative-writer；不可用由主线程执行。prompt 只给当前候选、必要前后文、`作者偏好：{本章 query 命中的 prose_style/story_design 项}` 和已定位的 1～2 处阅读问题，说明“审查只返回原句证据与改留建议，不改文件；保留首次必要的动机、关系、来历和因果说明，以及有效心理与生活片段；普通词形或机器比例不构成修改理由”。需要编辑时另传明确局部范围，服从本章剧情边界；不用“审查+去AI味”触发整套清洗，P0/P1 仍守冻结协议。
+质量检查阶段需要补充定向文字建议时，可调用已部署的 narrative-writer；不可用由主线程自查，但两者均不替代前述独立编辑签发或 reader 首读。prompt 只给当前候选、必要前后文、`作者偏好：{本章 query 命中的 prose_style/story_design 项}` 和已定位的 1～2 处阅读问题，说明“审查只返回原句证据与改留建议，不改文件；保留首次必要的动机、关系、来历和因果说明，以及有效心理与生活片段；普通词形或机器比例不构成修改理由”。需要编辑时另传明确局部范围，服从本章剧情边界；不用“审查+去AI味”触发整套清洗，P0/P1 仍守冻结协议。
 
-检查后若候选修订改变了连续性事实，重建本章暂存事务及全部受影响的摘要/receipt，保留创建时的 `expected_state_revision`，由 `candidate-commit.py check` 复核；不执行追踪 commit。只有本来就在修订已采用正文时，才按修订协议构造 `mode=revision` 的同章追踪事务并执行 `scripts/tracking_commit.py commit`：
+检查后若候选修订改变了连续性事实，重建本章暂存事务及全部受影响的摘要/receipt，保留创建时的 `expected_state_revision`，由 `candidate-commit.py check` 复核；不执行追踪 commit。修订已采用正文时，必须按 [workflow-revision.md](workflow-revision.md) 经 `revision-commit.py prepare/check/accept` 以及独立编辑、reader 和事实连续性复核；需要事实修订时构造 `mode=revision` 事务交该流程提交，不直接提交追踪绕过审阅：
 - 伏笔变化用 `foreshadow_changes` 更新同一 ID 的当前行，不追加重复历史；
 - 时间线变化写入 `timeline_events`，由 `_tracking-state.json` 统一派生 `作者真相.md` 与 `读者已知.md`，不得把作者秘密泄露到读者视图；
 - 核心角色状态变化同时提交该角色截至当前章的完整快照；
-- 事务失败后保留原事务 JSON，修正写入环境并重跑同一 `commit`；成功后执行 `check`，确认 state 与全部派生视图一致再继续写作。
+- 事务失败后保留原事务 JSON，按 revision-commit 恢复协议处理；成功后执行追踪 `check`，确认 state 与全部派生视图一致再继续写作。
 
 #### 已采用正文的作者声纹
 

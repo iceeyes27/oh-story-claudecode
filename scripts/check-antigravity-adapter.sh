@@ -88,7 +88,7 @@ from pathlib import Path
 
 root = Path(sys.argv[1])
 expected = {
-    'chapter-extractor', 'character-designer', 'consistency-checker',
+    'chapter-extractor', 'character-designer', 'consistency-checker', 'copy-editor',
     'narrative-writer', 'story-architect', 'story-explorer', 'story-researcher',
 }
 agents = sorted(path for path in root.glob('*/agent.md') if path.parent.name in expected)

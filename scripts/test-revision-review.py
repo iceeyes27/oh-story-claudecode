@@ -31,6 +31,7 @@ def module(name, filename):
 
 revision = module("independent_revision_review", TOOL)
 fixtures = module("independent_tracking_fixtures", ROOT / "scripts/test-tracking-commit.py")
+from test_review_process import make_process
 
 
 class RevisionReviewTests(unittest.TestCase):
@@ -66,6 +67,28 @@ class RevisionReviewTests(unittest.TestCase):
         for row in self.review["context"]:
             row.update(anchor=(self.project / row["path"]).read_text(encoding="utf-8").splitlines()[-1],
                        assessment="synthetic context checked")
+        # Engineering declarations only: these fixtures are not actual literary reviews.
+        candidate = self.directory / "candidate.md"
+        relative = candidate.relative_to(self.project).as_posix()
+        digest = self.manifest["candidate_sha256"]
+        files = [{"path": relative, "sha256": digest}]
+        evidence = [{"path": relative, "anchor": self.review["candidate_anchor"]}]
+        editor = dict(schema_version=1, policy_version="independent-editor-v1",
+                      status="PASS", source="independent", writer_run_id="fixture-writer",
+                      reviewer_run_id="fixture-editor", candidate_sha256=digest,
+                      context_files=files, findings=[],
+                      passes=[dict(kind=kind, files=[relative], assessment="Synthetic test declaration",
+                                   evidence=evidence) for kind in ("comprehension", "sentence")],
+                      signoff=dict(candidate_sha256=digest, limitations=[]))
+        reader = dict(schema_version=1, status="PASS", source="independent",
+                      run_id="fixture-reader-task", reviewer_run_id="fixture-reader",
+                      chapter=1, candidate_path=relative, reading_kind="first_read",
+                      candidate_sha256=digest, prose_files=files, findings=[],
+                      observations={key: dict(assessment="Synthetic test declaration", evidence=evidence)
+                                    for key in ("understanding", "friction", "reward", "read_on")})
+        self.review.update(editor_review=editor, reader_review=reader,
+                           review_process=make_process(self.project, 1, candidate, editor, [reader],
+                                                       prefix=f"审核/{self.operation}"))
         self.review_path = Path(self.temporary.name) / "review.json"
         self.review_path.write_text(json.dumps(self.review, ensure_ascii=False), encoding="utf-8")
         self.journal = self.project / f"候选/_历史/修订事务-{self.operation}.json"

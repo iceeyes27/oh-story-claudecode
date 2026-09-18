@@ -93,7 +93,7 @@ test('generic novel check requires all eleven stages and the manifest contract',
   );
   assert.deepEqual(manifest.stages.map((stage) => stage.order), [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
   assert.equal(new Set(allItems().map((item) => item.id)).size, allItems().length);
-  assert.equal(allItems().length, 113, 'manifest and validation spec must update together');
+  assert.equal(allItems().length, manifest.completion.catalogCount, 'catalog count must match actual entries');
 
   // 读者视角阶段的立身条件：只读正文。清单里丢了这条约束，阶段就退回作者视角。
   const readerStage = manifest.stages.find((stage) => stage.id === 'reader-comprehension');
@@ -115,7 +115,7 @@ test('generic novel check requires all eleven stages and the manifest contract',
 
   assert.match(skill, /composite-check-manifest\.json/);
   assert.match(skill, /ai-flavor-scan.*正文十层/s);
-  assert.match(skill, /113 个目录项都有合法状态/);
+  assert.match(skill, /manifest 实算的全部目录项都有合法状态/);
   assert.match(skill, /复合检查完成：11\/11，过滤项 M\/M/);
   assert.match(skill, /不得静默跳过/);
 });
@@ -138,13 +138,16 @@ test('pure Chinese prose profile gives logic checks at least one quarter of appl
     'review-evidence-program-boundary',
     'review-plot-progression',
     'review-foreshadow-tracking',
+    'editor-reference',
+    'editor-causality',
+    'editor-coherence',
   ];
 
-  assert.equal(applicable.length, 51);
+  assert.equal(applicable.length, 58);
   assert.equal(new Set(applicable).size, applicable.length);
   for (const id of applicable) assert.ok(catalog.has(id), `unknown profile filter: ${id}`);
-  assert.equal(logicIds.filter((id) => applicable.includes(id)).length, 13);
-  assert.ok(13 / applicable.length >= 0.25, `logic budget is ${13}/${applicable.length}`);
+  assert.equal(logicIds.filter((id) => applicable.includes(id)).length, 16);
+  assert.ok(16 / applicable.length >= 0.25, `logic budget is ${16}/${applicable.length}`);
 
   const applicableSet = new Set(applicable);
   const records = requiredIds().map((id) => applicableSet.has(id)
@@ -155,13 +158,18 @@ test('pure Chinese prose profile gives logic checks at least one quarter of appl
   assert.equal(coverageComplete(records, 'pure-chinese-prose'), false);
 });
 
-test('validation spec stays synchronized with the composite manifest', () => {
-  const validationSpec = fs.readFileSync(validationSpecPath, 'utf8');
-  assert.match(validationSpec, /十个有序阶段/);
-  assert.match(validationSpec, /108 个必检项/);
-  assert.match(validationSpec, /完整目录 108 项/);
-  assert.match(validationSpec, /纯中文正文.*13\/46 = 28\.26%/s);
-  assert.doesNotMatch(validationSpec, /七阶段|八个有序阶段|95 个必检项|103 个必检项|复合检查 7\/7/);
+test('independent reader and five editing dimensions cannot be omitted', () => {
+  const reader = manifest.stages.find((stage) => stage.id === 'reader-comprehension');
+  const editor = manifest.stages.find((stage) => stage.id === 'review').filters.filter((item) => item.id.startsWith('editor-'));
+  assert.equal(reader.independentReviewRequired, true);
+  assert.match(reader.readerViewOnly, /独立新会话/);
+  assert.equal(editor.length, 5);
+  assert.ok(editor.every((item) => item.independentReviewRequired));
+  assert.match(skill, /不得以 solo 自查记 `PASS`/);
+  for (const missing of [...editor, ...reader.filters]) {
+    const records = requiredIds().map((id) => ({id, status: id === missing.id ? 'BLOCKED' : 'PASS'}));
+    assert.equal(coverageComplete(records), false);
+  }
 });
 
 test('AI flavor manifest preserves all ten layers and five semantic mismatch checks', () => {

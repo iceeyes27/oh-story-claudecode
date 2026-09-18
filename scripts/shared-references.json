@@ -313,7 +313,9 @@
       "source": "skills/reader-comprehension-scan/references/reading-protocol.md",
       "targets": [
         "skills/story-write/references/reading-protocol.md",
-        "skills/story-review/references/reading-protocol.md"
+        "skills/story-review/references/reading-protocol.md",
+        "skills/story-import/references/reading-protocol.md",
+        "skills/story-setup/references/agent-references/reading-protocol.md"
       ]
     },
     {
@@ -321,7 +323,9 @@
       "source": "skills/story-write/references/candidate-logic-binding.md",
       "targets": [
         "skills/reader-comprehension-scan/references/candidate-logic-binding.md",
-        "skills/story-review/references/candidate-logic-binding.md"
+        "skills/story-review/references/candidate-logic-binding.md",
+        "skills/story-import/references/candidate-logic-binding.md",
+        "skills/story-setup/references/agent-references/candidate-logic-binding.md"
       ]
     },
     {
@@ -336,6 +340,36 @@
       "source": "skills/story-review/references/longform-reading-scenarios.md",
       "targets": [
         "skills/story-write/references/longform-reading-scenarios.md"
+      ]
+    },
+    {
+      "name": "review-distribution-copy-editor-specification",
+      "source": "skills/story-write/references/copy-editor-specification.md",
+      "targets": [
+        "skills/reader-comprehension-scan/references/copy-editor-specification.md",
+        "skills/story-review/references/copy-editor-specification.md",
+        "skills/story-import/references/copy-editor-specification.md",
+        "skills/story-setup/references/agent-references/copy-editor-specification.md"
+      ]
+    },
+    {
+      "name": "review-distribution-editor-review-receipt",
+      "source": "skills/story-write/references/editor-review-receipt.md",
+      "targets": [
+        "skills/reader-comprehension-scan/references/editor-review-receipt.md",
+        "skills/story-review/references/editor-review-receipt.md",
+        "skills/story-import/references/editor-review-receipt.md",
+        "skills/story-setup/references/agent-references/editor-review-receipt.md"
+      ]
+    },
+    {
+      "name": "review-distribution-review-process",
+      "source": "skills/story-write/references/review-process.md",
+      "targets": [
+        "skills/reader-comprehension-scan/references/review-process.md",
+        "skills/story-review/references/review-process.md",
+        "skills/story-import/references/review-process.md",
+        "skills/story-setup/references/agent-references/review-process.md"
       ]
     }
   ],

@@ -15,7 +15,7 @@
     "scripts/platform-capabilities.json": "869851d57f054125b10baf69413f520478a8405e7e1910ad628ae911261fb44c",
     "scripts/platform-skill-set.json": "4c465db3f8bcc8b2b7f38d9fc30916f4d5e7b82a82aad241fea83bbca2bf8014",
     "scripts/shared-assets.json": "e3c14d2f7549d58949a02117574deda45172f09286fdc7d2ce32d450b47a314a",
-    "scripts/quality-gate.json": "888ee8de4ec827e1b2d3feb924148295738be099a38ca9d34fdf0777b31ce646"
+    "scripts/quality-gate.json": "cabe074da3aa6db24d6b4d143f2eaf26cf2a29c99fc2a545f895f4cc116c4ce1"
   },
   "identity": {
     "fork_version": "0.8.1",

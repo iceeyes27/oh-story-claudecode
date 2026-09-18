@@ -8,6 +8,10 @@
       "release-manifest",
       "doc-budget",
       "candidate-transaction",
+      "editor-review",
+      "review-process",
+      "revision-independent-review",
+      "independent-editor-contract",
       "volume-audit",
       "arc-ledger",
       "contracts"
@@ -19,6 +23,10 @@
       "release-manifest",
       "doc-budget",
       "candidate-transaction",
+      "editor-review",
+      "review-process",
+      "revision-independent-review",
+      "independent-editor-contract",
       "volume-audit",
       "arc-ledger",
       "tracking",
@@ -42,6 +50,10 @@
       "release-manifest",
       "doc-budget",
       "candidate-transaction",
+      "editor-review",
+      "review-process",
+      "revision-independent-review",
+      "independent-editor-contract",
       "volume-audit",
       "arc-ledger",
       "tracking",
@@ -316,6 +328,31 @@
       ],
       "blocked_patterns": [
         "CLI not found"
+      ]
+    },
+    "editor-review": {
+      "command": "python",
+      "args": [
+        "skills/story-write/scripts/test_editor_review.py"
+      ]
+    },
+    "review-process": {
+      "command": "python",
+      "args": [
+        "skills/story-write/scripts/test_review_process.py"
+      ]
+    },
+    "revision-independent-review": {
+      "command": "python",
+      "args": [
+        "skills/story-write/scripts/test_revision_independent_review.py"
+      ]
+    },
+    "independent-editor-contract": {
+      "command": "node",
+      "args": [
+        "--test",
+        "skills/story-setup/tests/independent-editor-contract.test.js"
       ]
     }
   }

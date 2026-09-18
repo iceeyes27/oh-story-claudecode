@@ -413,4 +413,4 @@ Reasonix（DeepSeek-Reasonix CLI）当前只部署 skills 与 `AGENTS.md`，不�
 
 ## 独立编辑定向部署
 
-受管角色集合新增 `copy-editor`；其唯一角色源是 `references/templates/agents/copy-editor.md`，规范仅引用 `references/agent-references/copy-editor-specification.md`。维护仓库 `scripts/generate-codex-agents.py` 生成预制 Codex TOML，`scripts/generate-antigravity-agents.mjs` 生成 Antigravity 定义。专项升级只同步该角色到 `.claude/agents/copy-editor.md` 与 `.codex/agents/copy-editor.toml`，保留其他 Agent、hooks 和用户配置。生成两次必须一致，并验证角色名称、只读权限及规范引用；部署后在新会话验证实际调用。磁盘生成、适配检查及运行验证分别报告；未刷新完整 bundle 时不得改写 `.story-deployed` 为完整升级。
+受管角色集合新增 `copy-editor`；其唯一角色源是 `references/templates/agents/copy-editor.md`，规范仅引用 `.agents/skills/story-write/references/copy-editor-specification.md`。维护仓库 `scripts/generate-codex-agents.py` 生成预制 Codex TOML，`scripts/generate-antigravity-agents.mjs` 生成 Antigravity 定义。专项升级只同步该角色到 `.claude/agents/copy-editor.md` 与 `.codex/agents/copy-editor.toml`，保留其他 Agent、hooks 和用户配置。生成两次必须一致，并验证角色名称、只读权限及规范引用；部署后在新会话验证实际调用。磁盘生成、适配检查及运行验证分别报告；未刷新完整 bundle 时不得改写 `.story-deployed` 为完整升级。

@@ -38,7 +38,7 @@
 
 1. **step 7 正文执行**：输出路径传书根 `候选/第{N}章_{章名}.md`，不写 `正文/`。
 2. **step 12 更新追踪**：不执行 `tracking_commit.py commit`。主会话通读实际候选正文后，按现有事务 schema（`mode` / `chapter` / `delta` / `context` / `character_snapshots` 等）写入 `候选/第{N}章_追踪事务.json`。事务不得从骨架直接推算；必须保存候选创建时的 `expected_state_revision`，不得在采用时刷新。
-3. **绑定采用输入**：事务必须包含 `candidate_binding` v4，记录候选正文、细纲、骨架的项目内相对路径与 SHA-256，`quality_profile` 固定为 `fanqie-long-v2`，`coverage` 逐项覆盖骨架全部 O-ID；并按 `candidate-logic-binding.md` 写入 `logic_checks`，按 [editor-review-receipt.md](editor-review-receipt.md) 写入 `editor_review`，并按 [review-process.md](review-process.md) 绑定 `review_process`。任一输入变化后，旧候选必须重新检查并重新生成绑定。
+3. **绑定采用输入**：事务必须包含 `candidate_binding` v4，记录候选正文、细纲、骨架的项目内相对路径与 SHA-256，`quality_profile` 固定为 `fanqie-long-v2`，`coverage` 逐项覆盖骨架全部 O-ID；并按 `candidate-logic-binding.md` 写入 `logic_checks`，按 [editor-review-receipt.md](editor-review-receipt.md) 写入 `editor_review`，按 [review-process.md](review-process.md) 写入 `review_process`。任一输入变化后，旧候选必须重新检查并重新生成绑定。
 
 写后检查照常作用于候选文件：骨架/细纲覆盖、连续性、标题、字数，以及 `check-ai-patterns.js`、`check-degeneration.js`、`normalize-punctuation.js`、`check-outline-copy.js`。blocking 当轮修正后再提示作者审阅。确定性扫描通过只说明已登记模式没有阻断项，不能证明文风自然或没有 AI 痕迹。
 

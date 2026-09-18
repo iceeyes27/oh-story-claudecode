@@ -71,15 +71,11 @@ test('ordinary editing preserves context and stops after a bounded reading-drive
 });
 
 test('platform and generic rubrics require applicability before judging chapter shape', () => {
-  for (const text of [generic, checklist, ...platforms]) {
+  for (const text of [generic, checklist, review, ...platforms]) {
     assert.match(text, /本书承诺/);
     assert.match(text, /N\/A/);
     assert.match(text, /1～2 个最高阅读损失/);
   }
-  assert.match(review, /本书承诺/);
-  assert.match(review, /N\/A/);
-  assert.match(review, /硬伤全量处理，重要意见全量登记/);
-  assert.match(review, /体验修改每轮优先 1～2 个根因/);
   assert.match(generic, /未发生的高潮、关系跃迁、任务卡点或伏笔操作记 `N\/A`/);
   assert.match(review, /所有模式先读取 `story-review\/references\/quality-rubric\.md`/);
   assert.match(review, /不重建固定比例或风格禁令/);

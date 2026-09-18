@@ -140,9 +140,9 @@
         },
         {
           "id": "rc-03-comprehension-break",
-          "label": "理解断点",
+          "label": "理解断点（含普通术语可懂性）",
           "executor": "skills/reader-comprehension-scan/SKILL.md",
-          "scope": "仅正文，连续章节读者信息量",
+          "scope": "仅正文，连续章节读者信息量；关键用语不限专名，核查首次需要理解时的白话锚与作用依据",
           "required": true,
           "report": "findings"
         },

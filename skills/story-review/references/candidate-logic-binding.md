@@ -4,13 +4,13 @@
 
 ## 独立文字编辑凭证
 
-每章另含 `editor_review`，遵循 [editor-review-receipt.md](editor-review-receipt.md)。该凭证不占用 `logic_checks`，不改变 rc/arc 键；独立两遍通读和修后复核按 [copy-editor-specification.md](copy-editor-specification.md)。主会话自查不签独立通过，明确作者豁免另记 WAIVED。`--no-scan` 不跳过此项。正文与实际审读上下文变化后旧凭证失效；未启动的旧候选须补审升级，不批量补 PASS。
+每章另含 `editor_review`，遵循 [editor-review-receipt.md](.agents/skills/story-write/references/editor-review-receipt.md)。该凭证不占用 `logic_checks`，不改变 rc/arc 键；独立两遍通读和修后复核按 [copy-editor-specification.md](.agents/skills/story-write/references/copy-editor-specification.md)。主会话自查不签独立通过，明确作者豁免另记 WAIVED。`--no-scan` 不跳过此项。正文与实际审读上下文变化后旧凭证失效；未启动的旧候选须补审升级，不批量补 PASS。
 
 ## 每章必需项
 
 - `rc-01`：共享 `check-first-mention.js --json` 的确定性结果。
 - `rc-02`：只读正文回答“本章前因能否指到已发布正文”。
-- `rc-03`：只读正文回答“关键转折所需信息是否已经交代”。
+- `rc-03`：只读正文回答“关键转折所需信息及关键用语的当场含义是否可懂”；包括普通术语，按 reading-protocol.md 第三问附白话理解与正文依据，不以扫描通过替代。
 
 `rc-02/03` 的独立审读者按 [分批精读与前文回查](reading-protocol.md) 执行：每批最多 5 章是必读范围，当前第 N 章只向前检索已采用正文，不读未来章、设定、大纲、追踪或设计意图。记录实际精读、检索范围与打开的上下文、原句及文本版本。父流程确认断点前必须跨批消歧；尚未核实只记待核实，不把未命中升级为全书缺失，也不为已交代信息补解释。
 
@@ -73,4 +73,6 @@
 
 候选、已采用正文或 ledger 任一变化都会使批准失效。
 
-审核过程须同时遵循 [review-process.md](review-process.md)，采用绑定 v4 和采用日志 v3；既有 rc/arc 键不变。旧未启动候选不得补造过程记录。
+审核过程须同时遵循 [review-process.md](.agents/skills/story-write/references/review-process.md)，采用绑定 v4 和采用日志 v3；既有 rc/arc 键不变。旧未启动候选不得补造过程记录。
+
+以上 `.agents/skills/story-write/` 规范路径从当前项目根定位，不相对于本参考文件；它们是唯一规范来源，不另建副本。

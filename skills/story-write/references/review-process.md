@@ -27,7 +27,7 @@
 
 三份报告均含：`role`（editor/natural/diagnostic）、`chapter`、`candidate_sha256`、实际 `run_id`、`reviewer_run_id`、编排实际 `started_order/completed_order`、`findings` 数组、`observations` 对象。序号来自真实任务分派/返回次序，不编造模型时间；编辑完成后才派首读，首读返回后才派诊断任务。三个 run_id 不同，读者两个任务保持同一阅读身份，编辑独立。诊断报告另存 `natural_report_sha256`，对应冻结自然报告。
 
-每项 observation 为 `{assessment,evidence:[{path,anchor}]}`，必须含本次候选原句。编辑 observation 键精确为 `accuracy/clarity/naturalness/continuity`；自然阅读精确为 `understanding/engagement/confusion/skimming/reward_expectation`；诊断 observation 键精确为 `events/causes/turns/presence_space/objects/quantities_practice/repetition`，对应七问；不适用项写具体依据。自然报告另含 `reading_kind:first_read|targeted_recheck`。rc-02/03 或修订 reader receipt 的 run_id、阅读身份、reading_kind 对应当前诊断任务与自然报告。
+每项 observation 为 `{assessment,evidence:[{path,anchor}]}`，必须含本次候选原句。编辑 observation 键精确为 `accuracy/clarity/naturalness/continuity`；自然阅读精确为 `understanding/engagement/confusion/skimming/reward_expectation`；诊断 observation 键精确为 `events/causes/turns/presence_space/objects/quantities_practice/repetition`，对应七问；`turns.assessment/evidence` 必须同时记录 reading-protocol.md 的术语可懂性结论与正文依据，不限专名；不适用项写具体依据。自然报告另含 `reading_kind:first_read|targeted_recheck`。rc-02/03 或修订 reader receipt 的 run_id、阅读身份、reading_kind 对应当前诊断任务与自然报告。
 
 报告 finding 为 `{id,important,impact,evidence:[{path,anchor}]}`，空数组合法。重要原始意见以 `报告run_id/问题id` 为全局标识；处置行 `{finding_id,decision,reason,evidence:[{path,anchor}]}` 必须精确覆盖本次与前版保留的重要意见。decision 为 `accepted/partial/rejected/pending/deferred`。处置不是解决；现有编辑硬伤门不受此记录放宽，不以趣味偏好阻止采用。
 

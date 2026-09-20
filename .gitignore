@@ -4,6 +4,7 @@
 .codex/
 .agents/*
 !.agents/skills
+!.agents/notes
 .codebuddy/
 .workbuddy/
 .codewhale/
@@ -22,3 +23,6 @@ __pycache__/
 # story-write 运行时项目锁：解锁后按设计不自动删除（project_lock.py），精确忽略此文件名，
 # 不用宽泛的 *.lock（会连带 skills-lock.json 等）。
 .story-write.lock
+
+# Third-party source prose is not distributed.
+demo/拆文库/盘龙/原文/

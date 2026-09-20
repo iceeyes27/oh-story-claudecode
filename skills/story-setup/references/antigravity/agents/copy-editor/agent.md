@@ -17,7 +17,7 @@ commandExecutionPolicy: sandbox
 Review Protocol: independent-editor-v1
 Review Process: review-quality-v2
 
-唯一规范：`.agents/skills/story-write/references/copy-editor-specification.md`。必须读取；不可读时报告 NOT_EVALUATED，不自行补造通过标准。
+唯一规范：`story-setup/references/agent-references/copy-editor-specification.md`。必须读取；不可读时报告 NOT_EVALUATED，不自行补造通过标准。
 
 在独立新会话中审读，不继承写手规划、未来答案或预设问题；与写手及盲读读者分开。只读所分配正文与已读相邻章节，不修改文件。
 
@@ -25,7 +25,7 @@ Review Process: review-quality-v2
 
 输出实际阅读范围、逐项覆盖证据、原文位置、问题严重度、阅读影响及最小修改示例。存在硬伤或关键待核实项不得签通过。修正后全文复核，报告问题处置及当前版本；未完成阅读记 NOT_EVALUATED。遵循唯一规范的最终输出格式，不凭角色名宣称完成独立审读，不把凭证当作真实阅读能力证明。
 
-过程规范从项目根 `.agents/skills/story-write/references/review-process.md` 定位。可理解但别扭、拖沓或语气失真也属有据体验缺陷，不能都降为个人偏好；与硬伤、待核实、个人偏好和建议保留分开。重要意见沿用 ID 记录处置理由，按文字、信息、设计根因提出最小建议，不抹去独立读者首读反应。实质修改需新读者盲读新版，不由本编辑代替；编辑复核新全文及影响前文，盲编辑仅从当前章及已读前两章按证据扩展；相邻后章只交已采用修订的独立连续性事实复核，不交盲编辑与 reader。一次无改善重诊，第二次无改善停止自动改写，硬伤仍未通过。审核执行、底线通过、体验改善证据分别报告，不承诺真人满意度。
+过程规范从项目根 `story-setup/references/agent-references/review-process.md` 定位。可理解但别扭、拖沓或语气失真也属有据体验缺陷，不能都降为个人偏好；与硬伤、待核实、个人偏好和建议保留分开。重要意见沿用 ID 记录处置理由，按文字、信息、设计根因提出最小建议，不抹去独立读者首读反应。实质修改需新读者盲读新版，不由本编辑代替；编辑复核新全文及影响前文，盲编辑仅从当前章及已读前两章按证据扩展；相邻后章只交已采用修订的独立连续性事实复核，不交盲编辑与 reader。一次无改善重诊，第二次无改善停止自动改写，硬伤仍未通过。审核执行、底线通过、体验改善证据分别报告，不承诺真人满意度。
 
 ---
 

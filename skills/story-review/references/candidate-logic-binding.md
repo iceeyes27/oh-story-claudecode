@@ -4,7 +4,7 @@
 
 ## 独立文字编辑凭证
 
-每章另含 `editor_review`，遵循 [editor-review-receipt.md](.agents/skills/story-write/references/editor-review-receipt.md)。该凭证不占用 `logic_checks`，不改变 rc/arc 键；独立两遍通读和修后复核按 [copy-editor-specification.md](.agents/skills/story-write/references/copy-editor-specification.md)。主会话自查不签独立通过，明确作者豁免另记 WAIVED。`--no-scan` 不跳过此项。正文与实际审读上下文变化后旧凭证失效；未启动的旧候选须补审升级，不批量补 PASS。
+每章另含 `editor_review`，遵循 [editor-review-receipt.md](editor-review-receipt.md)。该凭证不占用 `logic_checks`，不改变 rc/arc 键；独立两遍通读和修后复核按 [copy-editor-specification.md](copy-editor-specification.md)。主会话自查不签独立通过，明确作者豁免另记 WAIVED。`--no-scan` 不跳过此项。正文与实际审读上下文变化后旧凭证失效；未启动的旧候选须补审升级，不批量补 PASS。
 
 ## 每章必需项
 
@@ -73,6 +73,4 @@
 
 候选、已采用正文或 ledger 任一变化都会使批准失效。
 
-审核过程须同时遵循 [review-process.md](.agents/skills/story-write/references/review-process.md)，采用绑定 v4 和采用日志 v3；既有 rc/arc 键不变。旧未启动候选不得补造过程记录。
-
-以上 `.agents/skills/story-write/` 规范路径从当前项目根定位，不相对于本参考文件；它们是唯一规范来源，不另建副本。
+审核过程须同时遵循 [review-process.md](review-process.md)，采用绑定 v4 和采用日志 v3；既有 rc/arc 键不变。旧未启动候选不得补造过程记录。

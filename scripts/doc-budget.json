@@ -12,13 +12,14 @@
     "长篇/短篇流程从 SKILL.md 拆到 references/long-mode.md、references/short-mode.md，",
     "SKILL.md 只保留路由与共享方法）。",
     "",
-    "新增热路径文件时把它加进来，否则它不受任何约束。"
+    "新增热路径文件时把它加进来，否则它不受任何约束。",
+    "2026-09-20：保留 09-18 同步的独立首读、编辑和修后复核规则，按当前入口实测更新预算；已删除的 review-execution 由 review-process 管理。"
   ],
   "files": [
     {
       "path": "skills/story-write/SKILL.md",
-      "budget": 5200,
-      "why": "长篇/短篇任一场景都无条件加载的路由入口；包含统一项目资料、文风与短篇阶段路由。"
+      "budget": 6100,
+      "why": "长篇/短篇任一场景都无条件加载的路由入口；包含统一项目资料、文风与短篇阶段路由。 保留当前独立审阅执行规则。"
     },
     {
       "path": "skills/story-write/references/long-mode.md",
@@ -74,17 +75,12 @@
       "path": "skills/story-write/references/workflow-revision.md",
       "budget": 4600,
       "why": "长篇普通修订与短篇 Phase 4 共用；保留候选采用边界和最终检查职责。"
-    },
-    {
-      "path": "skills/story-write/references/review-execution.md",
-      "budget": 1750,
-      "why": "审核编排专用，不随仅写正文/规划的通用入口加载。"
     }
   ],
   "paths": [
     {
       "label": "长篇日更主会话",
-      "budget": 52600,
+      "budget": 53400,
       "files": [
         "skills/story-write/SKILL.md",
         "skills/story-write/references/long-mode.md",
@@ -93,7 +89,7 @@
     },
     {
       "label": "长篇开书",
-      "budget": 52000,
+      "budget": 52700,
       "files": [
         "skills/story-write/SKILL.md",
         "skills/story-write/references/long-mode.md",
@@ -140,14 +136,14 @@
       "branches": [
         {
           "label": "世情打脸，无反派/揭露",
-          "budget": 47200,
+          "budget": 48400,
           "files": [
             "skills/story-write/references/genre-styles/世情打脸.md"
           ]
         },
         {
           "label": "世情打脸，含反派/揭露",
-          "budget": 49600,
+          "budget": 50700,
           "files": [
             "skills/story-write/references/genre-styles/世情打脸.md",
             "skills/story-write/references/villain-and-reveal.md"
@@ -155,14 +151,14 @@
         },
         {
           "label": "双男主，无反派/揭露",
-          "budget": 46000,
+          "budget": 47200,
           "files": [
             "skills/story-write/references/genre-styles/双男主.md"
           ]
         },
         {
           "label": "双男主，含反派/揭露",
-          "budget": 48300,
+          "budget": 49500,
           "files": [
             "skills/story-write/references/genre-styles/双男主.md",
             "skills/story-write/references/villain-and-reveal.md"
@@ -170,14 +166,14 @@
         },
         {
           "label": "复仇打脸，无反派/揭露",
-          "budget": 46700,
+          "budget": 47900,
           "files": [
             "skills/story-write/references/genre-styles/复仇打脸.md"
           ]
         },
         {
           "label": "复仇打脸，含反派/揭露",
-          "budget": 49000,
+          "budget": 50200,
           "files": [
             "skills/story-write/references/genre-styles/复仇打脸.md",
             "skills/story-write/references/villain-and-reveal.md"
@@ -185,14 +181,14 @@
         },
         {
           "label": "宅斗宫斗，无反派/揭露",
-          "budget": 47000,
+          "budget": 48200,
           "files": [
             "skills/story-write/references/genre-styles/宅斗宫斗.md"
           ]
         },
         {
           "label": "宅斗宫斗，含反派/揭露",
-          "budget": 49300,
+          "budget": 50500,
           "files": [
             "skills/story-write/references/genre-styles/宅斗宫斗.md",
             "skills/story-write/references/villain-and-reveal.md"
@@ -200,14 +196,14 @@
         },
         {
           "label": "总裁豪门，无反派/揭露",
-          "budget": 47500,
+          "budget": 48700,
           "files": [
             "skills/story-write/references/genre-styles/总裁豪门.md"
           ]
         },
         {
           "label": "总裁豪门，含反派/揭露",
-          "budget": 49900,
+          "budget": 51000,
           "files": [
             "skills/story-write/references/genre-styles/总裁豪门.md",
             "skills/story-write/references/villain-and-reveal.md"
@@ -215,14 +211,14 @@
         },
         {
           "label": "悬疑，无反派/揭露",
-          "budget": 46300,
+          "budget": 47400,
           "files": [
             "skills/story-write/references/genre-styles/悬疑.md"
           ]
         },
         {
           "label": "悬疑，含反派/揭露",
-          "budget": 48700,
+          "budget": 49800,
           "files": [
             "skills/story-write/references/genre-styles/悬疑.md",
             "skills/story-write/references/villain-and-reveal.md"
@@ -230,14 +226,14 @@
         },
         {
           "label": "民俗怪谈，无反派/揭露",
-          "budget": 46000,
+          "budget": 47300,
           "files": [
             "skills/story-write/references/genre-styles/民俗怪谈.md"
           ]
         },
         {
           "label": "民俗怪谈，含反派/揭露",
-          "budget": 48400,
+          "budget": 49600,
           "files": [
             "skills/story-write/references/genre-styles/民俗怪谈.md",
             "skills/story-write/references/villain-and-reveal.md"
@@ -245,14 +241,14 @@
         },
         {
           "label": "沙雕脑洞，无反派/揭露",
-          "budget": 46600,
+          "budget": 47700,
           "files": [
             "skills/story-write/references/genre-styles/沙雕脑洞.md"
           ]
         },
         {
           "label": "沙雕脑洞，含反派/揭露",
-          "budget": 48900,
+          "budget": 50100,
           "files": [
             "skills/story-write/references/genre-styles/沙雕脑洞.md",
             "skills/story-write/references/villain-and-reveal.md"
@@ -260,14 +256,14 @@
         },
         {
           "label": "甜宠，无反派/揭露",
-          "budget": 45600,
+          "budget": 46900,
           "files": [
             "skills/story-write/references/genre-styles/甜宠.md"
           ]
         },
         {
           "label": "甜宠，含反派/揭露",
-          "budget": 48000,
+          "budget": 49200,
           "files": [
             "skills/story-write/references/genre-styles/甜宠.md",
             "skills/story-write/references/villain-and-reveal.md"
@@ -275,14 +271,14 @@
         },
         {
           "label": "追妻火葬场，无反派/揭露",
-          "budget": 47100,
+          "budget": 48300,
           "files": [
             "skills/story-write/references/genre-styles/追妻火葬场.md"
           ]
         },
         {
           "label": "追妻火葬场，含反派/揭露",
-          "budget": 49400,
+          "budget": 50600,
           "files": [
             "skills/story-write/references/genre-styles/追妻火葬场.md",
             "skills/story-write/references/villain-and-reveal.md"
@@ -290,14 +286,14 @@
         },
         {
           "label": "冷门题材公式，无反派/揭露",
-          "budget": 49700,
+          "budget": 50900,
           "files": [
             "skills/story-write/references/genre-writing-formulas.md"
           ]
         },
         {
           "label": "冷门题材公式，含反派/揭露",
-          "budget": 52000,
+          "budget": 53200,
           "files": [
             "skills/story-write/references/genre-writing-formulas.md",
             "skills/story-write/references/villain-and-reveal.md"

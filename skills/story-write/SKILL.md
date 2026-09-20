@@ -10,6 +10,21 @@ disable: true
 
 长篇默认生成规划和章节骨架，明确成稿写入候选并经作者采用；短篇从构思写到成稿。
 
+## 阶段 Reference Gate
+
+先确定 mode：长篇从 `references/long-mode.md` 的场景路由定位当前阶段，只读取该阶段执行段；普通成稿写手只完整读取 `references/reader-first-writing.md` 与 `references/long-format.md`，其余按阶段或具体问题加载。短篇完整读取 `references/short-mode.md` 直到 EOF。只读本文件（SKILL.md）不算完成门禁；对明确要求完整读取的核心文件，`rg` 检索或局部摘读都不算完成门禁，必需路径缺失或不可读即停止。
+
+短篇运行 `node .agents/skills/_shared/scripts/check-phase2-contract.js --json {短篇目录}`；最多做 2 轮定向 repair。交付时用户明确的字数范围优先；运行 `node .agents/skills/_shared/scripts/check-delivery-contract.js --json --min-chars {MIN} --max-chars {MAX} --sections {N} {短篇目录}`。
+
+---
+
+> 运行环境兼容性：Claude Code / Codex / ZCode / OpenClaw 是内置适配目标。检查专业 agent 时按 `.claude/agents/{agent}.md` → `.codex/agents/{agent}.toml` 查找；找不到、Codex 返回 `unknown agent_type`，或检测到 `.zcode/`（ZCode 3.3.4 不执行项目 custom agents）时，直接 solo/direct 执行并报告 fallback。
+>
+> Spawn 版本提示（不阻断 spawn）：先读取项目根 `.story-deployed` 的 `agents_version`。与本版 `agents_version: 30` 不一致时（标记缺失、字段缺失/非整数、小于或大于 30）**照常按文件存在性检查并 spawn**，同时报告 `Notice: agents bundle 版本不匹配（项目 {N}，本版 30）` 并提示重新运行 `/story-setup` 后新开会话；大于 30 时额外提示先更新 oh-story-claudecode，不要用本地旧版 setup 降级覆盖。只有 agent 文件缺失、或运行时不暴露 custom agent 时才降级 solo/direct，报告 `Fallback: ... -> solo`。
+>
+> **卷纲取段器**：读取卷纲内容时运行 `{PYTHON} {skill 根}/scripts/outline_view.py`。先用 `--toc` 定位单元，只取卷级契约用 `--contract`，取单元闭包用 `--unit {单元ID}`；写正文加 `--stage write`，排纲保留默认 `--stage outline`。找不到单元或作用域声明无效时按脚本错误修复，不能改为整读卷纲。新建卷纲写入后运行 `outline_view.py --check --strict {卷纲路径}`；存量卷纲未声明作用域时保守纳入并提示补充。
+
+
 ## 独立编辑与读者审阅
 
 长篇候选、续写与修订均执行 [文字编辑规范](references/copy-editor-specification.md)：扫描后先独立编辑两遍通读及修后复核，再由另一位无历史的 reader 只读截至当前章正文。编辑与读者不得参与该段创作/规划；通用独立 agent 可承载完整编辑协议；reader 仅接收当前任务段，先派发自然首读，实际返回后再派发七问回查，不把完整诊断协议提前交给首读者。无独立调用时自查仍可进行，但独立项标 NOT_EVALUATED，不签通过。下方一般 solo/direct 兼容规则不豁免这一边界。
@@ -28,19 +43,6 @@ disable: true
 
 编辑修后读取新全文及受影响前文；盲编辑与 reader 只读截至当前章的正文，跨章疑点从当前章及已读前两章起按证据扩展；只有已采用章修订的独立连续性事实复核可读相邻后章，不把后章或未来答案交给盲编辑与首读者。一次修后问题仍在则重诊，第二次无改善停止自动改写；未解决硬伤仍阻断，趣味分歧交作者决定。分列“审核已执行 / 底线是否通过 / 体验改善证据”，不同版本或不同读者的差异本身不证明质量提升，不增加文学评分采用门。
 
-## 阶段 Reference Gate
-
-先确定 mode：长篇从 `references/long-mode.md` 的场景路由定位当前阶段，只读取该阶段执行段；普通成稿写手只完整读取 `references/reader-first-writing.md` 与 `references/long-format.md`，其余按阶段或具体问题加载。短篇完整读取 `references/short-mode.md` 直到 EOF。只读本文件（SKILL.md）不算完成门禁；对明确要求完整读取的核心文件，`rg` 检索或局部摘读都不算完成门禁，必需路径缺失或不可读即停止。
-
-短篇运行 `node .agents/skills/_shared/scripts/check-phase2-contract.js --json {短篇目录}`；最多做 2 轮定向 repair。交付时用户明确的字数范围优先；运行 `node .agents/skills/_shared/scripts/check-delivery-contract.js --json --min-chars {MIN} --max-chars {MAX} --sections {N} {短篇目录}`。
-
----
-
-> 运行环境兼容性：Claude Code / Codex / ZCode / OpenClaw 是内置适配目标。检查专业 agent 时按 `.claude/agents/{agent}.md` → `.codex/agents/{agent}.toml` 查找；找不到、Codex 返回 `unknown agent_type`，或检测到 `.zcode/`（ZCode 3.3.4 不执行项目 custom agents）时，直接 solo/direct 执行并报告 fallback。
->
-> Spawn 版本提示（不阻断 spawn）：先读取项目根 `.story-deployed` 的 `agents_version`。与本版 `agents_version: 30` 不一致时（标记缺失、字段缺失/非整数、小于或大于 30）**照常按文件存在性检查并 spawn**，同时报告 `Notice: agents bundle 版本不匹配（项目 {N}，本版 30）` 并提示重新运行 `/story-setup` 后新开会话；大于 30 时额外提示先更新 oh-story-claudecode，不要用本地旧版 setup 降级覆盖。只有 agent 文件缺失、或运行时不暴露 custom agent 时才降级 solo/direct，报告 `Fallback: ... -> solo`。
->
-> **卷纲取段器**：读取卷纲内容时运行 `{PYTHON} {skill 根}/scripts/outline_view.py`。先用 `--toc` 定位单元，只取卷级契约用 `--contract`，取单元闭包用 `--unit {单元ID}`；写正文加 `--stage write`，排纲保留默认 `--stage outline`。找不到单元或作用域声明无效时按脚本错误修复，不能改为整读卷纲。新建卷纲写入后运行 `outline_view.py --check --strict {卷纲路径}`；存量卷纲未声明作用域时保守纳入并提示补充。
 
 ## 模式路由（mode = long / short）
 
@@ -82,7 +84,7 @@ disable: true
 4. **只加载必需信息**。只取本章相关状态、伏笔与设定，其他材料留在文件系统。
 5. **阶段披露由状态驱动**。每轮先按 `references/progressive-disclosure.md` 识别 `mode`、`current_phase`、`current_stage`、`missing_inputs`、`artifacts`、`next_action`；只展示和读取当前阶段必需资料。用户说"继续"、"日更"、"精修"、"检查"时，优先回到已识别阶段，不重新展开完整流程。
 6. **契约与推进决策走权威参考文件**。涉及读者契约、主角代理权、利益安全、期待债、终局储备（终局底牌/升级台阶）、机构/势力边界和 契约安全 / 需补强 / 契约破坏 风险判定时，先按 `references/reader-contract-and-progression.md` 校准，不在 SKILL.md 内复制长规则。
-7. **复用作者习惯**。若作者记忆 state 已存在，正文前用 `.agents/skills/_shared/scripts/author_memory_commit.py query --kind prose_style --kind story_design` 获取本次相关 active 条目（总输出 ≤2KB），原样传给实际正文/改写 agent；设定/大纲按任务查询其他 kind。硬门禁、当前请求、本书设定/文风优先。明确长期声明在收尾用 `record` 写入并回传回执；完整规则见 [.agents/skills/_shared/references/author-memory.md](../_shared/references/author-memory.md)，不混入追踪。
+7. **复用作者习惯**。若作者记忆 state 已存在，正文前用 `.agents/skills/_shared/scripts/author_memory_commit.py query --kind prose_style --kind story_design --book-root {书目录}` 获取本次相关 active 条目（总输出 ≤2KB），原样传给实际正文/改写 agent；设定/大纲按任务查询其他 kind。硬门禁、当前请求、本书设定/文风优先。明确长期声明在收尾用 `record` 写入并回传回执；完整规则见 [.agents/skills/_shared/references/author-memory.md](../_shared/references/author-memory.md)，不混入追踪。
 
 | 题材 | 核心情绪 | 重点参考 |
 |------|---------|---------|

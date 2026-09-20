@@ -41,7 +41,9 @@
       "shared-assets",
       "static",
       "language-gates",
-      "writer-pipeline"
+      "writer-pipeline",
+      "agent-notes",
+      "agent-notes-check"
     ],
     "release": [
       "sync-unit",
@@ -79,7 +81,10 @@
       "quality-lifecycle",
       "antigravity-adapter",
       "hook-regex-sync",
-      "hook-locale-safety"
+      "hook-locale-safety",
+      "agent-notes",
+      "author-memory",
+      "agent-notes-check"
     ],
     "external": [
       "codex-cli-e2e",
@@ -353,6 +358,18 @@
       "args": [
         "--test",
         "skills/story-setup/tests/independent-editor-contract.test.js"
+      ]
+    },
+    "agent-notes": {
+      "command": "python",
+      "args": [
+        "scripts/test-agent-notes.py"
+      ]
+    },
+    "agent-notes-check": {
+      "command": "python",
+      "args": [
+        "scripts/check-agent-notes.py"
       ]
     }
   }

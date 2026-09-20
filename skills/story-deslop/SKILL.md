@@ -37,7 +37,7 @@ disable: true
 
 ### 小说修改后的独立复核
 
-仅对项目长篇正文的 `mode=novel` 修改：按 [修订入口](../story-write/references/workflow-revision.md) 生成候选，扫描后执行独立编辑两遍及修后复核，再由另一位无历史 reader 只读截至本章正文；准确凭证按该入口及运行器模板。旧相关凭证因正文修改失效，原 reader 只作定向复核，新首读验证须换未见旧稿与答案的 reader。确认硬伤及关键待核实不签通过，自查不冒充独立审核；保留合法省略、悬念、功能性复述。去 AI 味扫描通过不等于编辑或读者审核完成。只读任务不修改文件；`mode=general` 和非项目长篇片段不适用此候选流程。
+仅对项目长篇正文的 `mode=novel` 修改：路由到 story-write 的修订入口生成候选，扫描后执行独立编辑两遍及修后复核，再由另一位无历史 reader 只读截至本章正文；准确凭证按该入口及运行器模板。旧相关凭证因正文修改失效，原 reader 只作定向复核，新首读验证须换未见旧稿与答案的 reader。确认硬伤及关键待核实不签通过，自查不冒充独立审核；保留合法省略、悬念、功能性复述。去 AI 味扫描通过不等于编辑或读者审核完成。只读任务不修改文件；`mode=general` 和非项目长篇片段不适用此候选流程。
 
 ### 路由后行为
 
@@ -103,7 +103,7 @@ AI 味不按语法错误处理，也不需要「修正」。它属于风格问�
 
 ### 作者习惯
 
-若作者记忆 state 已存在，改写前用 `.agents/skills/_shared/scripts/author_memory_commit.py query --kind prose_style` 获取匹配的 active 文风条目（总输出 ≤2KB），并交给 inline/spawn 执行者作为自然倾向，不逐条展示或最大化命中，不牺牲连贯、节奏和字数；当前请求、原文剧情功能和本 skill 保护规则优先。用户明确声明长期文风习惯时，改写后按 [.agents/skills/_shared/references/author-memory.md](../_shared/references/author-memory.md) 用 `record` 写入并回传回执；重复修正/推断先待确认，一次性要求、检测器 findings 和助手自己的结果不记录。
+若作者记忆 state 已存在，改写前用 `.agents/skills/_shared/scripts/author_memory_commit.py query --kind prose_style --book-root {书目录}` 获取匹配的 active 文风条目（总输出 ≤2KB），并交给 inline/spawn 执行者作为自然倾向，不逐条展示或最大化命中，不牺牲连贯、节奏和字数；当前请求、原文剧情功能和本 skill 保护规则优先。用户明确声明长期文风习惯时，改写后按 [.agents/skills/_shared/references/author-memory.md](../_shared/references/author-memory.md) 用 `record` 写入并回传回执；只记作者明确说的，一次性要求、反复修改、检测器 findings 和助手自己的结果不记录。
 
 ---
 

@@ -10,7 +10,8 @@ test('editor generated roles share the canonical specification and read-only sco
   for (const file of files) {
     const value = read(file);
     assert.match(value, /name\s*[:=]\s*"?copy-editor/);
-    assert.match(value, /\.agents\/skills\/story-write\/references\/copy-editor-specification\.md/);
+    assert.match(value, /story-setup\/references\/agent-references\/copy-editor-specification\.md/);
+    assert.ok(fs.existsSync(path.join(root, 'references/agent-references/copy-editor-specification.md')));
     assert.match(value, /独立新会话/);
     assert.match(value, /NOT_EVALUATED/);
     assert.match(value, /合理省略/);
@@ -89,4 +90,16 @@ test('quality process marker and evidence-led reader/editor behavior reach both 
   assert.match(writer, /这些反应返回后才进行七问回查/);
   assert.match(writer, /必须另派无旧稿及问题答案的新读者只读新版/);
   assert.match(router, /检查仅报告，不写 review_process 或候选凭证/);
+});
+
+
+test('independent skill distributions carry exact source review protocols', () => {
+  const skills = path.dirname(root);
+  for (const name of ['copy-editor-specification.md', 'editor-review-receipt.md', 'review-process.md']) {
+    const source = fs.readFileSync(path.join(skills, 'story-write/references', name), 'utf8');
+    for (const skill of ['reader-comprehension-scan', 'story-review', 'story-import', 'story-setup']) {
+      const relative = skill === 'story-setup' ? 'references/agent-references' : 'references';
+      assert.equal(fs.readFileSync(path.join(skills, skill, relative, name), 'utf8'), source, skill + '/' + name);
+    }
+  }
 });

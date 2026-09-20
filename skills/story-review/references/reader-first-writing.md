@@ -46,7 +46,7 @@
 
 **复用边界**：复合检查或明确只读审稿只复用本节的理解、趣味问项及原句证据，按检查入口与 manifest 的阶段顺序执行；不要求先完成生产流程的编辑步骤，不生成候选 receipt，不修改正文或追踪。下述先编辑后 reader、候选凭证与局部修改步骤仅适用于写作及采用流程，不改变检查入口的只读边界。
 
-本节由编排器执行，写手不继续加载审查资料。生产中先扫描，再按 [copy-editor-specification.md](.agents/skills/story-write/references/copy-editor-specification.md) 完成独立编辑两遍通读、修正与复核，再由另一位无历史、未参与写作/规划/编辑的 reader 顺读。编辑负责准确、清楚、自然、连贯和句段信息节奏；读者先报告体验，再核实理解。编排及实际字段遵循 [review-process.md](.agents/skills/story-write/references/review-process.md) 与候选逻辑绑定，复用 rc/arc，不添加文学评分系统。
+本节由编排器执行，写手不继续加载审查资料。生产中先扫描，再按 [copy-editor-specification.md](copy-editor-specification.md) 完成独立编辑两遍通读、修正与复核，再由另一位无历史、未参与写作/规划/编辑的 reader 顺读。编辑负责准确、清楚、自然、连贯和句段信息节奏；读者先报告体验，再核实理解。编排及实际字段遵循 [review-process.md](review-process.md) 与候选逻辑绑定，复用 rc/arc，不添加文学评分系统。
 
 按 [reading-protocol.md](reading-protocol.md) 分两次任务：初始调用只传当前章正文与“首读任务”，不把完整协议、七问、扫描发现或编辑答案交给 reader。读者自然读完后先实际返回理解、投入/困惑/略读倾向、收获与期待的原句，允许无；父流程收到返回后，才向同一 reader 单独续派七问及前文回查，再递送下一章。不提供设定、大纲、追踪、未来章或其他版本。支持时用 `fork_turns="none"`；缺独立调用如实标未评估，不能以自查通过。
 
@@ -59,5 +59,3 @@
 第 3/5 章建议连读；已启用累计策略的单元末按 longform-reading.md 必读完整单元，检查重复、疲劳与兑现，不增加文学评分采用门；每 15 章（15/30/45…）执行 `arc-01`、`arc-02` 与作者批准边界，窗口是刚写完的这 15 章。
 
 候选仍等待作者采用。扫描通过和模型偏好只说明所做检查的结果，不能宣称读者满意度已经提高。
-
-以上 `.agents/skills/story-write/` 规范路径从当前项目根定位，不相对于本参考文件；它们是唯一规范来源，不另建副本。

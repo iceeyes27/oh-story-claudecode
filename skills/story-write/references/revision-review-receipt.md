@@ -6,7 +6,7 @@
 
 ## 编辑
 
-`editor_review` 严格沿用 [editor-review-receipt.md](editor-review-receipt.md)。当前文件绑定本次 `候选/_修订/{operation}/candidate.md`，并绑定实际读取的此前正文；编辑先完整理解，再核查句段。已批准的豁免与自查来源分别记录，不生成独立 PASS。
+`editor_review` 严格沿用 [editor-review-receipt.md](editor-review-receipt.md)。当前文件绑定本次 候选修订目录内的 candidate Markdown 文件（路径形如：候选/_修订/{operation}/candidate.md），并绑定实际读取的此前正文；编辑先完整理解，再核查句段。已批准的豁免与自查来源分别记录，不生成独立 PASS。
 
 ## 读者
 

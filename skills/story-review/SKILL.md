@@ -22,9 +22,9 @@ disable: true
 
 ## 作者习惯边界
 
-若作者记忆 state 已存在，审查前用 `.agents/skills/_shared/scripts/author_memory_commit.py query` 获取本次相关 active 条目（总输出 ≤2KB）。它们只能帮助解释意图和组织报告，不能降低 rubric 严重度、把事实冲突判为无问题或跳过平台门禁；当前请求仍优先。完整规则见 [.agents/skills/_shared/references/author-memory.md](../_shared/references/author-memory.md)。
+若作者记忆 state 已存在，审查前用 `.agents/skills/_shared/scripts/author_memory_commit.py query --kind delivery --kind interaction --kind prose_style --book-root {书目录}` 获取本次相关 active 条目（`--kind` 必传；不传 `--book-root` 就拿不到本书级偏好；总输出 ≤2KB）。它们只能帮助解释意图和组织报告，不能降低 rubric 严重度、把事实冲突判为无问题或跳过平台门禁；当前请求仍优先。完整规则见 [.agents/skills/_shared/references/author-memory.md](../_shared/references/author-memory.md)。
 
-用户对报告格式或协作方式作出稳定声明时，在本轮审查完成后用 `record` 记录并回传回执；重复修正/推断先待确认，一次性要求不记录。审查发现、工具告警和助手建议本身绝不自动学习。
+用户对报告格式或协作方式作出稳定声明时，在本轮审查完成后用 `record` 记录并回传回执；只记作者明确说的，一次性要求不记录，不从反复修改推断。审查发现、工具告警和助手建议本身绝不自动学习。
 
 ---
 
@@ -62,7 +62,7 @@ disable: true
     - 对每个必需 Agent 文件：
       - **Claude Code agent（`.claude/agents/`）**：读取 frontmatter，确认 `name:` 与 subagent_type 完全一致；frontmatter 缺失、不可解析或 name 不匹配时视为 malformed agent。
       - **Codex agent（`.codex/agents/`）**：文件名为 `{agent}.toml`，TOML 必须可解析，且包含 `name`、`description`、`developer_instructions`；`name` 必须与目标 agent 完全一致。
-    - **copy-editor 协议预检**：full 的同名文件还必须同时包含 `Review Protocol: independent-editor-v1` 、`Review Process: review-quality-v2` 和 `.agents/skills/story-write/references/copy-editor-specification.md`。缺任一项即旧版或不完整角色，不能算当前独立编辑覆盖；报告 `Editor Review: NOT_EVALUATED`，提示按 story-setup 独立编辑定向部署更新该角色，当前 full 降级 solo。名称存在或 bundle 版本相同不能代替本项，不改写 `.story-deployed` 的整包版本。
+    - **copy-editor 协议预检**：full 的同名文件还必须同时包含 `Review Protocol: independent-editor-v1` 、`Review Process: review-quality-v2` 和 `copy-editor-specification.md` 规范引用（路径必须可解析）。缺任一项即旧版或不完整角色，不能算当前独立编辑覆盖；报告 `Editor Review: NOT_EVALUATED`，提示按 story-setup 独立编辑定向部署更新该角色，当前 full 降级 solo。名称存在或 bundle 版本相同不能代替本项，不改写 `.story-deployed` 的整包版本。
     - `agents_version` 与本版不一致不影响本步：照常检查下列 agent 文件结构并 spawn，只按顶部规则附带版本提示。文件缺失或 malformed 才降级。
    - 如果目标模式所需任一文件缺失或 malformed，**不要尝试 spawn 缺失/异常 Agent**；自动降级为 `solo`，并在报告开头写明：`Fallback: missing agents -> solo` 或 `Fallback: malformed agents -> solo`，列出问题文件，建议用户运行 `/story-setup`。
 5. **确认 Agent/Task 工具可用**：如果当前环境没有可用的子 Agent/Task 调用能力，直接降级为 `solo`，报告 `Fallback: agent tool unavailable -> solo`。
@@ -400,12 +400,12 @@ full/lean 模式下，主会话仅向实际执行的作者视角角色（story-a
 
 ### Agent 5: copy-editor（独立文字编辑）
 
-当前过程标记为 `Review Process: review-quality-v2`；行为唯一规范仍为 copy-editor-specification.md，机器过程规范从项目根 `.agents/skills/story-write/references/review-process.md` 定位。编辑覆盖准确、清楚、自然、连贯及句段节奏；有据的别扭、拖沓和语气失真不能因不妨碍理解而忽略，须与硬伤、待核实、个人偏好和建议保留分开。
+当前过程标记为 `Review Process: review-quality-v2`；行为唯一规范仍为 copy-editor-specification.md，机器过程规范从本 Skill 的 `references/review-process.md` 定位。编辑覆盖准确、清楚、自然、连贯及句段节奏；有据的别扭、拖沓和语气失真不能因不妨碍理解而忽略，须与硬伤、待核实、个人偏好和建议保留分开。
 
 只读检查按原 11 阶段编排，读者先自然首读实际返回后再七问回查，编辑随后诊断；不写生产凭证或修改正文。需要授权改稿时转生产/修订流程：重要意见沿用 ID 按根因登记处置理由，实质理解、信息、动机、场景节奏或兑现改动须新读者盲读新版；纯不改意的错字标点仅编辑及必要定向复核。一次修后仍在则重诊，第二次无改善停止自动改；硬伤不因此通过，趣味分歧交作者，不投票。报告分列审核完成、底线通过、体验改善证据，不把调用成功或代理分数当成满意度。
 
 
-使用 `copy-editor` 的只读角色和独立新会话（不继承父对话）。只传项目路径、明确的正文/已读相邻章路径、审查范围及 `.agents/skills/story-write/references/copy-editor-specification.md`；不得传写手解释、未来答案或预设问题。先全文理解，再逐句逐段与跨章检查。按规范输出五项覆盖证据、原文位置、实际阅读损失、严重度及最小修改建议。合理省略、悬念、概数及功能性复述不机械判错。关键待核实不签通过；修改后全文复核；本角色不改正文。
+使用 `copy-editor` 的只读角色和独立新会话（不继承父对话）。只传项目路径、明确的正文/已读相邻章路径、审查范围及 `references/copy-editor-specification.md`；不得传写手解释、未来答案或预设问题。先全文理解，再逐句逐段与跨章检查。按规范输出五项覆盖证据、原文位置、实际阅读损失、严重度及最小修改建议。合理省略、悬念、概数及功能性复述不机械判错。关键待核实不签通过；修改后全文复核；本角色不改正文。
 
 角色引用不可读或阅读范围不完整时报告 NOT_EVALUATED，不得靠内置 rubric 生成编辑通过。需要候选采用时由候选流程保存并验证独立编辑凭证；报告文本不是身份或真实阅读的密码学证明。
 
@@ -560,3 +560,5 @@ Rubric Source: file | embedded fallback
 
 - 跟随用户的语言回复，用户用什么语言就用什么语言回复。
 - 中文回复遵循《中文文案排版指北》。
+
+体验修改每轮优先处理 1～2 个最高阅读损失的根因，重要问题仍全部登记。

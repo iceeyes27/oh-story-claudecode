@@ -14,6 +14,11 @@ All notable changes to this project will be documented in this file.
 - 导语作为正文第一场：宅斗宫斗、民俗怪谈、沙雕脑洞的第 1 章从导语末尾的后果、选择或新行动继续，避免重复搭景或重演同一事件。
 - 短篇拆文的节奏与对白指标改为描述性观察，不设跨题材固定阈值。
 
+### Changed
+
+- 作者记忆拆成项目级与书级两个 store，记忆随书走（#435）：全局、题材、流程条目留在工作区 `.story/作者记忆/`（`AP`），本书条目改存书目录 `.story/作者记忆/`（`BP`），`query` 合并两级返回。书级读写须传 `--book-root`，没传直接报错，不再写进工作区；一份 `commit` 只写一个 store，`replace` / `conflicts_with` 不跨 store。升级前写在工作区的本书条目不再参与查询（不做双读），用新增的 `migrate --book-root` 一次性整批搬进书目录，证据与确认次数原样保留。
+- 作者记忆只记作者明确表达的偏好（#436）：捕获表移除 `repeated_correction` / `inferred_pattern` 两条推断写入管道，`record` / `commit` 拒绝这两个来源；待确认只剩「作者原话范围含糊」一种来源。存量 state 里的旧来源条目照常可读、可确认、可退役。
+
 ### 修复
 
 - **恢复 `check-ai-patterns.js` 在一次合并中丢失的规则集**。合并 `7c380a1` 取了旧目录布局的过时副本，导致 17 个规则族（`banned-word-*` 全家族、`contrast-rhetorical`、`english-residue`、`grey-crack-in-head`、`narration-slogan`、`summary-slogan`、`process-term-as-object` 等）与 `banned-words.md` 的**运行时加载器**一并消失，规则数从 38 降到 21。现按三方合并恢复，同时保留合并另一侧新增的真人语料校准与 `套式反应` / `章尾状态总结体` / `引号强调` 规则。

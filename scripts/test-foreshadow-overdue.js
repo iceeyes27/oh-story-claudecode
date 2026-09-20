@@ -185,5 +185,5 @@ test('demo 书：热卡与已渲染的 追踪/上下文.md 逐条一致', () => 
   const report = computeOverdue(JSON.parse(fs.readFileSync(statePath, 'utf8'))).report;
   const rendered = [...fs.readFileSync(contextPath, 'utf8').matchAll(/^- (F\d+)｜/gm)].map((m) => m[1]);
   assert.deepEqual([...report.hot_card_ids].sort(), rendered.sort());
-  assert.equal(report.cold_count, 6, 'demo 写到第 20 章时已有 6 条伏笔掉出热卡');
+  assert.equal(report.cold_count, 8, 'demo 写到第 21 章时已有 8 条伏笔掉出热卡');
 });

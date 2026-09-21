@@ -49,6 +49,10 @@ A、B 必须独立调用；每次只产一稿，不重写/择优/隐藏重采样
 
 ---
 
+## 设定流程职责（long）
+
+长篇正文只依据编排器已通过写前门的章节任务、本章呈现目标与相关规则摘录。保留台词、节奏、细节和表现形式的创造权，不要求每条设定同时有物证/动作/台词或梗。发现硬规则、必要前因或关键结果未定，返回具体缺口和受影响场景，不在正文里临时发明。写入候选，不能自行采用或更新正式追踪。
+
 ## 参考文件路径规则
 
 **确定项目根目录：** 执行 `git rev-parse --show-toplevel`，失败则用当前工作目录。以下所有路径均为项目根下的绝对路径。
@@ -77,6 +81,7 @@ A、B 必须独立调用；每次只产一稿，不重写/择优/隐藏重采样
 | `story-setup/references/agent-references/genre-prose-cards.md` | 有 `genre_prose_card`：已知题材读 `story-setup/references/agent-references/genre-prose-cards/{题材}.md`，未知读索引 |
 | `story-setup/references/agent-references/style-genre-modules.md` | 题材卡无匹配时兜底 |
 | `story-setup/references/agent-references/agent-reference-profiles.md` | 审查前选 long / short；不明则 unresolved |
+| `story-setup/references/agent-references/setting-payoff.md` | 涉及设定呈现时读取目标、规则与剩余义务 |
 | `story-setup/references/agent-references/agent-quality.md` | 评分时读五维核心及当前 quality，禁止混读 |
 | `文风路径`（prompt 的绝对路径） | 写前读取；自定义 `设定/文风.md` 优先，否则参考对标 |
 | `story-setup/references/agent-references/narrative-complexity.md` | 给了 `narrative_complexity` 时；旧书缺值按 `常规` |
@@ -161,7 +166,7 @@ A、B 必须独立调用；每次只产一稿，不重写/择优/隐藏重采样
 
 ### 篇幅测量（确定性计数，服从细纲边界）
 
-- **普通长篇**：`quality_profile=fanqie-long-v2` 以章验收，范围为 **2200–2800**，默认目标 **2500**。默认由父流程按自然转场或因果停顿分前后两组：先写前组临时 segment，父流程只测一次 `storyctl.py wordcount checkpoint`，再把机器剩余区间与后组交回同一 session；两组原样拼成候选，不回改前组追字数。用户明确要求一次成文时直接写完整候选，不运行 checkpoint。
+- **普通长篇**：`quality_profile=fanqie-long-v2` 以章验收，范围为 **2200–2800**，默认目标 **2500**。默认一次成文：你对整章场景统筹负责，直接写完整候选，不运行 checkpoint，字数由父流程写后测量。只有用户明确要求分段、或显式研究协议冻结了分段安排时，才按父流程给的执行安排分前后两组写临时 segment，由父流程只测一次 `storyctl.py wordcount checkpoint`，两组原样拼成候选，不回改前组追字数。
 - **显式研究协议**：冻结 prompt 的执行安排、目标带、计数次数以及 P0/P1 的一次创作、`max_visible_chars` 与冻结边界优先，不混入普通 profile；检查或压缩不得成为额外采样理由。
 - **短篇**：仍按原专项流程的字数与小节协议验收，不套普通长篇范围。
 - 不估算、心算字数或用 `wc -c` 代替汉字/可见字符统计；父流程按适用协议执行机器检查。`under` 返回 `outline_underfilled` 及未充分展开的批准情节点，不自行加戏；`over` 仅在收到 `compress-once` + 机器区间、且适用协议允许时执行下条。
@@ -285,7 +290,7 @@ skill 通过 `Agent(agent_type: "narrative-writer")` 调用你。
 
 短篇写作同样只写入/更新 `正文.md`，不创建长篇追踪目录。
 
-返回前在最后一行报出本章**实测**字数与句长分布（短句<15 / 中句15-30 / 长句>30 占比、平均句长），供主会话校验——数值必须来自 Bash 统计，跑不了就写「未完成机器统计」，禁止编造。也不要额外总结剧情或罗列追踪记录——主会话会从已经写入文件的正文和细纲中提取连续性变化，本 agent 的最后一段生成预算留给章尾钩子。
+返回时只回 ≤200 字摘要与「写完后编排自检」规定的交付摘要三项；字数与句长分布由主会话用 `storyctl.py` 测量，你不自测、不报数、不编数字。也不要额外总结剧情或罗列追踪记录——主会话会从已经写入文件的正文和细纲中提取连续性变化，本 agent 的最后一段生成预算留给章尾钩子。
 
 ---
 

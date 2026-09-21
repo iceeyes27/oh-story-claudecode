@@ -10,11 +10,16 @@ import shutil
 import subprocess
 import sys
 import tempfile
-import tomllib
 from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT / "scripts"))
+
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import agent_toml as tomllib
 CODEX_GENERATOR = REPO_ROOT / "scripts/generate-codex-agents.py"
 ANTIGRAVITY_GENERATOR = (
     REPO_ROOT / "skills/story-setup/scripts/generate-antigravity-agents.mjs"

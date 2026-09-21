@@ -14,10 +14,13 @@
     "story-analyze",
     "story-cover",
     "story-deslop",
+    "story-hook-refine",
     "story-import",
+    "story-micro-scan",
     "story-review",
     "story-scan",
     "story-setup",
-    "story-write"
+    "story-write",
+    "typesafe-ai"
   ]
 }

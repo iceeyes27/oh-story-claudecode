@@ -37,6 +37,25 @@ STATE = "追踪/_tracking-state.json"
 KINDS = ("wording", "rhythm", "facts")
 
 
+def validate_revision_editor(project: Path, directory: Path, manifest: dict, review: dict) -> dict:
+    from editor_review import validate, EditorReviewError
+    try:
+        return validate(project, manifest["chapter"], directory / "candidate.md", review.get("editor_review"))
+    except EditorReviewError as exc:
+        raise Error(str(exc)) from exc
+
+
+def validate_revision_process(project: Path, directory: Path, manifest: dict, review: dict) -> dict:
+    """Validate declared review execution, never grade literary preference."""
+    from review_process import validate, ReviewProcessError
+    try:
+        return validate(project, manifest["chapter"], directory / "candidate.md",
+                        review.get("review_process"), editor=review["editor_review"],
+                        readers=[review["reader_review"]])
+    except ReviewProcessError as exc:
+        raise Error(str(exc)) from exc
+
+
 def safe_path(project: Path, relative: str, *, exists: bool = True) -> Path:
     require(isinstance(relative, str) and relative and not Path(relative).is_absolute(), "path must be project relative")
     path = project / relative
@@ -90,7 +109,7 @@ def operation_id(manifest: dict) -> str:
 def load(project: Path, operation: str) -> tuple[Path, dict]:
     directory = revision_dir(project, operation)
     manifest = candidate.read_json(directory / "manifest.json", "revision manifest")
-    require(manifest.get("schema") == "ordinary-revision/v1", "unsupported revision manifest")
+    require(manifest.get("schema") in {"ordinary-revision/v1", "ordinary-revision/v2", "ordinary-revision/v3"}, "unsupported revision manifest")
     require(operation_id(manifest) == operation == manifest.get("operation"), "revision manifest changed")
     for name, key in (("original.md", "original_sha256"), ("candidate.md", "candidate_sha256"), ("diff.patch", "diff_sha256")):
         path = safe_path(project, (directory / name).relative_to(project).as_posix())
@@ -129,7 +148,7 @@ def prepare(project: Path, chapter: int, source: Path, kind: str, summary: str) 
                 context[relative] = candidate.sha256_file(safe_path(project, relative))
         diff = "".join(difflib.unified_diff(original.splitlines(True), revised.splitlines(True),
                                          fromfile=matches[0], tofile="revision candidate"))
-        manifest = {"schema": "ordinary-revision/v1", "chapter": chapter, "kind": kind,
+        manifest = {"schema": "ordinary-revision/v3", "chapter": chapter, "kind": kind,
                     "summary": summary.strip(), "final": matches[0], "inventory": files,
                     "context": context, "state_sha256": candidate.sha256_file(project / STATE),
                     "expected_state_revision": state["state_revision"],
@@ -145,6 +164,7 @@ def prepare(project: Path, chapter: int, source: Path, kind: str, summary: str) 
             (directory / "diff.patch").write_bytes(diff.encode())
             candidate.atomic_json(directory / "manifest.json", manifest)
             template = {"reviewer": "", "reader_type": "model", "status": "pending",
+                        "editor_review": None, "reader_review": None, "review_process": None,
                         "original_sha256": manifest["original_sha256"],
                         "candidate_sha256": manifest["candidate_sha256"], "diff_sha256": manifest["diff_sha256"],
                         "facts_unchanged": None, "findings": [], "original_anchor": "", "candidate_anchor": "",
@@ -155,6 +175,72 @@ def prepare(project: Path, chapter: int, source: Path, kind: str, summary: str) 
         load(project, manifest["operation"])
         return {"action": "prepare", "operation": manifest["operation"], "directory": str(directory),
                 "kind": kind, "review_scope": list(context), "adopted": False}
+
+
+def valid_reader_review(project: Path, directory: Path, manifest: dict, review: dict) -> None:
+    """Keep prose-only reading separate from the retrospective continuity review.
+
+    Run identities and original excerpts are declared evidence, not proof that a
+    model actually read or understood the text. Never expose future chapters or
+    the original revision/diff to the initial reader.
+    """
+    reader = review.get("reader_review")
+    editor = review.get("editor_review")
+    require(isinstance(reader, dict), "independent reader_review required")
+    require(reader.get("schema_version") == 1, "unsupported reader_review schema")
+    require(reader.get("source") == "independent" and reader.get("status") == "PASS", "independent reader review not completed")
+    require(type(reader.get("chapter")) is int and reader["chapter"] == manifest["chapter"], "reader chapter mismatch")
+    identity = reader.get("reviewer_run_id")
+    require(isinstance(identity, str) and identity.strip(), "reader reviewer_run_id required")
+    require(identity not in {editor.get("writer_run_id"), editor.get("reviewer_run_id")}, "reader cannot be the writer or editor")
+    require(reader.get("reading_kind") in {"first_read", "targeted_recheck"}, "reader reading_kind required")
+    if reader["reading_kind"] == "targeted_recheck":
+        from editor_review import validate_first_read, EditorReviewError
+        try:
+            validate_first_read(project, reader, chapter=manifest["chapter"])
+        except EditorReviewError as exc:
+            raise Error(str(exc)) from exc
+    require(isinstance(reader.get("run_id"), str) and reader["run_id"].strip(), "reader run_id required")
+    require(reader.get("candidate_sha256") == manifest["candidate_sha256"], "reader candidate digest is stale")
+    current = (directory / "candidate.md").relative_to(project).as_posix()
+    require(reader.get("candidate_path") == current, "reader candidate path mismatch")
+    rows = reader.get("prose_files")
+    require(isinstance(rows, list) and rows, "reader prose_files required")
+    texts = {}
+    for row in rows:
+        require(isinstance(row, dict), "invalid reader prose file")
+        name = row.get("path")
+        require(isinstance(name, str) and name not in texts, "duplicate or invalid reader path")
+        if name != current:
+            number = candidate.chapter_of(Path(name).name)
+            require(name in manifest["inventory"] and number is not None and number < manifest["chapter"], "reader view must exclude future prose, old versions and author materials")
+        path = safe_path(project, name)
+        require(row.get("sha256") == candidate.sha256_file(path), "reader context digest is stale")
+        texts[name] = path.read_text(encoding="utf-8-sig")
+    require(current in texts, "reader did not bind the current revision")
+    previous = [(candidate.chapter_of(Path(name).name), name) for name in manifest["inventory"]
+                if candidate.chapter_of(Path(name).name) < manifest["chapter"]]
+    if previous:
+        require(max(previous)[1] in texts, "reader must include the preceding chapter")
+    observations = reader.get("observations")
+    require(isinstance(observations, dict) and set(observations) == {"understanding", "friction", "reward", "read_on"}, "all four reader observations required")
+    for observation in observations.values():
+        require(isinstance(observation, dict) and isinstance(observation.get("assessment"), str) and observation["assessment"].strip(), "reader assessment required")
+        evidence = observation.get("evidence")
+        require(isinstance(evidence, list) and evidence, "reader evidence required")
+        require(any(isinstance(item, dict) and item.get("path") == current for item in evidence), "reader observation needs current candidate evidence")
+        for item in evidence:
+            require(isinstance(item, dict) and item.get("path") in texts, "reader evidence outside its view")
+            anchor = item.get("anchor")
+            require(isinstance(anchor, str) and anchor.strip() and anchor in texts[item["path"]], "reader evidence cannot be located")
+    findings = reader.get("findings")
+    require(isinstance(findings, list), "reader findings required")
+    for item in findings:
+        require(isinstance(item, dict) and item.get("severity") in {"advisory", "blocking", "uncertain"}, "invalid reader finding")
+        require(item.get("severity") != "blocking" and item.get("critical") is False, "unresolved critical reader finding")
+        for key in ("id", "path", "anchor", "impact"):
+            require(isinstance(item.get(key), str) and item[key].strip(), "reader finding missing " + key)
+        require(item["path"] in texts and item["anchor"] in texts[item["path"]], "reader finding evidence cannot be located")
 
 
 def valid_review(project: Path, directory: Path, manifest: dict, review: dict) -> None:
@@ -178,6 +264,11 @@ def valid_review(project: Path, directory: Path, manifest: dict, review: dict) -
         anchor = row.get("anchor")
         require(isinstance(anchor, str) and anchor.strip() and anchor in safe_path(project, name).read_text(encoding="utf-8-sig"), f"context anchor missing: {name}")
         require(isinstance(row.get("assessment"), str) and row["assessment"].strip(), f"context assessment missing: {name}")
+    if manifest["schema"] in {"ordinary-revision/v2", "ordinary-revision/v3"}:
+        validate_revision_editor(project, directory, manifest, review)
+        valid_reader_review(project, directory, manifest, review)
+    if manifest["schema"] == "ordinary-revision/v3":
+        validate_revision_process(project, directory, manifest, review)
 
 
 def tracking_snapshot(project: Path) -> dict[str, str]:
@@ -195,6 +286,7 @@ def tracking_snapshot(project: Path) -> dict[str, str]:
 
 def build_changes(project: Path, directory: Path, manifest: dict, review: dict, transaction: dict | None) -> tuple[dict, dict]:
     ordinary(project)
+    require(manifest["schema"] == "ordinary-revision/v3", "legacy unstarted revision needs prepare and review-process evidence")
     state = tracking.check_project(project)
     tracking_before = tracking_snapshot(project)
     require(inventory(project) == manifest["inventory"], "adopted prose changed since revision preparation")
@@ -204,7 +296,7 @@ def build_changes(project: Path, directory: Path, manifest: dict, review: dict, 
     valid_review(project, directory, manifest, review)
     text = (directory / "candidate.md").read_text(encoding="utf-8")
     length = candidate.wordcount.fanqie_length(text)
-    require(length["status"] == "pass", f"revision length must be 2200–2800, actual={length['actual']}")
+    require(length["status"] == "pass", f"revision length must be {length['min']}–{length['max']}, actual={length['actual']}")
     # Scan a correctly named file: title checking and author-rule scope remain intact.
     import tempfile
     with tempfile.TemporaryDirectory(prefix="ordinary-revision-check-") as temporary:
@@ -235,6 +327,29 @@ def build_changes(project: Path, directory: Path, manifest: dict, review: dict, 
             # Review binds the new quote to unchanged value and fact chapter.
             # This cannot update amounts, dates, or facts from other chapters.
             record["source_phrase"] = anchor
+    # 设定兑现记录的证据锚点必须仍能在修订后的正文里定位；找不到的只能重绑，不能改结论
+    # （改结论是 facts 修订的事）。facts 修订可随事务重交本章记录；没重交而锚点又失效则拒绝。
+    rebinds = review.get("setting_payoff_rebind", [])
+    require(isinstance(rebinds, list), "setting_payoff_rebind must be a list")
+    rebind_by_id: dict[str, dict] = {}
+    for row in rebinds:
+        require(isinstance(row, dict) and isinstance(row.get("id"), str) and row["id"], "setting_payoff_rebind rows need an id")
+        require(row["id"] not in rebind_by_id, f"setting_payoff_rebind has duplicate id {row['id']}")
+        rebind_by_id[row["id"]] = row
+    for identifier, row in next_state.get("setting_payoffs", {}).items():
+        for record in row["records"]:
+            if record["chapter"] != manifest["chapter"] or not record["evidence_anchor"]:
+                continue
+            if record["evidence_anchor"] in text:
+                continue
+            rebind = rebind_by_id.pop(identifier, None)
+            require(rebind is not None, f"setting payoff {identifier} evidence disappeared from the revised prose; add setting_payoff_rebind or revise facts")
+            anchor = rebind.get("evidence_anchor")
+            require(isinstance(anchor, str) and anchor.strip() and anchor in text, f"setting payoff {identifier} rebind anchor cannot be located")
+            require(isinstance(rebind.get("note"), str) and rebind["note"].strip(), f"setting payoff {identifier} rebind needs a note")
+            require("result" not in rebind, f"setting payoff {identifier}: a rebind cannot change result; prepare kind=facts")
+            record["evidence_anchor"] = anchor.strip()
+    require(not rebind_by_id, f"setting_payoff_rebind names records that did not need rebinding: {sorted(rebind_by_id)}")
     # Stale measurements must not survive changed prose. Semantic summaries stay
     # only after an explicit unchanged-facts review, or the facts transaction.
     next_state["wordcount_records"].pop(str(manifest["chapter"]), None)
@@ -265,14 +380,29 @@ def build_changes(project: Path, directory: Path, manifest: dict, review: dict, 
         if before != encoded:
             changes[name] = {"before": before, "after": encoded}
     return changes, {"length": length, "state_revision": next_state["state_revision"],
+                     "editor_status": "WAIVED" if review["editor_review"].get("waiver") else "PASS",
+                     "reader_status": "PASS",
+                     "review_process_status": "VERIFIED",
                      "invalidated": ["previous reading receipts for changed prose/context", "previous candidate bindings", "chapter wordcount record"],
                      "reader_type": review["reader_type"], "review_scope": list(manifest["context"])}
+
+
+def revalidate_review_inputs(project: Path, operation: str, directory: Path, manifest: dict, review: dict) -> None:
+    """External editors may change sources while deterministic scans are running."""
+    latest_directory, latest_manifest = load(project, operation)
+    require(latest_directory == directory and latest_manifest == manifest, "revision proposal changed during checks")
+    require(inventory(project) == manifest["inventory"], "prose changed during revision checks")
+    require(candidate.sha256_file(project / STATE) == manifest["state_sha256"], "tracking changed during revision checks")
+    for name, digest in manifest["context"].items():
+        require(candidate.sha256_file(safe_path(project, name)) == digest, "context changed during revision checks")
+    valid_review(project, directory, manifest, review)
 
 
 def check(project: Path, operation: str, review: dict, transaction: dict | None) -> dict:
     assert_no_unfinished_adoption(project)
     directory, manifest = load(project, operation)
     _, report = build_changes(project, directory, manifest, review, transaction)
+    revalidate_review_inputs(project, operation, directory, manifest, review)
     return {"action": "check", "ok": True, "operation": operation, "adopted": False, **report}
 
 
@@ -325,8 +455,13 @@ def recover_locked(project: Path, operation: str) -> dict:
         tracking.check_project(project)
         journal["phase"] = "done"
         candidate.atomic_json(path, journal)
-    return {"action": "accept", "operation": operation, "adopted": True,
-            "original": str(directory / "original.md"), **payload["report"]}
+    result = {"action": "accept", "operation": operation, "adopted": True,
+              "original": str(directory / "original.md"), **payload["report"]}
+    if manifest["schema"] == "ordinary-revision/v1":
+        result["legacy_editor_status"] = "NOT_EVALUATED"
+    if manifest["schema"] in {"ordinary-revision/v1", "ordinary-revision/v2"}:
+        result["review_process_status"] = "NOT_EVALUATED"
+    return result
 
 
 def accept(project: Path, operation: str, review: dict, transaction: dict | None, approval: str) -> dict:
@@ -338,11 +473,7 @@ def accept(project: Path, operation: str, review: dict, transaction: dict | None
         changes, report = build_changes(project, directory, manifest, review, transaction)
         # External editors do not take our project lock. Bind again after slow
         # scans, before persisting a transaction that would block other writers.
-        load(project, operation)
-        require(inventory(project) == manifest["inventory"], "prose changed during revision checks")
-        require(candidate.sha256_file(project / STATE) == manifest["state_sha256"], "tracking changed during revision checks")
-        for name, digest in manifest["context"].items():
-            require(candidate.sha256_file(safe_path(project, name)) == digest, "context changed during revision checks")
+        revalidate_review_inputs(project, operation, directory, manifest, review)
         for name, versions in changes.items():
             target = safe_path(project, name, exists=False)
             require((target.read_bytes().hex() if target.exists() else None) == versions["before"], "projection changed during revision checks")

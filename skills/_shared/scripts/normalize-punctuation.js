@@ -3,12 +3,43 @@
 
 const fs = require('fs');
 const path = require('path');
+let styleWhitelistPath, loadStyleWhitelist, styleSpans;
+try {
+  ({ styleWhitelistPath, loadStyleWhitelist, styleSpans } = require('./style-whitelist.js'));
+} catch {
+  styleWhitelistPath = (file) => {
+    const parent = path.dirname(path.resolve(file));
+    const book = path.basename(parent) === '正文' ? path.dirname(parent) : parent;
+    return path.join(book, '.deslop-whitelist');
+  };
+  loadStyleWhitelist = (file) => {
+    try {
+      return fs.readFileSync(styleWhitelistPath(file), 'utf8')
+        .split(/\r?\n/).map(line => line.trim())
+        .filter(line => line && !line.startsWith('#'))
+        .sort((a, b) => b.length - a.length);
+    } catch (error) {
+      if (error.code === 'ENOENT') return [];
+      throw error;
+    }
+  };
+  styleSpans = (text, whitelist) => {
+    const spans = [];
+    for (const literal of (whitelist || [])) {
+      for (let at = text.indexOf(literal); at !== -1; at = text.indexOf(literal, at + 1)) {
+        spans.push([at, at + literal.length]);
+      }
+    }
+    return spans;
+  };
+}
 
 const USAGE = `Usage: node normalize-punctuation.js [--check] [--quote-mode keep|ascii|yan] <file...>
 
 Normalize正文 structure deterministically:
   - preserve ellipses, dashes, and double hyphens when they carry voice or meaning
   - remove markdown divider lines (---) from正文
+  - when a book-local .deslop-whitelist exists, preserve its approved pause punctuation and normalize other pause tokens
   - keep quote style by default; convert quotes only when explicitly requested
 `;
 
@@ -49,6 +80,7 @@ if (options.files.length === 0) {
 let totalFindings = 0;
 let changedFiles = 0;
 let failed = false;
+const fileQuoteStyles = []; // {file, curly, straight}：跨文件引号风格一致性提示用
 
 for (const file of options.files) {
   const fullPath = path.resolve(file);
@@ -61,7 +93,16 @@ for (const file of options.files) {
     continue;
   }
 
-  const result = normalizeDocument(input, options.quoteMode);
+  fileQuoteStyles.push({
+    file,
+    curly: (input.match(/[“”]/g) || []).length,
+    straight: (input.match(/"/g) || []).length,
+  });
+
+  let whitelist;
+  try { whitelist = loadStyleWhitelist(fullPath); }
+  catch (error) { die(`${file}: unable to read .deslop-whitelist (${error.message})`); }
+  const result = normalizeDocument(input, options.quoteMode, whitelist, fs.existsSync(styleWhitelistPath(fullPath)));
   totalFindings += result.findings.length;
 
   if (options.check) {
@@ -81,6 +122,24 @@ for (const file of options.files) {
 if (failed) {
   process.exit(2);
 }
+
+// 跨文件引号风格分歧提示（advisory，不改变 exit code）：同一批正文里既有纯弯引号文件
+// 又有纯直引号文件，通常是一本书的引号风格没统一。单文件混用已在 normalizeDocument
+// 内作为 finding 计入 --check 退出码；此处只管"章与章之间风格分家"。
+if (options.check && fileQuoteStyles.length >= 2) {
+  const pureCurly = fileQuoteStyles.filter((s) => s.curly > 0 && s.straight === 0);
+  const pureStraight = fileQuoteStyles.filter((s) => s.straight > 0 && s.curly === 0);
+  if (pureCurly.length >= 1 && pureStraight.length >= 1) {
+    console.error(
+      `[advisory] 引号风格跨文件不一致：${pureCurly
+        .map((s) => path.basename(s.file))
+        .join('、')} 用弯引号，${pureStraight
+        .map((s) => path.basename(s.file))
+        .join('、')} 用直引号；同一本书建议统一为中文弯引号。`
+    );
+  }
+}
+
 if (options.check && totalFindings > 0) {
   process.exit(1);
 }
@@ -94,7 +153,7 @@ function die(message) {
   process.exit(2);
 }
 
-function normalizeDocument(input, quoteMode) {
+function normalizeDocument(input, quoteMode, whitelist, normalizePauses) {
   const { lines, endings } = splitLinesKeepingEndings(input);
 
   const findings = [];
@@ -104,6 +163,9 @@ function normalizeDocument(input, quoteMode) {
   let quoteOpen = false;
   let commentOpen = false;
   let commentStart = null;
+  // 引号风格一致性（advisory）：统计非代码行里的弯/直引号字符数，判断同文件是否混用。
+  let curlyQuoteChars = 0;
+  let straightQuoteChars = 0;
   const commentCloseAhead = new Array(lines.length + 1).fill(false);
   for (let index = lines.length - 1; index >= 0; index -= 1) {
     commentCloseAhead[index] = lines[index].includes('-->') || commentCloseAhead[index + 1];
@@ -159,13 +221,21 @@ function normalizeDocument(input, quoteMode) {
     }
 
     const commentOpenBefore = commentOpen;
-    const commentResult = htmlCommentSpans(line, commentOpen);
-    commentOpen = commentResult.open;
+    const punctuationResult = normalizePauses
+      ? normalizePausePunctuation(line, lineNo, commentOpen, whitelist)
+      : { line, findings: [], commentOpen: htmlCommentSpans(line, commentOpen).open };
+    findings.push(...punctuationResult.findings);
+    line = punctuationResult.line;
+    commentOpen = punctuationResult.commentOpen;
     if (!commentOpenBefore && commentOpen) {
       commentStart = { line: lineNo, column: Math.max(1, line.lastIndexOf('<!--') + 1) };
     } else if (!commentOpen) {
       commentStart = null;
     }
+
+    // 引号风格统计：fence 内代码/示例、frontMatter 均已 continue，此处只统计正文行
+    curlyQuoteChars += (line.match(/[“”]/g) || []).length;
+    straightQuoteChars += (line.match(/"/g) || []).length;
 
     const quoteResult = normalizeQuotes(line, quoteMode, quoteOpen, lineNo);
     findings.push(...quoteResult.findings);
@@ -181,6 +251,18 @@ function normalizeDocument(input, quoteMode) {
       column: commentStart?.column || 1,
       type: 'html-comment-unclosed',
       message: 'HTML 注释未闭合；后续内容仍按正文检查。',
+    });
+  }
+
+  // 引号风格一致性（advisory）：同一文件内弯引号与直引号混用是排版事故信号
+  // （代码块/示例已被 fence 排除，此处只反映正文行）。不足 2 个字符的一方忽略，
+  // 避免英文撇号、英寸标记等零星直引号误报。
+  if (curlyQuoteChars >= 2 && straightQuoteChars >= 2) {
+    findings.push({
+      line: 1,
+      column: 1,
+      type: 'quote-style-mixed',
+      message: `引号风格混用：弯引号 ${curlyQuoteChars} 个、直引号 ${straightQuoteChars} 个；建议统一为中文弯引号。`,
     });
   }
 
@@ -235,7 +317,7 @@ function isClosingFence(line, fence) {
 // 一遍归一化留不干净，再跑一遍还会改已定稿的正文；所以反复归一化到不动点。
 // 每遍至少把一个 `…/./—/-` 换成非停顿字符，字符数严格递减，必然收敛。
 // findings 只留第一遍：同一处不重复计数，column 也仍然是原行的偏移。
-function normalizePausePunctuation(line, lineNo, commentOpen) {
+function normalizePausePunctuation(line, lineNo, commentOpen, whitelist) {
   let current = line;
   let findings = null;
   let commentOpenAfter = commentOpen;
@@ -243,7 +325,7 @@ function normalizePausePunctuation(line, lineNo, commentOpen) {
   for (;;) {
     const comments = htmlCommentSpans(current, commentOpen);
     commentOpenAfter = comments.open;
-    const pass = normalizePausePunctuationPass(current, lineNo, comments.spans);
+    const pass = normalizePausePunctuationPass(current, lineNo, comments.spans.concat(styleSpans(current, whitelist)));
     if (findings === null) findings = pass.findings;
     if (pass.line === current) break;
     current = pass.line;

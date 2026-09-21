@@ -188,6 +188,58 @@ function resolveBookRoot(file, projectRoot) {
 // 项目引用须写目录路径；裸文件名可能指向 skill reference，不猜测其归属。
 const REF_DIR_PREFIX = /^(?:设定|大纲|追踪|正文|读者笔记|对标)\//
 
+// 设定兑现（setting-payoff/v1）：项目有 设定/_设定登记.md 时，细纲必须有「#### 设定兑现」小节
+// （无设定时写一行「无」）；引用的编号必须在登记表里。小节缺失是 advisory——真正阻断新写章的
+// 是 candidate-commit.py 的举证门；未知编号 blocking。没有登记表的项目不产生本检查。
+function checkSettingPayoffSection(text, name, file, projectRoot) {
+  const bookRoot = resolveBookRoot(file, projectRoot)
+  const registryPath = path.join(bookRoot, '设定', '_设定登记.md')
+  if (!fs.existsSync(registryPath)) return null
+  let checker
+  try {
+    checker = require(path.join(__dirname, '..', '..', '_shared', 'scripts', 'check-setting-payoff.js'))
+  } catch {
+    return makeCheck('outline.setting-payoff', false, file, '找不到 _shared/scripts/check-setting-payoff.js', '共享检查器在场', '重新部署 skills', 'advisory')
+  }
+  const registry = checker.loadRegistry(bookRoot)
+  const known = new Set(Object.keys((registry && registry.entries) || {}))
+  const lines = text.split('\n')
+  const start = lines.findIndex((line) => /^#{2,4}\s*设定兑现\s*$/.test(line))
+  if (start < 0) {
+    const legacy = lines.some((line) => /^#{2,4}\s*设定兑现槽/.test(line))
+    return makeCheck(
+      'outline.setting-payoff', false, file,
+      legacy ? '仍是 v1「设定兑现槽」小节' : '缺「#### 设定兑现」小节',
+      '「#### 设定兑现」表：编号 / 关系 / 本章呈现目标 / 备注；无设定写「无」',
+      legacy ? '运行 node _shared/scripts/check-setting-payoff.js <书目录> --migrate' : '按 references/setting-payoff.md 第 4 节补小节',
+      'advisory',
+    )
+  }
+  const level = (/^(#+)/.exec(lines[start]) || ['', '#'])[1].length
+  const unknown = []
+  let rows = 0
+  let none = false
+  for (let i = start + 1; i < lines.length; i += 1) {
+    const heading = /^(#+)\s/.exec(lines[i])
+    if (heading && heading[1].length <= level) break
+    if (/^\s*(?:[-*]\s*)?无\s*$/.test(lines[i])) none = true
+    if (!lines[i].trim().startsWith('|')) continue
+    const cells = lines[i].split('|').slice(1, -1).map((cell) => cell.replace(/\*\*/g, '').trim())
+    if ((cells[0] || '') === '无') { none = true; continue }
+    const id = (cells[0] || '').match(/SET-\d{2,3}[A-Z]?/)
+    if (!id) continue
+    rows += 1
+    if (!known.has(id[0])) unknown.push(id[0])
+  }
+  if (unknown.length) {
+    return makeCheck('outline.setting-payoff', false, file, `引用了登记表没有的编号：${unknown.join('、')}`, '编号都能在 设定/_设定登记.md 找到', '先登记再排期，或改正编号')
+  }
+  if (!rows && !none) {
+    return makeCheck('outline.setting-payoff', false, file, '「设定兑现」小节既没有行也没写「无」', '至少一行编号，或一行「无」', '补行或写「无」', 'advisory')
+  }
+  return makeCheck('outline.setting-payoff', true, file, rows ? `${rows} 条设定已排期` : '本章无设定兑现', '', '')
+}
+
 function checkSettingRefs(text, name, file, projectRoot) {
   const bookRoot = resolveBookRoot(file, projectRoot)
   if (!bookRoot) {
@@ -393,6 +445,8 @@ function verify(file, options = {}) {
   }
 
   checks.push(checkSettingRefs(text, name, file, options.project || null))
+  const payoffCheck = checkSettingPayoffSection(text, name, file, options.project || null)
+  if (payoffCheck) checks.push(payoffCheck)
 
   const targetMatch = text.match(/字数目标\s*[：:]\s*(?:约\s*)?([\d,，]+)/)
   const target = targetMatch ? Number(targetMatch[1].replace(/[,，]/g, '')) : null

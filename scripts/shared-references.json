@@ -233,6 +233,9 @@
       "name": "long-format",
       "source": "skills/story-write/references/long-format.md",
       "targets": [
+        "skills/reader-comprehension-scan/references/long-format.md",
+        "skills/story-import/references/long-format.md",
+        "skills/story-review/references/long-format.md",
         "skills/story-setup/references/agent-references/long-format.md"
       ]
     },
@@ -283,29 +286,90 @@
       "name": "reader-first-writing",
       "source": "skills/story-write/references/reader-first-writing.md",
       "targets": [
+        "skills/reader-comprehension-scan/references/reader-first-writing.md",
+        "skills/story-import/references/reader-first-writing.md",
+        "skills/story-review/references/reader-first-writing.md",
         "skills/story-setup/references/agent-references/reader-first-writing.md"
       ]
     },
     {
-      "name": "style-resolution",
-      "source": "skills/_shared/references/style-resolution.md",
+      "name": "editor-review-receipt",
+      "source": "skills/story-write/references/editor-review-receipt.md",
       "targets": [
-        "skills/story-setup/references/agent-references/style-resolution.md"
+        "skills/reader-comprehension-scan/references/editor-review-receipt.md",
+        "skills/story-import/references/editor-review-receipt.md",
+        "skills/story-review/references/editor-review-receipt.md",
+        "skills/story-setup/references/agent-references/editor-review-receipt.md"
       ]
     },
     {
-      "name": "deslop-gate-rules",
-      "source": "skills/story-deslop/references/deslop-gates.md",
+      "name": "reading-protocol",
+      "source": "skills/story-write/references/reading-protocol.md",
       "targets": [
-        "skills/story-setup/references/agent-references/deslop-gates.md"
+        "skills/reader-comprehension-scan/references/reading-protocol.md",
+        "skills/story-import/references/reading-protocol.md",
+        "skills/story-review/references/reading-protocol.md",
+        "skills/story-setup/references/agent-references/reading-protocol.md"
       ]
     },
     {
-      "name": "tracking-initialization",
-      "source": "skills/story-write/references/tracking-initialization.md",
+      "name": "review-process",
+      "source": "skills/story-write/references/review-process.md",
       "targets": [
-        "skills/story-import/references/tracking-initialization.md",
-        "skills/story-review/references/tracking-initialization.md"
+        "skills/reader-comprehension-scan/references/review-process.md",
+        "skills/story-import/references/review-process.md",
+        "skills/story-review/references/review-process.md",
+        "skills/story-setup/references/agent-references/review-process.md"
+      ]
+    },
+    {
+      "name": "candidate-logic-binding",
+      "source": "skills/story-write/references/candidate-logic-binding.md",
+      "targets": [
+        "skills/reader-comprehension-scan/references/candidate-logic-binding.md",
+        "skills/story-import/references/candidate-logic-binding.md",
+        "skills/story-review/references/candidate-logic-binding.md",
+        "skills/story-setup/references/agent-references/candidate-logic-binding.md"
+      ]
+    },
+    {
+      "name": "copy-editor-specification",
+      "source": "skills/story-write/references/copy-editor-specification.md",
+      "targets": [
+        "skills/reader-comprehension-scan/references/copy-editor-specification.md",
+        "skills/story-import/references/copy-editor-specification.md",
+        "skills/story-review/references/copy-editor-specification.md",
+        "skills/story-setup/references/agent-references/copy-editor-specification.md"
+      ]
+    },
+    {
+      "name": "setting-payoff",
+      "source": "skills/story-write/references/setting-payoff.md",
+      "targets": [
+        "skills/story-import/references/setting-payoff.md",
+        "skills/story-review/references/setting-payoff.md",
+        "skills/story-setup/references/agent-references/setting-payoff.md"
+      ]
+    },
+    {
+      "name": "longform-reading-scenarios",
+      "source": "skills/story-write/references/longform-reading-scenarios.md",
+      "targets": [
+        "skills/story-review/references/longform-reading-scenarios.md"
+      ]
+    },
+    {
+      "name": "longform-reading",
+      "source": "skills/story-write/references/longform-reading.md",
+      "targets": [
+        "skills/story-review/references/longform-reading.md"
+      ]
+    },
+    {
+      "name": "long-story-design-review",
+      "source": "skills/story-write/references/long-story-design-review.md",
+      "targets": [
+        "skills/story-setup/references/agent-references/long-story-design-review.md"
       ]
     }
   ],

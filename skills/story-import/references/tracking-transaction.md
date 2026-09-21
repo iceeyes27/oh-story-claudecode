@@ -37,13 +37,14 @@ Markdown 只负责给作者和 Agent 阅读，工具不再反向解析 Markdown�
 
 ## 初始化事务
 
-新书从第 0 章初始化。`story-import` 导入已有小说时把最后完整章写入 `last_chapter=N`；第 1..N 章不伪造日更记录，常规续写从 N+1 章开始。
+新书从第 0 章初始化，缺省启用设定兑现（自第1章）；已有书导入时缺省保持未启用。旧协议显式关闭只用于兼容恢复，不能让已有登记的新书跳过审查。`story-import` 导入已有小说时把最后完整章写入 `last_chapter=N`；第 1..N 章不伪造日更记录，常规续写从 N+1 章开始。
 
 ```json
 {
   "schema_version": 1,
   "book_title": "让你管账号，你高燃混剪炸全网",
   "last_chapter": 0,
+  "setting_payoff": {"enabled": true, "schema_version": 1, "since_chapter": 1},
   "context": {
     "position": {
       "volume": "第一卷·军宣整顿",

@@ -16,6 +16,15 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 CHECKER = REPO_ROOT / "scripts/static-check.py"
 LAUNCHER = REPO_ROOT / "scripts/static-check.sh"
 
+if sys.version_info < (3, 10):
+    def _compat_write_text(self, data, encoding=None, errors=None, newline=None):
+        if newline is not None:
+            with self.open("w", encoding=encoding, errors=errors, newline=newline) as handle:
+                return handle.write(data)
+        return self._orig_write_text(data, encoding=encoding, errors=errors)
+    Path._orig_write_text = Path.write_text
+    Path.write_text = _compat_write_text
+
 
 def write(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)

@@ -19,6 +19,15 @@ TOOL = ROOT / "skills" / "story-write" / "scripts" / "author_voice_profile.py"
 START = b"<!-- author-voice:machine:start -->"
 END = b"<!-- author-voice:machine:end -->"
 
+if sys.version_info < (3, 10):
+    def _compat_write_text(self, data, encoding=None, errors=None, newline=None):
+        if newline is not None:
+            with self.open("w", encoding=encoding, errors=errors, newline=newline) as handle:
+                return handle.write(data)
+        return self._orig_write_text(data, encoding=encoding, errors=errors)
+    Path._orig_write_text = Path.write_text
+    Path.write_text = _compat_write_text
+
 
 def require(condition: bool, message: str) -> None:
     if not condition:

@@ -122,10 +122,11 @@ test('prepare uses a dedicated worktree and leaves dirty caller files untouched'
     git(repo, 'add', '.');
     git(repo, 'commit', '-qm', 'base');
     const base = git(repo, 'rev-parse', 'HEAD');
+    const defaultBranch = git(repo, 'branch', '--show-current').trim() || 'master';
 
     const policy = {
       schema_version: 1,
-      origin: { remote: 'origin', branch: 'master' },
+      origin: { remote: 'origin', branch: defaultBranch },
       upstream: { remote: 'upstream', branch: 'upstream-sim', baseline: base },
       quality_profile: 'release',
       policy_priority: ['forbidden', 'protected', 'generated', 'shared', 'unified', 'canonical', 'unknown'],
@@ -148,7 +149,7 @@ test('prepare uses a dedicated worktree and leaves dirty caller files untouched'
     git(repo, 'add', '.');
     git(repo, 'commit', '-qm', 'upstream change');
     const target = git(repo, 'rev-parse', 'HEAD');
-    git(repo, 'checkout', '-q', 'master');
+    git(repo, 'checkout', '-q', defaultBranch);
     git(repo, 'remote', 'add', 'origin', repo);
     git(repo, 'remote', 'add', 'upstream', repo);
     git(repo, 'remote', 'set-url', '--push', 'upstream', 'DISABLED');

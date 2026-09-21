@@ -9,7 +9,7 @@
 
 职责边界:
 - 脚本做确定性部分：固定首行、定位、标题行字面量、细纲指针、文风三行与判读的通用参考、
-  上一章结尾、降档判定与情绪/节奏槽、固定块指针。
+  上一章全文、降档判定与情绪/节奏槽、固定块指针。
 - 主会话填八槽：执行安排 / 本章意图 / 参考技法 / 本节速记 / 涉及角色 / genre_prose_card /
   必读设定 / author_preferences。降档不成立时情绪与节奏槽也归主会话。
   材料槽对应原流程步骤 3「写前准备」的四项输出（本节速记 / 情绪目标 / 涉及角色 /
@@ -23,14 +23,33 @@ Exit: 0 = 骨架已输出；2 = 输入缺失或无效。
 
 import argparse
 import io
+import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 from outline_view import parse as parse_volume
 
-TAIL_CHARS = 400          # 上一章结尾注入的目标字符数（按整行回退，不切半句）
 STATE_SECTIONS = ("当前位置", "长期约束", "核心角色状态", "活跃伏笔", "近三章速记", "下一章承诺", "连贯性风险")
+PACKET_MODES = ("full", "scene-view")
+# scene-view（A/B 试验 B 臂，见 docs/evaluations/2026-09-16-review-response-and-skill-proposals.md 3.A1/B1/B2/B3）：
+# 写手不读细纲原文件，改读由细纲＋状态卡派生的只读场景视图；逐情节点字数预算、SET/O-ID 编号不进视图，
+# 编号对应的剧情义务保留。默认 full 模式的输出与该开关加入前逐字一致，是 A 臂。
+SCENE_VIEW_DROP_KEYS = ("阶段位置", "单元ID/位置", "字数口径", "结尾拍ID/类型", "期待ID/类型", "契约风险")
+# 白名单去重：剧情流程／内容概括（五段式）／情节安排（多线）／爽点设计是「情节点＋章节蓝图」的复述，不进视图；
+# 设定兑现表由 setting_payoff_block 从登记表自动带出（硬约束表内），视图不重复。
+SCENE_VIEW_SECTIONS = ("本章目标", "章节蓝图", "因果链", "人物关系和出场顺序", "情节细化",
+                       "结尾设定和钩子", "中文梗/台词", "章末钩子", "伏笔", "本场关系变化")
+SCENE_VIEW_REMINDER_CHARS = 1500
+PACKET_REMINDER_CHARS = 8000
 SLOT_MARK = "［主会话填］"
+# Author opt-outs apply to optional craft references, never workflow/evidence gates.
+OPTIONAL_TECHNIQUES = frozenset({
+    "writing-craft.md", "long-chapter-hooks.md", "long-suspense.md", "long-reversal.md",
+    "hooks-chapter.md", "hooks-paragraph.md", "hooks-suspense.md", "dialogue-mastery.md",
+    "style-craft.md", "style-combat-face.md", "emotional-methods.md", "plot-core-methods.md",
+    "reversal-toolkit.md", "character-design-methods.md", "anti-ai-writing.md",
+})
 
 
 def read_text(path: Path):
@@ -43,32 +62,87 @@ def read_text(path: Path):
 def substantive(text):
     if not text:
         return False
+    text = re.sub(r"<!--.*?-->", "", text, flags=re.S)
     body = re.sub(r"^#{1,6}[^\n]*", "", text, flags=re.M)
     body = re.sub(r"待补充|待办|待定|暂无|TODO|TBD", "", body, flags=re.I)
     return bool(re.sub(r"[\s_#*\[\]【】{}。，；:：-]", "", body))
 
 
 def has_custom_style(text):
-    if not substantive(text):
-        return False
-    if len(re.sub(r"\s", "", text)) >= 200:
-        return True
-    for section in re.split(r"(?=^#{1,6}\s)", text, flags=re.M):
-        heading, _, body = section.partition("\n")
-        if re.search(r"句长|标点|对话|锚点|笔调", heading) and substantive(body):
-            if re.search(r"\d|例如|例句|不用|禁止|避免|偏好|优先|保留|使用", body):
-                return True
-    return False
+    # An author's usable one-sentence direction is not a missing asset.
+    return substantive(text)
 
 
-def find_chapter_file(directory: Path, chapter: int, prefix: str):
+def _excluded_chapter_entry(entry: Path):
+    name = entry.name
+    return (name.startswith(".")
+            or re.fullmatch(r"(?:候选|_?历史|原稿|归档|node_modules)", name) is not None
+            or name.startswith("_原稿")
+            or re.search(r"(?:_原稿(?:_|\.)|_历史_|_候选_)", name) is not None)
+
+
+def chapter_files(directory: Path, prefix: str, recursive=False):
+    """Find formal chapter files without admitting drafts, history, or symlinks."""
+    if not directory.is_dir() or directory.is_symlink():
+        return []
+    pattern = re.compile(rf"^{re.escape(prefix)}第0*(\d+)章.*\.md$")
+    found = []
+
+    def walk(current: Path):
+        for entry in sorted(current.iterdir()):
+            if entry.is_symlink() or _excluded_chapter_entry(entry):
+                continue
+            if entry.is_dir():
+                if recursive:
+                    walk(entry)
+                continue
+            match = pattern.match(entry.name)
+            if entry.is_file() and match and int(match.group(1)) > 0:
+                found.append((int(match.group(1)), entry))
+
+    walk(directory)
+    return sorted(found, key=lambda row: (row[0], str(row[1])))
+
+
+def find_chapter_file(directory: Path, chapter: int, prefix: str, recursive=False):
     if not directory.is_dir():
         return None
-    pattern = re.compile(rf"^{prefix}第0*{chapter}章.*\.md$")
-    for entry in sorted(directory.iterdir()):
-        if entry.is_file() and pattern.match(entry.name):
-            return entry
-    return None
+    matches = [entry for number, entry in chapter_files(directory, prefix, recursive)
+               if number == chapter]
+    if len(matches) > 1:
+        raise ValueError("同章文件歧义：" + "、".join(str(entry) for entry in matches))
+    return matches[0] if matches else None
+
+
+def longform_gate(project: Path, chapter: int):
+    tool = Path(__file__).resolve().parent / "review-state.js"
+    try:
+        result = subprocess.run(["node", str(tool), "longform", "gate", "--book", str(project),
+                                 "--chapter", str(chapter)], capture_output=True, text=True, timeout=30)
+        payload = json.loads(result.stdout) if result.stdout.strip() else {}
+    except (OSError, ValueError, subprocess.TimeoutExpired) as exc:
+        raise ValueError(f"连读写前入口未能运行：{exc}") from exc
+    if result.returncode != 0 or payload.get("can_generate") is not True:
+        raise ValueError("连读写前门未通过：" + (result.stderr.strip() or payload.get("status", "运行失败")))
+    return payload
+
+
+def selected_benchmark(project: Path):
+    text = read_text(project / "设定/题材定位.md") or ""
+    selected = extract_field(text, "主对标书")
+    if selected is None:
+        match = re.search(r"^\s*\|\s*主对标书\s*\|\s*([^|]+)\|", text.replace("**", ""), re.M)
+        selected = match.group(1) if match else None
+    if selected is None:
+        match = re.search(r"^\s*主对标书\s*[：:]\s*(.+)$", text.replace("**", ""), re.M)
+        selected = match.group(1) if match else None
+    if not selected or re.fullmatch(r"(?:无|无对标|未选择|未选|暂无|不使用|待定|待补充|[—_\-]+)", selected.strip()):
+        return None, None
+    name = selected.strip().strip("《》`\"'")
+    if any(char in name for char in '/\\') or name in {'.', '..'}:
+        raise ValueError("主对标书名称不能包含路径")
+    roots = [project / "对标" / name, project.parent / "拆文库" / name]
+    return name, next((root for root in roots if root.is_dir()), roots[0])
 
 
 def extract_field(outline_text: str, field: str):
@@ -115,22 +189,15 @@ def extract_state_sections(state_text: str):
     return found
 
 
-def previous_chapter_tail(project: Path, chapter: int):
-    """按整行从尾部回退，凑够 TAIL_CHARS 即停 —— 不切半句。"""
-    prev = find_chapter_file(project / "正文", chapter - 1, "")
+def previous_chapter_full(project: Path, chapter: int):
+    """上一章已采用正文全文（reader-first-writing.md「本章材料包」：上一章一章，不截尾段）。"""
+    prev = find_chapter_file(project / "正文", chapter - 1, "", recursive=True)
     if prev is None:
         return None, None
     text = read_text(prev)
     if not text:
         return prev, None
-    lines = [line for line in text.rstrip().splitlines() if line.strip()]
-    picked, total = [], 0
-    for line in reversed(lines):
-        picked.append(line)
-        total += len(line)
-        if total >= TAIL_CHARS:
-            break
-    return prev, "\n".join(reversed(picked))
+    return prev, text.rstrip()
 
 
 def learn_heading_form(project: Path, chapter: int, title: str):
@@ -144,16 +211,14 @@ def learn_heading_form(project: Path, chapter: int, title: str):
         return None, "正文/ 目录不存在"
     pattern = re.compile(r"^(#+)([ \t　]*)第(0*\d+)章([ \t　]*)(.*)$")
     best = None
-    for entry in sorted(body.glob("*.md")):
-        num = re.match(r"^第(\d+)章", entry.name)
-        if not num or int(num.group(1)) == chapter:
+    for number, entry in chapter_files(body, "", recursive=True):
+        if number == chapter:
             continue
         head = (read_text(entry) or "").lstrip().splitlines()
         if not head:
             continue
         hit = pattern.match(head[0].strip())
         if hit:
-            number = int(num.group(1))
             if number < chapter and (best is None or number > best[0]):
                 best = (number, hit)
     if best is None:
@@ -170,27 +235,178 @@ def learn_heading_form(project: Path, chapter: int, title: str):
             f"照既有章形态（{level} ＋ 章号{how}）")
 
 
-def parse_reference_ruling(style_text: str):
-    """扫 设定/文风.md「通用参考裁决」表，返回 (停读清单, 判读的行)。"""
-    skips, reads = [], []
-    for line in style_text.splitlines():
+def setting_payoff_block(project: Path, chapter: int) -> tuple[str, str]:
+    """设定兑现（setting-payoff/v1）：按细纲「#### 设定兑现」把规则摘录＋本章呈现目标交给写手。
+
+    写手拿到的是规则本身与"读者要理解什么"，不是整篇设定文，也不要求物证/动作/台词齐备。
+    没有登记表的项目返回空；检查器 blocking 时把问题写进核对报告，不静默。
+    """
+    registry = project / "设定" / "_设定登记.md"
+    state_path = project / "追踪" / "_tracking-state.json"
+    try:
+        state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.is_file() else {}
+    except (OSError, ValueError) as exc:
+        raise ValueError(f"追踪状态无法读取：{exc}") from exc
+    config = state.get("setting_payoff") or {}
+    enabled = config.get("enabled") is True
+    if registry.is_file() and not enabled and state.get("last_committed_chapter", 0) == 0:
+        raise ValueError("新书已有设定登记但未启用设定兑现记账；先 enable-setting-payoff")
+    if not registry.is_file() and not enabled:
+        return "", ""
+    active = enabled and chapter >= int(config.get("since_chapter") or 1)
+    checker = Path(__file__).resolve().parent.parent.parent / "_shared" / "scripts" / "check-setting-payoff.js"
+    if not checker.is_file():
+        raise ValueError("设定兑现检查器缺失，停止组装写手任务")
+    try:
+        completed = subprocess.run(
+            ["node", str(checker), str(project), "--json", "--chapter", str(chapter)] + (["--readiness"] if active else []),
+            capture_output=True, text=True, encoding="utf-8", check=False,
+        )
+        data = json.loads(completed.stdout)
+    except (OSError, ValueError) as exc:
+        raise ValueError(f"设定兑现检查器未能运行：{exc}") from exc
+    blocking = [f.get("message") for f in data.get("findings", []) if f.get("severity") == "blocking"]
+    if completed.returncode not in (0, 1) or blocking:
+        raise ValueError("设定写前门未通过：" + "；".join(str(item) for item in blocking))
+    info = data.get("chapter") or {}
+    rows = info.get("rows") or []
+    lines = []
+    for row in rows:
+        kind = row.get("type")
+        label = {"constraint": "必须遵守", "recurring": "本章要让读者看见（贯穿）", "payoff": "本章要让读者理解", "reserve": "储备（不进正文）"}.get(kind, kind)
+        if kind == "reserve":
+            continue
+        if row.get("relation") == "不适用":
+            continue
+        head = f"[{row['id']} · {label}] {row.get('title') or ''}".rstrip()
+        goal = row.get("goal") or ""
+        excerpt = (row.get("excerpt") or "").replace("\n", " / ")
+        if row.get("relation") == "涉及":
+            body = excerpt or goal
+        else:
+            body = goal + (f"（规则：{excerpt}）" if excerpt else "")
+        source = f"（{row['source']}）" if row.get("source") else ""
+        lines.append(f"{head}：{body}{source}")
+    note_parts = [f"设定兑现：第 {chapter} 章 {len(rows)} 条，自动带出 {len(lines)} 条"]
+    if info.get("missing"):
+        note_parts.append("细纲缺「#### 设定兑现」小节")
+    if blocking:
+        note_parts.append("检查器 blocking：" + "；".join(str(item) for item in blocking))
+    return "\n".join(lines), "；".join(note_parts)
+
+
+def _sha256(text: str) -> str:
+    import hashlib
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def _split_sections(md: str):
+    """按标题行切段，返回 [(标题文本, [正文行])]；标题前的内容归 ''。"""
+    out, cur, buf = [], "", []
+    for line in md.splitlines():
+        if line.startswith("#"):
+            out.append((cur, buf)); cur, buf = line.lstrip("#").strip(), []
+        else:
+            buf.append(line)
+    out.append((cur, buf))
+    return out
+
+
+def _table_rows(lines):
+    rows = []
+    for line in lines:
+        if not line.startswith("|"):
+            continue
         cells = [c.strip() for c in line.strip().strip("|").split("|")]
-        if len(cells) < 2:
+        if all(set(c) <= set("-: ") for c in cells):
             continue
-        name = re.sub(r"[`*]", "", cells[0]).strip()
-        if not name.endswith(".md") and not name.endswith("/*"):
-            continue
-        if re.match(r"^停读(?:$|[（(\s])", cells[1]):
-            skips.append(name)
-        elif "读" in cells[1]:
-            caveat = re.sub(r"[`*]", "", cells[1]).strip()
-            caveat = re.sub(r"^读\s*[（(]?", "", caveat).rstrip("）)").strip()
-            reads.append(f"{name}（{caveat}）" if caveat else name)
-    return skips, reads
+        rows.append(cells)
+    return rows
 
 
-def build(project: Path, chapter: int, report: list):
+def derive_scene_view(outline_text: str, report: list) -> str:
+    """从权威细纲派生只读场景视图：保留剧情义务、批准范围、禁释放与执行边界；
+    隐藏逐情节点字数预算／分辨率／功能标签与 SET 编号；丢弃编排元数据行。细纲仍是唯一权威。"""
+    out = []
+    for title, lines in _split_sections(outline_text):
+        key = next((k for k in SCENE_VIEW_SECTIONS if title.startswith(k)), None)
+        if key is None:
+            continue
+        if key == "情节细化":
+            rows = _table_rows(lines)
+            body = []
+            for cells in rows[1:] if rows else []:
+                if len(cells) < 6:
+                    continue
+                body.append(f"- {cells[1]}｜{cells[5]}")
+            tail = [l for l in lines if not l.startswith("|") and l.strip()
+                    and not l.startswith("目标字数合计")]
+            out.append("#### 情节点与执行边界（不按点分配篇幅）\n" + "\n".join(body)
+                       + ("\n" + "\n".join(tail) if tail else ""))
+            continue
+        kept = [l for l in lines
+                if not any(l.lstrip("- ").startswith(k + "：") for k in SCENE_VIEW_DROP_KEYS)]
+        text = "\n".join(kept).strip()
+        if text:
+            out.append(f"#### {title}\n{text}")
+    view = "\n\n".join(out)
+    report.append(f"场景视图：{len(view)} 字符（提醒值 {SCENE_VIEW_REMINDER_CHARS}"
+                  + ("，超出：先核对有无重复语义可合并，不删剧情义务" if len(view) > SCENE_VIEW_REMINDER_CHARS else "）"))
+    return view
+
+
+def state_card_view(state_text: str, chapter: int, report: list):
+    """状态卡自动注入（仅当状态卡「当前章」== 目标章-1）；活跃伏笔去掉「作者侧：」之后的真相。"""
+    m = re.search(r"当前章：第\s*(\d+)\s*章", state_text or "")
+    cur = int(m.group(1)) if m else None
+    if cur is None or cur != chapter - 1:
+        report.append(f"状态卡：不注入（状态卡当前章={cur}，目标章-1={chapter - 1}，不匹配即不适用）")
+        return None
+    found = extract_state_sections(state_text)
+    blocks = []
+    for name in STATE_SECTIONS:
+        body = found.get(name, "")
+        if name == "活跃伏笔":
+            body = "\n".join(re.split(r"作者侧[：:]", l)[0].rstrip("｜| ") for l in body.splitlines())
+        if body.strip():
+            blocks.append(f"[{name}]\n{body.strip()}")
+    report.append("状态卡：已注入 " + "、".join(n for n in STATE_SECTIONS if found.get(n, "").strip())
+                  + "；活跃伏笔已去作者侧真相")
+    return "\n".join(blocks)
+
+
+def author_rules_block(project: Path, report: list):
+    rules_file = None
+    for base in (project, project.parent):
+        cand = base / ".deslop-author-rules.json"
+        if cand.is_file():
+            rules_file = cand
+            break
+    if rules_file is None:
+        report.append("作者禁令：未找到 .deslop-author-rules.json")
+        return "作者禁令：未登记"
+    try:
+        data = json.loads(read_text(rules_file) or "{}")
+    except json.JSONDecodeError:
+        report.append(f"作者禁令：{rules_file} 不是合法 JSON")
+        return "作者禁令：登记文件损坏，以扫描器为准"
+    lines = []
+    for rule in data.get("rules", []):
+        scope = (rule.get("scope") or {}).get("path", "")
+        if scope and scope not in (project.name, str(project)):
+            continue
+        match = rule.get("match") or {}
+        quote = (rule.get("source") or {}).get("quote", "")
+        lines.append(f"- {match.get('value', '')}（{match.get('kind', '')}，{(rule.get('scope') or {}).get('surface', 'all')}）"
+                     + (f"：{quote}" if quote else ""))
+    report.append(f"作者禁令：{len(lines)} 条（{rules_file.name}）")
+    return "作者禁令（blocking，交付前 check-ai-patterns --fail-on=blocking 清零）：\n" + ("\n".join(lines) or "无")
+
+
+def build(project: Path, chapter: int, report: list, packet_mode: str = "full", candidate_tag: str = ""):
     errors = []
+    reading = longform_gate(project, chapter)
+    report.append(f"累计连读：{reading['status']}，写前入口已复验")
 
     outline_file = find_chapter_file(project / "大纲", chapter, "细纲_")
     if outline_file is None:
@@ -210,9 +426,11 @@ def build(project: Path, chapter: int, report: list):
         "命中即必读，未命中不预加载；交付摘要里报出读了哪几个。")
 
     parts.append(f"项目目录：{project}")
+    parts.append("必读核心：reader-first-writing.md 与 long-format.md；停读清单只适用于可选技法，不能豁免格式、事实、采用或阅读证据门禁。")
     parts.append(f"章节：第 {chapter} 章")
     if title:
-        out_path = project / "候选" / f"第{chapter:03d}章_{title}.md"
+        suffix = f"_{candidate_tag}" if candidate_tag else ""
+        out_path = project / "候选" / f"第{chapter:03d}章_{title}{suffix}.md"
     else:
         return None, [f"细纲缺章名：{outline_file}，需要 ### 第 N 章：章名"]
     if any(char in title for char in '/\\'):
@@ -226,6 +444,9 @@ def build(project: Path, chapter: int, report: list):
             report.append(f"标题行：{heading_line}　{how}")
         else:
             report.append(f"标题行：未注入——{how}")
+
+    if packet_mode == "scene-view":
+        return build_scene_view_packet(project, chapter, report, parts, outline_file, outline_text, errors)
 
     # ---- 细纲：只给路径，不注入全文 ----
     parts.append(f"细纲文件（动笔前完整读到 EOF）：{outline_file}")
@@ -247,48 +468,44 @@ def build(project: Path, chapter: int, report: list):
 
     # ---- 文风（本书自定义文风时由脚本全包）----
     style_file = project / "设定" / "文风.md"
-    style_digest = project / "设定" / "_文风摘要.md"
     style_text = read_text(style_file)
     custom_style = has_custom_style(style_text)
+    benchmark_name, benchmark_root = selected_benchmark(project)
     if custom_style:
-        if read_text(style_digest):
-            parts.append(
-                f"文风路径：{style_digest}（书级文风摘要卡，写作按它执行；"
-                f"与细纲或脚本读数冲突时再查全文 {style_file}）")
-        else:
-            parts.append(f"文风路径：{style_file}（书级权威文风，写前必读）")
+        parts.append(f"文风路径：{style_file}（书级权威文风，写前完整读取；不以未绑定摘要覆盖）")
         parts.append(
             "文风优先裁决：`设定/文风.md` 对句段／句法／对话落法／标点形态与删改取向的规定"
             "优先于通用风格建议；不覆盖细纲事实、信息边界、调用方所选 Gate 范围及格式硬线。"
             "风格冲突按文风写，交付摘要列出「因文风优先而未执行的通用条款」。")
-        skips, reads = parse_reference_ruling(style_text)
-        if skips:
-            parts.append("本书停读清单（整行跳过、不判定不读取）：" + "、".join(skips))
-        if reads:
-            parts.append("本书判读的通用参考：" + "；".join(reads))
-        report.append(
-            f"文风：custom_style=true，停读 {len(skips)} 项、判读 {len(reads)} 项")
-    else:
+        report.append("文风：custom_style=true，表达冲突按维度裁决；reference 读取仍按任务条件")
+    elif benchmark_name:
         parts.append(
             "——— 文风 ———\n"
             "（本书无可用的 设定/文风.md，未进入自定义文风模式；"
             "按 long-mode.md Phase 4 步骤 3(d) 走对标文风召回，由主会话补路径与召回指令）")
         report.append("文风：custom_style=false，文风召回归主会话（未跳过，留标题）")
+    else:
+        parts.append("——— 文风 ———\n未选择对标且无自定义文风：用本书材料与通用方法，跳过对标文风召回，不要求补对标。")
+        report.append("文风：custom_style=false，未选择对标，不阻塞")
 
-    # ---- 上一章结尾（不给路径，避免写手回头读整章）----
+    # ---- 上一章全文（承接人物关系、物件与前因；内联而不给路径，写手不必回头翻目录）----
     if chapter > 1:
-        prev_file, tail = previous_chapter_tail(project, chapter)
-        if prev_file is None or not tail:
+        prev_file, prev_text = previous_chapter_full(project, chapter)
+        if prev_file is None or not prev_text:
             errors.append(f"必在块缺失：找不到或读不到第 {chapter - 1} 章正文")
         else:
             parts.append(
-                "——— 上一章结尾（承接用，不重写；全章不需要，故不给路径）———\n" + tail)
-            report.append(f"上一章结尾：{prev_file.name} 末 {len(tail)} 字（按整行回退）")
+                "——— 上一章已采用正文（承接用，不重写、不复述）———\n" + prev_text)
+            report.append(f"上一章全文：{prev_file.name} 共 {len(prev_text)} 字")
 
-    # ---- 必读设定：整槽归主会话 ----
+    # ---- 必读设定：登记表能自动带出的先带，其余归主会话 ----
+    payoff_block, payoff_note = setting_payoff_block(project, chapter)
+    if payoff_note:
+        report.append(payoff_note)
     slot_setting = (
         "——— 必读设定 ———\n"
-        f"{SLOT_MARK} 本章要用到的设定，**直接写出那几句**，不要只给路径让写手去查"
+        + (payoff_block + "\n" if payoff_block else "")
+        + f"{SLOT_MARK} 本章要用到的其它设定，**直接写出那几句**，不要只给路径让写手去查"
         "（Grep 遇超长行会被截断，最关键那句往往正好被吞）。两处来源都要过："
         "① 细纲里显式引用的 `xxx.md`（连小节一起给）；② 细纲没点名、但本章会碰到的"
         "（术语口径、程序、数字锚）。无则写「无」。")
@@ -319,6 +536,16 @@ def build(project: Path, chapter: int, report: list):
     if not custom_style:
         why.append("custom_style=false")
     downgrade = not why
+    if benchmark_name:
+        # A selected benchmark remains a declared dependency. Downgrade only
+        # avoids repeated recall when this chapter has enough local guidance;
+        # it must not turn damaged benchmark assets into a silent no-benchmark path.
+        required = ["剧情/情绪模块.md", "剧情/节奏.md"]
+        if not custom_style:
+            required.append("文风.md")
+        missing = [relative for relative in required if not substantive(read_text(benchmark_root / relative))]
+        if missing:
+            return None, [f"已选对标 {benchmark_name} 资料缺失或无效：{'、'.join(missing)}；先修复已选资产再准备成稿"]
 
     if downgrade:
         lines = [
@@ -332,6 +559,11 @@ def build(project: Path, chapter: int, report: list):
             lines.append(f"  {tempo}")
         slot_recall = "——— 情绪与节奏召回 ———\n" + "\n".join(lines)
         report.append(f"召回降档：成立，文风、题材卡、目标情绪和单元 {unit_id} 情绪/节拍均可用")
+    elif not benchmark_name:
+        slot_recall = ("——— 情绪与节奏召回 ———\n"
+                       f"{SLOT_MARK} 未选择对标：从本章目标、单元卡及通用方法选情绪与节奏；"
+                       "不走对标全量召回，不设置 missing_primary_contract，不要求先拆一本书。")
+        report.append("召回降档：不成立（" + "、".join(why) + "）；无对标走本书资料，不要求对标全量召回")
     else:
         slot_recall = ("——— 情绪与节奏召回 ———\n"
                        f"{SLOT_MARK} 降档不成立（" + "、".join(why) +
@@ -341,9 +573,9 @@ def build(project: Path, chapter: int, report: list):
     # ---- 需要主会话判断的槽位 ----
     parts.append(
         "——— 执行安排 ———\n"
-        f"{SLOT_MARK} 全章细纲用于整体编排。默认按自然转场或因果停顿分前后两组，"
-        "填写当前组的情节点/片段及临时输出路径；先只写前组，父流程测一次 checkpoint 后"
-        "再给后组和机器剩余区间。只有用户明确要求一次成文时才填「全章，直接写最终路径」。")
+        f"{SLOT_MARK} 默认「全章一次成文，直接写最终候选路径」，写手对整章场景统筹负责，"
+        "父流程写后再测字数。只有用户明确要求分段、或显式研究协议（P0/P1）冻结了分段安排时，"
+        "才填前后两组与临时 segment 路径并按该协议运行 checkpoint。")
     parts.append(f"——— 本章意图（一句话）———\n{SLOT_MARK}")
     parts.append(slot_recall)
     # 伏笔与卷级禁忌走「主会话筛选后写进速记」这条原设计路线（步骤 3 状态筛选），
@@ -352,8 +584,7 @@ def build(project: Path, chapter: int, report: list):
     parts.append(
         "——— 参考技法 ———\n"
         f"{SLOT_MARK} 步骤 3 三问的第 ②③ 问：借鉴哪个参考文件的哪个技法、用在哪些段落。"
-        "上面「判读的通用参考」是书级可读范围，不是本章取用；本书自定义文风优先，"
-        "通用参考只作技法示例、不给验收线。")
+        "按 reference 表的任务条件读取；本书文风只覆盖冲突表达条款，不停读整份文件。")
     parts.append(
         "——— 本节速记 ———\n"
         f"{SLOT_MARK} 按 long-mode.md Phase 4 步骤 3「状态筛选」产出（`追踪/上下文.md` 不注入"
@@ -374,17 +605,116 @@ def build(project: Path, chapter: int, report: list):
 
     # ---- 固定块：压成指针，不重述 agent 定义 ----
     parts.append(
-        "本次照你的铁律 1-8 与被调用协议执行（细纲优先边界、正文形状、新增物三档、"
-        "阅读体验字段、交付三附件均以你的定义为准，此处不重述）。")
+        "本次按你定义中「最高优先级：细纲边界」「写完后编排自检」「被调用协议」执行"
+        "（细纲优先边界、正文形状、新增内容三级、阅读体验字段、交付摘要三项均以你的定义为准，此处不重述）。")
     parts.append(
         "字数目标按细纲执行，字数口径 visible_chars_v1；按执行安排交付，"
-        "目标按整章分量刻度使用，疏密自行分配，不拆逐点配额；不自测字数。")
+        "目标按整章分量刻度使用，疏密自行分配，不拆逐点配额；字数与句长由父流程测量，你不自测、不报数。")
 
     if errors:
         return None, errors
 
     prompt = "\n\n".join(parts) + "\n"
 
+    return prompt, []
+
+
+def build_scene_view_packet(project: Path, chapter: int, report: list, parts: list,
+                            outline_file: Path, outline_text: str, errors: list):
+    """B 臂材料包：五件（上一章全文／场景视图／人物盘算／作者认可样段／硬约束表）＋ B2 交付 ＋ B3 目标声明。"""
+    sizes = {}
+
+    # B3 首要目标（替换写手定义首条"严格消费细纲"的位置）
+    parts.append(
+        "——— 首要目标（本次协议，优先于你定义中「必须严格消费细纲」那一条）———\n"
+        "写完后，一个没看过设定的读者能复述这章发生了什么、人物为何这样行动、结果为何发生。"
+        "允许主角失败、无额外代价的章节和关系章节。细纲覆盖降为第二条：下方场景视图里的每条义务都要能在正文定位，"
+        "但不按点分配篇幅、不一项一段。")
+
+    # A1 场景视图（细纲不给路径）
+    view = derive_scene_view(outline_text, report)
+    state_file = project / "追踪" / "上下文.md"
+    state_text = read_text(state_file)
+    if not state_text:
+        errors.append(f"必在块缺失：读不到 {state_file}")
+        return None, errors
+    found = extract_state_sections(state_text)
+    missing = [s for s in STATE_SECTIONS if s not in found]
+    if missing:
+        errors.append(f"必在块缺失：{state_file} 缺栏目 " + "、".join(missing))
+        return None, errors
+    state_view = state_card_view(state_text, chapter, report)
+    header = (f"——— 场景视图（由细纲派生，只读；细纲 sha256={_sha256(outline_text)[:12]}"
+              f"，状态卡 sha256={_sha256(state_text)[:12]}；不读细纲原文件）———")
+    block = header + "\n" + view
+    if state_view:
+        block += "\n\n#### 必要前因与当前状态（状态卡截至上一章）\n" + state_view
+    else:
+        block += "\n\n#### 必要前因与当前状态\n（状态卡不适用于本章；前因只以上一章正文与场景视图为准）"
+    parts.append(block)
+    sizes["场景视图"] = len(block)
+
+    # 文风 / 作者认可样段
+    style_file = project / "设定" / "文风.md"
+    style_text = read_text(style_file)
+    if has_custom_style(style_text):
+        parts.append(f"——— 文风与作者认可样段 ———\n文风路径：{style_file}（写前完整读取；含认可段落时最多取两段作样例）")
+        report.append("文风：custom_style=true")
+    else:
+        parts.append("——— 文风与作者认可样段 ———\n本书无自定义文风；作者认可样段：未提供（不把对标段落当成作者认可）。用本书材料与通用方法。")
+        report.append("文风：custom_style=false；认可样段未提供")
+
+    # 上一章全文
+    if chapter > 1:
+        prev_file, prev_text = previous_chapter_full(project, chapter)
+        if prev_file is None or not prev_text:
+            errors.append(f"必在块缺失：找不到或读不到第 {chapter - 1} 章正文")
+            return None, errors
+        parts.append("——— 上一章已采用正文（承接用，不重写、不复述）———\n" + prev_text)
+        sizes["上一章全文"] = len(prev_text)
+        report.append(f"上一章全文：{prev_file.name} 共 {len(prev_text)} 字")
+
+    # 人物盘算（主会话填）
+    parts.append(
+        "——— 本场人物盘算（主会话填；默认 ≤3 人、每人 ≤150 字；第四人确有必要时保留并说明）———\n"
+        f"{SLOT_MARK} 每人：想要什么／怕什么／对主角的看法／今天影响行动的关系前史／声口，附来源文件。"
+        "不传完整档案。")
+
+    # 硬约束表：作者禁令 ＋ 关键数值 ＋ 禁释放 ＋ 必读设定（登记表自动带出 ＋ 主会话补规则摘录）
+    payoff_block, payoff_note = setting_payoff_block(project, chapter)
+    if payoff_note:
+        report.append(payoff_note)
+    must_not = extract_field(outline_text, "本章禁止提前释放") or "（细纲未列）"
+    numbers = extract_field(found.get("当前位置", ""), "关键数值") if state_view else None
+    hard = ["——— 硬约束表 ———",
+            author_rules_block(project, report),
+            f"禁止提前释放：{must_not}",
+            "关键数值：" + (numbers or "（以场景视图与上一章正文为准；正文要报电量先按 16 号 §4 算账）"),
+            "字数：visible_chars_v1 口径，范围与目标按场景视图「字数目标」；不自测、不报数。",
+            "正文元信息隔离：标题行以外不得出现 第N章／上一章／本章／前文／伏笔／细纲／读者 等写作工程词。",
+            "——— 本场规则与专业事实（必读设定）———",
+            (payoff_block + "\n" if payoff_block else "")
+            + f"{SLOT_MARK} 本场可以怎样解决、哪些办法实际上不可用及为什么；主角／对手／读者各知道什么；"
+              "本场确需的专业事实与来源。直接写出那几句，不只给路径。"]
+    parts.append("\n".join(hard))
+    sizes["硬约束表"] = len(parts[-1])
+
+    # 执行安排 ＋ B2 交付
+    parts.append(
+        "——— 执行安排与交付（本次协议，覆盖你定义中「写完后编排自检」的交付摘要三项）———\n"
+        "全章一次成文，直接写最终候选路径；不运行 checkpoint；写完即停，不为字数加戏。\n"
+        "交付＝正文文件 ＋ ≤10 行申报（只列三类：新增具名实体／关系变化／跨章事实，没有写 0）。"
+        "不交时空表、不交参考文件读取清单、不自测字数与句长。"
+        "细纲覆盖、字数、禁词、编号存在性由编排器事后核；发现规则或关键前因缺口时返回缺口，不在正文里临时发明。")
+
+    if errors:
+        return None, errors
+    prompt = "\n\n".join(parts) + "\n"
+    total = len(prompt)
+    detail = "、".join(f"{k} {v}" for k, v in sizes.items())
+    report.append(f"材料包容量：{total} 字符（{detail}；提醒值 {PACKET_REMINDER_CHARS}"
+                  + ("，超出：先去重、定点召回或说明例外，不截断前提）" if total > PACKET_REMINDER_CHARS else "）"))
+    report.append("材料包模式：scene-view（B 臂）；写手不读细纲原文件")
     return prompt, []
 
 
@@ -399,6 +729,10 @@ def main(argv=None):
     parser.add_argument("--project", required=True)
     parser.add_argument("--chapter", required=True, type=int)
     parser.add_argument("--out", default=None)
+    parser.add_argument("--packet-mode", default="full", choices=PACKET_MODES,
+                        help="full＝现行材料包（A 臂，默认）；scene-view＝派生场景视图材料包（B 臂）")
+    parser.add_argument("--candidate-tag", default="",
+                        help="候选文件名后缀（如 A／B），避免两臂候选同名互相覆盖")
     args = parser.parse_args(argv)
 
     project = Path(args.project).resolve()
@@ -409,7 +743,11 @@ def main(argv=None):
         return 2
 
     report = []
-    prompt, errors = build(project, args.chapter, report)
+    try:
+        prompt, errors = build(project, args.chapter, report, args.packet_mode, args.candidate_tag)
+    except (OSError, ValueError) as exc:
+        sys.stderr.write(f"组装中止：{exc}\n")
+        return 2
     if prompt is None:
         sys.stderr.write("组装中止，先修数据再重跑（这不是回落手拼的理由）：\n")
         for item in errors:

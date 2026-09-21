@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "网络小说创作工具箱 — 扫榜、拆文、写作全流程 Claude Code skill，覆盖长篇与短篇网文",
-    "version": "0.8.1"
+    "version": "0.9.0"
   },
   "plugins": [
     {
@@ -362,6 +362,60 @@
       ],
       "skills": [
         "./skills/humanizer"
+      ]
+    },
+    {
+      "name": "story-hook-refine",
+      "description": "网文小说「章末钩子替换」精修。把口号式/总结式/待办式收尾替换为具体物件/动作/时间/数字落点。",
+      "source": "./",
+      "strict": false,
+      "version": "1.0.0",
+      "category": "novel-polish",
+      "keywords": [
+        "hook",
+        "ending",
+        "refine",
+        "章末钩子",
+        "精修"
+      ],
+      "skills": [
+        "./skills/story-hook-refine"
+      ]
+    },
+    {
+      "name": "story-micro-scan",
+      "description": "小说正文「挑剔真人读者」细读层扫描。检查数字账目、跨章时间线、模板拟声雷同、表述悬空与台账对账。",
+      "source": "./",
+      "strict": false,
+      "version": "1.0.0",
+      "category": "novel-quality",
+      "keywords": [
+        "micro-scan",
+        "proofread",
+        "consistency",
+        "细读",
+        "对账"
+      ],
+      "skills": [
+        "./skills/story-micro-scan"
+      ]
+    },
+    {
+      "name": "typesafe-ai",
+      "description": "Build AI-powered software with TypeSafe: small units of AI intelligence you can use like programming primitives.",
+      "source": "./",
+      "strict": false,
+      "version": "1.0.0",
+      "category": "ai-tools",
+      "keywords": [
+        "typesafe",
+        "ai",
+        "primitives",
+        "system-one",
+        "jev"
+      ],
+      "skills": [
+        "./skills/typesafe-ai"
       ]
     }
   ]

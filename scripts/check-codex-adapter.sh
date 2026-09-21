@@ -319,9 +319,9 @@ from pathlib import Path
 from scripts.agent_toml import loads
 expected = {
     'chapter-extractor', 'character-designer', 'consistency-checker',
-    'narrative-writer', 'story-architect', 'story-explorer', 'story-researcher',
+    'copy-editor', 'narrative-writer', 'story-architect', 'story-explorer', 'story-researcher',
 }
-read_only = {'chapter-extractor', 'consistency-checker', 'story-explorer'}
+read_only = {'chapter-extractor', 'consistency-checker', 'copy-editor', 'story-explorer'}
 found = set()
 for path in sorted(Path('skills/story-setup/references/codex/agents').glob('*.toml')):
     data = loads(path.read_text(encoding='utf-8'))

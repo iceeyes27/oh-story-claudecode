@@ -33,19 +33,22 @@ TRACKING_STATE = "追踪/_tracking-state.json"
 TRANSACTION_SUFFIX = "_追踪事务.json"
 JOURNAL_PREFIX = "采用事务-"
 QUALITY_PROFILE = "fanqie-long-v2"
-BINDING_SCHEMA = 2
+BINDING_SCHEMA = 4
 RC_IDS = ("rc-01", "rc-02", "rc-03")
 ARC_IDS = ("arc-01", "arc-02")
 ARC_WINDOW = 15  # arc 连读每 15 章一次，窗口是 [N-14, N] 的不重叠连续块
 SEMANTIC_RECEIPT_IDS = ("rc-01", "rc-02", "rc-03", "arc-01")
 PHASES = ("prepared", "prose_moved", "tracking_committed", "done")
 CHAPTER_PREFIX = re.compile(r"^第0*(\d+)章")
-TRACKING_TOOL = Path(__file__).resolve().parent / "tracking_commit.py"
-SKELETON_TOOL = Path(__file__).resolve().parent / "check-chapter-skeleton.js"
-OUTLINE_CONTRACT_TOOL = Path(__file__).resolve().parent / "check-outline-contract.js"
-OUTLINE_COPY_TOOL = Path(__file__).resolve().parent / "check-outline-copy.js"
-CAUSAL_TOOL = Path(__file__).resolve().parent / "check-outline-causal.py"
-VOLUME_AUDIT_TOOL = Path(__file__).resolve().parent / "volume-audit.py"
+# The Dashboard carries this entrypoint as a generated asset; all gates resolve
+# from story-write so it cannot run stale or missing sibling helpers.
+RUNTIME_DIR = Path(__file__).resolve().parent.parent.parent / "story-write" / "scripts"
+TRACKING_TOOL = RUNTIME_DIR / "tracking_commit.py"
+SKELETON_TOOL = RUNTIME_DIR / "check-chapter-skeleton.js"
+OUTLINE_CONTRACT_TOOL = RUNTIME_DIR / "check-outline-contract.js"
+OUTLINE_COPY_TOOL = RUNTIME_DIR / "check-outline-copy.js"
+CAUSAL_TOOL = RUNTIME_DIR / "check-outline-causal.py"
+VOLUME_AUDIT_TOOL = RUNTIME_DIR / "volume-audit.py"
 INTENT_FIELDS = ("目标情绪", "主角目标/关键选择", "结尾拍ID/类型", "期待ID/类型", "读者验收预期")
 SHARED_SCRIPTS = Path(__file__).resolve().parent.parent.parent / "_shared" / "scripts"
 EMOTION_RUN_TOOL = SHARED_SCRIPTS / "check-emotion-run.js"
@@ -53,6 +56,16 @@ NAME_DRIFT_TOOL = SHARED_SCRIPTS / "check-name-drift.js"
 TITLE_TOOL = SHARED_SCRIPTS / "check-chapter-titles.js"
 FIRST_MENTION_TOOL = SHARED_SCRIPTS / "check-first-mention.js"
 ARC_LEDGER_TOOL = SHARED_SCRIPTS / "arc-ledger.js"
+SETTING_PAYOFF_TOOL = SHARED_SCRIPTS / "check-setting-payoff.js"
+SETTING_PAYOFF_RELATIONS = ("兑现", "涉及", "不适用")
+SETTING_PAYOFF_RESULTS = {
+    "兑现": ("已兑现", "部分兑现", "未兑现"),
+    "涉及": ("已遵守", "违反"),
+    "不适用": ("条件未触发",),
+}
+SETTING_PAYOFF_EVIDENCE_REQUIRED = ("已兑现", "部分兑现")
+SETTING_PAYOFF_NOTE_REQUIRED = ("已兑现", "部分兑现", "未兑现", "已遵守", "条件未触发", "违反")
+SETTING_PAYOFF_ANCHOR_MAX_BYTES = 240
 SCAN_SCRIPTS = ("check-ai-patterns.js", "check-degeneration.js")
 
 
@@ -67,6 +80,16 @@ def _load_module(name: str, path: Path) -> Any:
 
 tracking = _load_module("candidate_tracking", TRACKING_TOOL)
 wordcount = _load_module("candidate_wordcount", SHARED_SCRIPTS / "wordcount_core.py")
+editor_review = _load_module("candidate_editor_review", RUNTIME_DIR / "editor_review.py")
+review_process = _load_module("candidate_review_process", RUNTIME_DIR / "review_process.py")
+
+
+def validate_review_process(project, chapter, prose, binding, *, moved_to=None):
+    try:
+        return review_process.validate(project, chapter, prose, binding.get("review_process"),
+            editor=binding.get("editor_review", {}), readers=[binding.get("logic_checks", {}).get(key, {}) for key in ("rc-02", "rc-03")], moved_to=moved_to)
+    except review_process.ReviewProcessError as exc:
+        raise CandidateError(str(exc)) from exc
 
 
 class CandidateError(RuntimeError):
@@ -87,6 +110,28 @@ def require(condition: bool, message: str) -> None:
 
 def body_root(project: Path) -> Path:
     return project.resolve() / BODY_DIR
+
+
+def volume_dir_for_chapter(project: Path, chapter: int) -> Path | None:
+    """Return the existing volume subfolder that already holds chapter-1.
+
+    Promote otherwise writes a flat 正文/第N章 file. Projects that organize
+    adopted chapters into volume subfolders (e.g. 第1卷_异乡人) keep consecutive
+    chapters in the same folder. Only chapter 1 or a project without volume
+    folders falls back to the flat body root. The first chapter of a brand-new
+    volume is not auto-detected; create or move it explicitly.
+    """
+    root = body_root(project)
+    if chapter <= 1 or not root.is_dir():
+        return None
+    previous = re.compile(r"^第0*" + str(chapter - 1) + r"章")
+    for sub in sorted(root.iterdir()):
+        if not sub.is_dir():
+            continue
+        for existing in sub.iterdir():
+            if existing.is_file() and previous.match(existing.name):
+                return sub
+    return None
 
 
 def candidate_root(project: Path) -> Path:
@@ -373,7 +418,7 @@ def name_drift_gate(project: Path, chapter: int, state: dict[str, Any]) -> None:
         emit(f"专名漂移 advisory：{message}", error=True)
 
 
-def volume_gate(project: Path, chapter: int, prose: Path, binding: dict[str, Any]) -> dict[str, Any] | None:
+def volume_gate(project: Path, chapter: int, prose: Path, binding: dict[str, Any], next_state: dict[str, Any]) -> dict[str, Any] | None:
     """卷末采用门：本章是某卷声明的最后一章时，卷级审计必须先过。
 
     只在卷纲显式声明了章节范围、且范围终止于本章时触发；其余章节静默放行。
@@ -398,23 +443,10 @@ def volume_gate(project: Path, chapter: int, prose: Path, binding: dict[str, Any
     )
     volume = volumes[0]
 
-    # 待采用的候选章此刻还在 候选/ 下，用 --candidate 把它纳入本卷扫描；
-    # 不落盘报告——check 与 promote 共用本函数，采用前不得写项目文件。
-    result = run_python(
-        [
-            str(VOLUME_AUDIT_TOOL), "--project", str(project), "--volume", str(volume),
-            "--json", "--candidate", str(prose),
-        ],
-        "卷级审计",
-    )
-    require(
-        result.returncode in {0, 1},
-        f"卷级审计无法执行：\n{(result.stdout or result.stderr).strip()}",
-    )
-    try:
-        report = json.loads(result.stdout)
-    except json.JSONDecodeError as exc:
-        raise CandidateError(f"卷级审计未返回合法 JSON：{(result.stdout or result.stderr).strip()}") from exc
+    # Audit the already validated transaction projection, without writing book state.
+    # Otherwise the final chapter can neither clear its own payoff nor become due.
+    auditor = _load_module("candidate_volume_audit", VOLUME_AUDIT_TOOL)
+    report = auditor.audit_volume(project, volume, extra_prose=[prose], projected_state=next_state)
     findings = [item for item in report.get("findings", []) if isinstance(item, dict)]
     blocking = [item for item in findings if item.get("severity") == "blocking"]
     advisory = [item for item in findings if item.get("severity") != "blocking"]
@@ -427,6 +459,10 @@ def volume_gate(project: Path, chapter: int, prose: Path, binding: dict[str, Any
         "findings": findings,
     }
     if blocking:
+        setting_debt = [item for item in blocking if item.get("code", "").startswith("Setting_Payoff_")]
+        require(not setting_debt,
+                "设定卷末关卡未通过：" + "；".join(str(item.get("message")) for item in setting_debt)
+                + "；通用 volume_gate 批准不能代替登记延期/退役及重新审查")
         override = binding.get("volume_gate")
         message = "；".join(
             f"{item.get('code')}：{item.get('message')}" for item in blocking
@@ -451,6 +487,99 @@ def volume_gate(project: Path, chapter: int, prose: Path, binding: dict[str, Any
             error=True,
         )
     return receipt
+
+
+def setting_payoff_gate(
+    project: Path, chapter: int, prose: Path, binding: dict[str, Any], document: dict[str, Any], state: dict[str, Any]
+) -> list[dict[str, Any]]:
+    """设定兑现举证门（setting-payoff/v1，规则见 references/setting-payoff.md 第 6 节）。
+
+    脚本只核"证据可定位、登记表版本一致、结论词合法、与细纲排期一一对应"；
+    兑现是否成立由复核方在 review 里签名，脚本不从原句推断。返回值是要并入
+    delta.setting_payoff_changes 的记账条目——由本函数生成，不允许作者手填。
+    """
+    delta = document.get("delta")
+    require(
+        not (isinstance(delta, dict) and "setting_payoff_changes" in delta),
+        "delta.setting_payoff_changes 由 candidate_binding.setting_payoffs 生成，不要手填",
+    )
+    config = state.get("setting_payoff") or {}
+    enabled = config.get("enabled") is True
+    since = config.get("since_chapter")
+    items = binding.get("setting_payoffs")
+    require(enabled or not ((project / "设定" / "_设定登记.md").is_file() and state.get("last_committed_chapter", 0) == 0),
+            "新书已有设定登记但未启用设定兑现记账；先 enable-setting-payoff，不能按旧书跳过")
+    if not enabled or (isinstance(since, int) and chapter < since):
+        require(items in (None, []), "追踪未启用设定兑现记账（或本章早于 since_chapter），candidate_binding.setting_payoffs 必须为空或省略")
+        return []
+    require(isinstance(items, list), "已启用设定兑现记账：candidate_binding.setting_payoffs 必须是数组（本章无设定时为空数组）")
+    result = run_node([str(SETTING_PAYOFF_TOOL), str(project), "--json", "--chapter", str(chapter), "--readiness"], "设定兑现检查")
+    if result.returncode == 2:
+        require(False, f"设定兑现检查无法执行：\n{(result.stdout or result.stderr).strip()}")
+    report = parse_node_json(result, "设定兑现检查", {0, 1})
+    require(not report.get("notApplicable"), "追踪已启用设定兑现记账，但找不到 设定/_设定登记.md")
+    blocking = [item for item in report.get("findings", []) if isinstance(item, dict) and item.get("severity") == "blocking"]
+    require(not blocking, "设定登记/排期未通过：" + "；".join(str(item.get("message") or item) for item in blocking))
+    registry = report.get("registry") or {}
+    entries = registry.get("entries") or {}
+    chapter_info = report.get("chapter") or {}
+    require(not chapter_info.get("missing"), f"第{chapter}章细纲缺「#### 设定兑现」小节（无设定时写一行「无」）")
+    outline_rows = {row["id"]: row for row in chapter_info.get("rows", []) if isinstance(row, dict)}
+    prose_text = prose.read_text(encoding="utf-8-sig")
+    changes: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    for index, item in enumerate(items):
+        label = f"candidate_binding.setting_payoffs[{index}]"
+        require(isinstance(item, dict), f"{label} 必须是对象")
+        item_id = str(item.get("id", "")).strip()
+        require(item_id in entries, f"{label}.id {item_id!r} 不在登记表里")
+        require(item_id not in seen, f"{label}.id {item_id} 重复")
+        seen.add(item_id)
+        entry = entries[item_id]
+        require(entry.get("type") != "retired", f"{item_id} 已退役，不能举证")
+        require(item.get("registry_sha256") == registry.get("sha256"), f"{item_id} 的 registry_sha256 与当前登记表不一致，绑定已过期")
+        outline_row = outline_rows.get(item_id)
+        require(outline_row is not None, f"{item_id} 不在第{chapter}章细纲「设定兑现」小节里，先排期再举证")
+        relation = str(item.get("relation", "")).strip()
+        require(relation in SETTING_PAYOFF_RELATIONS, f"{item_id}.relation 非法")
+        require(relation == outline_row.get("relation"), f"{item_id} 绑定关系「{relation}」与细纲「{outline_row.get('relation')}」不一致")
+        review = item.get("review")
+        require(isinstance(review, dict), f"{item_id} 缺少 review 复核签名")
+        result_word = str(review.get("result", "")).strip()
+        allowed = SETTING_PAYOFF_RESULTS[relation]
+        require(result_word in allowed, f"{item_id}.review.result 对关系「{relation}」只能是 {allowed}")
+        note = str(review.get("note", "") or "").strip()
+        reviewer = str(review.get("reviewer", "") or "").strip()
+        require(reviewer, f"{item_id}.review.reviewer 必须写复核方（主会话或 agent 名）")
+        require(note or result_word not in SETTING_PAYOFF_NOTE_REQUIRED, f"{item_id} 结论「{result_word}」必须在 note 里写原因")
+        require(result_word != "违反", f"{item_id} 复核签了「违反」：本章违反了必须遵守的设定，先改正文")
+        evidence = item.get("evidence") or []
+        require(isinstance(evidence, list), f"{item_id}.evidence 必须是数组")
+        anchors: list[str] = []
+        for pos, ev in enumerate(evidence):
+            require(isinstance(ev, dict), f"{item_id}.evidence[{pos}] 必须是对象")
+            anchor = str(ev.get("anchor", "") or "").strip()
+            require(anchor, f"{item_id}.evidence[{pos}].anchor 为空")
+            require(len(anchor.encode("utf-8")) <= SETTING_PAYOFF_ANCHOR_MAX_BYTES, f"{item_id}.evidence[{pos}].anchor 超过 {SETTING_PAYOFF_ANCHOR_MAX_BYTES} 字节，截成可定位的短句")
+            require(anchor in prose_text, f"{item_id} 的证据未出现在候选正文：「{anchor}」")
+            anchors.append(anchor)
+        require(anchors or result_word not in SETTING_PAYOFF_EVIDENCE_REQUIRED, f"{item_id} 结论「{result_word}」必须给至少一段正文证据")
+        change: dict[str, Any] = {
+            "action": "upsert",
+            "id": item_id,
+            "type": entry.get("type"),
+            "title": entry.get("title") or item_id,
+            "relation": relation,
+            "result": result_word,
+            "evidence_anchor": anchors[0] if anchors else "",
+            "note": note,
+        }
+        if entry.get("type") == "recurring" and entry.get("window"):
+            change["window"] = {"min": int(entry["window"]["min"]), "max": int(entry["window"]["max"])}
+        changes.append(change)
+    missing = [item_id for item_id in outline_rows if item_id not in seen]
+    require(not missing, f"第{chapter}章细纲排了 {'、'.join(missing)}，但 candidate_binding.setting_payoffs 没有举证")
+    return changes
 
 
 def scan_gate(prose: Path, *, project: Path | None = None, target: Path | None = None) -> str | None:
@@ -771,7 +900,7 @@ def validate_binding(
 
     binding = document.get("candidate_binding")
     require(isinstance(binding, dict), "追踪事务缺少 candidate_binding")
-    require(binding.get("schema_version") == BINDING_SCHEMA, "candidate_binding v1 已停止采用；请重新生成带逻辑证据的 v2 绑定")
+    require(binding.get("schema_version") == BINDING_SCHEMA, "candidate_binding 必须升级至 v4 并完成真实审核过程")
     require(binding.get("quality_profile") == QUALITY_PROFILE, f"candidate_binding.quality_profile 必须是 {QUALITY_PROFILE}")
     prose_binding = binding.get("prose")
     outline_binding = binding.get("outline")
@@ -792,8 +921,25 @@ def validate_binding(
     for key, value in (("prose", hashes["candidate"]), ("outline", hashes["outline"]), ("skeleton", hashes["skeleton"])):
         require(binding[key].get("sha256") == value, f"candidate_binding.{key}.sha256 已过期")
 
+    try:
+        editor_result = editor_review.validate(project, chapter, prose, binding.get("editor_review"))
+    except editor_review.EditorReviewError as exc:
+        raise CandidateError(str(exc)) from exc
     logic_results = validate_logic_checks(project, chapter, prose, binding, hashes["candidate"])
+    for reader_id in ("rc-02", "rc-03"):
+        reader = binding["logic_checks"][reader_id]
+        require(type(reader.get("chapter")) is int and reader["chapter"] == chapter and reader.get("candidate_path") == project_relative(project, prose), f"{reader_id} 章号或候选路径不一致")
+        identity = reader.get("reviewer_run_id")
+        require(reader.get("source") == "independent" and isinstance(identity, str) and identity.strip(), f"{reader_id} 缺独立读者身份")
+        require(identity not in {binding["editor_review"]["writer_run_id"], binding["editor_review"]["reviewer_run_id"]}, f"{reader_id} 不得由写手或编辑兼任")
+        require(reader.get("reading_kind") in {"first_read", "targeted_recheck"}, f"{reader_id} 缺阅读类型")
+        if reader["reading_kind"] == "targeted_recheck":
+            try:
+                editor_review.validate_first_read(project, reader, chapter=chapter)
+            except editor_review.EditorReviewError as exc:
+                raise CandidateError(f"{reader_id}: {exc}") from exc
     rc01 = binding["logic_checks"]["rc-01"]
+    process_result = validate_review_process(project, chapter, prose, binding)
     reader_view_binding = {
         "prose_files": [dict(item) for item in rc01["prose_files"]],
         "prose_set_sha256": rc01["prose_set_sha256"],
@@ -805,10 +951,9 @@ def validate_binding(
     emotion_run_gate(project, chapter, state)
     causal_gate(project, chapter, state)
     name_drift_gate(project, chapter, state)
-    volume_receipt = volume_gate(project, chapter, prose, binding)
     validate_titles(project, prose)
     length = wordcount.fanqie_length(prose.read_text(encoding="utf-8-sig"))
-    require(length["status"] == "pass", f"番茄长篇字数必须为 2200–2800，有效字数为 {length['actual']}")
+    require(length["status"] == "pass", f"番茄长篇字数必须为 {length['min']}–{length['max']}，有效字数为 {length['actual']}")
 
     coverage = binding.get("coverage")
     require(isinstance(coverage, list), "candidate_binding.coverage 必须是数组")
@@ -836,8 +981,14 @@ def validate_binding(
         findings = scan_gate(prose, project=project)
         require(findings is None, f"候选未通过采用前确定性检查：\n{findings}")
 
+    setting_payoff_changes = setting_payoff_gate(project, chapter, prose, binding, document, state)
+
     tracking_payload = dict(document)
     tracking_payload.pop("candidate_binding", None)
+    if setting_payoff_changes:
+        # 记账条目由举证门生成后并入同一份事务：采用日志的 state_after 摘要天然覆盖它，
+        # recover / 重复采用都走同一条回放路径，不另开写入口。
+        tracking_payload["delta"] = {**tracking_payload.get("delta", {}), "setting_payoff_changes": setting_payoff_changes}
     try:
         normalized = tracking.normalize_transaction(project, state, tracking_payload)
         next_state = tracking.merge_transaction(state, normalized)
@@ -852,6 +1003,7 @@ def validate_binding(
         next_state.get("metrics") or {},
         tracking_payload.get("metrics_unchanged_reason"),
     )
+    volume_receipt = volume_gate(project, chapter, prose, binding, next_state)
     hashes["tracking_payload"] = sha256_bytes(canonical_json(tracking_payload))
     hashes["state_after"] = sha256_bytes(tracking.json_payload(next_state).encode("utf-8"))
     hashes["candidate_after_checks"] = sha256_file(prose)
@@ -862,6 +1014,15 @@ def validate_binding(
     require(hashes["transaction_after_checks"] == hashes["transaction"], "追踪事务在检查期间发生变化")
     require(hashes["outline_after_checks"] == hashes["outline"], "细纲在检查期间发生变化")
     require(hashes["skeleton_after_checks"] == hashes["skeleton"], "骨架在检查期间发生变化")
+    try:
+        editor_review.validate(project, chapter, prose, binding["editor_review"])
+        for reader_id in ("rc-02", "rc-03"):
+            reader = binding["logic_checks"][reader_id]
+            if reader.get("reading_kind") == "targeted_recheck":
+                editor_review.validate_first_read(project, reader, chapter=chapter)
+    except editor_review.EditorReviewError as exc:
+        raise CandidateError(str(exc)) from exc
+    validate_review_process(project, chapter, prose, binding)
     return {
         "expected_revision": expected,
         "expected_next_revision": next_state["state_revision"],
@@ -872,8 +1033,13 @@ def validate_binding(
         "skeleton": project_relative(project, skeleton),
         "logic_results": logic_results,
         "reader_view_binding": reader_view_binding,
+        "editor_review": binding["editor_review"],
+        "editor_result": editor_result,
+        "review_process": binding["review_process"],
+        "process_result": process_result,
         "scan_skip": scan_skip,
         "volume_gate": volume_receipt,
+        "setting_payoffs": [item["id"] for item in setting_payoff_changes],
     }
 
 
@@ -913,7 +1079,7 @@ def create_journal(project: Path, chapter: int, prose: Path, transaction: Path, 
     path = journal_path(project, operation_id)
     archive = history_root(project) / f"{operation_id}-{transaction.name}"
     journal = {
-        "schema_version": 1,
+        "schema_version": 3,
         "operation_id": operation_id,
         "phase": "prepared",
         "chapter": chapter,
@@ -921,7 +1087,7 @@ def create_journal(project: Path, chapter: int, prose: Path, transaction: Path, 
         "expected_next_revision": preflight["expected_next_revision"],
         "paths": {
             "candidate": project_relative(project, prose),
-            "final": project_relative(project, body_root(project) / prose.name),
+            "final": project_relative(project, (volume_dir_for_chapter(project, chapter) or body_root(project)) / prose.name),
             "transaction": project_relative(project, transaction),
             "archive_transaction": project_relative(project, archive),
             "outline": preflight["outline"],
@@ -932,6 +1098,10 @@ def create_journal(project: Path, chapter: int, prose: Path, transaction: Path, 
         "length": preflight["length"],
         "logic_results": preflight["logic_results"],
         "reader_view_binding": preflight["reader_view_binding"],
+        "editor_review": preflight["editor_review"],
+        "editor_result": preflight["editor_result"],
+        "review_process": preflight["review_process"],
+        "process_result": preflight["process_result"],
         "scan_skip": preflight["scan_skip"],
         "volume_gate": preflight["volume_gate"],
         "created_at": datetime.now().astimezone().isoformat(),
@@ -1028,9 +1198,9 @@ def replay_tracking(project: Path, payload: dict[str, Any]) -> None:
         raise CandidateError(f"追踪事务回放失败：\n{(result.stderr or result.stdout).strip()}")
 
 
-def recover_journal(project: Path, path: Path) -> dict[str, Any]:
+def recover_journal(project: Path, path: Path, *, legacy_authorization: dict[str, str] | None = None) -> dict[str, Any]:
     journal = read_json(path, "采用日志")
-    require(journal.get("schema_version") == 1 and journal.get("phase") in PHASES, f"采用日志格式非法：{path}")
+    require(journal.get("schema_version") in {1, 2, 3} and journal.get("phase") in PHASES, f"采用日志格式非法：{path}")
     paths = {key: (project.resolve() / value).resolve() for key, value in journal["paths"].items()}
     for resolved in paths.values():
         project_relative(project, resolved)
@@ -1041,7 +1211,39 @@ def recover_journal(project: Path, path: Path) -> dict[str, Any]:
     digests = journal["digests"]
 
     if journal["phase"] in {"prepared", "prose_moved"}:
+        if journal["schema_version"] < 3:
+            require(legacy_authorization is not None, f"migration_required: {journal['operation_id']} journal_sha256={sha256_file(path)}")
+            require(legacy_authorization.get("operation_id") == journal["operation_id"] and legacy_authorization.get("journal_sha256") == sha256_file(path), "旧事务授权范围或日志摘要不一致")
+            require(all(isinstance(legacy_authorization.get(key), str) and legacy_authorization[key].strip() for key in ("author_approval", "reason")), "旧事务授权缺原话或原因")
         verify_recovery_reader_view(project, path, journal, paths, digests)
+        if journal["schema_version"] >= 2:
+            source = read_json(transaction, "追踪事务").get("candidate_binding", {})
+            require(source.get("schema_version") == journal["schema_version"] + 1, "恢复事务版本不匹配")
+            require(journal.get("editor_review") == source.get("editor_review"), "编辑快照与原事务不一致")
+            try:
+                result = editor_review.validate(project, journal["chapter"], candidate, source.get("editor_review"), moved_to=final)
+                for reader_id in ("rc-02", "rc-03"):
+                    reader = source.get("logic_checks", {}).get(reader_id, {})
+                    if reader.get("reading_kind") == "targeted_recheck":
+                        editor_review.validate_first_read(project, reader, chapter=journal["chapter"])
+            except editor_review.EditorReviewError as exc:
+                raise CandidateError(str(exc)) from exc
+            require(result == journal.get("editor_result"), "编辑签发结果不一致")
+            if journal["schema_version"] == 3:
+                require(source.get("review_process") == journal.get("review_process"), "审核过程快照不一致")
+                require(validate_review_process(project, journal["chapter"], candidate, source, moved_to=final) == journal.get("process_result"), "审核过程结果不一致")
+        if journal["schema_version"] < 3:
+            # Authorization is separate from the original digest-bound journal.
+            require(read_json(transaction, "追踪事务").get("candidate_binding", {}).get("schema_version") == journal["schema_version"] + 1, "旧事务授权仅适用于原版本候选事务")
+            state = read_state(project)
+            require(state.get("state_revision") in {journal["expected_state_revision"], journal["expected_next_revision"]}, "旧事务追踪版本冲突")
+            expected_hash = digests["state_before"] if state.get("state_revision") == journal["expected_state_revision"] else digests["state_after"]
+            require(sha256_file(project.resolve() / TRACKING_STATE) == expected_hash, "旧事务追踪摘要冲突")
+            atomic_json(path.with_name("legacy-authorization-" + journal["operation_id"] + "-" + legacy_authorization["journal_sha256"] + ".json"), {
+                **legacy_authorization, "legacy_editor_status": journal.get("editor_result", {}).get("status", "not_evaluated"),
+                "process_status": "NOT_EVALUATED",
+                "authorized_at": datetime.now().astimezone().isoformat(),
+            })
 
     if journal["phase"] == "prepared":
         if candidate.exists():
@@ -1058,6 +1260,7 @@ def recover_journal(project: Path, path: Path) -> dict[str, Any]:
         state = read_state(project)
         revision = state.get("state_revision")
         if revision == journal["expected_state_revision"]:
+            require(sha256_file(project.resolve() / TRACKING_STATE) == digests["state_before"], "采用前追踪状态摘要已变化")
             replay_tracking(project, journal["tracking_payload"])
             state = read_state(project)
             revision = state.get("state_revision")
@@ -1086,6 +1289,8 @@ def recover_journal(project: Path, path: Path) -> dict[str, Any]:
         "state_revision": state["state_revision"],
         "operation_id": journal["operation_id"],
         "recovered": True,
+        "editor_status": journal.get("editor_result", {}).get("status", "legacy_not_evaluated"),
+        "process_status": journal.get("process_result", {}).get("status", "NOT_EVALUATED"),
     }
 
 
@@ -1135,6 +1340,8 @@ def check_chapter(project: Path, chapter: int) -> dict[str, Any]:
         "skeleton": preflight["skeleton"],
         "expected_revision": preflight["expected_revision"],
         "volume_gate": preflight["volume_gate"],
+        "editor_review": preflight["editor_result"],
+        "review_process": preflight["process_result"],
     }
 
 
@@ -1164,14 +1371,16 @@ def promote_chapter(
         return result
 
 
-def recover(project: Path, chapter: int | None) -> list[dict[str, Any]]:
+def recover(project: Path, chapter: int | None, *, legacy_authorization: dict[str, str] | None = None) -> list[dict[str, Any]]:
     project = project.resolve()
     with project_lock(project):
         paths = pending_journals(project, chapter)
         if not paths and chapter is not None:
             paths = completed_journals(project, chapter)[:1]
         require(paths, "没有可恢复的候选采用事务")
-        return [recover_journal(project, path) for path in paths]
+        if legacy_authorization is not None:
+            require(len(paths) == 1, "旧事务授权只允许恢复一个指定事务")
+        return [recover_journal(project, path, legacy_authorization=legacy_authorization) for path in paths]
 
 
 def reject_chapter(project: Path, chapter: int, *, rewrite: bool) -> dict[str, Any]:
@@ -1256,6 +1465,10 @@ def build_parser() -> argparse.ArgumentParser:
     recover_group = recover_parser.add_mutually_exclusive_group(required=True)
     recover_group.add_argument("--chapter", type=int)
     recover_group.add_argument("--all", action="store_true")
+    recover_parser.add_argument("--legacy-operation-id")
+    recover_parser.add_argument("--journal-sha256")
+    recover_parser.add_argument("--author-approval")
+    recover_parser.add_argument("--reason")
     reject = sub.add_parser("reject")
     reject.add_argument("--project", type=Path, required=True)
     reject.add_argument("--chapter", type=int, required=True)
@@ -1282,7 +1495,10 @@ def main(argv: list[str] | None = None) -> int:
                 else promote_chapter(args.project, args.chapter, skip_scan=args.no_scan, scan_skip_reason=reason or None)
             )
         elif args.command == "recover":
-            result = recover(args.project, None if args.all else args.chapter)
+            values = [args.legacy_operation_id, args.journal_sha256, args.author_approval, args.reason]
+            require(not any(values) or (all(values) and not args.all), "旧事务恢复必须限定 chapter 并提供全部四项授权参数")
+            authorization = dict(zip(("operation_id", "journal_sha256", "author_approval", "reason"), values)) if any(values) else None
+            result = recover(args.project, None if args.all else args.chapter, legacy_authorization=authorization)
         elif args.command == "reject":
             result = reject_chapter(args.project, args.chapter, rewrite=args.rewrite)
         elif args.command == "check":

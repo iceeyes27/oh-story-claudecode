@@ -6,7 +6,7 @@
     {
       "name": "oh-story",
       "source": "./",
-      "version": "0.8.1",
+      "version": "0.9.0",
       "description": "由统一清单发布的网文 Skills、Commands 与 ZCode 写作守卫。"
     }
   ]

@@ -12,24 +12,30 @@ disable: true
 
 你是审查协调器。你的职责是找出小说文本中的结构、角色、文字、设定问题，并给出可执行修改建议。
 
-**执行铁律：审查是找问题，不是验证正确性。**
+**执行铁律：审查基于实际证据定位问题；没有问题可以无 finding，证据不足据实说明，不为填表凑问题。**
+
+## 长篇累计连读入口
+
+写作流程到达已启用的单元末/十五章检查点时，先读取 [references/longform-reading.md](references/longform-reading.md)。本入口独立于普通 full/lean/solo 作者视角审查：未参与该段创作/规划的读者先顺序读正文，不看设计卡或未来答案，再比较此前相似单元；父流程只汇总、后置对照设计及安排处置。普通审查的设定、追踪和作者偏好资料不得注入盲读。没有独立审读者不能用 solo 自评代替，保留待审原因。
+
+本协议的长篇流程记录由 `review-state.js` 的独立命名空间管理，不覆盖普通 `latest.json`，不写故事事实台账。实际入口为 `review-state.js longform init/status/gate/start/read/finish/fail/authorize`，状态位于 `.story-review/longform-v1.json`；写命令采用 expected-revision CAS，参数与最小操作例见 longform-reading.md。以下普通模式的状态规则不充当长篇完成证明；累计阅读范围、证据、授权、失效及旧书启用边界以 longform-reading.md 为准。用户明确只读时不写任何状态或收据。
 
 ## 作者习惯边界
 
-若作者记忆 state 已存在，审查前用 `.agents/skills/_shared/scripts/author_memory_commit.py query` 获取本次相关 active 条目（总输出 ≤2KB）。它们只能帮助解释意图和组织报告，不能降低 rubric 严重度、把事实冲突判为无问题或跳过平台门禁；当前请求仍优先。完整规则见 [.agents/skills/_shared/references/author-memory.md](../_shared/references/author-memory.md)。
+若作者记忆 state 已存在，审查前用 `.agents/skills/_shared/scripts/author_memory_commit.py query --kind delivery --kind interaction --kind prose_style --book-root {书目录}` 获取本次相关 active 条目（`--kind` 必传；不传 `--book-root` 就拿不到本书级偏好；总输出 ≤2KB）。它们只能帮助解释意图和组织报告，不能降低 rubric 严重度、把事实冲突判为无问题或跳过平台门禁；当前请求仍优先。完整规则见 [.agents/skills/_shared/references/author-memory.md](../_shared/references/author-memory.md)。
 
-用户对报告格式或协作方式作出稳定声明时，在本轮审查完成后用 `record` 记录并回传回执；重复修正/推断先待确认，一次性要求不记录。审查发现、工具告警和助手建议本身绝不自动学习。
+用户对报告格式或协作方式作出稳定声明时，在本轮审查完成后用 `record` 记录并回传回执；只记作者明确说的，一次性要求不记录，不从反复修改推断。审查发现、工具告警和助手建议本身绝不自动学习。
 
 ---
 
 ## Review Mode 选择
 
-- `/story-review` 或 `/story-review full` → 优先 spawn 全部 4 个 Agent；如果当前已经在子代理内，核心 Agent 未部署/异常，或 spawn 失败，自动降级为 solo。
-- `/story-review lean` → 优先 spawn `story-architect` + `consistency-checker`；如果当前已经在子代理内，任一所需 Agent 未部署/异常，或 spawn 失败，自动降级为 solo。
+- `/story-review` 或 `/story-review full` → 优先 spawn 全部 5 个 Agent；如果当前已经在子代理内，核心 Agent 未部署/异常，或非容量原因 spawn 失败，自动降级为 solo；会话/线程容量限制先按 Phase 2 有限调度处理，不能直接认定角色缺失。
+- `/story-review lean` → 优先 spawn `story-architect` + `consistency-checker`；如果当前已经在子代理内，任一所需 Agent 未部署/异常，或非容量原因 spawn 失败，自动降级为 solo；会话/线程容量限制先按 Phase 2 有限调度处理，不能直接认定角色缺失。
 - `/story-review solo` → 不 spawn Agent，由当前会话执行基础审查。
 - 未指定 → 默认 full，并在报告里写明最终实际执行模式。
 
-> AI味 / 文字自然度这一维度只有 `narrative-writer` 审，仅 full 模式覆盖。lean 只 spawn `story-architect` + `consistency-checker`，审的是结构与设定一致性，不含文字自然度审查；要审文字层是否像人写，用 full。
+> AI味 / 文字自然度由 `narrative-writer` 审，语文准确、指代、因果、描写与连贯由独立 `copy-editor` 审，仅 full 模式覆盖。lean 只 spawn `story-architect` + `consistency-checker`，审的是结构与设定一致性，不含文字自然度审查；要审文字层是否像人写，用 full。
 
 ### 跨批 findings 状态
 
@@ -42,6 +48,8 @@ disable: true
 
 ---
 
+独立编辑状态：full 必须实际调用未参与该稿写作的 `copy-editor`；不得继承写手上下文。总体模式与单角色状态分别记录：没有成功完成独立编辑时记 `Editor Review: NOT_EVALUATED`，自查不得代签独立通过；复合检查中未执行的编辑项记 `BLOCKED`。若独立编辑已在本次相同输入范围成功完成，即使其他角色缺失使总体降级 lean/solo，也保留其真实结果及证据，复合编辑项按自身实际执行结果记 `PASS`/`FAIL`，不能因总体模式清除结果。已完成一个角色仍不能将总体宣称为 full；其他可执行项继续。普通 full 报告不自动充当候选采用凭证。
+
 ## Phase 0：预检与降级（必须先执行）
 
 1. **确定请求模式**：解析用户输入中的 `full`、`lean`、`solo`；未指定时目标模式为 `full`。
@@ -49,15 +57,16 @@ disable: true
 3. **识别 ZCode 能力边界**：如果当前运行于 ZCode 且项目使用 `.zcode/`，ZCode 3.3.4 不执行项目/plugin custom agents；不要因为磁盘上存在其他端的 agent 文件就尝试同名 spawn，直接降级 `solo` 并报告 `Fallback: project custom agents unavailable -> solo`。
 4. **检查核心 Agent 部署状态**（检查项目内 agents，同时兼容 Claude Code 和 Codex）：
    - 优先检查 `.claude/agents/`，其次检查 `.codex/agents/`；两个目录任一存在即视为已部署
-    - full 必需：Claude 为 `story-architect.md`、`character-designer.md`、`narrative-writer.md`、`consistency-checker.md`；Codex 为同名 `.toml`
+    - full 必需：Claude 为 `story-architect.md`、`character-designer.md`、`narrative-writer.md`、`consistency-checker.md`、`copy-editor.md`；Codex 为同名 `.toml`
     - lean 必需：Claude 为 `story-architect.md`、`consistency-checker.md`；Codex 为同名 `.toml`
     - 对每个必需 Agent 文件：
       - **Claude Code agent（`.claude/agents/`）**：读取 frontmatter，确认 `name:` 与 subagent_type 完全一致；frontmatter 缺失、不可解析或 name 不匹配时视为 malformed agent。
       - **Codex agent（`.codex/agents/`）**：文件名为 `{agent}.toml`，TOML 必须可解析，且包含 `name`、`description`、`developer_instructions`；`name` 必须与目标 agent 完全一致。
+    - **copy-editor 协议预检**：full 的同名文件还必须同时包含 `Review Protocol: independent-editor-v1` 、`Review Process: review-quality-v2` 和 `copy-editor-specification.md` 规范引用（路径必须可解析）。缺任一项即旧版或不完整角色，不能算当前独立编辑覆盖；报告 `Editor Review: NOT_EVALUATED`，提示按 story-setup 独立编辑定向部署更新该角色，当前 full 降级 solo。名称存在或 bundle 版本相同不能代替本项，不改写 `.story-deployed` 的整包版本。
     - `agents_version` 与本版不一致不影响本步：照常检查下列 agent 文件结构并 spawn，只按顶部规则附带版本提示。文件缺失或 malformed 才降级。
    - 如果目标模式所需任一文件缺失或 malformed，**不要尝试 spawn 缺失/异常 Agent**；自动降级为 `solo`，并在报告开头写明：`Fallback: missing agents -> solo` 或 `Fallback: malformed agents -> solo`，列出问题文件，建议用户运行 `/story-setup`。
 5. **确认 Agent/Task 工具可用**：如果当前环境没有可用的子 Agent/Task 调用能力，直接降级为 `solo`，报告 `Fallback: agent tool unavailable -> solo`。
-6. **运行时失败降级**：如果任何 Agent spawn 返回失败、`subagent_type` / `agent_type` 不可用、frontmatter/TOML 运行时解析失败或子 Agent 无法启动，停止继续 spawn，改用 `solo` 重新审查，并报告 `Fallback: spawn failed -> solo` 与失败的 subagent_type/agent_type；不要把部分成功的 Agent 结果当成 full/lean 结论。
+6. **运行时失败降级**：会话/线程容量限制先按 Phase 2 的有限调度规则处理，只有支持的实际释放或独立新会话执行成功才可继续 full；没有这两类能力就停止容量重试并保留已完成独立审读结果。其他 Agent spawn 返回失败、`subagent_type` / `agent_type` 不可用、frontmatter/TOML 运行时解析失败或子 Agent 无法启动，停止继续 spawn，改用 `solo` 重新审查，并报告 `Fallback: spawn failed -> solo` 与失败的 subagent_type/agent_type；不要把部分成功的 Agent 结果当成 full/lean 结论。
 7. **确定实际模式**：报告中必须同时列出 `Requested Mode` 与 `Effective Mode`。
 8. **禁止把 `.active-book` 当作平台来源**：`.active-book` 只表示当前书名/目录名，不代表目标平台。
 
@@ -102,6 +111,7 @@ Rubric Source: file | embedded fallback
 | 质量代际协议 | `story-review/references/quality-lifecycle.md` |
 | 显式 P0/P1 treatment | `story-review/references/quality-p1.md` |
 | 顺序读者与盲评链 | `story-review/references/reader-chain-and-graph.md` |
+| 普通长篇累计连读与前文回查边界 | `story-review/references/longform-reading.md` |
 | 去 AI 味方法 | `.agents/skills/_shared/references/anti-ai-writing.md` |
 | 剧情循环/高潮公式 | `story-review/references/plot-core-methods.md` |
 | 角色关系/好感度 | `story-review/references/character-relations.md` |
@@ -128,6 +138,7 @@ Rubric Source: file | embedded fallback
 - 角色动机：行为依据在正文可恢复；为剧情强转动机或与处境矛盾按影响定 S1/S2。
 - 对话质量：符合意图、身份、关系与知识；必要说明和说话标签可保留，知识越界或同腔按损失报。
 - 设定一致性：不违背既有规则、时间线与角色事实；有事实冲突报告证据，不猜补。
+- 设定兑现：目标须通过正文事件与结果成立并遵守规则；部分兑现保留剩余义务，只报名词、违反规则或到期未处理时按证据报告。
 - 文字自然度：直写、动作、修辞和留白服从声线与清晰度；词形不判错，无功能重复按影响报。
 - 句长节奏：主体、连接、结果清楚；主干丢失或必要信息省掉才修，不按数字带切句。
 - 标点节奏：迟疑、打断、未尽、强调与声线成立时保留相应标点；只修错误语义和无功能堆砌。
@@ -153,16 +164,13 @@ AI 味 / 禁用词 fallback 速查：
 
 ### 传给子 Agent 的规则
 
-full/lean 模式下，主会话必须把“审查基准包摘要”直接写进每个 Agent prompt。**不要要求子 Agent 必须读取 `story-review/references/*` 才能完成任务**；子 Agent 可读取已部署的 story-setup 参考包作为补充，但最终必须遵守本 skill 注入的 rubric 摘要和统一 Findings Schema。
+full/lean 模式下，主会话仅向实际执行的作者视角角色（story-architect、character-designer、narrative-writer、consistency-checker）注入“审查基准包摘要”；copy-editor 明确排除，不接收本书承诺、章节设计功能或作者答案，只接收独立正文输入和唯一编辑规范。**不要要求子 Agent 必须读取 `story-review/references/*` 才能完成任务**；子 Agent 可读取已部署的 story-setup 参考包作为补充，但最终必须遵守本 skill 注入的 rubric 摘要和统一 Findings Schema。
 
-### 跨批审查落盘契约（所有模式）
+### 普通跨批审查落盘契约
 
-只要多章/整卷/整本审查被拆成两批及以上，full、lean、solo 都维护 **{项目根}/.story-review/state.md**：
+普通 full/lean 分批审查遵守上方「跨批 findings 状态」：只通过 `review-state.js` 管理 `{书目录}/.story-review/latest.json`，不再另写 state.md 或自行原子替换文件。保留完整范围、已完成/下一批和未解决 findings；输入变化须复核。solo 或明确只读仅查询及输出，不创建持久状态。
 
-1. 首批确定本次完整审查范围和批次顺序。每批综合裁决后，用同目录临时文件 + rename 原子重写 state.md，不能只把结果留在对话里。
-2. state.md 只记录完整审查范围、已完成范围、下一批，以及“上一批未解决 findings 摘要”。摘要项保留 location、issue 和预计核查/兑现范围。
-3. 下一批开始前先读取 state.md，把未解决摘要注入 reviewer prompt；已解决或用户明确不处理的项不再继承，但须在本批输出中说明。
-4. 每个项目同时只维护一条跨批审查；若新一轮与 state.md 中未完成范围不同，先说明会丢弃的旧进度并征得用户确认，确认后在首批完成时覆盖。续接时 state.md 缺失、损坏或本批超出既定范围，应明确报告并停止，不猜测旧内容；非分批审查不创建它。
+下一批读取普通审查的开放项并在结果中说明处理；状态损坏、冲突或范围变更按运行器契约处理，不猜旧内容、不静默覆盖。累计连读另走 longform-reading.md 的独立命名空间；普通报告及其完成状态不能替代独立阅读收据，旧问题仅在盲读完成后核对。
 
 **.story-review/** 只保存审查状态，不属于小说事实追踪；不得借此修改正文、设定、大纲或 `追踪/`。
 
@@ -177,7 +185,7 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
    - 优先把文件路径、章节名、行号范围传给 reviewer，不要把整本或大量章节完整复制进每个 prompt。
    - 单文件或短片段可附 300-1200 字关键摘录。
    - 多章/整卷/整本审查必须分批：按章节或文件组拆分，每批输出独立 findings，再综合。
-   - **跨批连续性（分批必做）**：审每一批前，先读 `追踪/伏笔.md` 中状态为 `已埋` 且计划回收章 ≤ 本批末章的当前行，再按需读取相关 `追踪/逐章记录/第NNN章.md` 查变更原因；同时读取涉及角色的独立快照，并按上方契约把 state.md 的上一批未解决 findings 摘要作为「继承的开放项」注入 reviewer / consistency-checker prompt。新发现但尚未登记的开放钩子先列为维护候选，收尾时必须有正文证据才能进入修订事务。
+   - **跨批连续性（分批必做）**：审每一批前，先读 `追踪/伏笔.md` 中状态为 `已埋` 且计划回收章 ≤ 本批末章的当前行，再按需读取相关 `追踪/逐章记录/第NNN章.md` 查变更原因；同时读取涉及角色的独立快照，并按上方普通模式契约把 latest.json 中上一批未解决 findings 摘要作为「继承的开放项」注入 reviewer / consistency-checker prompt。新发现但尚未登记的开放钩子先列为维护候选，收尾时必须有正文证据才能进入修订事务。
    - **乱序/重叠审查提醒**：若已审过靠后的范围（如先审 300-400），之后审靠前的范围（200-300）时，只有当本批**新增/改动了一个开放项、且其预计兑现章落在已审过的靠后范围内**，才提醒用户「200-300 的改动可能影响已审的 300-400」，并让用户选择复审受影响章节 / 全量复审 / 仅记为待办——**默认记为待办，不盲目全量重跑**。无具体跨范围依赖时不提醒。
 3. **读取相关支撑材料**：正文、相关设定、角色档案、大纲、追踪/上下文、伏笔文件；缺失时在报告中标记证据不足。
 4. **按题材与章节功能选择 rubric**：
@@ -186,7 +194,7 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
    - 再识别目标平台：用户显式指定优先，其次项目 `目标平台` / `平台` 字段；`.active-book` 只定位书名，不提供平台或题材。
    - 番茄 / 起点 / 知乎盐言分别补读 `story-review/references/rubrics/fanqie.md`、`story-review/references/rubrics/qidian.md`、`story-review/references/rubrics/zhihu.md`；不可读时用对应内置摘要。平台未知用 generic web-fiction，不默认玄幻升级或强冲突。
    - 报告 `Rubric` 与 `Rubric Source: file | embedded fallback`，并写明题材、当前功能及适用范围。不从规则满足情况推断真实留存数据。
-5. **形成审查基准包摘要**：写明本书承诺、当前章节功能、适用维度、N/A 原因与 5–12 条证据判断标准。solo 和子 Agent 使用同一份摘要，不重建固定比例或风格禁令。
+5. **形成审查基准包摘要**：写明本书承诺、当前章节功能、适用维度、N/A 原因与 5–12 条证据判断标准。solo 和实际执行的作者视角子 Agent 使用同一份摘要，不重建固定比例或风格禁令；copy-editor 不接收该摘要。
 6. **确定性预检（只报告，不修改）**：当审查范围包含本地正文文件路径时，运行本 skill 自带脚本：
    ```bash
    node .agents/skills/_shared/scripts/normalize-punctuation.js --check <正文文件...>
@@ -198,12 +206,12 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
    ```
    - `check-subject-switch.js` 是 advisory 级（段首"他/她"承接错位，输出上段末句+本段首行供复核），结果并入 `prose` 按 S4，人工复核后再定是否升级；正常承接（段首"他"就指上段主角）占绝大多数，不算病。
    - `check-chapter-boundary.js` 是 advisory 级（跨章信息续接：跨章复读/计划悬空/动作钩子收尾，输出上章尾句+下章头句供复核），结果并入「案件型/多章连续性专项检查」的跨章链路结论，按 S4；换场/跨天有明确标记的正常承接不算病。
-   - `check-setting-payoff.js` 检查设定兑现闭环（设定 → `追踪/设定兑现看板.md` → 细纲兑现槽）。项目没建看板时它自己 exit 0 跳过，存量书不受影响。结果并入 `consistency`：blocking（编号孤儿、看板与槽位脱钩、排期章与槽位章矛盾、三槽未填满、状态词非法、编号映射悬空）按 S2——台账断链会让后续章漏兑现；`setting.orphan-*` advisory 按 S4，复核时区分三种情况——本卷不碰（正常，建议补进中后期池）、组合技/上位概念（正常，建议写进 `设定/_兑现豁免.txt`）、**真漏排**（设定写了却没有任何一章用，按 S3 报）。零落点同时是「能力 A 被错记成能力 B」的主要信号：报出 A 零落点时，查一下是不是有别的条目在干 A 的活。本脚本只读，不改看板；核销是 `story-write` 日更流程的事。
+   - `check-setting-payoff.js` 核查新版登记与细纲；legacy/未启用须如实报告，不能当作通过。设定完善性、兑现语义与返回阶段按 `references/setting-payoff.md` 执行：复核规则与正文事件是否匹配、兑现是否完整；原句存在不等于兑现。部分兑现保留剩余义务；只读正文的读者复核隔离设定资料。报告证据、影响、返回设定/细纲/正文哪一层，不手改追踪。
    - 按格式工具实际结果合并 `format` findings，同处去重。省略号、破折号与其他标点先核对迟疑、打断、未尽和声线功能，不因符号出现就改写；工具建议不能替代语气判断。
    - `check-ai-patterns.js` 的 findings 合并进 `prose`，保留实际 severity、来源和作用域；确定性 blocking 与有来源的作者禁令按其原因处理，规则加载错误记录为检查受阻，不当成正文 S2。不得在 prompt 硬编码旧 blocking 类别或直接照搬统一修法。
    - advisory 初始按 S4 线索复核；只有正文证据表明具体阅读损失才按影响定级。有功能保留可记 `PRESERVED_WITH_FUNCTION` 及理由，普通审稿不为保留原句启动研究 A/B。误报与证据不足分别记录，不要求清零。
    - `check-degeneration.js` 报告模型退化（逐字复读/截断/占位符/工程词泄漏），每条带 `severity: blocking|advisory`：blocking（复读/截断/tier1 工程词）作为 S1/S2 `prose` findings，修复建议是「重新生成该段，不是改写」；advisory（tier2 章节/歧义词）作为 S4。
-   - 上述预检脚本全部只读；`story-review` **不修改正文、设定或大纲文件**，需要自动修复正文时建议转 `/story-deslop`。full / lean 模式只有下方「追踪文件维护」允许修改 `追踪/`；分批审查的所有模式都可按上方契约写 **.story-review/state.md**，solo 除该状态外不写项目内容。
+   - 上述预检脚本全部只读；`story-review` **不修改正文、设定或大纲文件**，需要自动修复正文时建议转 `/story-deslop`。full / lean 模式只有下方「追踪文件维护」允许修改 `追踪/`；普通 full/lean 分批状态只由 `review-state.js` 管理，solo 或明确只读不写项目内容；长篇连读另遵守独立入口。
    - 默认 `--quote-mode keep`，不把知乎盐言短篇的 `「」` 当作问题；只有项目明确指定引号风格时才检查对应转换建议。
    - 这些脚本都是 `story-review` 的本地副本，不引用其他 skill 的文件。
 
@@ -259,7 +267,7 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
 
 ## Phase 2：并行 Spawn Agent（full/lean 模式）
 
-使用 Agent/Task 工具并行调用（Codex 原生子代理使用 `agent_type`，Claude Code 兼容面使用 `subagent_type`；实际字段以当前 CLI 暴露的工具为准）。每个 Agent 不继承父对话上下文，prompt 必须自包含项目路径、审查范围、文件路径、必要摘录、审查基准包摘要、Rubric Source 和统一 Findings Schema。
+使用 Agent/Task 工具按实际可用并发槽及会话总数限制分批调用，父会话也计入平台限制。先调用能容纳的角色并保存实际结果；完成不等于释放会话。有受支持的 close/release 工具时，保存结果后显式释放，再执行下一批；仅 interrupt 或等待不能视为释放。没有释放能力，但有受支持的无历史隔离调用（例如 CLI 新会话）时，可由主协调器用真实新会话执行完整角色协议，记录工具来源、调用身份、实际输入及结果；不得伪装成原生角色调用。该新会话只执行所分配角色，不再启动外部子会话，禁止无限外部递归。两者都不可用时停止重试，不得只等待或循环重试永久会话上限；缺失角色记 BLOCKED/NOT_EVALUATED，普通综合降级 solo，并保留已完成独立审读的真实状态与证据，不把其清除或冒充全套通过。只有五角色全部真实返回后才汇总 full，任何角色未执行不得宣称 full 完成；平台限制不降低完成条件。调用接口说明（Codex 原生子代理使用 `agent_type`，Claude Code 兼容面使用 `subagent_type`；实际字段以当前 CLI 暴露的工具为准）。每个 Agent 不继承父对话上下文。前四个作者视角角色的 prompt 自包含项目路径、审查范围、文件路径、必要摘录、审查基准包摘要、Rubric Source 和统一 Findings Schema；copy-editor 只接收其下方独立正文输入，不注入作者视角基准包。
 
 **调用规则**：执行 Phase 0 后，只有实际模式仍是 full/lean 时才 spawn。不要 spawn 缺失 Agent。
 
@@ -390,10 +398,21 @@ full/lean 模式下，主会话必须把“审查基准包摘要”直接写进�
 
 ---
 
+### Agent 5: copy-editor（独立文字编辑）
+
+当前过程标记为 `Review Process: review-quality-v2`；行为唯一规范仍为 copy-editor-specification.md，机器过程规范从本 Skill 的 `references/review-process.md` 定位。编辑覆盖准确、清楚、自然、连贯及句段节奏；有据的别扭、拖沓和语气失真不能因不妨碍理解而忽略，须与硬伤、待核实、个人偏好和建议保留分开。
+
+只读检查按原 11 阶段编排，读者先自然首读实际返回后再七问回查，编辑随后诊断；不写生产凭证或修改正文。需要授权改稿时转生产/修订流程：重要意见沿用 ID 按根因登记处置理由，实质理解、信息、动机、场景节奏或兑现改动须新读者盲读新版；纯不改意的错字标点仅编辑及必要定向复核。一次修后仍在则重诊，第二次无改善停止自动改；硬伤不因此通过，趣味分歧交作者，不投票。报告分列审核完成、底线通过、体验改善证据，不把调用成功或代理分数当成满意度。
+
+
+使用 `copy-editor` 的只读角色和独立新会话（不继承父对话）。只传项目路径、明确的正文/已读相邻章路径、审查范围及 `references/copy-editor-specification.md`；不得传写手解释、未来答案或预设问题。先全文理解，再逐句逐段与跨章检查。按规范输出五项覆盖证据、原文位置、实际阅读损失、严重度及最小修改建议。合理省略、悬念、概数及功能性复述不机械判错。关键待核实不签通过；修改后全文复核；本角色不改正文。
+
+角色引用不可读或阅读范围不完整时报告 NOT_EVALUATED，不得靠内置 rubric 生成编辑通过。需要候选采用时由候选流程保存并验证独立编辑凭证；报告文本不是身份或真实阅读的密码学证明。
+
 ## Phase 3：综合裁决
 
 1. 收集实际执行的 reviewer VERDICT 和 FINDINGS。
-2. 合并去重：按 `severity` 排序（S1 > S2 > S3 > S4），同级按实际阅读损失排序；列全硬问题，首轮建议只选 1～2 个最高阅读损失，并列出应保留表达。N/A、误报与证据不足不计作问题数量，不从建议多推导全章重写。
+2. 合并去重：按 `severity` 排序（S1 > S2 > S3 > S4），同级按实际阅读损失排序；硬伤全量处理，重要意见全量登记；体验修改每轮优先 1～2 个根因，并列出应保留表达。N/A、误报与证据不足不计作问题数量，不从建议多推导全章重写。
 3. **可选事实核查**：如果审查内容涉及需要验证的外部事实（历史年代、地理方位、职业细节等），只有在 `Effective Mode` 仍为 `full`/`lean`、当前不是子 Agent、Agent/Task 工具可用且 agent 目录（优先 `.claude/agents/`，其次 `.codex/agents/`）下的 `story-researcher.md` 或 `story-researcher.toml` 已部署时，才可额外 spawn `story-researcher` 搜索验证；`solo`、missing/malformed/stale/spawn failed 降级或子代理递归保护场景下不得 spawn，只能在报告中标记“需人工事实核查”。
 4. **分歧呈现**：如果 reviewer 间有冲突意见，明确呈现分歧让用户裁决；不要自动妥协。
 5. 输出综合审查报告。报告必须列出实际模式、fallback 原因、使用的 rubric、Rubric Source、审查范围和证据不足项。
@@ -420,6 +439,8 @@ Rubric Source: file | embedded fallback
 - character-designer: APPROVE / CONCERNS(n) / REJECT / NOT_RUN
 - narrative-writer: APPROVE / CONCERNS(n) / REJECT / NOT_RUN
 - consistency-checker: APPROVE / CONCERNS(n) / REJECT / NOT_RUN
+- copy-editor: APPROVE / CONCERNS(n) / REJECT / NOT_EVALUATED
+Editor Review: {独立执行范围及真实状态；未完成独立编辑为 NOT_EVALUATED，总体降级不清除已完成结果}
 
 > `NOT_RUN` 只用于 lean 模式排除的 reviewer 或可选 reviewer；如果 full/lean 必需 reviewer 缺失或 spawn 失败，应降级 solo，而不是在 full/lean 报告中标记 NOT_RUN 后继续综合。
 
@@ -442,7 +463,7 @@ APPROVE(通过) / CONCERNS(有具体阅读损失) / REJECT(存在阻断问题)
 {缺失设定、缺失大纲、无法核查事实等}
 
 ## 修改建议
-{列全硬问题，首轮编辑选 1～2 个最高阅读损失；写明范围及需保留的表达，不从 REJECT 自动推导整章重写}
+{硬伤全量处理，重要意见全量登记；体验修改每轮优先 1～2 个根因；写明范围及需保留的表达，不从 REJECT 自动推导整章重写}
 
 ## 继承到下一批
 {仅分批审查填写：逐条列 location、issue、预计核查/兑现范围；无则写“无”}
@@ -513,7 +534,7 @@ Rubric Source: file | embedded fallback
 
 ## 追踪文件维护（长篇工程，审查收尾时执行）
 
-新追踪协议只有一个写入口：本 skill 的 `scripts/tracking_commit.py`；完整事务字段和命令见 `references/tracking-transaction.md`。**full / lean 模式只允许通过该工具修改 `追踪/`；solo 模式不修改任何 `追踪/` 文件。** 分批审查的所有模式仍可写 **.story-review/state.md**，它不是追踪事实。不得直接 Edit/Write/追加 `伏笔.md`、角色快照、时间线视图、摘要或 `上下文.md`。
+新追踪协议只有一个写入口：本 skill 的 `scripts/tracking_commit.py`；完整事务字段和命令见 `references/tracking-transaction.md`。**full / lean 模式只允许通过该工具修改 `追踪/`；solo 模式不修改任何 `追踪/` 文件。** 普通 full/lean 分批状态按 `review-state.js` 契约处理；solo 不写状态。长篇独立连读记录另按 longform-reading.md 执行，均不是追踪事实。不得直接 Edit/Write/追加 `伏笔.md`、角色快照、时间线视图、摘要或 `上下文.md`。
 
 1. **先检查状态**：执行 `tracking_commit.py check --project {项目根}`，确认 `_tracking-state.json` 与全部派生视图一致。失败时重跑产生当前目标状态的原事务，不得猜测、手改 Markdown 或另造事务覆盖。
 2. **判定是否需要修订**：只有正文证据表明现有追踪事实错误或缺失时才维护。过期伏笔、漏登记开放钩子、角色当前状态、客观时间线、读者认知都归入其证据所在章的 `mode=revision` 事务。普通审查意见和未来写作建议不进追踪。
@@ -539,3 +560,5 @@ Rubric Source: file | embedded fallback
 
 - 跟随用户的语言回复，用户用什么语言就用什么语言回复。
 - 中文回复遵循《中文文案排版指北》。
+
+体验修改每轮优先处理 1～2 个最高阅读损失的根因，重要问题仍全部登记。

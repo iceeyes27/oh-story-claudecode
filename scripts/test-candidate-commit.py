@@ -13,6 +13,7 @@ import importlib.util
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import tempfile
@@ -20,10 +21,24 @@ import unittest
 import shutil
 from pathlib import Path
 
+if sys.version_info < (3, 10):
+    _orig_write_text = Path.write_text
+
+    def _compat_write_text(self, data, encoding=None, errors=None, newline=None):
+        if newline is not None:
+            with self.open("w", encoding=encoding, errors=errors, newline=newline) as handle:
+                return handle.write(data)
+        return _orig_write_text(self, data, encoding=encoding, errors=errors)
+
+    Path.write_text = _compat_write_text
+
 
 ROOT = Path(__file__).resolve().parents[1]
 TOOL = ROOT / "skills/story-write/scripts/candidate-commit.py"
 TRACKING_TOOL = ROOT / "skills/story-write/scripts/tracking_commit.py"
+
+sys.path.insert(0, str(ROOT / "skills/story-write/scripts"))
+from test_review_process import make_process
 
 # 借用追踪测试里的合法文档构造器，避免重复维护事务形状。
 _spec = importlib.util.spec_from_file_location(
@@ -71,7 +86,9 @@ class CandidateCommitTests(unittest.TestCase):
         self.candidate_dir.mkdir(parents=True)
         (self.project / "正文").mkdir()
         # 初始化追踪状态（last_committed_chapter=0, state_revision=0）。
-        self._tracking("init", initial_document(last_chapter=last_chapter))
+        init_doc = initial_document(last_chapter=last_chapter)
+        init_doc["setting_payoff"] = {"enabled": False, "schema_version": 1, "since_chapter": None}
+        self._tracking("init", init_doc)
         for chapter in range(1, last_chapter + 1):
             first = chr(0x4E00 + chapter * 2)
             second = chr(0x4E00 + chapter * 2 + 1)
@@ -185,6 +202,14 @@ class CandidateCommitTests(unittest.TestCase):
             for receipt_id in ("rc-01", "rc-02", "rc-03")
         }
         checks["rc-01"]["result_sha256"] = self._canonical_sha(report)
+        for name in ("rc-02", "rc-03"):
+            checks[name].update(
+                source="independent",
+                reviewer_run_id=f"test-reader-{name}",
+                reading_kind="first_read",
+                chapter=chapter,
+                candidate_path=prose.relative_to(self.project).as_posix(),
+            )
         if chapter % 15 == 0:
             start = chapter - 14
             ledger = ledger or {
@@ -287,14 +312,50 @@ class CandidateCommitTests(unittest.TestCase):
                 doc.update(tx_overrides)
             evidence = content.splitlines()[-1][:8]
             digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
+            logic_checks = self._logic_checks(chapter, prose, ledger=ledger)
+            prose_files = logic_checks["rc-01"]["prose_files"]
+            anchor = prose.read_text(encoding="utf-8-sig").rstrip().splitlines()[-1][:12]
+            editor_review = {
+                "schema_version": 1,
+                "policy_version": "independent-editor-v1",
+                "status": "PASS",
+                "source": "independent",
+                "writer_run_id": "test-writer",
+                "reviewer_run_id": "test-editor",
+                "candidate_sha256": digest(prose),
+                "context_files": prose_files,
+                "passes": [
+                    {
+                        "kind": kind,
+                        "files": [f["path"] for f in prose_files],
+                        "assessment": "夹具完成对应检查声明",
+                        "evidence": [{"path": f"候选/{prose.name}", "anchor": anchor}],
+                    }
+                    for kind in ("comprehension", "sentence")
+                ],
+                "findings": [],
+                "signoff": {"candidate_sha256": digest(prose), "limitations": []},
+            }
+            readers = [logic_checks["rc-02"], logic_checks["rc-03"]]
+            review_process = make_process(
+                self.project,
+                chapter,
+                prose,
+                editor_review,
+                readers,
+                prefix=f"审核/ch{chapter:03d}-process",
+            )
             doc["candidate_binding"] = {
-                "schema_version": 2,
+                "schema_version": 4,
                 "quality_profile": "fanqie-long-v2",
                 "prose": {"path": f"候选/{prose.name}", "sha256": digest(prose)},
                 "outline": {"path": f"大纲/{outline.name}", "sha256": digest(outline)},
                 "skeleton": {"path": f"骨架/{skeleton.name}", "sha256": digest(skeleton)},
                 "coverage": [{"id": "O1", "evidence": evidence}],
-                "logic_checks": self._logic_checks(chapter, prose, ledger=ledger),
+                "setting_payoffs": [],
+                "logic_checks": logic_checks,
+                "editor_review": editor_review,
+                "review_process": review_process,
             }
             (self.candidate_dir / f"第{chapter:03d}章_追踪事务.json").write_text(
                 json.dumps(doc, ensure_ascii=False), encoding="utf-8"
@@ -316,10 +377,24 @@ class CandidateCommitTests(unittest.TestCase):
         self.assertEqual(self.read_state()["state_revision"], 0)
         self.assertEqual(self.read_state()["last_committed_chapter"], 0)
 
+    def test_check_accepts_3500_and_rejects_3501_without_adopting(self) -> None:
+        for actual, exit_code in [(3500, 0), (3501, 1)]:
+            with self.subTest(actual=actual):
+                body = "# 第1章 测试章名\n" + "".join(chr(0x6000 + n) for n in range(actual - 1))
+                self.make_candidate(1, body=body)
+                before = self.read_state()
+                result = self._candidate(["check", "--chapter", "1"], expect=exit_code)
+                if exit_code:
+                    self.assertIn("2200–3500", result.stderr)
+                else:
+                    self.assertTrue(json.loads(result.stdout)["ok"])
+                self.assertEqual(self.read_state(), before)
+                self.assertEqual(self.final_files(), [])
+
     def test_candidate_workflow_documents_v2_logic_contract(self) -> None:
         workflow = (ROOT / "skills/story-write/references/candidate-workflow.md").read_text(encoding="utf-8")
         binding = (ROOT / "skills/story-write/references/candidate-logic-binding.md").read_text(encoding="utf-8")
-        self.assertIn("candidate_binding` v2", workflow)
+        self.assertIn("candidate_binding` v4", workflow)
         self.assertIn("fanqie-long-v2", workflow)
         for receipt_id in ("rc-01", "rc-02", "rc-03", "arc-01", "arc-02"):
             self.assertIn(receipt_id, binding)
@@ -501,8 +576,7 @@ class CandidateCommitTests(unittest.TestCase):
             "schema_version": 1, "quality_profile": "fanqie-long-v1",
         }))
         result = self._candidate(["promote", "--chapter", "1"], expect=2)
-        self.assertIn("v1", result.stderr)
-        self.assertIn("重新生成", result.stderr)
+        self.assertIn("必须升级至 v4", result.stderr)
 
     def test_promote_rejects_missing_or_unknown_logic_id(self) -> None:
         for case in ("missing", "unknown"):
@@ -537,8 +611,7 @@ class CandidateCommitTests(unittest.TestCase):
         accepted = next((self.project / "正文").glob("第001章_*.md"))
         accepted.write_text(accepted.read_text(encoding="utf-8") + "正文后来改变。\n", encoding="utf-8")
         result = self._candidate(["promote", "--chapter", "2"], expect=2)
-        self.assertIn("prose_files", result.stderr)
-        self.assertIn("sha256 已过期", result.stderr)
+        self.assertTrue("stale/missing context" in result.stderr or "sha256 已过期" in result.stderr)
 
     def test_promote_rejects_empty_or_unbound_semantic_evidence(self) -> None:
         for case in ("empty", "outside-prose", "missing-anchor"):
@@ -1223,7 +1296,7 @@ class OrdinaryRevisionTests(unittest.TestCase):
     def setUp(self):
         self.fixture = CandidateCommitTests()
         self.fixture._reset_project(last_chapter=4)
-        self.project = self.fixture.project
+        self.project = self.fixture.project.resolve()
         self.original = sorted((self.project / "正文").glob("*.md"))[1]
         fill = "".join(chr(0x6000 + n) for n in range(2300))
         # newline="\n" 是可移植性要求，不是风格：生产侧 atomic_write_text 固定写 LF，
@@ -1249,9 +1322,69 @@ class OrdinaryRevisionTests(unittest.TestCase):
         review.update(reviewer="synthetic test fixture", status="pass", facts_unchanged=kind != "facts",
                       original_anchor=(self.directory / "original.md").read_text(encoding="utf-8").splitlines()[1],
                       candidate_anchor=(self.directory / "candidate.md").read_text(encoding="utf-8").splitlines()[1])
+        context_rows = []
         for row in review["context"]:
-            row["anchor"] = (self.project / row["path"]).read_text(encoding="utf-8").splitlines()[-1]
+            p = self.project / row["path"]
+            row["anchor"] = p.read_text(encoding="utf-8").splitlines()[-1]
             row["assessment"] = "synthetic unaffected context"
+            m = re.match(r"^第0*(\d+)章", p.name)
+            if m and int(m[1]) < 2:
+                context_rows.append({"path": row["path"], "sha256": hashlib.sha256(p.read_bytes()).hexdigest()})
+        manifest = json.loads((self.directory / "manifest.json").read_text(encoding="utf-8"))
+        candidate_rel = (self.directory / "candidate.md").resolve().relative_to(self.project.resolve()).as_posix()
+        candidate_anchor = (self.directory / "candidate.md").read_text(encoding="utf-8").splitlines()[1]
+        prose_row = {"path": candidate_rel, "sha256": manifest["candidate_sha256"]}
+        all_context_files = [prose_row, *context_rows]
+        all_paths = [f["path"] for f in all_context_files]
+        review["editor_review"] = {
+            "schema_version": 1,
+            "policy_version": "independent-editor-v1",
+            "source": "independent",
+            "status": "PASS",
+            "writer_run_id": "fixture-writer",
+            "reviewer_run_id": "fixture-editor",
+            "candidate_sha256": manifest["candidate_sha256"],
+            "context_files": all_context_files,
+            "passes": [
+                {
+                    "kind": k,
+                    "files": all_paths,
+                    "assessment": "Synthetic pass evidence.",
+                    "evidence": [{"path": candidate_rel, "anchor": candidate_anchor}],
+                }
+                for k in ("comprehension", "sentence")
+            ],
+            "findings": [],
+            "signoff": {"candidate_sha256": manifest["candidate_sha256"], "limitations": []},
+        }
+        review["reader_review"] = {
+            "schema_version": 1,
+            "status": "PASS",
+            "source": "independent",
+            "run_id": "fixture-reader-first-run",
+            "chapter": 2,
+            "candidate_path": candidate_rel,
+            "reviewer_run_id": "fixture-reader",
+            "reading_kind": "first_read",
+            "candidate_sha256": manifest["candidate_sha256"],
+            "prose_files": all_context_files,
+            "observations": {
+                key: {
+                    "assessment": "Synthetic receipt; not actual reader feedback.",
+                    "evidence": [{"path": candidate_rel, "anchor": candidate_anchor}],
+                }
+                for key in ("understanding", "friction", "reward", "read_on")
+            },
+            "findings": [],
+        }
+        review["review_process"] = make_process(
+            self.project,
+            2,
+            self.directory / "candidate.md",
+            review["editor_review"],
+            [review["reader_review"]],
+            prefix="审核/revision-fixture",
+        )
         self.review_path.write_text(json.dumps(review, ensure_ascii=False), encoding="utf-8")
         return result
 

@@ -1,12 +1,14 @@
 # 怎么拆解榜单爆款小说、学它的结构：扫榜和拆文的自动化做法
 
-**一句话答案：** 先扫榜再拆文。扫榜看的是跨样本重复的模式，不是单本排名；拆文先拆黄金三章，再逐章摘要、聚合成"节奏"和"情绪模块"两份可复用的资产，最后从中提炼文风。Oh Story（`zenstory-ai/oh-story-claudecode`，开源 MIT）把这条线做成了三个 skill：`/story-long-scan`（扫榜）→ `/story-long-analyze`（拆文）→ `/story-long-write`（写作直接消费拆文产物）。短篇有对应的 `short-scan` / `short-analyze` / `short-write`。
+> 本 fork 使用统一 Skill 与 long/short 模式。长篇写章默认生成骨架，明确成稿请求写入候选；作者采用后才并入正文并推进追踪。仅规划按请求范围停止。
+
+**一句话答案：** 先扫榜再拆文。扫榜看的是跨样本重复的模式，不是单本排名；拆文先拆黄金三章，再逐章摘要、聚合成"节奏"和"情绪模块"两份可复用的资产，最后从中提炼文风。Oh Story（`zenstory-ai/oh-story-claudecode`，开源 MIT）把这条线做成了三个 skill：`/story-scan long`（扫榜）→ `/story-analyze long`（拆文）→ `/story-write long`（写作直接消费拆文产物）。短篇有对应的 `short-scan` / `short-analyze` / `short-write`。
 
 这份文档讲扫榜和拆文各自产出什么、怎么衔接到写作。它拆的是用户合法持有的作品，性质是只读的结构分析，不复制原文。
 
 ## 第一步：扫榜，看模式不看排名
 
-`story-long-scan` 的核心信念是一句话：**单本排名只提供线索，跨样本重复模式才算信号。** 一本书上榜只算个例；同类样本达到可比数量，才标记为趋势候选。
+`story-scan` (mode=long) 的核心信念是一句话：**单本排名只提供线索，跨样本重复模式才算信号。** 一本书上榜只算个例；同类样本达到可比数量，才标记为趋势候选。
 
 三个平台看的东西不同：
 
@@ -22,7 +24,7 @@
 
 ## 第二步：拆文，一条管道六个阶段
 
-`story-long-analyze` 只有一条深度管道，跑到黄金三章后自动停靠，问你要不要继续：
+`story-analyze` (mode=long) 只有一条深度管道，跑到黄金三章后自动停靠，问你要不要继续：
 
 | Stage | 做什么 | 产出 |
 |---|---|---|
@@ -45,7 +47,7 @@ Stage 3 还做角色合并（跨章去重、别名归一，置信度 ≥0.85 自
 
 ## 第三步：写作时怎么用
 
-`story-long-write` 的方法论第三条："用模块组装，不要重新发明。" 具体做法：把对标书的具体角色看成功能位（对手 / 盟友 / 催化剂），再映射到你自己的角色；用你的素材填充这些功能位。
+`story-write` (mode=long) 的方法论第三条："用模块组装，不要重新发明。" 具体做法：把对标书的具体角色看成功能位（对手 / 盟友 / 催化剂），再映射到你自己的角色；用你的素材填充这些功能位。
 
 拆文产物通过项目里的 `对标/{书名}/` 目录被写作 skill 读取（`剧情/`、`角色/`、`设定/`、`文风.md`），日更前会先读 `文风.md` 贴近对标书文风。写作时不复制原文句子，复制的是结构和节奏。
 
@@ -61,6 +63,6 @@ Stage 3 还做角色合并（跨章去重、别名归一，置信度 ≥0.85 自
 
 ## 相关
 
-- 触发：`/story-long-scan`、`/长篇扫榜`、"长篇什么火"；`/story-long-analyze`、`/长篇拆文`、"帮我拆这本书"。
-- 参考方法：`skills/story-long-analyze/references/material-decomposition.md`、`deconstruction-notes.md`
+- 触发：`/story-scan long`、`/长篇扫榜`、"长篇什么火"；`/story-analyze long`、`/长篇拆文`、"帮我拆这本书"。
+- 参考方法：`skills/story-analyze/references/material-decomposition.md`、`deconstruction-notes.md`
 - 仓库地址：https://github.com/zenstory-ai/oh-story-claudecode（原 `worldwonderer/oh-story-claudecode`，旧链接自动跳转）

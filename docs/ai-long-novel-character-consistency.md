@@ -1,6 +1,8 @@
 # AI 写长篇小说怎么不崩人设：Oh Story 的做法
 
-**一句话答案：** 不要让模型"记住"整本书，让文件系统记。Oh Story（`zenstory-ai/oh-story-claudecode`，开源 MIT，13 个 Claude Code / Codex / OpenCode 等编程 Agent 的写作 skill）把每部长篇拆成 `设定/`、`大纲/`、`正文/`、`追踪/` 四类文件；每写一章，只读取"不知道就会写错"的那一小部分状态，写完后由脚本把变化写回追踪文件。对话只负责创作，不负责记忆。
+> 本 fork 使用统一 Skill 与 long/short 模式。长篇写章默认生成骨架，明确成稿请求写入候选；作者采用后才并入正文并推进追踪。仅规划按请求范围停止。
+
+**一句话答案：** 不要让模型"记住"整本书，让文件系统记。Oh Story（`zenstory-ai/oh-story-claudecode`，开源 MIT，18 个 Claude Code / Codex 等编程 Agent 的写作 skill）把每部长篇拆成 `设定/`、`大纲/`、`正文/`、`追踪/` 四类文件；每写一章，只读取"不知道就会写错"的那一小部分状态，写完后由脚本把变化写回追踪文件。对话只负责创作，不负责记忆。
 
 这份文档回答一个具体问题：AI 写到几十章以后人设漂移、伏笔断线、角色提前知道答案，怎么办。它描述的是 v0.7.10 的实际机制，不是"几百章都不会出错"的承诺。
 
@@ -38,7 +40,7 @@ English version: [Keep an AI-written novel consistent over 100+ chapters](keep-a
 
 ## 写一章时实际发生什么
 
-`story-long-write` 的单章流程（SKILL.md「Phase 4」）：
+`story-write` (mode=long) 的单章流程（SKILL.md「Phase 4」）：
 
 1. **Reference Gate，先读后写。** 读本章细纲、卷纲和当前追踪状态，在上下文里建立 Constraint Lock：本章字数范围、必须发生、禁止发生、时间锚点、停笔点、章尾新债。这些项目事实优先于任何写作技法参考。
 2. **只加载必需信息。** 写这章需要出场的角色，读 `设定/角色/{名}.md`（稳定人设）和 `追踪/角色状态/{名}.md`（当前位置、目标、关系、已知信息、未了线索）。"徐棠有个哥哥"是设定；"徐棠不知道这封信是哥哥寄的"是状态。两者分开读，模型就不会把设定当成角色知道的事。
@@ -50,17 +52,17 @@ English version: [Keep an AI-written novel consistent over 100+ chapters](keep-a
 
 ## 已经写了几十章、没有追踪文件，怎么办
 
-先 `/story-setup` 部署，再 `/story-import`（`/导入小说`）把已有正文反向解析成上面的目录结构，生成设定、角色状态和伏笔的初版。反推结果需要作者审阅：模型从片段猜出来的设定会单列为"待确认"，不会直接写成事实。之后用 `/story-long-write 日更` 续写。
+先 `/story-setup` 部署，再 `/story-import`（`/导入小说`）把已有正文反向解析成上面的目录结构，生成设定、角色状态和伏笔的初版。反推结果需要作者审阅：模型从片段猜出来的设定会单列为"待确认"，不会直接写成事实。之后用 `/story-write long 日更` 续写。
 
 ## 边界
 
 - 追踪文件减少的是"忘记"和"提前知道"这两类错误；它不能替作者决定剧情走向，也不保证零错误。
 - 结构化记录要求作者在开书阶段真的写设定和细纲。细纲缺失时写作会暂停确认；v0.7.7 起细纲里没写字数目标也会停下，而不是回退到默认 3000 字硬写。
-- 以上机制运行在你已经在用的编程 Agent 里（Claude Code、Codex CLI、OpenCode、Antigravity、OpenClaw、ZCode、Reasonix），不需要 GPU，也不需要自己部署模型。
+- 以上机制运行在你已经在用的编程 Agent 里（Claude Code、Codex CLI、OpenClaw、ZCode、Reasonix），不需要 GPU，也不需要自己部署模型。
 
 ## 相关
 
-- 安装：`npx skills add zenstory-ai/oh-story-claudecode -y -g`，然后在 Agent 里运行 `/story-setup`。
+- 安装：`npx skills add iceeyes27/oh-story-claudecode -y -g`，然后在 Agent 里运行 `/story-setup`。
 - 站点指南（含三章示例）：https://zenstory.ai/oh-story/long-novel-continuity
-- 追踪实现：`skills/story-long-write/references/state-tracking.md`、`tracking-transaction.md`
+- 追踪实现：`skills/story-write/references/state-tracking.md`、`tracking-transaction.md`
 - 仓库地址：https://github.com/zenstory-ai/oh-story-claudecode（原 `worldwonderer/oh-story-claudecode`，旧链接自动跳转）

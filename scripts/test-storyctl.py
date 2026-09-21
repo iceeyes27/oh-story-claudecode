@@ -38,6 +38,15 @@ def run_cli(*arguments: str) -> tuple[subprocess.CompletedProcess[str], dict[str
 
 
 class VisibleCharsTests(unittest.TestCase):
+    def test_fanqie_length_boundaries(self) -> None:
+        for actual, expected in [(2199, "under"), (2200, "pass"), (2801, "pass"),
+                                 (3500, "pass"), (3501, "over")]:
+            with self.subTest(actual=actual):
+                result = storyctl.core.fanqie_length("# 标题\r\n" + "字" * actual + "\r\n \t")
+                self.assertEqual(result["actual"], actual)
+                self.assertEqual((result["min"], result["max"]), (2200, 3500))
+                self.assertEqual(result["status"], expected)
+
     def test_frozen_unicode_counting_contract(self) -> None:
         self.assertEqual(storyctl.count_visible_chars("甲\n乙"), 2)
         self.assertEqual(storyctl.count_visible_chars("甲\r\n乙"), 2)
@@ -268,7 +277,13 @@ class StoryctlCliTests(unittest.TestCase):
     def test_demo_outlines_and_bodies_use_the_same_metric(self) -> None:
         book = ROOT / "demo/长篇/让你管账号，你高燃混剪炸全网"
         outlines = sorted((book / "大纲").glob("细纲_第*.md"))
-        self.assertEqual(len(outlines), 20)
+        self.assertEqual(len(outlines), 21)
+        # 导入的章节其「字数目标」是从已发布正文反推的，因此逐字相等；
+        # 导入之后由 skill 写出的章节只需落在内部带内（作者可接受偏短的成稿）。
+        state = json.loads(
+            (book / "追踪/_tracking-state.json").read_text(encoding="utf-8")
+        )
+        imported_through = state["imported_through_chapter"]
         for outline in outlines:
             outline_text = outline.read_text(encoding="utf-8")
             target_matches = re.findall(r"^- 字数目标：([1-9]\d*) 字$", outline_text, re.MULTILINE)
@@ -291,7 +306,8 @@ class StoryctlCliTests(unittest.TestCase):
             )
             self.assertEqual(completed.returncode, 0, f"{outline.name}: {completed.stderr}")
             self.assertEqual(result["status"], "internal_pass", outline.name)
-            self.assertEqual(result["target"], result["actual"], outline.name)
+            if int(chapter) <= imported_through:
+                self.assertEqual(result["target"], result["actual"], outline.name)
 
 
 if __name__ == "__main__":

@@ -37,6 +37,11 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 
 `references/` 中的文件由 skill 按需加载，不会全部塞进上下文。
 
+## 维护者指引与决策笔记
+
+- 仓库根的 [AGENTS.md](AGENTS.md) 是给维护本仓库的 coding agent 读的开发指引（改动前必知的硬规矩、验证入口、笔记规则）；`CLAUDE.md` 只有一行 `@AGENTS.md`，不维护第二份正文。它与 story-setup 部署到用户写作项目的 `AGENTS.md` / `CLAUDE.md` 无关。
+- 非平凡改动要在 `.agents/notes/{proposed,implemented,rejected}/{feature,bug-fix,simplification,architecture,process,testing}/yyyy-mm-dd-topic.md` 留一篇决策笔记（Problem / Decision 或 Proposal / Alternatives considered / Consequences），规则全文见 AGENTS.md「重要改动必须留笔记」；格式由 `scripts/check-agent-notes.py` 在 CI 守卫。检索：`rg --hidden <关键词> .agents/notes/`。
+
 ## 如何贡献
 
 ### 改进现有 skill
@@ -233,3 +238,9 @@ bash scripts/test-codex-hooks.sh
 - **PreToolUse 不完整拦截**：Codex 官方说明当前 shell/edit 拦截不是完备安全边界；story hooks 只作为写作流程 guardrail，不能替代版本控制和人工审查。
 - **agent 文件格式**：Codex custom agents 是 `.codex/agents/{name}.toml`，必需 `name`、`description`、`developer_instructions`；只读 agent 使用 `sandbox_mode = "read-only"`。
 - **custom-agent 运行时注册**：`$story-setup` 写入 `.codex/agents/*.toml` 后，需要 trust 项目 `.codex/` 配置层并新开 Codex 会话。若当前 Codex 运行时仍返回 `unknown agent_type`（本地 `codex exec 0.141.0` 临时项目烟测可复现），skill 必须降级 solo/direct 并报告 fallback；自动化硬门槛是 TOML schema 与文件部署检查。
+
+## 决策笔记
+
+非平凡改动先检索 `.agents/notes/` 中同主题笔记，记录问题、决定、考虑过的替代方案与影响；新决定与实现一同提交。笔记按状态和分类存放，不建立手工索引。
+
+本地运行 `python scripts/check-agent-notes.py` 和 `python scripts/test-agent-notes.py` 校验目录布局与必需小节。

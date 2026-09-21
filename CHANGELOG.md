@@ -23,12 +23,13 @@ All notable changes to this project will be documented in this file.
 ### 变更与修复
 
 - 合并上游文风优先级裁决，统一使用书目录 `.deslop-whitelist` 豁免机制。
+- 作者记忆拆成项目级与书级两个 store，记忆随书走（#435）：全局、题材、流程条目留在工作区 `.story/作者记忆/`（`AP`），本书条目改存书目录 `.story/作者记忆/`（`BP`），`query` 合并两级返回。书级读写须传 `--book-root`，没传直接报错，不再写进工作区。
+- 作者记忆只记作者明确表达的偏好（#436）：捕获表移除 `repeated_correction` / `inferred_pattern` 两条推断写入管道，`record` / `commit` 拒绝这两个来源。
 - 修复 `build_writer_prompt.py` 中遗留的参考裁决表格注入问题，保证通用参考按任务条件读取。
 - 修复 `story_codex_hook.py` 与 `story_hook_core.js` 的 `load_style_whitelist` 与 `mask_style_text` 豁免穿透。
 - 修复 `normalize-punctuation.js` 对书级白名单中破折号、省略号的保护逻辑。
 - 修复 `workflow-daily.md` 中关于 `mode=revision` 与质量修复闭环的契约条款。
 - 全量质量门禁 32/32 项全部验证通过（PASS）。
-
 
 
 ## v0.8.1

@@ -1,5 +1,7 @@
 # AI 写的小说 AI 味太重怎么办：去AI味的具体做法
 
+> 本 fork 使用统一 Skill 与 long/short 模式。长篇写章默认生成骨架，明确成稿请求写入候选；作者采用后才并入正文并推进追踪。仅规划按请求范围停止。
+
 **一句话答案：** AI 味不是语法错误，是"过度圆滑、过度工整、解释太满"。去 AI 味要改的是读感，改最少的字，保留剧情功能。Oh Story（`zenstory-ai/oh-story-claudecode`，开源 MIT）把这件事做成了一个可重复的写作 lint：`/story-deslop`（`/去AI味`），先用脚本确定性地检出已知句式，再按 7 个 Gate 分级改写，删除比例有上限，改完出报告。
 
 这份文档说明 AI 味具体表现在哪里、怎么按等级处理，以及一个 skill 能自动化到什么程度。它不承诺任何 AI 检测器的分数。
@@ -65,6 +67,6 @@
 ## 相关
 
 - 触发：`/story-deslop`、`/去AI味`，或直接说"这篇太 AI 了"。
-- 预防优于治疗：`story-long-write` 和 `story-short-write` 在写作阶段就加载同一套 anti-ai-writing 规则。
+- 预防优于治疗：`story-write` (mode=long) 和 `story-write` (mode=short) 在写作阶段就加载同一套 anti-ai-writing 规则。
 - 站点上的改稿示例（前后对照）：https://zenstory.ai/oh-story/revise-ai-prose
 - 仓库地址：https://github.com/zenstory-ai/oh-story-claudecode（原 `worldwonderer/oh-story-claudecode`，旧链接自动跳转）

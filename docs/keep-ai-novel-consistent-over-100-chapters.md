@@ -1,6 +1,8 @@
 # How to keep an AI writing agent from breaking character over 100+ chapters
 
-**Short answer:** stop asking the model to remember the book. Put the story state in files, load only the slice a chapter needs, and write the changes back with a script. That is how Oh Story (`zenstory-ai/oh-story-claudecode`, MIT, 6.8k stars, 13 agent skills for Claude Code, Codex CLI, OpenCode and other coding agents) runs "daily update" batches of three chapters at a time without the cast drifting.
+> 本 fork 使用统一 Skill 与 long/short 模式。长篇写章默认生成骨架，明确成稿请求写入候选；作者采用后才并入正文并推进追踪。仅规划按请求范围停止。
+
+**Short answer:** stop asking the model to remember the book. Put the story state in files, load only the slice a chapter needs, and write the changes back with a script. That is how Oh Story (`zenstory-ai/oh-story-claudecode`, MIT, 18 public skills for Claude Code, Codex CLI and other coding agents) supports continuity checks with chapter skeletons, prose candidates and explicit author adoption.
 
 This page describes the mechanism as shipped in v0.7.10. It is not a claim that nothing ever goes wrong across 300 chapters.
 
@@ -38,7 +40,7 @@ Three design rules do the work:
 
 ## What one chapter actually does
 
-From `story-long-write`'s single-chapter flow:
+From `story-write` (mode=long)'s single-chapter flow:
 
 1. **Reference gate, read before write.** Load the chapter brief, the volume outline and the current tracking state, then build a Constraint Lock: word range, must-happen, must-not-happen, time anchors, where the chapter stops, what new debt it opens. These project facts override any craft reference.
 2. **Load only what would otherwise be wrong.** For each character on stage, read `设定/角色/{name}.md` (stable characterization) and `追踪/角色状态/{name}.md` (current location, goal, relationships, what they know, open threads). "Xu Tang has an older brother" is characterization. "Xu Tang does not know the letter came from him" is state. Reading them separately is what stops the model from turning a fact into character knowledge.
@@ -50,7 +52,7 @@ This is why a three-chapter batch keeps working: each chapter starts from a fres
 
 ## Already 40 chapters in, no tracking files?
 
-Run `/story-setup`, then `/story-import` to reverse-parse the existing manuscript into the structure above. It produces first-pass settings, character states and setups. Inferred facts are listed as "to confirm" rather than written as truth; review them, then continue with `/story-long-write`.
+Run `/story-setup`, then `/story-import` to reverse-parse the existing manuscript into the structure above. It produces first-pass settings, character states and setups. Inferred facts are listed as "to confirm" rather than written as truth; review them, then continue with `/story-write long`.
 
 ## Limits
 
@@ -60,7 +62,7 @@ Run `/story-setup`, then `/story-import` to reverse-parse the existing manuscrip
 
 ## Related
 
-- Install: `npx skills add zenstory-ai/oh-story-claudecode -y -g`, then `/story-setup` inside the agent.
+- Install: `npx skills add iceeyes27/oh-story-claudecode -y -g`, then `/story-setup` inside the agent.
 - Site guide with a worked three-chapter example: https://zenstory.ai/oh-story/long-novel-continuity
-- Implementation notes: `skills/story-long-write/references/state-tracking.md`, `tracking-transaction.md`
+- Implementation notes: `skills/story-write/references/state-tracking.md`, `tracking-transaction.md`
 - Repository: https://github.com/zenstory-ai/oh-story-claudecode (formerly `worldwonderer/oh-story-claudecode`; old links redirect)

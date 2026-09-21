@@ -8,6 +8,25 @@ import { aggregateStatus } from './quality-gate.mjs';
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const SCRIPTS = join(ROOT, 'scripts');
 
+test('independent review suites run directly in every local quality profile', () => {
+  const gate = JSON.parse(readFileSync(join(SCRIPTS, 'quality-gate.json'), 'utf8'));
+  const required = {
+    'editor-review': ['python', ['skills/story-write/scripts/test_editor_review.py']],
+    'review-process': ['python', ['skills/story-write/scripts/test_review_process.py']],
+    'revision-independent-review': ['python', ['skills/story-write/scripts/test_revision_independent_review.py']],
+    'independent-editor-contract': ['node', ['--test', 'skills/story-setup/tests/independent-editor-contract.test.js']],
+  };
+  for (const [name, [command, args]] of Object.entries(required)) {
+    assert.equal(gate.checks[name]?.command, command, `missing executable check: ${name}`);
+    assert.deepEqual(gate.checks[name].args, args);
+    assert.ok(existsSync(join(ROOT, args.at(-1))), `missing suite: ${name}`);
+    for (const profile of ['fast', 'affected', 'release']) {
+      assert.equal(gate.profiles[profile].filter((entry) => entry === name).length, 1,
+        `${profile} must run ${name} exactly once`);
+    }
+  }
+});
+
 test('all required checks must pass', () => {
   assert.equal(aggregateStatus([{ status: 'PASS' }, { status: 'PASS' }]), 'PASS');
   assert.equal(aggregateStatus([{ status: 'PASS' }, { status: 'SKIP' }]), 'BLOCKED');

@@ -99,11 +99,11 @@ Correct: 子场景打印 "note: ..."；根目录从 import.meta.url 转为文件
 
 - Good：公开 Skill 清单、`_shared`、生成 command 和各 marketplace 一致。
 - Base：仓库 Skill 均归入公开或本地专用清单，数量从清单计算。
-- Bad：平台只安装 `story` 与 10 个旧公开 Skill，却宣称复合检查 10/10。
+- Bad：平台只安装 `story` 与 10 个旧公开 Skill，却宣称复合检查 11/11。
 
 ### 6. Tests Required
 
-- `skills/story/tests/composite-check-contract.test.js`：断言十阶段顺序、108 个必检项、读者视角阶段的只读正文约束和公开依赖集合。
+- `skills/story/tests/composite-check-contract.test.js`：断言十一阶段顺序、120 个必检项、读者视角阶段的只读正文约束和公开依赖集合。
 - `scripts/skill-publication-coverage.test.js`：断言公开与本地专用集合无遗漏、无重叠且原因非空。
 - 平台检查：断言 marketplace、commands、frontmatter、manifest 与清单一一对应。
 - 平台 AGENTS 路由模板中的 Skill 名称也必须与 `platform-skill-set.json` 一致，禁止保留已删除的 `story-long-*` / `story-short-*` 名称。
@@ -135,8 +135,8 @@ Correct: 读取 platform-skill-set.json，并额外复制 skills/_shared/。
 
 ### 3. Contracts
 
-- 清单必须声明十个有序阶段与完整目录 108 项。前两个阶段是读者视角（`reader-comprehension` / `opening-arc`），只读 `正文/`。
-- 场景适用项由 manifest 的 profile 明确列出；纯中文正文为 46 项，其中逻辑项 13 项，`13/46 = 28.26%`。profile 外项目用 `NOT_APPLICABLE` 及原因登记，不进入适用分母。
+- 清单必须声明十一个有序阶段与完整目录 120 项。前两个阶段是读者视角（`reader-comprehension` / `opening-arc`），只读 `正文/`。
+- 场景适用项由 manifest 的 profile 明确列出；纯中文正文为 46 项，其中逻辑项 13 项，`16/58 = 27.59%`。profile 外项目用 `NOT_APPLICABLE` 及原因登记，不进入适用分母。
 - 每个必检项必须有唯一 `id`、`executor`、`scope`、`required` 和 `report`。
 - Hook 输入使用 `hook_event_name`、`tool_name`、`tool_input`；Write/Edit/MultiEdit 读取 `file_path`、`path`、`filePath`，Bash 读取 `command`、`cmd` 或 `script`。
 - Hook 的项目根、工作目录和目标文件必须先按物理路径归一化再做范围判断：允许 `/var` 与 `/private/var`、项目根别名等同对象路径，拒绝词法位于根内但经符号链接逃到根外的目标。
@@ -156,13 +156,13 @@ Correct: 读取 platform-skill-set.json，并额外复制 skills/_shared/。
 
 ### 5. Good / Base / Bad Cases
 
-- Good：十阶段全部有结论，完整目录 108 项均有状态；纯中文正文 46 个适用项全部返回，输出 `复合检查完成：10/10，过滤项 46/46（完整目录 108 项）`。
+- Good：十一阶段全部有结论，完整目录 120 项均有状态；纯中文正文 58 个适用项全部返回，输出 `复合检查完成：11/11，过滤项 58/58（完整目录 120 项）`。
 - Base：某项发现问题但仍执行后续项目，输出 `FAIL` 而不是中断。
 - Bad：只报告十个阶段名称，或把无法读取的文件静默排除后输出完成。
 
 ### 6. Tests Required
 
-- `node --test skills/story/tests/composite-check-contract.test.js`：阶段顺序、108 项目录、纯中文 13/46 预算、规范同步、依赖来源、漏项、阻断和触发词。
+- `node --test skills/story/tests/composite-check-contract.test.js`：阶段顺序、120 项目录、纯中文 16/58 预算、规范同步、依赖来源、漏项、阻断和触发词。
 - `bash scripts/test-prose-backstop-hook.sh`：Bash 成功/失败、Write、Edit、MultiEdit 的合法 Hook JSON 与正文发现，并覆盖物理同路径别名及符号链接逃逸。
 - `bash scripts/test-story-continuity.sh`：章节号与 tracking state 判定，不依赖固定 mtime 延迟。
 - `bash scripts/check-story-setup-deployment.sh`：部署模板必须包含 `prose-after-event` 路由。

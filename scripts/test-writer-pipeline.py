@@ -180,8 +180,8 @@ class PipelineTests(unittest.TestCase):
         self.assertIn('召回降档：成立', result.stdout)
         self.assertIn('第2章质疑', result.stdout)
 
-    def test_one_sentence_style_beats_stale_digest(self):
-        style = self.put('设定/文风.md', '采用有限全知，允许进入母女各自内心。')
+    def test_short_style_section_beats_stale_digest(self):
+        style = self.put('设定/文风.md', '## 笔调\n优先使用有限全知，允许进入母女各自内心。')
         digest = self.put('设定/_文风摘要.md', '旧规则：深度限知，不得进入他人内心。')
         result = self.build()
         self.assertEqual(result.returncode, 0, result.stderr)
@@ -201,7 +201,7 @@ class PipelineTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertNotIn('Traceback', result.stderr)
 
-    def test_style_reference_table_cannot_change_read_scope(self):
+    def test_style_reference_table_only_changes_optional_craft_scope(self):
         style = self.put('设定/文风.md', '用短句，保留必要的直接心理。')
         original = self.build()
         self.assertEqual(original.returncode, 0, original.stderr)
@@ -214,9 +214,13 @@ class PipelineTests(unittest.TestCase):
                 style.write_text(content, encoding='utf-8')
                 result = self.build()
                 self.assertEqual(result.returncode, 0, result.stderr)
-                # Style remains a full-text input; a legacy table must not become
-                # an extra executable instruction or narrow the reference set.
-                self.assertEqual(result.stdout, original.stdout)
+                self.assertIn('必读核心：reader-first-writing.md 与 long-format.md', result.stdout)
+                self.assertNotIn('agent-quality.md', result.stdout.split('本书停读清单（整行跳过、不判定不读取）：')[-1].split('\n')[0])
+                self.assertNotIn('references/*', result.stdout)
+                if 'writing-craft.md' in table:
+                    self.assertIn('本书停读清单（整行跳过、不判定不读取）：writing-craft.md、anti-ai-writing.md', result.stdout)
+                else:
+                    self.assertIn('本书判读的通用参考：dialogue-mastery.md（只看排版）', result.stdout)
                 self.assertEqual(style.read_text(encoding='utf-8'), content)
 
 

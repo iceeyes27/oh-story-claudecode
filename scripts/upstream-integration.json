@@ -7,7 +7,7 @@
   "upstream": {
     "remote": "upstream",
     "branch": "main",
-    "baseline": "fde17546758c58ad4d3306ef93d0db8ad28f9f3c"
+    "baseline": "0ffe7db4fa02489f5d1989e58a22ce62d040a850"
   },
   "quality_profile": "release",
   "policy_priority": [
@@ -27,10 +27,6 @@
       },
       {
         "prefix": ".opencode/",
-        "reason": "This fork dropped OpenCode as a supported platform; upstream still ships it, so auto-reject instead of re-conflicting every sync."
-      },
-      {
-        "prefix": "skills/story-setup/references/opencode/",
         "reason": "This fork dropped OpenCode as a supported platform; upstream still ships it, so auto-reject instead of re-conflicting every sync."
       },
       {
@@ -78,6 +74,14 @@
       {
         "path": "skills/story-write/scripts/candidate-commit.py",
         "reason": "Candidate adoption is a fork-owned author approval boundary."
+      },
+      {
+        "prefix": "skills/story-setup/references/opencode/",
+        "reason": "Fork-owned compatibility templates restored in 33a10af; preserve existing assets and review changes explicitly."
+      },
+      {
+        "path": "AGENTS.md",
+        "reason": "Preserve the local project instructions; port repository maintenance guidance to CONTRIBUTING.md."
       }
     ],
     "generated": [
@@ -176,6 +180,87 @@
       },
       {
         "path": "reasonix-plugin.json"
+      },
+      {
+        "path": "docs/ai-long-novel-character-consistency.md"
+      },
+      {
+        "path": "docs/claude-code-skills-for-writers.md"
+      },
+      {
+        "path": "docs/how-to-remove-ai-flavor-from-web-fiction.md"
+      },
+      {
+        "path": "docs/keep-ai-novel-consistent-over-100-chapters.md"
+      },
+      {
+        "path": "docs/scan-charts-and-deconstruct-bestsellers.md"
+      },
+      {
+        "path": ".agents/notes/implemented/process/2026-09-16-readme-for-readers-not-engines.md"
+      },
+      {
+        "path": ".agents/notes/implemented/process/2026-09-16-readme-masthead.md"
+      },
+      {
+        "path": ".agents/notes/implemented/architecture/2026-05-07-cross-skill-copies-not-symlinks.md"
+      },
+      {
+        "path": ".agents/notes/implemented/architecture/2026-07-15-hook-guard-failure-semantics.md"
+      },
+      {
+        "path": ".agents/notes/implemented/architecture/2026-09-18-author-memory-two-level-store.md"
+      },
+      {
+        "path": ".agents/notes/implemented/bug-fix/2026-08-22-deployment-manifest-self-copy-guard.md"
+      },
+      {
+        "path": ".agents/notes/implemented/bug-fix/2026-09-18-author-memory-query-budget.md"
+      },
+      {
+        "path": ".agents/notes/implemented/process/2026-05-08-agents-version-sole-staleness-authority.md"
+      },
+      {
+        "path": ".agents/notes/implemented/process/2026-06-26-openclaw-single-line-frontmatter.md"
+      },
+      {
+        "path": ".agents/notes/implemented/process/2026-08-11-hot-path-doc-budget.md"
+      },
+      {
+        "path": ".agents/notes/implemented/process/2026-09-15-root-agents-md-tracked.md"
+      },
+      {
+        "path": ".agents/notes/implemented/process/2026-09-18-readme-demo-is-real-recording.md"
+      },
+      {
+        "path": ".agents/notes/implemented/simplification/2026-09-07-hot-path-text-to-references.md"
+      },
+      {
+        "path": ".agents/notes/implemented/simplification/2026-09-18-author-memory-explicit-only.md"
+      },
+      {
+        "path": ".agents/notes/implemented/testing/2026-07-14-behavior-anchors-not-wording.md"
+      },
+      {
+        "path": ".agents/notes/implemented/testing/2026-09-18-agent-notes-format-guard.md"
+      },
+      {
+        "path": "docs/architecture.md"
+      },
+      {
+        "path": "docs/architecture_EN.md"
+      },
+      {
+        "path": "docs/hosts.md"
+      },
+      {
+        "path": "docs/hosts_EN.md"
+      },
+      {
+        "path": "docs/knowledge-base.md"
+      },
+      {
+        "path": "docs/knowledge-base_EN.md"
       }
     ]
   },

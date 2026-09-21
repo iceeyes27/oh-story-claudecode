@@ -14,3 +14,7 @@
 ## Self-contained runtime rule
 
 独立 Skill 不得读取其它业务 Skill 的脚本或参考文件。仅 `browser-cdp` 与 `_shared` 可作为基础依赖；需要其它能力时用路由说明而非文件路径。
+
+## Independent review reference distribution
+
+The editor specification, editor receipt and review-process reference are authored in the story-write reference directory. Standalone reader, review, import and setup packages carry exact distribution copies; setup agents read their deployed local reference bundle. Manage these distribution copies in scripts/shared-references.json and verify them with the shared-reference check and independent-editor contract test. The runtime shared-assets manifest intentionally excludes Markdown; do not bypass that rule. Reviewer protocol markers remain independent-editor-v1 and review-quality-v2.

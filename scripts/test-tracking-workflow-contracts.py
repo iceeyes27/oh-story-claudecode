@@ -256,7 +256,8 @@ def test_daily_quality_repairs_close_tracking_before_batch_finish() -> None:
     revision = text.index("若本步修文改变了会影响后续的事实")
     step_four = text.index("## Step 4：批末收尾")
     require(revision < step_four, "quality repair revision invariant must appear before Step 4")
-    require_all(text[revision:step_four], ("mode=revision", "通过 `check`", "纯措辞调整不重复提交"), "daily quality repair closure")
+    require_all(text[revision:step_four], ("revision-commit.py", "未采用候选只更新候选及绑定", "重跑 check", "不提前提交追踪"), "daily quality repair closure")
+    require_all(read("skills/story-write/references/workflow-revision.md"), ("mode=revision", "--transaction", "纯文字修订保留经复核的事实"), "adopted chapter revision transaction")
 
 
 def test_tracking_examples_use_the_demo_novel() -> None:

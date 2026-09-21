@@ -802,7 +802,7 @@ for ref_dir in "$SKILL_DIR"/references/*/; do
   esac
 done
 ref_dir_count="$(find "$SKILL_DIR/references" -maxdepth 1 -mindepth 1 -type d | wc -l | tr -d ' ')"
-[ "$ref_dir_count" -eq 8 ] || fail "story-setup references/ now has $ref_dir_count subdirs (expected 8); update the Phase 1 self-check list and this assertion"
+[ "$ref_dir_count" -eq 9 ] || fail "story-setup references/ now has $ref_dir_count subdirs (expected 9); update the Phase 1 self-check list and this assertion"
 assert_grep '剧情/情绪模块\.md.*missing_primary_contract|missing_primary_contract.*剧情/情绪模块\.md' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must require the current emotion-module artifact"
 assert_grep '剧情/节奏\.md.*missing_primary_contract|missing_primary_contract.*剧情/节奏\.md' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must require the current rhythm artifact"
 assert_no_grep 'legacy_deconstruction|contract_version.*legacy|pre-v12' "$SKILL_DIR/references/templates/agents/story-explorer.md" "story-explorer must not keep legacy benchmark branches"
@@ -820,6 +820,8 @@ assert_grep '复核否定铺垫后再肯定翻转' "$SKILL_DIR/references/templa
 assert_grep '跨段否定三连.*语义功能裁决' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must review cross-paragraph negation by semantic function"
 assert_grep '承担辩解、悬念排除、反讽或情绪递进时可保留' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must preserve functional negation"
 assert_grep '至于X不X，怎么X' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must review formulaic dialogue too"
+assert_grep '设定/文风\.md' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must consume the shared style decision"
+assert_grep '项目规则和白名单的格式、校验与例外以共享实现为准' "$REPO_ROOT/skills/story-deslop/SKILL.md" "style whitelist must use the shared implementation contract"
 assert_grep 'check-ai-patterns\.js --check' "$SKILL_DIR/references/templates/agents/narrative-writer.md" "narrative-writer must require detector rescan handoff"
 assert_grep '裸调用.*不得自动进入正文写作|不得自动进入正文写作.*裸调用' "$REPO_ROOT/skills/story-write/SKILL.md" "story-write bare invocation must not auto-write prose"
 assert_grep '不得把已有项目默认为日更 3 章|默认为日更 3 章' "$REPO_ROOT/skills/story-write/references/long-mode.md" "story-write must not default existing projects to daily 3 chapters on bare invocation"

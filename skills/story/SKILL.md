@@ -23,7 +23,8 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 | 选题决策 | 写什么能爆、帮我选题、选题方向 | `/story-scan` (mode=long) |
 | 短篇扫榜 | 短篇排行、知乎盐言排行 | `/story-scan` (mode=short) |
 | 去 AI 味 | 去 AI 味、太 AI、去味、说人话 | `/story-deslop` |
-| 小说复合检查 | 检查、检查这本小说、帮我检查、检查一下当前书 | 依次执行 `reader-comprehension-scan` → `opening-arc-audit`（章节数达窗口） → `story-review` → `ai-flavor-scan` → `story-deslop` (mode=novel) → `dialogue-naturalness-scan` → `jargon-verb-scan` → `legal-domain-veracity-scan`（涉司法实务题材） → `story-deslop` (mode=general) → `humanizer` |
+| 章末钩子替换 | 章末钩子、钩子替换、章末口号、章末精修、换章末收尾、口号腔收尾 | `/story-hook-refine` |
+| 小说复合检查 | 检查、检查这本小说、帮我检查、检查一下当前书 | 依次执行 `reader-comprehension-scan` → `opening-arc-audit`（章节数达窗口） → `story-review` → `ai-flavor-scan` → `story-deslop` (mode=novel) → `dialogue-naturalness-scan` → `jargon-verb-scan` → `legal-domain-veracity-scan`（涉司法实务题材） → `story-deslop` (mode=general) → `humanizer` → `story-micro-scan` |
 | 律政专业度 | 检查律政专业度、证据合法性、取证程序、司法硬伤 | `/legal-domain-veracity-scan` |
 | 封面 | 封面、封面图 | `/story-cover` |
 | 环境部署 | 准备写书、搭环境、初始化 | `/story-setup` |
@@ -42,9 +43,9 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 
 ## 作者记忆
 
-用户要求记住、查看、确认、替换或忘掉作者习惯时，加载 [.agents/skills/_shared/references/author-memory.md](../_shared/references/author-memory.md)，并只用共享脚本 `.agents/skills/_shared/scripts/author_memory_commit.py` 管理工作区级 `.story/作者记忆/`。常用变更走单事件 `record`；工具未返回 `ok: true` 和 `Author Memory Receipt` 前，不得声称已记住。显示画像或待确认项是只读操作；不存在时直接说明尚未建立。
+用户要求记住、查看、确认、替换或忘掉作者习惯时，加载 [.agents/skills/_shared/references/author-memory.md](../_shared/references/author-memory.md)，并只用共享脚本 `.agents/skills/_shared/scripts/author_memory_commit.py` 管理两级 `.story/作者记忆/`：全局、题材、流程条目在工作区（`AP`），本书条目在书目录（`BP`，传 `--book-root`）。常用变更走单事件 `record`；工具未返回 `ok: true` 和 `Author Memory Receipt` 前，不得声称已记住。显示画像或待确认项是只读操作；不存在时直接说明尚未建立。
 
-新增习惯必须保留用户原话和适用范围。一次性要求只执行不记录；小说事实写入本书设定/追踪；推断和重复修正先进入待确认；与已生效习惯冲突时显式 replace，不原地改写历史。用户没有指定工作区时，按协议定位已有作者记忆的最近祖先或当前创作工作区，禁止默认写到用户主目录。
+新增习惯必须保留用户原话和适用范围。一次性要求只执行不记录；小说事实写入本书设定/追踪；不从反复修改或成稿推断偏好，只记作者明确说的，原话范围含糊才进待确认；与已生效习惯冲突时显式 replace，不原地改写历史。项目级画像里还有「本书：」条目时，建议对该书运行 `migrate --book-root`。用户没有指定工作区时，按协议定位已有作者记忆的最近祖先或当前创作工作区，禁止默认写到用户主目录。
 
 ## Dashboard 工作台
 
@@ -94,10 +95,15 @@ metadata: {"openclaw":{"source":"https://github.com/iceeyes27/oh-story-claudecod
 8. `legal-domain-veracity-scan`：律政实务与证据合规专项，检查取证程序、证明力背书和庭审规范硬伤；题材完全不涉司法实务时整阶段按清单标 `SKIPPED` 并写明判断依据。
 9. `story-deslop`（mode=general）：正文及对外文案的套路腔、空话和模板感。
 10. `humanizer`：通用 AI 痕迹复核；纯中文正文只作模式复核。
+11. `story-micro-scan`：挑剔真人读者逐段通读，查数字与账目自洽（可复现计算、跨章并排）、跨章时间线与承诺兑现、同类拟声/句式/数量模板雷同、表述悬空（无主因"被 X"）、追踪台账-正文对账（冲突以正文为准，细纲未兑现不许预支）；只读 `正文/` + `追踪/`，不注入设定与大纲。
 
-前两个阶段是读者视角，先于一切文字层清洗执行：逻辑看不懂的稿子，把 AI 味洗干净也还是弃书。
+本轮共用审阅行为规范：读者先自然首读并实际返回理解、投入与困惑、略读、收获期待及原句，再七问回查；编辑覆盖准确、清楚、自然、连贯与句段节奏，有据体验缺陷也须报告。重要意见按原 ID 记录处置理由，不以规划答案抹除首读反应。检查仅报告，不写 review_process 或候选凭证，不改正文；保持 11 阶段及既有过滤项数量。完成、底线通过与体验改善分别报告。
 
-开始前输出当前书名、正文目录、章节总数、十阶段识别结果、完整目录项数和当前场景适用项数。纯中文小说正文使用 manifest 的 `pure-chinese-prose` profile；该 profile 之外的 filter 记 `NOT_APPLICABLE` 并说明场景原因，不进入适用分母。每完成一个阶段，立即输出执行状态、实际范围、目录项数、适用项数、已返回结果数、问题数量和关键发现。阶段内部逐项登记：
+独立审核要求：读者使用不继承作者上下文的新会话，按顺序只读正文，报告理解、跳读及期待证据；编辑与写手、读者分开，按唯一编辑规范两遍通读。独立审核缺失或输入不完整时对应项记 `BLOCKED`，不得以 solo 自查记 `PASS`，不得报告复合检查完成。趣味意见不阻止作者采用，但必须完成检查并如实报告。目录总数 N 和适用数 M 均由 manifest 实算。
+
+复合只读检查保留清单顺序，与候选交付的“编辑后再首读”顺序分开；检查中不改正文。前两个阶段是读者视角，先于一切文字层清洗执行：逻辑看不懂的稿子，把 AI 味洗干净也还是弃书。
+
+开始前输出当前书名、正文目录、章节总数、十一阶段识别结果、完整目录项数和当前场景适用项数。纯中文小说正文使用 manifest 的 `pure-chinese-prose` profile；该 profile 之外的 filter 记 `NOT_APPLICABLE` 并说明场景原因，不进入适用分母。每完成一个阶段，立即输出执行状态、实际范围、目录项数、适用项数、已返回结果数、问题数量和关键发现。阶段内部逐项登记：
 
 ```text
 filter_id | status | scope | findings | reason
@@ -105,7 +111,7 @@ filter_id | status | scope | findings | reason
 
 `PASS` 表示已执行且无发现，`FAIL` 表示已执行且有发现，`BLOCKED` 表示无法执行，`SKIPPED` 只用于阶段运行条件不满足，`NOT_APPLICABLE` 只用于当前 profile 排除的 filter；后二者都要写明原因。普通发现不能中断后续过滤器；输入不可读、范围不完整或没有等价执行器时必须报告阻断，不得静默跳过。Reviewer agent 不可用但 `story-review` 完成 solo 降级时必须标明。
 
-只有十个阶段全部有结论、108 个目录项都有合法状态、当前场景 M 个适用项全部返回且没有未说明的 `BLOCKED`/`SKIPPED`/`NOT_APPLICABLE` 时，才允许输出 `复合检查完成：10/10，过滤项 M/M（完整目录 108 项）`。
+只有十一个阶段全部有结论、manifest 实算的全部目录项都有合法状态、当前场景 M 个适用项全部返回且所有适用项均已实际执行、不存在任何 `BLOCKED` 或未执行项，非适用项的 `SKIPPED`/`NOT_APPLICABLE` 均说明原因 时，才允许输出 `复合检查完成：11/11，过滤项 M/M（完整目录 N 项，N 由 manifest 实算）`。
 
 用户未明确要求修改时，复合检查只读，不写正文文件。
 

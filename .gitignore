@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+.novel-kit.lock
+.novel-tmp-*

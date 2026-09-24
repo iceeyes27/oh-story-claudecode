@@ -40,6 +40,15 @@ def read(path):
     return path.read_bytes() if path.exists() else None
 
 
+def text(path):
+    # Never rely on the locale encoding (GBK/cp950 on Chinese Windows).
+    return path.read_text(encoding='utf-8')
+
+
+def load(path):
+    return json.loads(text(path))
+
+
 def dump(value):
     return (json.dumps(value, ensure_ascii=False, indent=2) + '\n').encode('utf-8')
 
@@ -106,9 +115,9 @@ def locked(root):
 
 
 def rows(root):
-    text = inside(root, STATE).read_text(encoding='utf-8')
+    content = text(inside(root, STATE))
     result = {}
-    for line in text.splitlines():
+    for line in content.splitlines():
         if not line.strip().startswith('|'):
             continue
         cells = [x.strip() for x in line.strip().strip('|').split('|')]
@@ -144,7 +153,7 @@ def scene_path(ch, sc):
 
 def outline(root, ch):
     p = inside(root, f'大綱/細綱/第{ch:03d}章.md')
-    content = p.read_text(encoding='utf-8')
+    content = text(p)
     require(re.search(r'^- 狀態：已確認\s*$', content, re.M), '細綱未確認')
     nums = [int(s) for s in re.findall(r'^## 場景(\d{2,})(?:\s|$)', content, re.M)]
     require(nums and nums == list(range(1, len(nums) + 1)), '細綱場景必須由 01 連續編號且不重複')
@@ -157,11 +166,11 @@ def journals(root):
 
 def idle(root):
     for p in journals(root):
-        require(json.loads(p.read_text())['status'] not in {'applying', 'reverting'}, '有中斷的採用，請先 accept 恢復：' + p.parent.name)
+        require(load(p)['status'] not in {'applying', 'reverting'}, '有中斷的採用，請先 accept 恢復：' + p.parent.name)
 
 
 def tasks(root):
-    return [(p, json.loads(p.read_text())) for p in sorted((root / '審閱/修訂').glob('*/任務.json'))]
+    return [(p, load(p)) for p in sorted((root / '審閱/修訂').glob('*/任務.json'))]
 
 
 def no_revision(root):
@@ -181,7 +190,7 @@ def previous_chapter(root, ch, data):
         verify_adopted(root, ch - 1, 0, data)
     else:
         p = root / '導入/清單.json'
-        imports = json.loads(p.read_text()) if p.exists() else {}
+        imports = load(p) if p.exists() else {}
         r = imports.get(str(ch - 1), {})
         require(r.get('text') and r['text'] == digest(read(inside(root, scene_path(ch - 1, 0)))), '上一章未採用或尚未確認導入')
 
@@ -288,7 +297,7 @@ def prepare(root, spec):
         require(data[ch, sc]['status'] in {'撰寫中', '自動審閱中'}, '先 begin 再交付')
     else:
         tp = task_path(root, spec['revision'])
-        task = json.loads(tp.read_text())
+        task = load(tp)
         require(task['status'] == 'active', '修訂任務不是進行中')
     review = spec['review']
     require(review['mode'] in REVIEWERS and isinstance(review.get('completed'), list) and isinstance(review.get('unresolved'), list), '審閱紀錄格式錯誤')
@@ -353,7 +362,7 @@ def prepare(root, spec):
             changes.append(change(root, STATE, table(data)))
         else:
             ip = root / '導入/清單.json'
-            imports = json.loads(ip.read_text()) if ip.exists() else {}
+            imports = load(ip) if ip.exists() else {}
             if str(ch) in imports:
                 imports[str(ch)]['text'] = prose[0]['after_hash']
                 changes.append(change(root, '導入/清單.json', dump(imports)))
@@ -387,7 +396,7 @@ def change(root, target, after, before=_UNSET):
 
 def accept(root, name, approval, override=''):
     p = inside(root, f'審閱/採用/{ident(name)}/journal.json')
-    j = json.loads(p.read_text())
+    j = load(p)
     if j['status'] == 'complete':
         return 'already-complete'
     require(j['status'] in {'prepared', 'applying'}, '交付不可採用')
@@ -396,7 +405,7 @@ def accept(root, name, approval, override=''):
     require(approval.strip(), '須記錄作者明確採用的回覆；工具不能替作者授權')
     require(not (j['missing_reviewers'] or j['review']['unresolved']) or override.strip(), '審閱未完成或仍有未決問題，須記錄作者明確裁決')
     for other in journals(root):
-        require(other == p or json.loads(other.read_text())['status'] not in {'applying', 'reverting'}, '先恢復另一個中斷採用')
+        require(other == p or load(other)['status'] not in {'applying', 'reverting'}, '先恢復另一個中斷採用')
     targets = {e['target']: e for e in j['changes']}
     for name, expected in j['watches'].items():
         current = digest(read(inside(root, name)))
@@ -424,7 +433,7 @@ def accept(root, name, approval, override=''):
 
 def rollback(root, name, reason):
     p = inside(root, f'審閱/採用/{ident(name)}/journal.json')
-    j = json.loads(p.read_text())
+    j = load(p)
     require(reason.strip(), '須記錄取消採用的原因')
     if j['status'] == 'cancelled':
         return 'already-cancelled'
@@ -449,7 +458,7 @@ def rollback(root, name, reason):
 
 def revision_extend(root, name, targets):
     idle(root)
-    p = task_path(root, name); t = json.loads(p.read_text())
+    p = task_path(root, name); t = load(p)
     require(t['status'] == 'active', '修訂任務已結束')
     for target in targets:
         target = rel(root, inside(root, target))
@@ -465,7 +474,7 @@ def revision_extend(root, name, targets):
 
 def revision_cancel(root, name):
     idle(root)
-    p = task_path(root, name); t = json.loads(p.read_text())
+    p = task_path(root, name); t = load(p)
     require(t['status'] == 'active' and not any(e['adopted'] for e in t['targets']), '部分已採用的修訂須先完成事實同步，不能直接取消')
     require(all(digest(read(root / e['target'])) == e['start_hash'] for e in t['targets']), '正文有手改，須先處理後才可取消')
     t['status'] = 'cancelled'; atomic(p, dump(t))
@@ -474,7 +483,7 @@ def revision_cancel(root, name):
 def confirm_import(root, manifest):
     idle(root); no_revision(root)
     ip = root / '導入/清單.json'
-    entries = json.loads(ip.read_text()) if ip.exists() else {}
+    entries = load(ip) if ip.exists() else {}
     for item in manifest:
         ch = int(item['chapter'])
         require(ch > 0 and str(ch) not in entries and not any(c == ch for c, _ in rows(root)), '章號重複或已登記')
@@ -538,13 +547,13 @@ def main(argv=None):
             if c == 'check': check(root, args.path)
             elif c == 'confirm-plan': confirm_plan(root, args.chapter)
             elif c in {'begin', 'reopen'}: begin(root, args.chapter, args.scene, c == 'reopen')
-            elif c == 'prepare': print(prepare(root, json.loads(inside(root, args.spec).read_text())))
+            elif c == 'prepare': print(prepare(root, load(inside(root, args.spec))))
             elif c == 'rollback': print(rollback(root, args.id, args.reason))
             elif c == 'accept': print(accept(root, args.id, args.approval, args.override))
             elif c == 'revision-start': revision_start(root, args.id, args.targets)
             elif c == 'revision-extend': revision_extend(root, args.id, args.targets)
             elif c == 'revision-cancel': revision_cancel(root, args.id)
-            elif c == 'confirm-import': confirm_import(root, json.loads(inside(root, args.manifest).read_text()))
+            elif c == 'confirm-import': confirm_import(root, load(inside(root, args.manifest)))
             elif c == 'commit': print(safe_commit(root, args.paths, args.message))
         return 0
     except (Invalid, OSError, ValueError, KeyError, TypeError, subprocess.CalledProcessError) as e:

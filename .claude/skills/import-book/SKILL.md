@@ -64,7 +64,7 @@ argument-hint: "[原稿路徑]"
 
 在對話中回報重點，請作者確認衝突與待確認項目。確認後更新檔案，建立導入規格 JSON 陣列：每項含 chapter（章號）、source（導入/原稿/ 下的備份路徑）、location（來源章節標題或範圍）、coverage（詳細或摘要）。
 
-執行 `python3 .claude/scripts/novel.py confirm-import <規格路徑>`，工具將來源與正文版本登記到 `導入/清單.json`。此命令記錄作者已確認的導入，不替代切分文字比對及語义抽取。按檔案提交；原有暫存不動。
+執行 `bash .claude/scripts/py.sh .claude/scripts/novel.py confirm-import <規格路徑>`，工具將來源與正文版本登記到 `導入/清單.json`。此命令記錄作者已確認的導入，不替代切分文字比對及語義抽取。按檔案提交；原有暫存不動。
 
 ## 六、可選：全書體檢
 

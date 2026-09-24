@@ -12,7 +12,7 @@ argument-hint: "[第NNN章 場景MM]"
 
 讀場景狀態與未完成修訂任務。有待審交付就附路徑等待作者；有中斷採用或待復核依賴，先處理。找已確認章節的下一個未開始場景；所有場景已採用就做收尾，收尾已採用則提示規劃下一章。
 
-執行 `python3 .claude/scripts/novel.py begin <章號> <場景號>`，工具核對細綱版本、前序正文與修訂任務。不能以手改狀態跳過。
+執行 `bash .claude/scripts/py.sh .claude/scripts/novel.py begin <章號> <場景號>`，工具核對細綱版本、前序正文與修訂任務。不能以手改狀態跳過。
 
 ## 準備與寫作
 

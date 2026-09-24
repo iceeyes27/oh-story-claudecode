@@ -23,7 +23,7 @@ class Workflow(unittest.TestCase):
 
     def write(self, path, content):
         p = self.root / path; p.parent.mkdir(parents=True, exist_ok=True)
-        p.write_bytes(content if isinstance(content, bytes) else content.encode())
+        p.write_bytes(content if isinstance(content, bytes) else content.encode('utf-8'))
         return p
 
     def plan(self, ch=1, scenes=2, confirmed=True):
@@ -68,7 +68,7 @@ class Workflow(unittest.TestCase):
 
     def test_unknown_and_duplicate_rows_rejected(self):
         self.ready()
-        text = (self.root / n.STATE).read_text()
+        text = (self.root / n.STATE).read_text(encoding='utf-8')
         self.write(n.STATE, text.replace('未開始', '未知', 1))
         with self.assertRaises(n.Invalid): n.rows(self.root)
         self.write(n.STATE, text + next(x for x in text.splitlines() if '場景01' in x) + '\n')
@@ -112,7 +112,7 @@ class Workflow(unittest.TestCase):
         n.prepare(self.root, s)
         with self.assertRaises(n.Invalid): n.accept(self.root, 's1', '通過')
         n.accept(self.root, 's1', '作者明確採用此版本', '作者知道缺席及 CC-1，決定保留')
-        j = json.loads((self.root/'審閱/採用/s1/journal.json').read_text())
+        j = json.loads((self.root/'審閱/採用/s1/journal.json').read_text(encoding='utf-8'))
         self.assertTrue(j['missing_reviewers']); self.assertEqual(j['review']['unresolved'], ['CC-1 S1'])
 
     def test_new_scene_cannot_silently_use_text_mode(self):
@@ -138,7 +138,7 @@ class Workflow(unittest.TestCase):
     def test_revision_candidate_preserves_official_text(self):
         self.adopted_chapter(); target=n.scene_path(1,0)
         n.revision_start(self.root,'fix',[target]); n.prepare(self.root,self.revision_delivery())
-        self.assertEqual((self.root/target).read_text(), '已採用整章')
+        self.assertEqual((self.root/target).read_text(encoding='utf-8'), '已採用整章')
         self.plan(ch=2)
         with self.assertRaises(n.Invalid): n.confirm_plan(self.root,2)
 
@@ -158,7 +158,7 @@ class Workflow(unittest.TestCase):
         n.prepare(self.root,self.revision_delivery(n.scene_path(1,1))); n.accept(self.root,'r1','通過')
         self.assertEqual(n.rows(self.root)[1,2]['status'],'待復核')
         n.revision_extend(self.root,'fix',[n.scene_path(1,2)])
-        self.assertEqual(len(json.loads(n.task_path(self.root,'fix').read_text())['targets']),2)
+        self.assertEqual(len(json.loads(n.task_path(self.root,'fix').read_text(encoding='utf-8'))['targets']),2)
 
     def test_cancel_preserves_prose_and_cannot_cancel_partial_adoption(self):
         self.adopted_chapter(); n.revision_start(self.root,'fix',[n.scene_path(1,0)])
@@ -171,7 +171,7 @@ class Workflow(unittest.TestCase):
         self.adopted_chapter(); target=n.scene_path(1,0); n.revision_start(self.root,'fix',[target])
         self.write(target,'作者手改')
         with self.assertRaises(n.Invalid): n.prepare(self.root,self.revision_delivery())
-        self.assertEqual((self.root/target).read_text(),'作者手改')
+        self.assertEqual((self.root/target).read_text(encoding='utf-8'),'作者手改')
 
     def test_interruption_resumes_without_overwriting_external_edits(self):
         self.adopted_chapter(); n.revision_start(self.root,'fix',[n.scene_path(1,0)])
@@ -182,7 +182,7 @@ class Workflow(unittest.TestCase):
             real(path,data)
         with patch.object(n,'atomic',stop_at_task):
             with self.assertRaises(OSError): n.accept(self.root,'r1','通過')
-        self.assertEqual((self.root/n.scene_path(1,0)).read_text(),'新的修訂正文')
+        self.assertEqual((self.root/n.scene_path(1,0)).read_text(encoding='utf-8'),'新的修訂正文')
         with self.assertRaises(n.Invalid): n.idle(self.root)
         n.accept(self.root,'r1','通過')
         self.assertEqual(n.accept(self.root,'r1','通過'),'already-complete')
@@ -198,7 +198,7 @@ class Workflow(unittest.TestCase):
             with self.assertRaises(OSError): n.accept(self.root,'r1','通過')
         self.write(n.scene_path(1,0),'中斷後作者又改')
         with self.assertRaises(n.Invalid): n.accept(self.root,'r1','通過')
-        self.assertEqual((self.root/n.scene_path(1,0)).read_text(),'中斷後作者又改')
+        self.assertEqual((self.root/n.scene_path(1,0)).read_text(encoding='utf-8'),'中斷後作者又改')
 
     def test_existing_chapter_without_confirmed_import_is_insufficient(self):
         self.write(n.scene_path(1,0),'導入章'); self.plan(ch=2)
@@ -226,11 +226,11 @@ class Workflow(unittest.TestCase):
         env=dict(os.environ,CLAUDE_PROJECT_DIR=str(self.root))
         for tool in ['Write','Edit']:
             payload={'tool_name':tool,'tool_input':{'file_path':str(self.root/n.scene_path(1,2))}}
-            result=subprocess.run([sys.executable,str(HOOK)],input=json.dumps(payload),text=True,capture_output=True,env=env)
+            result=subprocess.run([sys.executable,str(HOOK)],input=json.dumps(payload),text=True,encoding='utf-8',capture_output=True,env=env)
             self.assertEqual(result.returncode,2)
-        result=subprocess.run([sys.executable,str(HOOK)],input='{',text=True,capture_output=True,env=env)
+        result=subprocess.run([sys.executable,str(HOOK)],input='{',text=True,encoding='utf-8',capture_output=True,env=env)
         self.assertEqual(result.returncode,2)
-        result=subprocess.run([sys.executable,str(HOOK)],input=json.dumps({'tool_name':'Read'}),text=True,capture_output=True,env=env)
+        result=subprocess.run([sys.executable,str(HOOK)],input=json.dumps({'tool_name':'Read'}),text=True,encoding='utf-8',capture_output=True,env=env)
         self.assertEqual(result.returncode,0)
 
     def test_rollback_restores_interrupted_revision(self):
@@ -243,9 +243,9 @@ class Workflow(unittest.TestCase):
         with patch.object(n,'atomic',stop):
             with self.assertRaises(OSError): n.accept(self.root,'r1','approved')
         n.rollback(self.root,'r1','cancel interrupted adoption')
-        self.assertEqual((self.root/target).read_text(),'已採用整章')
+        self.assertEqual((self.root/target).read_text(encoding='utf-8'),'已採用整章')
         self.assertEqual(n.rollback(self.root,'r1','again'),'already-cancelled')
-        self.assertIsNone(json.loads(n.task_path(self.root,'fix').read_text())['targets'][0]['adopted'])
+        self.assertIsNone(json.loads(n.task_path(self.root,'fix').read_text(encoding='utf-8'))['targets'][0]['adopted'])
         with self.assertRaises(n.Invalid): n.accept(self.root,'r1','approved')
         n.idle(self.root)
 
@@ -291,7 +291,7 @@ class Workflow(unittest.TestCase):
     def test_hook_rejects_wrong_json_shapes(self):
         env=dict(os.environ,CLAUDE_PROJECT_DIR=str(self.root))
         for value in [[], None, {'tool_name':'Write','tool_input':[]}, {'tool_name':'Edit','tool_input':{'file_path':3}}]:
-            r=subprocess.run([sys.executable,str(HOOK)],input=json.dumps(value),text=True,capture_output=True,env=env)
+            r=subprocess.run([sys.executable,str(HOOK)],input=json.dumps(value),text=True,encoding='utf-8',capture_output=True,env=env)
             self.assertEqual(r.returncode,2,r.stderr)
 
     def git(self,*args):
@@ -323,7 +323,7 @@ class Workflow(unittest.TestCase):
 
     def test_cli_works_without_git(self):
         self.plan()
-        r=subprocess.run([sys.executable,str(SCRIPT),'--root',str(self.root),'confirm-plan','1'],text=True,capture_output=True)
+        r=subprocess.run([sys.executable,str(SCRIPT),'--root',str(self.root),'confirm-plan','1'],text=True,encoding='utf-8',errors='replace',capture_output=True)
         self.assertEqual(r.returncode,0,r.stderr)
         self.assertFalse((self.root/'.git').exists())
 

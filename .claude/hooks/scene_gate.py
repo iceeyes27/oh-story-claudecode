@@ -1,17 +1,31 @@
 #!/usr/bin/env python3
-"""PreToolUse guard for Write/Edit. Shell/external editor writes are not intercepted."""
+"""PreToolUse guard for Write/Edit. Shell/external editor writes are not intercepted.
+
+Claude Code only treats exit 2 as a block; any other failure lets the write
+through. Every error path therefore exits 2, and I/O never depends on the
+locale (Chinese Windows defaults to GBK/cp950).
+"""
 import json
 import os
 from pathlib import Path
 import sys
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from novel import check, Invalid
+
+def report(message):
+    data = ('【場景關卡】' + message + '\n').encode('utf-8', 'backslashreplace')
+    try:
+        sys.stderr.buffer.write(data)
+        sys.stderr.buffer.flush()
+    except Exception:
+        pass
 
 
 def main():
     try:
-        data = json.load(sys.stdin)
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
+        from novel import check, Invalid
+        # Claude Code sends raw UTF-8 JSON; strict decoding rejects anything else.
+        data = json.loads(sys.stdin.buffer.read().decode('utf-8'))
         if not isinstance(data, dict):
             raise Invalid('Hook 輸入必須是物件')
         if data.get('tool_name') not in {'Write', 'Edit'}:
@@ -25,8 +39,11 @@ def main():
             raise Invalid('Write/Edit 缺少 file_path')
         check(root, path)
         return 0
-    except (OSError, ValueError, KeyError, TypeError) as e:
-        print('【場景關卡】' + str(e), file=sys.stderr)
+    except UnicodeDecodeError:
+        report('Hook 輸入不是有效的 UTF-8')
+        return 2
+    except Exception as e:  # Strict gate: a failing hook must never let the write through.
+        report(str(e) or type(e).__name__)
         return 2
 
 

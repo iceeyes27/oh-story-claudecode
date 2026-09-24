@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""PreToolUse guard for Write/Edit. Shell/external editor writes are not intercepted.
+"""PreToolUse guard for file-writing tools. Shell/external editor writes are not intercepted.
 
 Claude Code only treats exit 2 as a block; any other failure lets the write
 through. Every error path therefore exits 2, and I/O never depends on the
@@ -9,6 +9,9 @@ import json
 import os
 from pathlib import Path
 import sys
+
+# Official file-writing tools; MultiEdit is kept for older Claude Code versions.
+TOOLS = {'Write', 'Edit', 'MultiEdit', 'NotebookEdit'}
 
 
 def report(message):
@@ -28,15 +31,16 @@ def main():
         data = json.loads(sys.stdin.buffer.read().decode('utf-8'))
         if not isinstance(data, dict):
             raise Invalid('Hook 輸入必須是物件')
-        if data.get('tool_name') not in {'Write', 'Edit'}:
+        if data.get('tool_name') not in TOOLS:
             return 0
         root = Path(os.environ.get('CLAUDE_PROJECT_DIR') or data.get('cwd') or os.getcwd()).resolve()
         tool_input = data.get('tool_input')
         if not isinstance(tool_input, dict):
-            raise Invalid('Write/Edit 缺少有效 tool_input')
-        path = tool_input.get('file_path')
+            raise Invalid('寫檔工具缺少有效 tool_input')
+        # NotebookEdit names its target notebook_path.
+        path = tool_input.get('file_path') or tool_input.get('notebook_path')
         if not path:
-            raise Invalid('Write/Edit 缺少 file_path')
+            raise Invalid('寫檔工具缺少 file_path 或 notebook_path')
         check(root, path)
         return 0
     except UnicodeDecodeError:

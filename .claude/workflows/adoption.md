@@ -109,6 +109,13 @@ bash .claude/scripts/py.sh .claude/scripts/novel.py commit --message '第001章 
 
 ## Hook 邊界
 
-Write/Edit 在寫入草稿前共用 `check`；正式正文直接 Write/Edit 被阻止。導入的新正文由導入整理步驟寫入並確認清單。Shell、外部編輯器與其他工具不在 Hook 攔截範圍內；工具以版本比對發現漂移，不把 Hook 宣傳為授權驗證器。
+寫檔工具（Write、Edit、NotebookEdit，並相容舊版 MultiEdit；NotebookEdit 取 `notebook_path`）在寫入前共用 `check`：
 
-設定依 [Claude Code 官方 Hook 文件](https://code.claude.com/docs/en/hooks) 使用 `Write|Edit` 和退出碼 2。Windows 需按當地 Python 命令調整設定；本版本尚未做 Windows 與 Claude Code 真實會話驗證。
+- 正式正文直接寫入被阻止；`草稿/第NNN章/場景MM.md` 與 `整章候選.md` 須符合場景狀態，其他 `草稿/` 路徑格式錯誤。
+- `追蹤/場景狀態.md`、`審閱/採用/` 下所有檔案、`審閱/修訂/<id>/任務.json`、`導入/清單.json` 只由 `novel.py` 以原子寫入維護，直接寫入被阻止（副檔名不分大小寫），請改用上方對應命令。同目錄的修訂候選、交付檔與規格照常寫。
+- 書稿外的絕對路徑放行，例如 Claude Code 的記憶與計劃檔。須字面路徑、解析後的真實路徑與各既有上層目錄的檔案身分都不在書稿內；8.3 短名、junction、符號連結、`\\?\` 前綴與大小寫別名繞回書稿時照常檢查。UNC 路徑（書稿本身不在 UNC 上時）、相對路徑與磁碟相對路徑 `D:foo` 不算書稿外，交由嚴格路徑檢查拒絕。
+- 路徑段含冒號（`::$DATA` 資料流）或以點、空白結尾時一律拒絕，Windows 會把它們寫進同名檔。
+
+導入的新正文由導入整理步驟寫入並確認清單。Shell、外部編輯器與其他工具不在 Hook 攔截範圍內；工具以版本比對發現漂移，不把 Hook 宣傳為授權驗證器。
+
+設定依 [Claude Code 官方 Hook 文件](https://code.claude.com/docs/en/hooks) 使用 `Write|Edit|MultiEdit|NotebookEdit` 和退出碼 2；[工具清單](https://code.claude.com/docs/en/tools-reference) 目前的寫檔工具是 Write、Edit、NotebookEdit，MultiEdit 只為舊版保留。Hook 經 `bash` 啟動，Python 由 `.claude/scripts/py.sh` 探測，不必按當地 Python 命令改設定。Windows 必須裝 Git Bash：未裝時官方預設改用 PowerShell 執行 Hook，`bash` 找不到會以非 2 退出而放行寫入。

@@ -16,6 +16,8 @@ STATE = '追蹤/場景狀態.md'
 STATES = {'未開始', '撰寫中', '自動審閱中', '待審', '已通過', '待復核'}
 SCENE = re.compile(r'草稿/第(\d{3,})章/場景(\d{2,})\.md')
 CHAPTER = re.compile(r'正文/第(\d{3,})章\.md')
+# Written only through atomic() by the commands below; re.I because Windows ignores extension case.
+TOOL_OWNED = re.compile(r'追蹤/場景狀態\.md|審閱/採用/.+|審閱/修訂/[^/]+/任務\.json|導入/清單\.json', re.I)
 REVIEWERS = {
     '完整': {'copy-editor', 'consistency-checker', 'character-reviewer', 'prose-reviewer', 'structure-reviewer'},
     '文字': {'copy-editor', 'consistency-checker'},
@@ -77,6 +79,38 @@ def inside(root, name):
     require(not any(x.is_symlink() for x in [p, *p.parents] if x != root and root in x.parents), '不接受符號連結路徑')
     require(p == p.resolve(), '路徑必須是專案內的標準路徑')
     return p
+
+
+def outside(root, name):
+    """True only for absolute paths verifiably outside the book (Claude Code memory, plans).
+
+    The literal path, the resolved path and every existing ancestor's file identity must all
+    miss root: 8.3 short names, junctions, symlinks, \\\\?\\ prefixes and case-insensitive
+    filesystems can alias back into the book. UNC/device paths on another drive than root
+    are never outside, since \\\\localhost\\C$ reaches local disks without a visible link.
+    """
+    if not isinstance(name, str) or not name or '\x00' in name:
+        return False
+    p = Path(name)
+    if not p.is_absolute():
+        return False
+    if p.drive != root.drive and p.drive[:2] in {'\\\\', '//'}:
+        return False
+    try:
+        real = p.resolve()
+        key = root.stat()
+    except (OSError, RuntimeError):
+        return False
+    if any(x == root or root in x.parents for x in (p, real)):
+        return False
+    for x in [p, *p.parents]:
+        try:
+            s = x.stat()
+        except OSError:
+            continue
+        if (s.st_dev, s.st_ino) == (key.st_dev, key.st_ino):
+            return False
+    return True
 
 
 def rel(root, path):
@@ -213,8 +247,14 @@ def eligible(root, ch, sc, allow_pending=False):
 
 
 def check(root, name):
+    if outside(root, name):
+        return
     p = inside(root, name)
     name = rel(root, p)
+    # Windows drops trailing dots/spaces and maps '::$DATA' to the main stream.
+    require(not re.search(r':|[. ](/|$)', name), '路徑段不可含冒號或以點、空白結尾')
+    if TOOL_OWNED.fullmatch(name):
+        raise Invalid('此檔由 novel.py 維護，請改用對應命令（見 .claude/workflows/adoption.md）')
     if name.startswith('正文/'):
         raise Invalid('正式正文只能經採用工具更新；請修改候選')
     if name.startswith('導入/原稿/') and p.exists():

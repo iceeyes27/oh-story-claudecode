@@ -62,14 +62,29 @@ class Book(unittest.TestCase):
     def plan(self, ch, confirmed):
         self.write(f'大綱/細綱/第{ch:03d}章.md', '- 狀態：' + ('已確認' if confirmed else '草案') + '\n## 場景01 甲\n## 場景02 乙\n')
 
-    def payload(self, path, tool='Write', raw=False, **extra):
+    def payload(self, path, tool='Write', raw=False, key='file_path', **extra):
         path = str(path)
         # raw: pass the path verbatim (relative, other-OS forms). Python 3.13 on Windows
         # no longer treats '/c/…' as absolute, so do not rely on os.path.isabs for those.
         target = path if raw or os.path.isabs(path) else str(self.root / path)
         data = {'session_id': 'x', 'cwd': str(self.root), 'hook_event_name': 'PreToolUse', 'tool_name': tool,
-                'tool_input': {'file_path': target, 'content': '內容 "引號" \\ 反斜線'}, **extra}
+                'tool_input': {key: target, 'content': '內容 "引號" \\ 反斜線'}, **extra}
         return json.dumps(data, ensure_ascii=False).encode('utf-8')
+
+    def outside(self):
+        return Path(self.tmp.name).resolve() / '別的專案/正文/第001章.md'
+
+    def scope_cases(self):
+        """(payload, expected exit) shared by the Python gate and the no-Python fallback."""
+        owned = ['追蹤/場景狀態.md', '追蹤/場景狀態.MD', '審閱/採用/s1/journal.json',
+                 '審閱/修訂/fix/任務.json', '審閱/修訂/fix/任務.Json', '導入/清單.json', '導入/清單.JSON']
+        return ([(self.payload(p), 2) for p in owned] +
+                [(self.payload(self.outside()), 0), (self.payload('設定/設定.md'), 0),
+                 (self.payload('審閱/修訂/fix/候選.md'), 0), (self.payload('追蹤/追蹤.md'), 0),
+                 (self.payload('正文/第001章.md', tool='MultiEdit'), 2),
+                 (self.payload('正文/第001章.ipynb', tool='NotebookEdit', key='notebook_path'), 2),
+                 (self.payload('設定/筆記.ipynb', tool='NotebookEdit', key='notebook_path'), 0),
+                 (self.payload(self.outside(), tool='NotebookEdit', key='notebook_path'), 0)])
 
     def env(self, **extra):
         # PYTHONIOENCODING forces non-UTF-8 stdio on every platform. PYTHONUTF8 is unset
@@ -99,6 +114,13 @@ class PythonHook(Book):
                     self.assertEqual(r.returncode, code, (io, tool, path, r.stderr.decode('utf-8', 'replace')))
         r = self.run_hook(self.payload('正文/第001章.md'))
         self.assertIn('正式正文', r.stderr.decode('utf-8'))
+
+    def test_scope_outside_tool_owned_and_notebook(self):
+        for data, code in self.scope_cases():
+            r = self.run_hook(data)
+            self.assertEqual(r.returncode, code, (data.decode('utf-8'), r.stderr.decode('utf-8', 'replace')))
+        r = self.run_hook(self.payload('追蹤/場景狀態.md'))
+        self.assertIn('novel.py 維護', r.stderr.decode('utf-8'))
 
     def test_invalid_utf8_is_rejected(self):
         gbk = json.dumps({'tool_name': 'Write', 'tool_input': {'file_path': str(self.root / '設定/設定.md')}},
@@ -132,7 +154,7 @@ class Launcher(Book):
 
     def command(self):
         hooks = json.loads(SETTINGS.read_text(encoding='utf-8'))['hooks']['PreToolUse']
-        self.assertEqual(hooks[0]['matcher'], 'Write|Edit')
+        self.assertEqual(hooks[0]['matcher'], 'Write|Edit|MultiEdit|NotebookEdit')
         return hooks[0]['hooks'][0]['command']
 
     def run_settings(self, data, path_dirs):
@@ -158,6 +180,12 @@ class Launcher(Book):
         for path, code in cases:
             r = self.run_settings(self.payload(path), [self.bin])
             self.assertEqual(r.returncode, code, (path, r.stderr.decode('utf-8', 'replace')))
+
+    def test_store_stub_scope_through_settings(self):
+        self.fake_store_stub()
+        for data, code in self.scope_cases():
+            r = self.run_settings(data, [self.bin])
+            self.assertEqual(r.returncode, code, (data.decode('utf-8'), r.stderr.decode('utf-8', 'replace')))
 
     def test_launcher_exports_utf8(self):
         self.fake_store_stub()
@@ -192,6 +220,26 @@ class Launcher(Book):
         r = self.run_no_python(self.payload('正文/x.md', tool='Read'))
         self.assertEqual(r.returncode, 0)
 
+    def test_no_python_scope_outside_tool_owned_and_notebook(self):
+        for data, code in self.scope_cases():
+            r = self.run_no_python(data)
+            self.assertEqual(r.returncode, code, (data.decode('utf-8'), r.stderr.decode('utf-8', 'replace')))
+        r = self.run_no_python(self.payload('導入/清單.json'))
+        self.assertIn('novel.py 維護', r.stderr.decode('utf-8'))
+        r = self.run_no_python(self.payload('正文/x.ipynb', tool='NotebookEdit', key='path'))
+        self.assertEqual(r.returncode, 2)
+
+    def test_no_python_alias_back_into_project_blocks(self):
+        # Identity check ([[ -ef ]]) catches outside-looking paths that reach the book.
+        link = Path(self.tmp.name) / 'alias'
+        try:
+            link.symlink_to(self.root, target_is_directory=True)
+        except OSError:
+            self.skipTest('無法建立符號連結')
+        for path in [link / '正文/第001章.md', link / '設定/設定.md']:
+            r = self.run_no_python(self.payload(path))
+            self.assertEqual(r.returncode, 2, (path, r.stderr.decode('utf-8', 'replace')))
+
     def test_no_python_relative_and_windows_paths(self):
         cases = [('C:\\book', 'C:\\book\\正文\\第001章.md', 2), ('C:\\book', 'c:/book/草稿/第001章/場景01.md', 2),
                  ('C:\\book', 'C:\\book\\設定\\設定.md', 0), ('C:/book', '/c/book/正文/第001章.md', 2),
@@ -201,7 +249,15 @@ class Launcher(Book):
                  ('C:\\book', 'C:\\book\\正文.\\第001章.md', 2),
                  ('C:\\book', 'C:\\book\\正文 \\第001章.md', 2),
                  ('C:\\book', 'C:\\book\\導入\\原稿.\\a.txt', 2),
-                 ('C:\\book', 'D:正文\\第001章.md', 2)]
+                 ('C:\\book', 'D:正文\\第001章.md', 2),
+                 ('C:\\book', 'C:\\book\\追蹤\\場景狀態.MD', 2), ('C:\\book', 'c:/BOOK/導入/清單.json', 2),
+                 ('C:\\book', 'C:\\book\\追蹤\\場景狀態.md::$DATA', 2),
+                 ('C:\\book', 'C:\\book\\導入\\清單.json.', 2),
+                 ('C:\\book', '\\\\localhost\\C$\\book\\正文\\第001章.md', 2),
+                 ('\\\\srv\\share\\book', '\\\\srv\\share\\book\\設定\\x.md', 0),
+                 ('\\\\srv\\share\\book', '\\\\srv\\share\\other\\x.md', 0),
+                 ('\\\\srv\\share\\book', '\\\\srv\\share\\book\\正文\\第001章.md', 2),
+                 ('/srv/book', '/srv/book/追蹤/場景狀態.md', 2), ('/srv/book', '/srv/other/追蹤/場景狀態.md', 0)]
         for root, path, code in cases:
             r = self.run_no_python(self.payload(path, raw=True), root=root)
             self.assertEqual(r.returncode, code, (root, path, r.stderr.decode('utf-8', 'replace')))

@@ -88,3 +88,46 @@ Hook 設定以 [Claude Code 官方 Hook 契約](https://code.claude.com/docs/en/
 - 未在 Claude Code 真實會話中觸發 Hook（留待 maturity-gate 子任務）；Claude Code 在 Windows 經 Git Bash 執行 Hook 的前提依官方文件與 main 分支現行做法。
 - 無 Python 回退只做字串判定，不解析符號連結；書稿外路徑回退放行、Python 關卡仍拒絕，兩者由 hook-scope 子任務統一。
 - `novel.py` CLI 的 stdout／stderr 仍依 locale；經 `py.sh` 啟動時為 UTF-8，直接以 `python` 執行時不保證。
+
+## 2026-09-24 Hook 範圍（hook-scope）
+
+基線：ec67d6b。範圍：書稿外路徑放行、工具專屬檔禁寫、寫檔工具名擴充、無 Python 回退同步。
+
+### 問題
+
+- 書稿外的絕對路徑經 `inside()` 拋錯，Hook 退出 2，誤擋 Claude Code 的記憶、計劃等書稿外寫入；無 Python 回退卻放行，兩條路徑不一致。
+- `追蹤/場景狀態.md`、`審閱/採用/`、`審閱/修訂/*/任務.json`、`導入/清單.json` 只應由 `novel.py` 寫入，但 Write/Edit 可直接改動。
+- matcher 只有 `Write|Edit`，NotebookEdit（路徑欄位是 `notebook_path`）與舊版 MultiEdit 不經關卡。
+
+### 修改
+
+- `novel.py` 新增 `outside(root, name)`：只有絕對路徑，且字面路徑、`Path.resolve()` 後的真實路徑、各既有上層目錄的檔案身分（`st_dev`／`st_ino`）都不在書稿內才算書稿外；`check()` 遇到即放行。實測 `resolve()` 對 `\\?\C:\…` 與 `\\localhost\C$\…` 不會還原成盤符路徑，只比對字面與真實路徑會被這兩種寫法繞回書稿；因此 UNC／裝置路徑與書稿不同磁碟時一律不算書稿外，身分比對再補上 macOS 大小寫別名等 `resolve()` 看不出的情況。相對路徑與 `D:foo` 不算書稿外，仍由 `inside()` 拒絕。
+- `TOOL_OWNED`（`re.I`）命中即拒絕並指向 adoption 流程。`novel.py` 自身經 `atomic()` 寫這些檔，不經 `check()`。另拒絕含冒號（`::$DATA`）或段尾點／空白的路徑：這些檔尚不存在時 `resolve()` 保留原樣，Windows 卻寫進同名檔，會繞過 `TOOL_OWNED`。
+- `settings.json` matcher 改為 `Write|Edit|MultiEdit|NotebookEdit`；`scene_gate.py` 同步工具集合，路徑取 `file_path`，沒有則取 `notebook_path`。
+- `scene_gate.sh` 回退：工具名同步；`notebook_path` 備援；工具專屬檔 glob 陣列（比對不加引號）；前綴與 glob 比對全程 `nocasematch`；拒絕冒號與 UNC；字面在書稿外時以 `[[ -ef ]]` 逐層核對既有上層目錄，連結繞回書稿即攔截。
+- README（安裝段標明 Windows 必須裝 Git Bash、Hook 段）、`adoption.md`「Hook 邊界」、`CLAUDE.md` 與 `import-book` 的 Hook 名稱同步。
+
+### 驗證
+
+環境：Windows 11 Pro 10.0.26200、Git Bash（GNU bash 5.3.15）、Python 3.13.3（`python`）、`python3` 為 Store 佔位程式（退出 49）、系統編碼 cp936，未設 `PYTHONUTF8`。
+
+| 命令 | 結果 |
+|---|---|
+| `python -m unittest discover -s tests -v` | 56 項通過（原 48 + 新 8），無略過 |
+| 實作前同一命令（先寫測試） | 13 項失敗／錯誤 |
+| 變異：去掉回退的 `-ef` 身分核對 | 符號連結繞回書稿的用例失敗（0 ≠ 2），還原後通過 |
+| `python -m py_compile .claude/scripts/novel.py .claude/hooks/scene_gate.py`、`bash -n .claude/hooks/scene_gate.sh`、`git diff --check` | 通過 |
+
+新測試覆蓋：書稿外絕對路徑 → 0（Python、經 settings 的佔位 `python3`、無 Python 三條路徑）；四類工具專屬檔含 `.MD`／`.JSON` 大小寫變體 → 2；MultiEdit 與以 `notebook_path` 寫 `正文/` 的 NotebookEdit → 2，`notebook_path` 缺失 → 2；`設定/設定.md`、`審閱/修訂/fix/候選.md` → 0；符號連結、`\\?\`、`\\.\`、`\\localhost\C$`、大寫路徑繞回書稿 → 拒絕；`::$DATA`、段尾點 → 拒絕；原有 `正文/`、`草稿/` 規則不變。
+
+經 `settings.json` 實際命令手工驗收（`CLAUDE_PROJECT_DIR="$(pwd -W)"`，printf 原始 UTF-8 JSON）：書稿外 `C:/Users/…/.claude/projects/…/memory/MEMORY.md` → 0；`追蹤/場景狀態.md` → 2；`追蹤/場景狀態.MD`（Edit）→ 2；`正文/第001章.md`（Write、MultiEdit）→ 2；NotebookEdit `正文/第001章.ipynb` → 2；`導入/清單.json` → 2；`設定/設定.md` → 0。每次約 0.6 秒，與修改前相同；無 Python 回退約 0.24 秒。
+
+Claude Code 真實會話（本機 Claude Code 桌面版，已裝 Git Bash，工作區即 novel-kit 書稿）：Write 書稿外暫存檔成功；Edit `追蹤/場景狀態.md` 被 Hook 攔截，提示「此檔由 novel.py 維護」。修改前同一會話 Write 書稿外暫存檔被攔截（「路徑必須位於專案內」）。
+
+### 未驗證範圍
+
+- **Windows 未裝 Git Bash 時 Hook 失效**：依[官方 Hook 文件](https://code.claude.com/docs/en/hooks)，command hook 的 `shell` 預設 `"bash"`，Windows 未裝 Git Bash 時預設改為 `"powershell"`；`bash …` 在 PowerShell 找不到，以非 2 退出，Claude Code 視為非阻斷錯誤而放行寫入。Hook 內部無法修復。評估過在 settings 顯式寫 `"shell": "bash"`：文件只說它是預設值，未說明 Git Bash 缺席時會怎樣，無法證明能轉成攔截，故未加入，留待在無 Git Bash 的 Windows 以真實會話驗證（連同 PowerShell 端退出 2 的可行寫法）。目前以 README 標明 Git Bash 為 Windows 必需依賴。
+- 真實會話只驗了 Write／Edit；NotebookEdit 與 MultiEdit 只以 Hook 輸入模擬驗證。
+- 未在 macOS／Linux 實機跑本輪測試；macOS 大小寫別名只靠身分比對邏輯推論，未實測。
+- UNC 書稿（書稿本身在網路共用上）未實測；無 Python 回退會把 `//server` 合併成單斜線再比對，身分核對在這種情況下不生效。
+- 身分比對依賴檔案系統提供穩定的 `st_ino`；不穩定的檔案系統上可能把書稿外路徑誤判為書稿內而攔截（偏嚴，不會放行），未實測。

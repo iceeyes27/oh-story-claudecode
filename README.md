@@ -4,11 +4,11 @@
 
 ## 安裝
 
-需要 Claude Code、Python 3.9+；Git 選用。把本工具組（含隱藏的 `.claude`）複製到書稿資料夾，從該資料夾啟動 Claude Code。閱讀交付可用 Obsidian 或任何 Markdown 編輯器。
+需要 Claude Code、Python 3.9+；Windows 另需 [Git for Windows](https://git-scm.com/downloads/win)（提供 Hook 使用的 Git Bash）；Git 版本控制本身選用。把本工具組（含隱藏的 `.claude`）複製到書稿資料夾，從該資料夾啟動 Claude Code。閱讀交付可用 Obsidian 或任何 Markdown 編輯器。
 
 若已有 oh-story，另建資料夾並導入原稿，避免兩套 hooks 和 agents 混用。本工具組是獨立方案，不需要合併 oh-story 主線。
 
-Hook 與流程命令都經 `.claude/scripts/py.sh` 啟動，依序探測 `python3` → `python` → `py -3`，只採用能執行的 Python 3.9+，並固定 UTF-8 讀寫；Windows 的 Microsoft Store 佔位 `python3` 會被略過，不必修改 `.claude/settings.json`。Hook 以 `bash` 執行（Windows 上 Claude Code 使用 Git Bash）。找不到 Python 時，寫入 `正文/`、`草稿/`、`導入/原稿/` 一律被攔截並提示安裝，其他檔案照常寫入。Python 是候選採用與恢復的必要依賴，不能只刪 Hook 設定就視為已部署。Claude Code 真實會話及各桌面環境的相容性仍需實測。
+Hook 與流程命令都經 `.claude/scripts/py.sh` 啟動，依序探測 `python3` → `python` → `py -3`，只採用能執行的 Python 3.9+，並固定 UTF-8 讀寫；Windows 的 Microsoft Store 佔位 `python3` 會被略過，不必修改 `.claude/settings.json`。Hook 以 `bash` 執行。Windows 必須安裝 Git Bash：依 Claude Code 官方文件，未裝 Git Bash 時 Hook 改由 PowerShell 執行，`bash` 命令找不到，Claude Code 會把這個錯誤當作非阻斷而放行所有寫入，關卡形同失效，Hook 內部無法補救。找不到 Python 時，寫入 `正文/`、`草稿/`、`導入/原稿/` 與工具專屬檔一律被攔截並提示安裝，其他檔案照常寫入。Python 是候選採用與恢復的必要依賴，不能只刪 Hook 設定就視為已部署。Claude Code 真實會話及各桌面環境的相容性仍需實測。
 
 ## 開始
 
@@ -86,7 +86,7 @@ bash .claude/scripts/py.sh .claude/scripts/novel.py scan 草稿/第001章/場景
 - 中斷採用可重跑，已完成檔案不重做；遇外部手改先停下保留現場。
 - 有原有暫存變更時保留原樣，不自動提交。禁止整個工作區 `git add -A`。
 - Git 提交失敗會顯示「已採用、未提交」，不撤銷作者已採用的內容。
-- Write/Edit Hook 檢查新建與既有草稿，正式正文由採用工具更新。Shell 和外部編輯器不受此 Hook 攔截；版本核對會發現輸入變更。
+- 寫檔 Hook（Write、Edit、NotebookEdit，並相容舊版 MultiEdit）檢查新建與既有草稿，正式正文由採用工具更新。`追蹤/場景狀態.md`、`審閱/採用/`、`審閱/修訂/*/任務.json`、`導入/清單.json` 只由 `novel.py` 寫入，直接改會被攔截（副檔名不分大小寫）。書稿外的絕對路徑（如 Claude Code 的記憶與計劃檔）不受管理；字面路徑、解析後的真實路徑與檔案身分都須在書稿外才放行，連結或短名繞回書稿仍會被攔截。Shell 和外部編輯器不受此 Hook 攔截；版本核對會發現輸入變更。
 - 工具記錄作者的決定，不能技術上證明是作者本人授權，協調器不得自行捏造「通過」。
 
 ## 驗證

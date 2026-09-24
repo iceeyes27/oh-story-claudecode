@@ -221,11 +221,52 @@ class Workflow(unittest.TestCase):
         self.write('target.md','x'); (self.root/'alias.md').symlink_to(self.root/'target.md')
         with self.assertRaises(n.Invalid): n.inside(self.root,'alias.md')
 
+    def test_absolute_paths_outside_project_skip_gate(self):
+        other = tempfile.TemporaryDirectory(prefix='novel-other-'); self.addCleanup(other.cleanup)
+        elsewhere = Path(other.name).resolve()
+        for path in [elsewhere/'正文/第001章.md', elsewhere/'追蹤/場景狀態.md', elsewhere/'memory/MEMORY.md']:
+            self.assertTrue(n.outside(self.root,str(path)),path)
+            n.check(self.root,str(path))
+        # Relative, drive-relative and '..' forms are never "outside": inside() rejects them.
+        for path in ['../outside.md','D:outside.md',str(self.root/'..'/self.root.name/'正文/第001章.md'),
+                     str(elsewhere/'..'/self.root.name/'正文/第001章.md')]:
+            self.assertFalse(n.outside(self.root,path),path)
+            with self.assertRaises(n.Invalid): n.check(self.root,path)
+
+    def test_outside_alias_back_into_project_is_gated(self):
+        other = tempfile.TemporaryDirectory(prefix='novel-other-'); self.addCleanup(other.cleanup)
+        link = Path(other.name).resolve()/'alias'
+        try: link.symlink_to(self.root,target_is_directory=True)
+        except OSError: self.skipTest('無法建立符號連結')
+        with self.assertRaises(n.Invalid): n.check(self.root,str(link/'正文/第001章.md'))
+        self.assertFalse(n.outside(self.root,str(link/'設定/設定.md')))
+
+    @unittest.skipUnless(os.name=='nt','Windows 路徑別名')
+    def test_windows_device_and_unc_aliases_are_gated(self):
+        drive, rest = str(self.root)[0], str(self.root)[2:]
+        for path in ['\\\\?\\'+str(self.root)+'\\正文\\第001章.md', '\\\\.\\'+str(self.root)+'\\正文\\第001章.md',
+                     f'\\\\localhost\\{drive}$'+rest+'\\正文\\第001章.md', str(self.root).upper()+'\\正文\\第001章.md']:
+            self.assertFalse(n.outside(self.root,path),path)
+            with self.assertRaises(n.Invalid): n.check(self.root,path)
+
+    def test_tool_owned_files_rejected(self):
+        self.ready()
+        for path in [n.STATE,'追蹤/場景狀態.MD','審閱/採用/s1/journal.json','審閱/採用/s1/other.md',
+                     '審閱/修訂/fix/任務.json','審閱/修訂/fix/任務.JSON','導入/清單.json','導入/清單.Json']:
+            with self.assertRaises(n.Invalid) as e: n.check(self.root,path)
+            self.assertIn('novel.py 維護',str(e.exception),path)
+        # Windows drops trailing dots/spaces and writes '::$DATA' to the main stream.
+        for path in ['導入/清單.json.','追蹤/場景狀態.md ','追蹤/場景狀態.md::$DATA','設定/設定.md:x']:
+            with self.assertRaises(n.Invalid): n.check(self.root,path)
+        for path in ['追蹤/追蹤.md','設定/設定.md','審閱/第001章/場景01_交付.md','審閱/修訂/fix/候選.md','審閱/修訂/fix/任務說明.json']:
+            n.check(self.root,path)
+
     def test_hook_write_edit_and_malformed_input(self):
         self.ready()
         env=dict(os.environ,CLAUDE_PROJECT_DIR=str(self.root))
-        for tool in ['Write','Edit']:
-            payload={'tool_name':tool,'tool_input':{'file_path':str(self.root/n.scene_path(1,2))}}
+        for tool in ['Write','Edit','MultiEdit','NotebookEdit']:
+            key='notebook_path' if tool=='NotebookEdit' else 'file_path'
+            payload={'tool_name':tool,'tool_input':{key:str(self.root/n.scene_path(1,2))}}
             result=subprocess.run([sys.executable,str(HOOK)],input=json.dumps(payload),text=True,encoding='utf-8',capture_output=True,env=env)
             self.assertEqual(result.returncode,2)
         result=subprocess.run([sys.executable,str(HOOK)],input='{',text=True,encoding='utf-8',capture_output=True,env=env)

@@ -42,7 +42,7 @@ bash .claude/scripts/py.sh .claude/scripts/novel.py begin 1 1
   "context": ["設定/文風樣本.md", "追蹤/追蹤.md"],
   "review": {
     "mode": "完整",
-    "completed": ["copy-editor", "consistency-checker", "character-reviewer", "prose-reviewer", "structure-reviewer"],
+    "completed": ["copy-editor", "reader-reviewer", "consistency-checker", "character-reviewer", "prose-reviewer", "structure-reviewer"],
     "unresolved": []
   }
 }
@@ -54,7 +54,7 @@ bash .claude/scripts/py.sh .claude/scripts/novel.py begin 1 1
 bash .claude/scripts/py.sh .claude/scripts/novel.py prepare 審閱/第001章/場景01_v1.json
 ```
 
-工具保存精確快照並將場景改成待審。先完成交付檔再 prepare；之後改正文、交付檔、細綱或輸入都需重新交付。新版本使用新 ID，不能覆寫舊 journal。
+工具保存精確快照並將場景改成待審。prepare 會再掃一次正文候選：作者禁詞（`設定/禁用詞.md`）與簡體正文中的繁體字自動加入 unresolved，並記在 journal 的 `scan`；`設定/禁用詞.md` 同時被監看，prepare 後改動禁詞表，舊交付不能採用。先完成交付檔再 prepare；之後改正文、交付檔、細綱或輸入都需重新交付。新版本使用新 ID，不能覆寫舊 journal。
 
 收尾用 `kind: chapter`、`scene: 0`、`mode: 章節`，正文檔案映射為 `草稿/第001章/整章候選.md` → `正文/第001章.md`。同時交付本章追蹤、兌現登記等更新：各自先寫候選，再加入 `files`。所有目標的修改前內容都會凍結。
 

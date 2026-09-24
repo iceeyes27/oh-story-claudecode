@@ -17,10 +17,13 @@ STATES = {'未開始', '撰寫中', '自動審閱中', '待審', '已通過', '�
 SCENE = re.compile(r'草稿/第(\d{3,})章/場景(\d{2,})\.md')
 CHAPTER = re.compile(r'正文/第(\d{3,})章\.md')
 REVIEWERS = {
-    '完整': {'copy-editor', 'consistency-checker', 'character-reviewer', 'prose-reviewer', 'structure-reviewer'},
+    '完整': {'copy-editor', 'reader-reviewer', 'consistency-checker', 'character-reviewer', 'prose-reviewer', 'structure-reviewer'},
     '文字': {'copy-editor', 'consistency-checker'},
-    '章節': {'copy-editor', 'consistency-checker', 'structure-reviewer'},
+    '章節': {'copy-editor', 'reader-reviewer', 'consistency-checker', 'structure-reviewer'},
 }
+PATTERNS = Path(__file__).resolve().parents[1] / 'workflows/ai-patterns.md'
+BANS = '設定/禁用詞.md'
+QUOTES = {'「': '」', '『': '』', '“': '”'}
 
 
 class Invalid(ValueError):
@@ -323,6 +326,10 @@ def prepare(root, spec):
         changes.append(change(root, target, after))
     require(changes, '採用清單不可空白')
     prose = [e for e in changes if SCENE.fullmatch(e['target']) or CHAPTER.fullmatch(e['target'])]
+    found, blocking = prose_gate(root, prose)
+    review = {**review, 'unresolved': [*review['unresolved'], *blocking]}
+    # Editing the ban list invalidates deliveries screened against the old list.
+    watches[BANS] = digest(read(root / BANS))
     if kind in {'scene', 'chapter'}:
         target = scene_path(ch, sc)
         require(len(prose) == 1 and prose[0]['target'] == target, '交付只能採用指定正文')
@@ -376,7 +383,7 @@ def prepare(root, spec):
         task['status'] = 'complete'
         changes.append(change(root, rel(root, tp), dump(task)))
     journal = {'version': 1, 'id': name, 'kind': kind, 'status': 'prepared', 'review': review,
-               'missing_reviewers': pending, 'watches': watches, 'changes': changes}
+               'missing_reviewers': pending, 'scan': found, 'watches': watches, 'changes': changes}
     # Write journal first: interrupted preparation cannot authorize adoption.
     atomic(dest, dump(journal))
     if kind in {'scene', 'chapter'}:
@@ -497,6 +504,140 @@ def confirm_import(root, manifest):
     atomic(ip, dump(entries))
 
 
+def blocks(content, kind):
+    return re.findall(r'^```' + re.escape(kind) + r'[ \t]*\n(.*?)^```', content, re.M | re.S)
+
+
+def hint_rules():
+    result = []
+    for body in blocks(text(PATTERNS), 'ai-pattern'):
+        for line in body.splitlines():
+            if not line.strip():
+                continue
+            cells = [c.strip() for c in line.split(' | ', 5)]
+            require(len(cells) == 6 and all(cells[:5]), '提示規則欄位不足：' + line.strip())
+            rid, category, scope, limit, pattern, note = cells
+            require(scope in {'敘述', '全部'}, '提示規則範圍只能是敘述或全部：' + rid)
+            require(limit.isdigit() and int(limit) > 0, '提示規則門檻須為正整數：' + rid)
+            try:
+                regex = re.compile(pattern)
+            except re.error as e:
+                raise Invalid('提示規則正則錯誤：' + rid) from e
+            result.append({'id': rid, 'category': category, 'scope': scope, 'limit': int(limit), 'regex': regex, 'note': note})
+    require(len({r['id'] for r in result}) == len(result), '提示規則編號重複')
+    return result
+
+
+def traditional_glyphs():
+    return set(''.join(''.join(b.split()) for b in blocks(text(PATTERNS), 'glyph-traditional')))
+
+
+def author_bans(root):
+    p = inside(root, BANS)
+    result = []
+    for body in blocks(text(p), 'author-ban') if p.exists() else []:
+        for line in body.splitlines():
+            if not line.strip():
+                continue
+            word, _, source = line.partition(' | ')
+            require(word.strip() and source.strip(), '作者禁詞須附作者原話或決定日期：' + line.strip())
+            result.append(word.strip())
+    return result
+
+
+def simplified_prose(root):
+    # The author requires simplified prose unless the book explicitly opts out.
+    p = root / '設定/設定.md'
+    m = re.search(r'^- 正文字形：\s*(\S)', text(p), re.M) if p.exists() else None
+    return not (m and m[1] == '繁')
+
+
+def quoted(content):
+    # Chinese multi-paragraph dialogue omits closing quotes, so each line starts unquoted.
+    mask, stack = [], []
+    for ch in content:
+        if ch == '\n':
+            stack = []
+        elif stack and ch == stack[-1]:
+            stack.pop(); mask.append(True); continue
+        elif ch in QUOTES:
+            stack.append(QUOTES[ch]); mask.append(True); continue
+        mask.append(bool(stack))
+    return mask
+
+
+def hit(content, start, end):
+    left = max(content.rfind('\n', 0, start) + 1, start - 15)
+    stop = content.find('\n', end)
+    right = min(len(content) if stop < 0 else stop, end + 15)
+    return {'line': content.count('\n', 0, start) + 1, 'match': content[start:end], 'excerpt': content[left:right]}
+
+
+def scan_text(root, content, hints=None, glyphs=None):
+    result = {'author': [], 'glyph': [], 'hints': []}
+    for word in author_bans(root):
+        result['author'] += [hit(content, m.start(), m.end()) for m in re.finditer(re.escape(word), content)]
+    if glyphs and simplified_prose(root):
+        found = {}
+        for i, ch in enumerate(content):
+            if ch in glyphs:
+                found.setdefault(ch, []).append(content.count('\n', 0, i) + 1)
+        result['glyph'] = [{'char': c, 'count': len(ls), 'lines': sorted(set(ls))[:10]}
+                           for c, ls in sorted(found.items(), key=lambda x: -len(x[1]))]
+    mask = quoted(content) if hints else []
+    for r in hints or []:
+        found = [m for m in r['regex'].finditer(content) if m.group() and (r['scope'] == '全部' or not mask[m.start()])]
+        if len(found) >= r['limit']:
+            result['hints'].append({'id': r['id'], 'category': r['category'], 'note': r['note'], 'count': len(found),
+                                    'hits': [hit(content, m.start(), m.end()) for m in found]})
+    return result
+
+
+def scan(root, paths):
+    hints, glyphs = hint_rules(), traditional_glyphs()
+    files = []
+    for name in paths:
+        p = inside(root, name)
+        require(p.exists(), '找不到掃描對象：' + name)
+        for t in sorted(p.rglob('*.md')) if p.is_dir() else [p]:
+            files.append({'path': rel(root, t), **scan_text(root, text(t), hints, glyphs)})
+    return files
+
+
+def report(files):
+    lines = []
+    for f in files:
+        lines.append('## ' + f['path'])
+        lines += [f'作者禁詞 第{h["line"]}行：{h["match"]}｜{h["excerpt"]}' for h in f['author']]
+        lines += [f'繁體字 {g["char"]}×{g["count"]}（第{"、".join(map(str, g["lines"]))}行）' for g in f['glyph']]
+        for h in f['hints']:
+            lines.append(f'提示 {h["id"]} {h["category"]} ×{h["count"]}：{h["note"]}')
+            lines += [f'  第{x["line"]}行：{x["match"]}｜{x["excerpt"]}' for x in h['hits']]
+        if not (f['author'] or f['glyph'] or f['hints']):
+            lines.append('無命中')
+    return '\n'.join(lines)
+
+
+def prose_gate(root, prose):
+    """Author bans and glyph requirements are author decisions; hits must be ruled on before adoption."""
+    glyphs, found, blocking = traditional_glyphs(), {}, []
+    for e in prose:
+        try:
+            content = base64.b64decode(e['after']).decode('utf-8')
+        except UnicodeDecodeError as err:
+            raise Invalid('正文候選不是 UTF-8：' + e['target']) from err
+        r = scan_text(root, content, glyphs=glyphs)
+        found[e['target']] = {'author': r['author'], 'glyph': r['glyph']}
+        counts = {}
+        for h in r['author']:
+            counts[h['match']] = counts.get(h['match'], 0) + 1
+        blocking += [f'作者禁詞：{w}×{c}（{e["target"]}）' for w, c in counts.items()]
+        if r['glyph']:
+            chars = '、'.join(f'{g["char"]}×{g["count"]}' for g in r['glyph'][:10])
+            blocking.append(f'正文字形：簡體正文含繁體字 {chars}（{e["target"]}）')
+    return found, blocking
+
+
 def safe_commit(root, paths, message):
     """Refuse pre-existing staged changes; commit only the named files."""
     def git(*args, **kwargs):
@@ -540,8 +681,15 @@ def main(argv=None):
     p = sub.add_parser('revision-cancel'); p.add_argument('id')
     p = sub.add_parser('confirm-import'); p.add_argument('manifest')
     p = sub.add_parser('commit'); p.add_argument('--message', required=True); p.add_argument('paths', nargs='+')
+    p = sub.add_parser('scan'); p.add_argument('paths', nargs='+'); p.add_argument('--json', action='store_true')
     args = parser.parse_args(argv); root = Path(args.root).resolve()
     try:
+        if args.command == 'scan':
+            # Read-only: must not contend for the workflow lock.
+            files = scan(root, args.paths)
+            out = json.dumps(files, ensure_ascii=False, indent=2) if args.json else report(files)
+            sys.stdout.buffer.write((out + '\n').encode('utf-8')); sys.stdout.flush()
+            return 0
         with locked(root):
             c = args.command
             if c == 'check': check(root, args.path)

@@ -35,7 +35,7 @@ class Workflow(unittest.TestCase):
     def scene_delivery(self, sc=1, name=None):
         name = name or f's{sc}'
         n.begin(self.root, 1, sc)
-        source = n.scene_path(1, sc); self.write(source, f'場景 {sc} 正文')
+        source = n.scene_path(1, sc); self.write(source, f'场景 {sc} 正文')
         self.write(f'審閱/{name}.md', '完整候選與審閱結果')
         return {'id': name, 'kind': 'scene', 'chapter': 1, 'scene': sc,
                 'delivery': f'審閱/{name}.md', 'files': [{'source': source, 'target': source}],
@@ -56,7 +56,7 @@ class Workflow(unittest.TestCase):
 
     def revision_delivery(self, target=None, name='r1'):
         target = target or n.scene_path(1, 0)
-        self.write('審閱/修訂/fix/候選.md', '新的修訂正文')
+        self.write('審閱/修訂/fix/候選.md', '新的修订正文')
         self.write(f'審閱/{name}.md', '修改對照')
         return {'id': name, 'kind': 'revision', 'revision': 'fix', 'delivery': f'審閱/{name}.md',
                 'files': [{'source': '審閱/修訂/fix/候選.md', 'target': target}],
@@ -126,7 +126,7 @@ class Workflow(unittest.TestCase):
 
     def test_chapter_is_not_published_before_acceptance(self):
         self.ready(scenes=1); self.adopt_scene(); n.begin(self.root,1,0)
-        self.write('草稿/第001章/整章候選.md', '候選')
+        self.write('草稿/第001章/整章候選.md', '候选')
         self.assertFalse((self.root/n.scene_path(1,0)).exists())
         self.plan(ch=2)
         with self.assertRaises(n.Invalid): n.confirm_plan(self.root, 2)
@@ -182,7 +182,7 @@ class Workflow(unittest.TestCase):
             real(path,data)
         with patch.object(n,'atomic',stop_at_task):
             with self.assertRaises(OSError): n.accept(self.root,'r1','通過')
-        self.assertEqual((self.root/n.scene_path(1,0)).read_text(encoding='utf-8'),'新的修訂正文')
+        self.assertEqual((self.root/n.scene_path(1,0)).read_text(encoding='utf-8'),'新的修订正文')
         with self.assertRaises(n.Invalid): n.idle(self.root)
         n.accept(self.root,'r1','通過')
         self.assertEqual(n.accept(self.root,'r1','通過'),'already-complete')

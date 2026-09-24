@@ -36,3 +36,55 @@ Hook 設定以 [Claude Code 官方 Hook 契約](https://code.claude.com/docs/en/
 - 尚未進行真實章節的對照試用、作者盲讀或審閱費用比較。工程測試通過不能替代文風與閱讀品質驗收。
 
 本輪完成安全與採用機制、流程口徑統一，並補入導入登記。原方案中的完整長篇導入自動化和真實寫作試用不列為完成。
+
+## 2026-09-24 Windows 可用性修復
+
+基線：81abcc1。範圍：文字 I/O 編碼、Hook 輸入輸出、Hook 啟動器、無 Python 時的嚴格回退。
+
+### 問題（中文 Windows 實測）
+
+- `novel.py` 13 處 `read_text()` 未指定編碼，預設 GBK 下 36 項測試 22 項失敗；`PYTHONUTF8=1` 下全過。
+- Hook 以 locale 解碼 stdin，UTF-8 路徑成亂碼後前綴比對全部落空：寫 `正文/第001章.md`、未確認細綱的 `草稿/…/場景01.md` 均被放行（退出 0）。
+- `settings.json` 用 `python3`；本機 `python3` 是 Microsoft Store 佔位程式（退出 49），Claude Code 視為非阻斷錯誤而放行。
+
+### 修改
+
+- `novel.py` 以 `text()`／`load()` 統一 UTF-8 讀取；`tests/test_encoding.py` 以 AST 檢查 `novel.py`、`scene_gate.py`、`tests/*.py`，未指定 encoding 的 `read_text`／`write_text`／文字模式 `open`／`subprocess(text=True)` 即失敗，UTF-8 系統上也能擋回歸。
+- `scene_gate.py` 以位元組讀 stdin、嚴格 UTF-8 解碼，stderr 直接寫 UTF-8 位元組；任何例外都退出 2。
+- 新增 `.claude/scripts/py.sh`：依序探測 `python3` → `python` → `py -3`，以版本檢查排除佔位程式，設 `PYTHONUTF8=1`、`PYTHONIOENCODING=utf-8` 後執行；都不可用退出 127。技能與 adoption 流程命令改經此啟動器。
+- 新增 `.claude/hooks/scene_gate.sh`，`settings.json` 改為 `bash "$CLAUDE_PROJECT_DIR/.claude/hooks/scene_gate.sh"`。0／2 原樣返回，其他非零一律 2；127（無 Python）時以純 bash（`LC_ALL=C`，bash 3.2 語法）判定：`正文/`、`草稿/`、`導入/原稿/` 攔截並提示安裝 Python，書稿外與其他路徑放行，取不到路徑、含 `..` 或含 `\uXXXX` 等無法還原的跳脫一律攔截。
+
+### 驗證
+
+環境：Windows 11 Pro 10.0.26200、Git Bash（GNU bash 5.2）、Python 3.13.3（`python`）、`python3` 為 Store 佔位程式（退出 49）、系統編碼 cp936；另以 WSL Ubuntu 22.04（Python 3.12.3、bash 5.2.21）跑同一套測試。
+
+| 命令 | 結果 |
+|---|---|
+| Windows 預設編碼（未設 PYTHONUTF8）`python -m unittest discover -s tests -v` | 48 項通過（原 36 + 新 12） |
+| 修改前同一命令 | 原 36 項中 22 項失敗；新增 12 項中 11 項失敗 |
+| WSL `python3 -m unittest discover -s tests`（C.UTF-8 與 `LC_ALL=C`） | 均 48 項通過 |
+| WSL 以原 `scene_gate.py` 跑 `tests/test_hook_encoding.py` | 2 項失敗（GBK stdin 下亂碼放行／錯誤放行），確認測試在 Linux 也能重現 |
+| `python -m py_compile …`、`bash -n`、`sh -n`、`git diff --check` | 通過 |
+
+經 `settings.json` 實際命令（`CLAUDE_PROJECT_DIR` 以 `pwd -W` 模擬，`python3` 為佔位程式）：Write `正文/第001章.md` → 2；無細綱的 `草稿/第001章/場景01.md` → 2；`設定/設定.md` → 0；Edit 以反斜線 Windows 路徑寫 `正文\第001章.md` → 2。
+
+模擬無 Python（`PATH=/nonexistent`）：`正文/…`、`草稿/…`、`導入/原稿/…` → 2 且 stderr 提示安裝 Python 3.9+；`設定/設定.md`、書稿外路徑 → 0；缺 `file_path` → 2。
+
+經啟動器每次 Hook 約 0.6 秒（直接呼叫 Python 約 0.2 秒），差額是佔位程式與版本探測。
+
+### 複查後修正
+
+獨立複查（只讀）另發現三項，已修正並補測試：
+
+- `scene_gate.sh` 以內建 `read` 逐位元組讀 stdin，3 MB 內容需 8.4 秒；內容大到觸發 Hook 逾時就會被放行。改為有 `cat` 時整塊讀取（PATH 無 `cat` 才退回 `read`；Windows 的 MSYS 環境不一定有 `/dev/stdin`，不採用 `$(</dev/stdin)`）。3 MB 實測約 0.9 秒，`正文` → 2、`設定` → 0。
+- 無 Python 回退的路徑漏洞：`\\?\` 裝置前綴、路徑段尾的點或空白（Windows 會去掉，`正文.\` 仍寫進 `正文`）、磁碟相對路徑 `D:正文\…` 曾被放行。現在前綴會先去掉再判定，後兩者一律攔截；Python 關卡本來就攔截這些情況。
+- `import-book` 技能一處「語义」改為「語義」。
+
+修正後 Windows 預設編碼 48 項通過。
+
+### 未驗證範圍
+
+- 未在 macOS 實機執行；回退分支刻意只用 bash 3.2 語法，但未以 bash 3.2 實測。
+- 未在 Claude Code 真實會話中觸發 Hook（留待 maturity-gate 子任務）；Claude Code 在 Windows 經 Git Bash 執行 Hook 的前提依官方文件與 main 分支現行做法。
+- 無 Python 回退只做字串判定，不解析符號連結；書稿外路徑回退放行、Python 關卡仍拒絕，兩者由 hook-scope 子任務統一。
+- `novel.py` CLI 的 stdout／stderr 仍依 locale；經 `py.sh` 啟動時為 UTF-8，直接以 `python` 執行時不保證。

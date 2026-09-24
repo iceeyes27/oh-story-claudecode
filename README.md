@@ -8,7 +8,7 @@
 
 若已有 oh-story，另建資料夾並導入原稿，避免兩套 hooks 和 agents 混用。本工具組是獨立方案，不需要合併 oh-story 主線。
 
-Windows 若 Python 命令是 `python`，調整 `.claude/settings.json` 的命令。Python 是候選採用與恢復的必要依賴，不能只刪 Hook 設定就視為已部署。Windows、Claude Code 真實會話及各桌面環境的相容性仍需實測。
+Hook 與流程命令都經 `.claude/scripts/py.sh` 啟動，依序探測 `python3` → `python` → `py -3`，只採用能執行的 Python 3.9+，並固定 UTF-8 讀寫；Windows 的 Microsoft Store 佔位 `python3` 會被略過，不必修改 `.claude/settings.json`。Hook 以 `bash` 執行（Windows 上 Claude Code 使用 Git Bash）。找不到 Python 時，寫入 `正文/`、`草稿/`、`導入/原稿/` 一律被攔截並提示安裝，其他檔案照常寫入。Python 是候選採用與恢復的必要依賴，不能只刪 Hook 設定就視為已部署。Claude Code 真實會話及各桌面環境的相容性仍需實測。
 
 ## 開始
 
@@ -78,5 +78,7 @@ Claude 寫候選、跑完整審閱，產生 `審閱/第NNN章/場景MM_交付.md
 ```sh
 python3 -m unittest discover -s tests -v
 ```
+
+Windows 改用 `python -m unittest …` 或 `py -3 -m unittest …`；不要設 `PYTHONUTF8`，測試須在系統預設編碼（如 GBK）下通過。需要 `bash` 的 Hook 測試在找不到 bash 時略過。
 
 測試使用臨時書稿與臨時 Git 倉庫，驗證版本、採用、恢復、修訂、導入登記、Hook 輸入與提交範圍。實作範圍及未驗證項目見 [驗證記錄](docs/validation.md)。

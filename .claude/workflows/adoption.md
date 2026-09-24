@@ -2,6 +2,8 @@
 
 協調器處理本流程；寫手只寫指定候選，審閱者只讀。Python 3.9+ 為必要依賴。以下命令在書稿根目錄執行；作者不必手填 JSON，由協調器依實際檔案產生。
 
+命令一律經 `bash .claude/scripts/py.sh` 啟動：它依序找 `python3`、`python`、`py -3` 中可用的 Python 3.9+（排除 Windows 的 Microsoft Store 佔位程式），並以 UTF-8 讀寫。不要直接寫 `python3 …`；Windows 上它常是佔位程式。
+
 ## 檔案的用途
 
 - `追蹤/場景狀態.md` 是場景工作狀態的唯一入口，四欄保留；備註由工具保存細綱與正文版本，不手改。
@@ -15,8 +17,8 @@
 作者確認細綱後，把細綱的狀態改為單值 `- 狀態：已確認`，場景標題使用 `## 場景01 標題`，由 01 連續編號。然後：
 
 ```sh
-python3 .claude/scripts/novel.py confirm-plan 1
-python3 .claude/scripts/novel.py begin 1 1
+bash .claude/scripts/py.sh .claude/scripts/novel.py confirm-plan 1
+bash .claude/scripts/py.sh .claude/scripts/novel.py begin 1 1
 ```
 
 工具登記所有場景及收尾，凍結細綱版本。尚未開始任何場景時，可以修改細綱後再次確認；已有寫作內容時不得直接改確認摘要來繞過復核。收尾使用 `begin 1 0`。
@@ -49,7 +51,7 @@ python3 .claude/scripts/novel.py begin 1 1
 `context` 列出實際影響本次審閱的設定、角色卡、原文等檔案；工具另綁定細綱、同章前序場景和上一章。`completed` 只能列真正完成的審閱者。`unresolved` 列未解決 S1/S2、嚴重分歧和需要作者裁決的覆蓋缺口；S3/S4 仍放交付檔，不必全部當阻塞項。
 
 ```sh
-python3 .claude/scripts/novel.py prepare 審閱/第001章/場景01_v1.json
+bash .claude/scripts/py.sh .claude/scripts/novel.py prepare 審閱/第001章/場景01_v1.json
 ```
 
 工具保存精確快照並將場景改成待審。先完成交付檔再 prepare；之後改正文、交付檔、細綱或輸入都需重新交付。新版本使用新 ID，不能覆寫舊 journal。
@@ -63,7 +65,7 @@ python3 .claude/scripts/novel.py prepare 審閱/第001章/場景01_v1.json
 僅在作者已明確採用該交付版本後執行：
 
 ```sh
-python3 .claude/scripts/novel.py accept ch001-sc01-v1 --approval '作者回覆：通過'
+bash .claude/scripts/py.sh .claude/scripts/novel.py accept ch001-sc01-v1 --approval '作者回覆：通過'
 ```
 
 一個待審交付時可由「通過」指向它；多個待審對象須先確定指的是哪份。命令參數是決策記錄，不能證明真人授權，協調器不得自行填入虛構回覆。
@@ -77,7 +79,7 @@ python3 .claude/scripts/novel.py accept ch001-sc01-v1 --approval '作者回覆�
 文字修訂與情節修訂都先建立任務。情節影響分析與作者範圍決定先完成，再執行：
 
 ```sh
-python3 .claude/scripts/novel.py revision-start fix-ch001 正文/第001章.md
+bash .claude/scripts/py.sh .claude/scripts/novel.py revision-start fix-ch001 正文/第001章.md
 ```
 
 工具保存當前文本快照；對作者已手改的稿，這是「開始審閱時的作者稿」，不是「修改前稿」。修改前依據取上次採用 journal 的原文或已核實 Git 版本；找不到就報告基準缺失，不猜造差異，也不先 commit 全工作區。
@@ -100,7 +102,7 @@ python3 .claude/scripts/novel.py revision-start fix-ch001 正文/第001章.md
 採用本身不依賴 Git。需要記錄版本時，只列本次實際檔案：
 
 ```sh
-python3 .claude/scripts/novel.py commit --message '第001章 場景01 通過' 草稿/第001章/場景01.md 追蹤/場景狀態.md 審閱/第001章/場景01_交付.md 審閱/第001章/場景01_v1.json 審閱/採用/ch001-sc01-v1/journal.json
+bash .claude/scripts/py.sh .claude/scripts/novel.py commit --message '第001章 場景01 通過' 草稿/第001章/場景01.md 追蹤/場景狀態.md 審閱/第001章/場景01_交付.md 審閱/第001章/場景01_v1.json 審閱/採用/ch001-sc01-v1/journal.json
 ```
 
 禁止 `git add -A`。有任何原有暫存變更時，採用仍保留，但自動提交停止並說明；不要清掉、混入或替作者提交原有暫存。提交失敗不撤銷已採用正文，報告「已採用、未提交」。

@@ -2,8 +2,9 @@
 name: scene-writer
 description: 小說寫手。依細綱寫單一場景，或依審閱問題、使用者意見做最小範圍修改。只在協調器明確指派時使用。
 tools: Read, Write, Edit, Glob, Grep
-model: opus
 ---
+
+<!-- Generated from .novel-kit/roles; edit the shared source. -->
 
 # 寫手
 

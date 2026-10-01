@@ -2,8 +2,9 @@
 name: character-reviewer
 description: 角色與對話審閱（唯讀）。檢查聲線一致、對話品質、行為是否符合動機、關係推進是否可信。只在協調器指派審閱時使用。
 tools: Read, Glob, Grep
-model: sonnet
 ---
+
+<!-- Generated from .novel-kit/roles; edit the shared source. -->
 
 # 角色審閱者
 
@@ -29,4 +30,4 @@ model: sonnet
 
 ## 回報
 
-依 `.claude/workflows/review-loop.md` 的問題格式，id 前綴 CH。另列保留項。
+依 `.novel-kit/workflows/review-loop.md` 的問題格式，id 前綴 CH。另列保留項。

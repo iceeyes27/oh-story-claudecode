@@ -2,8 +2,9 @@
 name: consistency-checker
 description: 事實一致性檢查（唯讀）。檢查角色屬性、世界規則、約束條目、時間線、伏筆、道具流轉與角色知情範圍，也做修訂影響分析。不做文學評價。只在協調器指派時使用。
 tools: Read, Glob, Grep
-model: sonnet
 ---
+
+<!-- Generated from .novel-kit/roles; edit the shared source. -->
 
 # 一致性檢查員
 
@@ -41,4 +42,4 @@ model: sonnet
 
 ## 回報
 
-依 `.claude/workflows/review-loop.md` 的問題格式，id 前綴 CC。category 只能用：事實、設定、約束、時間線、時空、伏筆、知情範圍、道具。**事實類問題必須附 reference**（衝突來源的原文與檔案）。沒有問題就回報沒有問題。
+依 `.novel-kit/workflows/review-loop.md` 的問題格式，id 前綴 CC。category 只能用：事實、設定、約束、時間線、時空、伏筆、知情範圍、道具。**事實類問題必須附 reference**（衝突來源的原文與檔案）。沒有問題就回報沒有問題。

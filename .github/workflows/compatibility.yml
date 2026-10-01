@@ -1,0 +1,29 @@
+name: novel-kit compatibility
+on:
+  push:
+    branches: [novel-kit]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+        python: ['3.9', '3.13']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Generate local adapters
+        run: python novel.py setup --agent all
+      - name: Check generated adapters
+        run: python novel.py setup --agent all --check
+      - name: Exercise both hook launch commands
+        run: python novel.py doctor --agent all
+      - name: Workflow and native platform tests
+        run: python -m unittest discover -s tests -v

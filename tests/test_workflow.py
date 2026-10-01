@@ -1,4 +1,5 @@
 import importlib.util
+import base64
 import json
 import os
 from pathlib import Path
@@ -8,7 +9,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-SCRIPT = Path(__file__).resolve().parents[1] / '.claude/scripts/novel.py'
+SCRIPT = Path(__file__).resolve().parents[1] / '.novel-kit/scripts/novel.py'
 spec = importlib.util.spec_from_file_location('novel', SCRIPT)
 n = importlib.util.module_from_spec(spec); spec.loader.exec_module(n)
 HOOK = SCRIPT.parents[1] / 'hooks/scene_gate.py'
@@ -44,14 +45,20 @@ class Workflow(unittest.TestCase):
     def adopt_scene(self, sc=1):
         s = self.scene_delivery(sc); n.prepare(self.root, s); n.accept(self.root, s['id'], '通過')
 
-    def adopted_chapter(self):
+    def chapter_delivery(self):
         self.ready(scenes=1); self.adopt_scene()
         n.begin(self.root, 1, 0)
         self.write('草稿/第001章/整章候選.md', '已採用整章')
         self.write('審閱/closure.md', '收尾交付')
+        self.write('審閱/追蹤候選.md', '第一章已完成，下一章承諾已登記')
         s = {'id': 'closure', 'kind': 'chapter', 'chapter': 1, 'delivery': '審閱/closure.md',
-             'files': [{'source': '草稿/第001章/整章候選.md', 'target': n.scene_path(1, 0)}],
+             'files': [{'source': '草稿/第001章/整章候選.md', 'target': n.scene_path(1, 0)},
+                       {'source': '審閱/追蹤候選.md', 'target': '追蹤/追蹤.md'}],
              'review': {'mode': '章節', 'completed': sorted(n.REVIEWERS['章節']), 'unresolved': []}}
+        return s
+
+    def adopted_chapter(self):
+        s = self.chapter_delivery()
         n.prepare(self.root, s); n.accept(self.root, 'closure', '通過')
 
     def revision_delivery(self, target=None, name='r1'):
@@ -134,6 +141,37 @@ class Workflow(unittest.TestCase):
     def test_chapter_acceptance_allows_next_plan(self):
         self.adopted_chapter(); self.plan(ch=2); n.confirm_plan(self.root,2)
         n.begin(self.root,2,1)
+        self.assertEqual(n.text(self.root/'追蹤/追蹤.md'), '第一章已完成，下一章承諾已登記')
+
+    def test_chapter_requires_tracking_before_any_delivery_side_effect(self):
+        s = self.chapter_delivery(); s['files'].pop()
+        state = (self.root/n.STATE).read_bytes()
+        with self.assertRaisesRegex(n.Invalid, '最終追蹤'): n.prepare(self.root, s)
+        self.assertFalse((self.root/'審閱/採用/closure').exists())
+        self.assertFalse((self.root/n.scene_path(1, 0)).exists())
+        self.assertEqual((self.root/n.STATE).read_bytes(), state)
+
+    def test_old_prepared_chapter_without_tracking_is_rejected(self):
+        s = self.chapter_delivery(); n.prepare(self.root, s)
+        p = self.root/'審閱/採用/closure/journal.json'; j = n.load(p)
+        j['changes'] = [e for e in j['changes'] if e['target'] != '追蹤/追蹤.md']
+        n.atomic(p, n.dump(j))  # Simulate a journal prepared by the old version.
+        with self.assertRaisesRegex(n.Invalid, '最終追蹤'): n.accept(self.root, 'closure', '通過')
+        self.assertFalse((self.root/n.scene_path(1, 0)).exists())
+
+    def test_chapter_tracking_interruption_blocks_next_until_recovery(self):
+        s = self.chapter_delivery(); self.write('追蹤/追蹤.md', '舊追蹤'); n.prepare(self.root, s)
+        real = n.atomic
+        def stop(path, data):
+            if path == self.root/'追蹤/追蹤.md': raise OSError('tracking write interrupted')
+            real(path, data)
+        with patch.object(n, 'atomic', stop):
+            with self.assertRaises(OSError): n.accept(self.root, 'closure', '通過')
+        self.plan(ch=2)
+        with self.assertRaises(n.Invalid): n.confirm_plan(self.root, 2)
+        self.assertEqual(n.text(self.root/'追蹤/追蹤.md'), '舊追蹤')
+        n.accept(self.root, 'closure', '通過'); n.confirm_plan(self.root, 2)
+        self.assertEqual(n.text(self.root/'追蹤/追蹤.md'), '第一章已完成，下一章承諾已登記')
 
     def test_revision_candidate_preserves_official_text(self):
         self.adopted_chapter(); target=n.scene_path(1,0)
@@ -172,6 +210,86 @@ class Workflow(unittest.TestCase):
         self.write(target,'作者手改')
         with self.assertRaises(n.Invalid): n.prepare(self.root,self.revision_delivery())
         self.assertEqual((self.root/target).read_text(encoding='utf-8'),'作者手改')
+
+    def test_refresh_preserves_hand_edit_and_invalidates_prepared_revision(self):
+        self.adopted_chapter(); target = n.scene_path(1, 0)
+        n.revision_start(self.root, 'fix', [target]); n.prepare(self.root, self.revision_delivery())
+        state = (self.root/n.STATE).read_bytes()
+        before = n.load(n.task_path(self.root, 'fix'))['targets'][0]
+        self.write(target, '作者手改的新稿')
+        n.revision_refresh(self.root, 'fix', target, '作者要求重新審阅手改')
+        entry = n.load(n.task_path(self.root, 'fix'))['targets'][0]
+        self.assertEqual(entry['baseline_history'][0]['start_bytes'], before['start_bytes'])
+        self.assertEqual(base64.b64decode(entry['start_bytes']).decode('utf-8'), '作者手改的新稿')
+        self.assertEqual(n.text(self.root/target), '作者手改的新稿')
+        self.assertEqual((self.root/n.STATE).read_bytes(), state)
+        self.assertIsNone(entry['adopted'])
+        with self.assertRaises(n.Invalid): n.accept(self.root, 'r1', '通過')
+        with self.assertRaises(n.Invalid): n.revision_cancel(self.root, 'fix')
+        with self.assertRaises(n.Invalid): n.no_revision(self.root)
+        # A new review may adopt the author's unchanged text; refresh itself cannot.
+        s = self.revision_delivery(name='r2'); self.write(s['files'][0]['source'], '作者手改的新稿')
+        n.prepare(self.root, s); n.accept(self.root, 'r2', '作者通過重新審閱版本')
+        with self.assertRaises(n.Invalid): n.no_revision(self.root)
+        self.write('審閱/結案追蹤.md', '手改事實已同步'); self.write('審閱/end.md', '修訂收尾')
+        n.prepare(self.root, {'id':'end','kind':'revision-finish','revision':'fix','delivery':'審閱/end.md',
+            'files':[{'source':'審閱/結案追蹤.md','target':'追蹤/追蹤.md'}],
+            'review':{'mode':'文字','completed':sorted(n.REVIEWERS['文字']),'unresolved':[]}})
+        n.accept(self.root, 'end', '通過'); n.no_revision(self.root)
+        self.plan(ch=2); n.confirm_plan(self.root, 2); n.begin(self.root, 2, 1)
+        self.assertEqual(n.text(self.root/target), '作者手改的新稿')
+
+    def test_refresh_preserves_other_adoptions_and_stales_finish(self):
+        self.adopted_chapter(); target = n.scene_path(1, 0); other = n.scene_path(2, 0)
+        self.write(other, '已導入第二章')
+        n.revision_start(self.root, 'fix', [target, other])
+        for path, name in [(target, 'r1'), (other, 'r2')]:
+            s = self.revision_delivery(path, name); n.prepare(self.root, s); n.accept(self.root, name, '通過')
+        self.write('審閱/結案追蹤.md', '結案追蹤'); self.write('審閱/end.md', '結案')
+        n.prepare(self.root, {'id':'end','kind':'revision-finish','revision':'fix','delivery':'審閱/end.md',
+            'files':[{'source':'審閱/結案追蹤.md','target':'追蹤/追蹤.md'}],
+            'review':{'mode':'文字','completed':sorted(n.REVIEWERS['文字']),'unresolved':[]}})
+        old = n.load(n.task_path(self.root, 'fix'))
+        self.write(target, '採用後再次手改'); n.revision_refresh(self.root, 'fix', target, '再次手改')
+        now = n.load(n.task_path(self.root, 'fix'))
+        self.assertEqual(now['targets'][1], old['targets'][1])
+        self.assertEqual(now['targets'][0]['baseline_history'][0]['adopted'], old['targets'][0]['adopted'])
+        with self.assertRaises(n.Invalid): n.accept(self.root, 'end', '通過')
+        self.assertEqual(now['status'], 'active')
+
+    def test_refresh_rejects_invalid_scope_empty_unchanged_and_reason(self):
+        self.adopted_chapter(); target = n.scene_path(1, 0)
+        n.revision_start(self.root, 'fix', [target]); original = n.task_path(self.root, 'fix').read_bytes()
+        for path, reason in [(target, '不變'), (target, ' '), (n.scene_path(2, 0), '範圍外')]:
+            with self.assertRaises(n.Invalid): n.revision_refresh(self.root, 'fix', path, reason)
+        self.write(target, ' \n')
+        with self.assertRaises(n.Invalid): n.revision_refresh(self.root, 'fix', target, '空稿')
+        self.assertEqual(n.task_path(self.root, 'fix').read_bytes(), original)
+
+    def test_refresh_atomic_failure_retains_previous_baseline_and_author_text(self):
+        self.adopted_chapter(); target = n.scene_path(1, 0); n.revision_start(self.root, 'fix', [target])
+        before = n.task_path(self.root, 'fix').read_bytes(); self.write(target, '新手改')
+        with patch.object(n.os, 'replace', side_effect=OSError('disk failure')):
+            with self.assertRaises(OSError): n.revision_refresh(self.root, 'fix', target, '重新審閱')
+        self.assertEqual(n.task_path(self.root, 'fix').read_bytes(), before)
+        self.assertEqual(n.text(self.root/target), '新手改')
+        n.revision_refresh(self.root, 'fix', target, '重試')
+        self.write(target, '第二次手改'); n.revision_refresh(self.root, 'fix', target, '第二次')
+        self.assertEqual(len(n.load(n.task_path(self.root, 'fix'))['targets'][0]['baseline_history']), 2)
+
+    def test_refresh_cannot_skip_interrupted_adoption_or_closed_task(self):
+        self.adopted_chapter(); target = n.scene_path(1, 0); n.revision_start(self.root, 'fix', [target])
+        n.revision_cancel(self.root, 'fix'); self.write(target, '作者新稿')
+        with self.assertRaises(n.Invalid): n.revision_refresh(self.root, 'fix', target, '已結束')
+        n.revision_start(self.root, 'next', [target])
+        s = self.revision_delivery(); s['revision'] = 'next'; n.prepare(self.root, s)
+        real = n.atomic
+        def stop(path, data):
+            if path.name == '任務.json': raise OSError('interrupted')
+            real(path, data)
+        with patch.object(n, 'atomic', stop):
+            with self.assertRaises(OSError): n.accept(self.root, 'r1', '通過')
+        with self.assertRaises(n.Invalid): n.revision_refresh(self.root, 'next', target, '不能跳過恢復')
 
     def test_interruption_resumes_without_overwriting_external_edits(self):
         self.adopted_chapter(); n.revision_start(self.root,'fix',[n.scene_path(1,0)])
@@ -293,8 +411,10 @@ class Workflow(unittest.TestCase):
     def test_rollback_removes_only_new_official_candidate(self):
         self.ready(scenes=1); self.adopt_scene(); n.begin(self.root,1,0)
         self.write('草稿/第001章/整章候選.md','candidate'); self.write('審閱/end.md','delivery')
+        self.write('審閱/追蹤候選.md', 'tracking')
         s={'id':'end','kind':'chapter','chapter':1,'delivery':'審閱/end.md',
-           'files':[{'source':'草稿/第001章/整章候選.md','target':n.scene_path(1,0)}],
+           'files':[{'source':'草稿/第001章/整章候選.md','target':n.scene_path(1,0)},
+                    {'source':'審閱/追蹤候選.md','target':'追蹤/追蹤.md'}],
            'review':{'mode':'章節','completed':sorted(n.REVIEWERS['章節']),'unresolved':[]}}
         n.prepare(self.root,s); real=n.atomic
         def stop(path,data):

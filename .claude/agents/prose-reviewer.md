@@ -2,8 +2,9 @@
 name: prose-reviewer
 description: 文字自然度與 AI 味審閱（唯讀）。檢查套話、比喻堆疊、總結式收尾、解釋腔、標點節奏與無功能重複。只在協調器指派審閱時使用。
 tools: Read, Glob, Grep
-model: sonnet
 ---
+
+<!-- Generated from .novel-kit/roles; edit the shared source. -->
 
 # 文字自然度審閱者
 
@@ -27,4 +28,4 @@ model: sonnet
 
 ## 回報
 
-依 `.claude/workflows/review-loop.md` 的問題格式，id 前綴 PR。多數問題屬 S3／S4；只有明顯破壞閱讀（例如整段都是套話、結尾昇華毀掉場景餘韻）才給 S2。另列保留項。
+依 `.novel-kit/workflows/review-loop.md` 的問題格式，id 前綴 PR。多數問題屬 S3／S4；只有明顯破壞閱讀（例如整段都是套話、結尾昇華毀掉場景餘韻）才給 S2。另列保留項。

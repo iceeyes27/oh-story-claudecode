@@ -2,13 +2,22 @@
 
 一本書一個資料夾，以逐場景寫作、獨立審閱、作者採用來完成章節。支援開新書、導入舊稿與修訂。場景候選、整章候選和正式正文分開；採用工具保存必要版本，避免舊審閱套到新文字或中斷後覆寫作者修改。
 
-## 安裝
+## 安裝與平台
 
-需要 Claude Code、Python 3.9+；Windows 另需 [Git for Windows](https://git-scm.com/downloads/win)（提供 Hook 使用的 Git Bash）；Git 版本控制本身選用。把本工具組（含隱藏的 `.claude`）複製到書稿資料夾，從該資料夾啟動 Claude Code。閱讀交付可用 Obsidian 或任何 Markdown 編輯器。
+支援 Windows 與 macOS 的 Python 3.9+ 流程核心，無第三方 Python 套件依賴。Claude Code、Codex 有專用入口；其他有本地讀寫與執行能力的 Agent 使用 `AGENTS.md` 與 `.agents/skills/`。Git 用於版本記錄，可選；Windows 不需要為本工具安裝 Git Bash。
 
-若已有 oh-story，另建資料夾並導入原稿，避免兩套 hooks 和 agents 混用。本工具組是獨立方案，不需要合併 oh-story 主線。
+把整份工具組（含隱藏的 `.agents`、`.novel-kit`）放進新的書稿資料夾。已有 oh-story 或其他工具時另建資料夾導入原稿，避免混用。首次使用：
 
-Hook 與流程命令都經 `.claude/scripts/py.sh` 啟動，依序探測 `python3` → `python` → `py -3`，只採用能執行的 Python 3.9+，並固定 UTF-8 讀寫；Windows 的 Microsoft Store 佔位 `python3` 會被略過，不必修改 `.claude/settings.json`。Hook 以 `bash` 執行。Windows 必須安裝 Git Bash：依 Claude Code 官方文件，未裝 Git Bash 時 Hook 改由 PowerShell 執行，`bash` 命令找不到，Claude Code 會把這個錯誤當作非阻斷而放行所有寫入，關卡形同失效，Hook 內部無法補救。找不到 Python 時，寫入 `正文/`、`草稿/`、`導入/原稿/` 與工具專屬檔一律被攔截並提示安裝，其他檔案照常寫入。Python 是候選採用與恢復的必要依賴，不能只刪 Hook 設定就視為已部署。Claude Code 真實會話及各桌面環境的相容性仍需實測。
+| 平台 | 安裝兩套入口 | 自檢 |
+|---|---|---|
+| macOS | `./novel setup --agent all` | `./novel doctor --agent all` |
+| Windows PowerShell/CMD | `.\novel.cmd setup --agent all` | `.\novel.cmd doctor --agent all` |
+
+只用一種 Agent 可把 `all` 換成 `claude`、`codex` 或 `generic`。macOS 啟動權限未保留時用 `sh novel …`；已有 Python 時也可用 `python3 novel.py …`（Windows 通常是 `py -3 novel.py …`）。啟動器排除無效 Python，固定 UTF-8 讀寫。
+
+安裝只更新本資料夾的適配檔，保留其他設定與 Hook，不改帳號或全域設定。遇到自訂適配檔會停止並列出；檢視後可用 `setup --replace` 備份並更新。配置含本機路徑，搬動目錄或切換作業系統後重跑 setup。Codex 需在 `/hooks` 檢視並信任新增或變動的 Hook，再開新會話。自檢只能驗證命令與載荷，不能證明宿主已載入或信任它。
+
+共用來源與完整保護邊界見 [相容性說明](docs/compatibility.md)。
 
 ## 開始
 
@@ -18,11 +27,13 @@ Hook 與流程命令都經 `.claude/scripts/py.sh` 啟動，依序探測 `python
 /write-scene
 ```
 
+Claude Code 可使用上述斜線指令；Codex 使用 `$new-book`、`$plan-chapter`、`$write-scene` 或自然語言。其他 Agent 先讀 `AGENTS.md`，再載入對應 `SKILL.md`；不要假設各工具有相同指令或子代理 API。
+
 有舊稿時先 `/import-book 〈原稿路徑〉`。導入會備份原稿、整理章節、抽取事實，交作者確認後登記清單。只有正式正文檔存在，不代表完成導入。
 
 ## 每場交付
 
-Claude 寫候選、跑完整審閱，產生 `審閱/第NNN章/場景MM_交付.md` 後停下。交付第一節是候選全文，後面列自動修改、兌現、剩餘問題、分歧與章內事實增量。
+寫手產生候選、跑完整審閱，產生 `審閱/第NNN章/場景MM_交付.md` 後停下。交付第一節是候選全文，後面列自動修改、兌現、剩餘問題、分歧與章內事實增量。
 
 | 作者回覆 | 後續動作 |
 |---|---|
@@ -46,31 +57,33 @@ Claude 寫候選、跑完整審閱，產生 `審閱/第NNN章/場景MM_交付.md
 
 作者自己寫的部分只審不自動修。工具保留當前作者稿，再找上次採用版本比較；沒有改前基準會明說，不憑空重建。候選、交付或上下文有變，舊審閱不能繼續使用。
 
+修訂任務開始後作者再次手改，協調器以 `revision-refresh` 保存新舊基準，再重新審閱交付；不覆寫手改、不沿用舊審閱。整章採用必須包含最終追蹤候選，全部寫入完成才可續寫。
+
 ## 審閱分工
 
-| 角色 | 主要工作 | 預設模型 |
+| 角色 | 主要工作 | 角色性質 |
 |---|---|---|
-| copy-editor | 只讀正文，檢查理解、承接、指代、句段 | opus |
-| consistency-checker | 事實、時間線、知情、道具與修訂依賴 | sonnet |
-| character-reviewer | 對話、動機與關係 | sonnet |
-| prose-reviewer | 文風、套話與自然度 | sonnet |
-| structure-reviewer | 場景功能、細綱與兌現 | opus |
-| scene-writer | 寫候選及範圍內修改 | opus |
-| chapter-extractor | 導入原稿抽取 | sonnet |
+| copy-editor | 只讀正文，檢查理解、承接、指代、句段 | 繼承宿主設定 |
+| consistency-checker | 事實、時間線、知情、道具與修訂依賴 | 繼承宿主設定 |
+| character-reviewer | 對話、動機與關係 | 繼承宿主設定 |
+| prose-reviewer | 文風、套話與自然度 | 繼承宿主設定 |
+| structure-reviewer | 場景功能、細綱與兌現 | 繼承宿主設定 |
+| scene-writer | 寫候選及範圍內修改 | 繼承宿主設定 |
+| chapter-extractor | 導入原稿抽取 | 繼承宿主設定 |
 
-模型可在 `.claude/agents/` 的 `model` 欄位調整。新場景與待審稿修改先維持完整審閱；純文字修訂用兩位審閱者，章節收尾用文字、事實、結構三位。最多兩輪自動修正，局部修改最多一輪；未決問題交作者。
+角色預設繼承使用者的宿主模型設定。新場景與待審稿修改先維持完整審閱；純文字修訂用兩位審閱者，章節收尾用文字、事實、結構三位。最多兩輪自動修正，局部修改最多一輪；未決問題交作者。
 
 每輪盲讀使用新上下文。審閱缺席、嚴重分歧或關鍵覆蓋不足都會標出，不算通過。模型評價不能替代作者或真人讀者的採用意見。輕量審閱配置待真實試用後再評估。
 
 ## 版本與恢复
 
-日常命令由協調器執行，作者不必手填狀態或 JSON。詳細步驟見 [採用與恢復流程](.claude/workflows/adoption.md)。
+日常命令由協調器執行，作者不必手填狀態或 JSON。詳細步驟見 [採用與恢復流程](.novel-kit/workflows/adoption.md)。
 
 - 場景工作狀態保存在 Markdown；小型採用日誌只保存精確版本與中斷進度。
 - 中斷採用可重跑，已完成檔案不重做；遇外部手改先停下保留現場。
 - 有原有暫存變更時保留原樣，不自動提交。禁止整個工作區 `git add -A`。
 - Git 提交失敗會顯示「已採用、未提交」，不撤銷作者已採用的內容。
-- 寫檔 Hook（Write、Edit、NotebookEdit，並相容舊版 MultiEdit）檢查新建與既有草稿，正式正文由採用工具更新。`追蹤/場景狀態.md`、`審閱/採用/`、`審閱/修訂/*/任務.json`、`導入/清單.json` 只由 `novel.py` 寫入，直接改會被攔截（副檔名不分大小寫）。書稿外的絕對路徑（如 Claude Code 的記憶與計劃檔）不受管理；字面路徑、解析後的真實路徑與檔案身分都須在書稿外才放行，連結或短名繞回書稿仍會被攔截。Shell 和外部編輯器不受此 Hook 攔截；版本核對會發現輸入變更。
+- 啟用的寫檔 Hook（Claude Code 的 Write、Edit、NotebookEdit、MultiEdit，及 Codex 的 apply_patch）檢查新建與既有草稿，正式正文由採用工具更新。`追蹤/場景狀態.md`、`審閱/採用/`、`審閱/修訂/*/任務.json`、`導入/清單.json` 只由 `novel.py` 寫入，直接改會被攔截（副檔名不分大小寫）。書稿外的絕對路徑（如 Claude Code 的記憶與計劃檔）不受管理；字面路徑、解析後的真實路徑與檔案身分都須在書稿外才放行，連結或短名繞回書稿仍會被攔截。Shell 和外部編輯器不受此 Hook 攔截；版本核對會發現輸入變更。
 - 工具記錄作者的決定，不能技術上證明是作者本人授權，協調器不得自行捏造「通過」。
 
 ## 驗證
@@ -79,6 +92,6 @@ Claude 寫候選、跑完整審閱，產生 `審閱/第NNN章/場景MM_交付.md
 python3 -m unittest discover -s tests -v
 ```
 
-Windows 改用 `python -m unittest …` 或 `py -3 -m unittest …`；不要設 `PYTHONUTF8`，測試須在系統預設編碼（如 GBK）下通過。需要 `bash` 的 Hook 測試在找不到 bash 時略過。
+Windows 改用 `python -m unittest …` 或 `py -3 -m unittest …`。原生 Windows 啟動器與 Hook 測試只在 Windows 執行，macOS 會明確略過；bash 回退測試在找不到 bash 時略過。CI 配置覆蓋 Windows/macOS 與 Python 3.9/3.13；配置存在不代表遠端已跑過。
 
 測試使用臨時書稿與臨時 Git 倉庫，驗證版本、採用、恢復、修訂、導入登記、Hook 輸入與提交範圍。實作範圍及未驗證項目見 [驗證記錄](docs/validation.md)。

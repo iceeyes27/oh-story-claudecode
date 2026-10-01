@@ -2,3 +2,10 @@ __pycache__/
 *.pyc
 .novel-kit.lock
 .novel-tmp-*
+.novel-kit/adapters.json
+.novel-kit/adapter-backups/
+.claude/settings.local.json
+.codex/hooks.json
+node_modules/
+test-results/
+.trellis/

@@ -14,11 +14,12 @@ import tempfile
 import unittest
 
 KIT = Path(__file__).resolve().parents[1]
-SCRIPT = KIT / '.claude/scripts/novel.py'
+SCRIPT = KIT / '.novel-kit/scripts/novel.py'
 spec = importlib.util.spec_from_file_location('novel', SCRIPT)
 n = importlib.util.module_from_spec(spec); spec.loader.exec_module(n)
-HOOK = KIT / '.claude/hooks/scene_gate.py'
-SETTINGS = KIT / '.claude/settings.json'
+HOOK = KIT / '.novel-kit/hooks/scene_gate.py'
+sys.path.insert(0, str(KIT / '.novel-kit/scripts'))
+from adapters import hook_config
 
 
 def find_bash():
@@ -139,7 +140,10 @@ class Launcher(Book):
 
     def setUp(self):
         super().setUp()
-        shutil.copytree(KIT / '.claude', self.root / '.claude', ignore=shutil.ignore_patterns('__pycache__'))
+        # Only the runtime is needed: never copy local worktrees or skill adapters.
+        for folder in ('hooks', 'scripts'):
+            shutil.copytree(KIT / '.novel-kit' / folder, self.root / '.novel-kit' / folder,
+                            ignore=shutil.ignore_patterns('__pycache__'))
         self.bin = Path(self.tmp.name) / 'bin'; self.bin.mkdir()
         self.empty = Path(self.tmp.name) / 'empty'; self.empty.mkdir()
 
@@ -153,13 +157,13 @@ class Launcher(Book):
         self.fake('python', f'exec "{posix(sys.executable)}" "$@"')
 
     def command(self):
-        hooks = json.loads(SETTINGS.read_text(encoding='utf-8'))['hooks']['PreToolUse']
-        self.assertEqual(hooks[0]['matcher'], 'Write|Edit|MultiEdit|NotebookEdit')
-        return hooks[0]['hooks'][0]['command']
+        config = hook_config(self.root, 'claude', 'posix')
+        self.assertIn('apply_patch', config['matcher'])
+        return config['hooks'][0]
 
     def run_settings(self, data, path_dirs):
         path = os.pathsep.join([*map(str, path_dirs), os.path.dirname(BASH), os.environ.get('PATH', '')])
-        return subprocess.run([BASH, '-c', self.command()], input=data, capture_output=True,
+        return subprocess.run([BASH, *[posix(p) for p in self.command()['args']]], input=data, capture_output=True,
                               env=self.env(PATH=path))
 
     def run_no_python(self, data, root=None):
@@ -167,11 +171,14 @@ class Launcher(Book):
         env = self.env(PATH=str(self.empty))
         if root is not None:
             env['CLAUDE_PROJECT_DIR'] = root
-        return subprocess.run([BASH, str(self.root / '.claude/hooks/scene_gate.sh')], input=data,
+            payload = json.loads(data.decode('utf-8')); payload['cwd'] = root
+            data = json.dumps(payload, ensure_ascii=False).encode('utf-8')
+        return subprocess.run([BASH, str(self.root / '.novel-kit/hooks/scene_gate.sh')], input=data,
                               capture_output=True, env=env)
 
     def test_settings_uses_bash_launcher(self):
-        self.assertEqual(self.command(), 'bash "$CLAUDE_PROJECT_DIR/.claude/hooks/scene_gate.sh"')
+        self.assertEqual(self.command()['command'], '/bin/bash')
+        self.assertEqual(self.command()['args'], [str(self.root/'.novel-kit/hooks/scene_gate.sh')])
 
     def test_store_stub_python3_is_skipped(self):
         self.fake_store_stub()
@@ -191,13 +198,13 @@ class Launcher(Book):
         self.fake_store_stub()
         code = 'import os,sys; print(os.environ["PYTHONUTF8"], os.environ["PYTHONIOENCODING"], sys.stdout.encoding, sys.version_info >= (3, 9))'
         path = os.pathsep.join([str(self.bin), os.environ.get('PATH', '')])
-        r = subprocess.run([BASH, str(KIT / '.claude/scripts/py.sh'), '-c', code], capture_output=True,
+        r = subprocess.run([BASH, str(KIT / '.novel-kit/scripts/py.sh'), '-c', code], capture_output=True,
                            env=self.env(PATH=path))
         self.assertEqual(r.returncode, 0, r.stderr.decode('utf-8', 'replace'))
         self.assertEqual(r.stdout.decode('utf-8').split(), ['1', 'utf-8', 'utf-8', 'True'])
 
     def test_launcher_without_python_exits_127(self):
-        r = subprocess.run([BASH, str(KIT / '.claude/scripts/py.sh'), '-c', 'pass'], capture_output=True,
+        r = subprocess.run([BASH, str(KIT / '.novel-kit/scripts/py.sh'), '-c', 'pass'], capture_output=True,
                            env=self.env(PATH=str(self.empty)))
         self.assertEqual(r.returncode, 127)
         self.assertIn('Python 3.9', r.stderr.decode('utf-8'))
@@ -268,6 +275,12 @@ class Launcher(Book):
                      self.payload(str(self.root) + '/設定/../正文/第001章.md')]:
             r = self.run_no_python(data)
             self.assertEqual(r.returncode, 2, data)
+
+    def test_no_python_relative_path_under_protected_cwd_blocks(self):
+        data = self.payload('第001章.md', raw=True, cwd=str(self.root/'正文'))
+        self.assertEqual(self.run_no_python(data).returncode, 2)
+        data = self.payload('setting.md', raw=True, cwd=str(self.root/'設定'))
+        self.assertEqual(self.run_no_python(data).returncode, 0)
 
 
 if __name__ == '__main__':

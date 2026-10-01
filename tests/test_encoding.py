@@ -9,7 +9,7 @@ from pathlib import Path
 import unittest
 
 KIT = Path(__file__).resolve().parents[1]
-FILES = [KIT / '.claude/scripts/novel.py', KIT / '.claude/hooks/scene_gate.py', *sorted((KIT / 'tests').glob('*.py'))]
+FILES = [KIT / 'novel.py', *sorted((KIT / '.novel-kit').rglob('*.py')), *sorted((KIT / 'tests').glob('*.py'))]
 SUBPROCESS_TEXT = {'run', 'check_output', 'Popen', 'call', 'check_call'}
 
 

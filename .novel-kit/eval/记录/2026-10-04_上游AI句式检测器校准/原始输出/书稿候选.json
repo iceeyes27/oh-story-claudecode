@@ -1,0 +1,74 @@
+{
+  "findings": [
+    {
+      "file": "wozaiyuenan/候选/第001章.md",
+      "line": 111,
+      "column": 1,
+      "type": "stock-reaction-tic",
+      "severity": "advisory",
+      "message": "套式反应细节：指尖/指节/喉结/眼圈/声音放轻等通用反应或“平静得像在念”式语气比喻 6 处（1.7/千字）；逐处做删除测试，只标注情绪、不改变选择、关系、物件或动作结果的删掉，不要换部位或同义动作。",
+      "excerpt": "格里普斯尖着嗓子，枯瘦的手指一下下敲打着桌上的羊皮纸 | 陈放屈起指节，在羊皮纸抬头的凹凸纹路上轻轻一叩： | 其中一个右手下意识探进斗篷握住魔杖柄，眼神...",
+      "review": "semantic"
+    },
+    {
+      "file": "wozaiyuenan/候选/第001章.md",
+      "line": 123,
+      "column": 91,
+      "type": "em-dash",
+      "severity": "blocking",
+      "message": "破折号按功能改写：打断→动作 beat/短句，拖长音→省略或动作，插入说明→逗号/冒号；勿一律改句号。",
+      "excerpt": "生攒上整整两年半——更何况翻倒巷的黑",
+      "review": "mechanical"
+    },
+    {
+      "file": "wozaiyuenan/候选/第001章.md",
+      "line": 167,
+      "column": 35,
+      "type": "em-dash",
+      "severity": "blocking",
+      "message": "破折号按功能改写：打断→动作 beat/短句，拖长音→省略或动作，插入说明→逗号/冒号；勿一律改句号。",
+      "excerpt": "出一道尖利的叫嚣——分毫不差，正是格",
+      "review": "mechanical"
+    },
+    {
+      "file": "wozaiyuenan/候选/第001章.md",
+      "line": 213,
+      "column": 45,
+      "type": "em-dash",
+      "severity": "blocking",
+      "message": "破折号按功能改写：打断→动作 beat/短句，拖长音→省略或动作，插入说明→逗号/冒号；勿一律改句号。",
+      "excerpt": "对方不是在吓唬他——只要这段声音明早",
+      "review": "mechanical"
+    },
+    {
+      "file": "wozaiyuenan/候选/第001章.md",
+      "line": 245,
+      "column": 14,
+      "type": "em-dash",
+      "severity": "blocking",
+      "message": "破折号按功能改写：打断→动作 beat/短句，拖长音→省略或动作，插入说明→逗号/冒号；勿一律改句号。",
+      "excerpt": "飞快过了一遍清单——",
+      "review": "mechanical"
+    },
+    {
+      "file": "wozaiyuenan/候选/第002章.md",
+      "line": 203,
+      "column": 10,
+      "type": "em-dash",
+      "severity": "blocking",
+      "message": "破折号按功能改写：打断→动作 beat/短句，拖长音→省略或动作，插入说明→逗号/冒号；勿一律改句号。",
+      "excerpt": "等等，你个一年级——嘶！”",
+      "review": "mechanical"
+    },
+    {
+      "file": "wozaiyuenan/候选/第003章.md",
+      "line": 49,
+      "column": 89,
+      "type": "em-dash",
+      "severity": "blocking",
+      "message": "破折号按功能改写：打断→动作 beat/短句，拖长音→省略或动作，插入说明→逗号/冒号；勿一律改句号。",
+      "excerpt": "拆验，韦斯莱先生——这在学生守则里，",
+      "review": "mechanical"
+    }
+  ]
+}

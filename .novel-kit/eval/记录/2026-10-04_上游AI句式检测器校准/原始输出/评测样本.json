@@ -1,0 +1,14 @@
+{
+  "findings": [
+    {
+      "file": ".novel-kit/eval/样本/D02/正文.md",
+      "line": 9,
+      "column": 45,
+      "type": "em-dash",
+      "severity": "blocking",
+      "message": "破折号按功能改写：打断→动作 beat/短句，拖长音→省略或动作，插入说明→逗号/冒号；勿一律改句号。",
+      "excerpt": "对方不是在吓唬他——只要这段声音明早",
+      "review": "mechanical"
+    }
+  ]
+}

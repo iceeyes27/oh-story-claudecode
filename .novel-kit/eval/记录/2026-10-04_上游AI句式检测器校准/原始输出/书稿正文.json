@@ -1,0 +1,234 @@
+{
+  "findings": [
+    {
+      "file": "wozaiyuenan/正文/第001章.md",
+      "line": 123,
+      "column": 91,
+      "type": "em-dash",
+      "severity": "blocking",
+      "message": "破折号按功能改写：打断→动作 beat/短句，拖长音→省略或动作，插入说明→逗号/冒号；勿一律改句号。",
+      "excerpt": "生攒上整整两年半——更何况翻倒巷的黑",
+      "review": "mechanical"
+    },
+    {
+      "file": "wozaiyuenan/正文/第001章.md",
+      "line": 167,
+      "column": 35,
+      "type": "em-dash",
+      "severity": "blocking",
+      "message": "破折号按功能改写：打断→动作 beat/短句，拖长音→省略或动作，插入说明→逗号/冒号；勿一律改句号。",
+      "excerpt": "出一道尖利的叫嚣——分毫不差，正是格",
+      "review": "mechanical"
+    },
+    {
+      "file": "wozaiyuenan/正文/第001章.md",
+      "line": 215,
+      "column": 45,
+      "type": "em-dash",
+      "severity": "blocking",
+      "message": "破折号按功能改写：打断→动作 beat/短句，拖长音→省略或动作，插入说明→逗号/冒号；勿一律改句号。",
+      "excerpt": "对方不是在吓唬他——只要这段声音明早",
+      "review": "mechanical"
+    },
+    {
+      "file": "wozaiyuenan/正文/第001章.md",
+      "line": 239,
+      "column": 77,
+      "type": "em-dash",
+      "severity": "blocking",
+      "message": "破折号按功能改写：打断→动作 beat/短句，拖长音→省略或动作，插入说明→逗号/冒号；勿一律改句号。",
+      "excerpt": "口径录入防护条例——东方家传法器，略",
+      "review": "mechanical"
+    },
+    {
+      "file": "wozaiyuenan/正文/第001章.md",
+      "line": 251,
+      "column": 14,
+      "type": "em-dash",
+      "severity": "blocking",
+      "message": "破折号按功能改写：打断→动作 beat/短句，拖长音→省略或动作，插入说明→逗号/冒号；勿一律改句号。",
+      "excerpt": "飞快过了一遍清单——",
+      "review": "mechanical"
+    },
+    {
+      "file": "wozaiyuenan/正文/第007章.md",
+      "line": 5,
+      "column": 1,
+      "type": "overcompressed-prose-tic",
+      "severity": "advisory",
+      "message": "过度精炼短段：叙述段 154 个，其中 91 个≤15字（59%），自然连接 65.4/千字偏少；先通读判断，确有提纲感再补断裂处和必要结构虚词，有意短镜头可留，别机械注水。",
+      "excerpt": "这句话是从西看台飘下来的。 | 他撇撇嘴。 | 身后两个跟班跟着哄笑。 | 他本是来凑热闹的。 | 球场另一头，队员稀稀拉拉落了地。 | 哄笑声又起了一阵。",
+      "review": "semantic"
+    },
+    {
+      "file": "wozaiyuenan/正文/第008章.md",
+      "line": 3,
+      "column": 1,
+      "type": "overcompressed-prose-tic",
+      "severity": "advisory",
+      "message": "过度精炼短段：叙述段 163 个，其中 97 个≤15字（60%），自然连接 71.3/千字偏少；先通读判断，确有提纲感再补断裂处和必要结构虚词，有意短镜头可留，别机械注水。",
+      "excerpt": "天已经黑了四十分钟。 | 他粗嗓门点完最后一个名字。 | 名单上少了三个。 | 她一句话压得极低。 | 雨刚停。 | 没人敢大声说话。",
+      "review": "semantic"
+    },
+    {
+      "file": "wozaiyuenan/正文/第009章.md",
+      "line": 3,
+      "column": 1,
+      "type": "overcompressed-prose-tic",
+      "severity": "advisory",
+      "message": "过度精炼短段：叙述段 147 个，其中 97 个≤15字（66%），自然连接 79.6/千字偏少；先通读判断，确有提纲感再补断裂处和必要结构虚词，有意短镜头可留，别机械注水。",
+      "excerpt": "问题还没问完。 | 埃德蒙刚报完一组数字。 | 斯内普没吭声。 | 他停下。 | 不是夸。 | 袖子里，傻妞的声音压得只剩一线。",
+      "review": "semantic"
+    },
+    {
+      "file": "wozaiyuenan/正文/第009章.md",
+      "line": 43,
+      "column": 1,
+      "type": "negation-pair-tic",
+      "severity": "advisory",
+      "message": "否定对偶偏多：「没A，也没B」式叙述 4 处；写人物没做什么是英文式节奏，改成他做了什么（留一两处真正要强调的）。",
+      "excerpt": "没信，也没 | 没说对，也没 | 没有红笔打出的大叉，也没有 | 没问，也不",
+      "review": "semantic"
+    },
+    {
+      "file": "wozaiyuenan/正文/第011章.md",
+      "line": 3,
+      "column": 1,
+      "type": "overcompressed-prose-tic",
+      "severity": "advisory",
+      "message": "过度精炼短段：叙述段 147 个，其中 92 个≤15字（63%），自然连接 83.8/千字偏少；先通读判断，确有提纲感再补断裂处和必要结构虚词，有意短镜头可留，别机械注水。",
+      "excerpt": "她没回头，手里的针还在走。 | 埃德蒙把皮箱搁在墙角，没出声。 | 他打量这间住了十一年的屋子。 | 桌角压着几枚小小的银币，少得可怜。 | 她眼底有掩不...",
+      "review": "semantic"
+    },
+    {
+      "file": "wozaiyuenan/正文/第011章.md",
+      "line": 9,
+      "column": 14,
+      "type": "not-is-comparison",
+      "severity": "blocking",
+      "message": "高频 AI 对比句式；删掉否定铺垫，直接写后项，或改成动作/细节呈现。",
+      "excerpt": "不是饭香。 是浆洗过的旧布味，混着一点炭火的暖",
+      "review": "mechanical"
+    },
+    {
+      "file": "wozaiyuenan/正文/第011章.md",
+      "line": 63,
+      "column": 1,
+      "type": "stock-reaction-tic",
+      "severity": "advisory",
+      "message": "套式反应细节：指尖/指节/喉结/眼圈/声音放轻等通用反应或“平静得像在念”式语气比喻 4 处（1.9/千字）；逐处做删除测试，只标注情绪、不改变选择、关系、物件或动作结果的删掉，不要换部位或同义动作。",
+      "excerpt": "埃德蒙指尖在袖底轻轻一按，算作应下 | 埃德蒙垂着眼，指尖在旧袍上慢慢摩挲 | 她眉头微微蹙着，像是想起什么 | 埃德蒙的手指，慢慢收紧了",
+      "review": "semantic"
+    },
+    {
+      "file": "wozaiyuenan/正文/第011章.md",
+      "line": 123,
+      "column": 4,
+      "type": "reverse-not-is",
+      "severity": "blocking",
+      "message": "反序对比腔：「是A，不是B」与「不是A，是B」同族；删掉后置否定，直接写 A 的具体表现，或用细节让读者自己对比。",
+      "excerpt": "是母亲多挣几个西可，不是开一间符店",
+      "review": "mechanical"
+    },
+    {
+      "file": "wozaiyuenan/正文/第011章.md",
+      "line": 287,
+      "column": 5,
+      "type": "not-is-comparison",
+      "severity": "blocking",
+      "message": "高频 AI 对比句式；删掉否定铺垫，直接写后项，或改成动作/细节呈现。",
+      "excerpt": "不是她们去求的散活。 是主顾自己找上门来的",
+      "review": "mechanical"
+    },
+    {
+      "file": "wozaiyuenan/正文/第012章.md",
+      "line": 81,
+      "column": 1,
+      "type": "quote-emphasis-tic",
+      "severity": "advisory",
+      "message": "引号强调滥用：叙述里 1-4 字短词加引号强调 3 处；只留真正反讽/转述必要的一两处，其余去掉引号直接写，或换成具体动作让读者自己品。",
+      "excerpt": "啪 唰 嗯",
+      "review": "semantic"
+    },
+    {
+      "file": "wozaiyuenan/正文/第012章.md",
+      "line": 131,
+      "column": 2,
+      "type": "voice-contrast",
+      "severity": "blocking",
+      "message": "音量反差腔：「声音不大/不高…却/但…」是 AI 高频反差模板；删掉音量铺垫，直接写声音落进场子的具体效果（谁停了手、哪排安静了）。",
+      "excerpt": "声音不高，却",
+      "review": "mechanical"
+    },
+    {
+      "file": "wozaiyuenan/正文/第013章.md",
+      "line": 3,
+      "column": 1,
+      "type": "overcompressed-prose-tic",
+      "severity": "advisory",
+      "message": "过度精炼短段：叙述段 168 个，其中 100 个≤15字（60%），自然连接 84.5/千字偏少；先通读判断，确有提纲感再补断裂处和必要结构虚词，有意短镜头可留，别机械注水。",
+      "excerpt": "对角巷走到北端，一点一点窄下去。 | 再往前拐个弯，就是翻倒巷。 | 路过的巫师走到这儿，脚步都快几分。 | 埃德蒙却在拐角前停住了。 | 因为眼前这栋楼...",
+      "review": "semantic"
+    },
+    {
+      "file": "wozaiyuenan/正文/第013章.md",
+      "line": 21,
+      "column": 1,
+      "type": "negation-pair-tic",
+      "severity": "advisory",
+      "message": "否定对偶偏多：「没A，也没B」式叙述 5 处；写人物没做什么是英文式节奏，改成他做了什么（留一两处真正要强调的）。",
+      "excerpt": "不大，光也不 | 不近，也不 | 没往墙后探，也没 | 没停，也没",
+      "review": "semantic"
+    },
+    {
+      "file": "wozaiyuenan/正文/第013章.md",
+      "line": 21,
+      "column": 1,
+      "type": "metaphor-density-tic",
+      "severity": "advisory",
+      "message": "比喻密度过高：像/好像/仿佛/如同等比喻标记 12 处（4.8/千字）；保留最有叙事功能的少数比喻，其余回到具体动作、物件、声音或后果，不要换成新比喻。",
+      "excerpt": "灯笼不大，光也不晃，安安静静亮着，像从没灭过 | 这铃声脆，短，像水珠落在瓷上 | 那一眼里没什么火气，倒像是怪他不先递个话 | 她像是忽然想起什么，起身...",
+      "review": "semantic"
+    },
+    {
+      "file": "wozaiyuenan/正文/第014章.md",
+      "line": 19,
+      "column": 1,
+      "type": "metaphor-density-tic",
+      "severity": "advisory",
+      "message": "比喻密度过高：像/好像/仿佛/如同等比喻标记 10 处（4.6/千字）；保留最有叙事功能的少数比喻，其余回到具体动作、物件、声音或后果，不要换成新比喻。",
+      "excerpt": "一句话，平平的，像说过很多遍 | 傻妞的声音透过骨传导，轻得像是怕惊动谁 | 他不敢动，连呼吸都放轻了，像怕惊着这双手 | 他手上的力道，稳得像在记时间 ...",
+      "review": "semantic"
+    },
+    {
+      "file": "wozaiyuenan/正文/第014章.md",
+      "line": 77,
+      "column": 1,
+      "type": "stock-reaction-tic",
+      "severity": "advisory",
+      "message": "套式反应细节：指尖/指节/喉结/眼圈/声音放轻等通用反应或“平静得像在念”式语气比喻 4 处（1.8/千字）；逐处做删除测试，只标注情绪、不改变选择、关系、物件或动作结果的删掉，不要换部位或同义动作。",
+      "excerpt": "袖口的屏幕，微微一亮 | 他顺着膝眼往上，手指摸到膝盖外侧，那块微微凸起的骨头下头 | 母亲揉面的声音，也放轻了 | 手指在膝上轻轻按了按",
+      "review": "semantic"
+    },
+    {
+      "file": "wozaiyuenan/正文/第014章.md",
+      "line": 103,
+      "column": 1,
+      "type": "not-is-comparison",
+      "severity": "blocking",
+      "message": "高频 AI 对比句式；删掉否定铺垫，直接写后项，或改成动作/细节呈现。",
+      "excerpt": "不是热水烫的那种热，是透进骨头的、一阵一阵的暖",
+      "review": "mechanical"
+    },
+    {
+      "file": "wozaiyuenan/正文/第015章.md",
+      "line": 3,
+      "column": 1,
+      "type": "overcompressed-prose-tic",
+      "severity": "advisory",
+      "message": "过度精炼短段：叙述段 106 个，其中 69 个≤15字（65%），自然连接 82.0/千字偏少；先通读判断，确有提纲感再补断裂处和必要结构虚词，有意短镜头可留，别机械注水。",
+      "excerpt": "埃德蒙擦干手，过去开了门。 | 埃德蒙愣了一下，然后认出来人。 | 埃德蒙有点不好意思。 | 比尔挑眉，笑得眼睛都弯了， | 比尔捏了块饼干抹了一勺： |...",
+      "review": "semantic"
+    }
+  ]
+}

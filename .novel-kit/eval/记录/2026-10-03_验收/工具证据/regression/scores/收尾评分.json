@@ -1,0 +1,811 @@
+{
+  "schema_version": 1,
+  "kind": "novel-kit-eval-score",
+  "created_at": "2026-10-03T14:27:59Z",
+  "quality_judgment_source": "model_comparison",
+  "quality_acceptance": "not_determined",
+  "scope": "review_only",
+  "evidence_complete": true,
+  "missing": [],
+  "runs": [
+    {
+      "run_id": "A01_copy-editor_1",
+      "sample": "A01",
+      "role": "copy-editor",
+      "attempt": 1,
+      "detected": {
+        "numerator": 1,
+        "denominator": 3,
+        "rate": 0.3333333333333333,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 3,
+        "rate": 0.3333333333333333,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "A01_copy-editor_2",
+      "sample": "A01",
+      "role": "copy-editor",
+      "attempt": 2,
+      "detected": {
+        "numerator": 1,
+        "denominator": 3,
+        "rate": 0.3333333333333333,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 3,
+        "rate": 0.3333333333333333,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "A02_copy-editor_1",
+      "sample": "A02",
+      "role": "copy-editor",
+      "attempt": 1,
+      "detected": {
+        "numerator": 0,
+        "denominator": 3,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 1,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "A02_copy-editor_2",
+      "sample": "A02",
+      "role": "copy-editor",
+      "attempt": 2,
+      "detected": {
+        "numerator": 1,
+        "denominator": 3,
+        "rate": 0.3333333333333333,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 1,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "A03_copy-editor_1",
+      "sample": "A03",
+      "role": "copy-editor",
+      "attempt": 1,
+      "detected": {
+        "numerator": 1,
+        "denominator": 2,
+        "rate": 0.5,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 2,
+        "rate": 0.5,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "A03_copy-editor_2",
+      "sample": "A03",
+      "role": "copy-editor",
+      "attempt": 2,
+      "detected": {
+        "numerator": 2,
+        "denominator": 2,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 2,
+        "rate": 0.5,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "A04_copy-editor_1",
+      "sample": "A04",
+      "role": "copy-editor",
+      "attempt": 1,
+      "detected": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 3,
+        "rate": 0.3333333333333333,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "A04_copy-editor_2",
+      "sample": "A04",
+      "role": "copy-editor",
+      "attempt": 2,
+      "detected": {
+        "numerator": 1,
+        "denominator": 3,
+        "rate": 0.3333333333333333,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 3,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "B01_copy-editor_1",
+      "sample": "B01",
+      "role": "copy-editor",
+      "attempt": 1,
+      "detected": {
+        "numerator": 1,
+        "denominator": 2,
+        "rate": 0.5,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 2,
+        "rate": 0.5,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "B01_copy-editor_2",
+      "sample": "B01",
+      "role": "copy-editor",
+      "attempt": 2,
+      "detected": {
+        "numerator": 1,
+        "denominator": 2,
+        "rate": 0.5,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 2,
+        "rate": 0.5,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "B02_copy-editor_1",
+      "sample": "B02",
+      "role": "copy-editor",
+      "attempt": 1,
+      "detected": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 2,
+        "denominator": 2,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "B02_copy-editor_2",
+      "sample": "B02",
+      "role": "copy-editor",
+      "attempt": 2,
+      "detected": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 2,
+        "denominator": 2,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "B03_copy-editor_1",
+      "sample": "B03",
+      "role": "copy-editor",
+      "attempt": 1,
+      "detected": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "B03_copy-editor_2",
+      "sample": "B03",
+      "role": "copy-editor",
+      "attempt": 2,
+      "detected": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "B04_copy-editor_1",
+      "sample": "B04",
+      "role": "copy-editor",
+      "attempt": 1,
+      "detected": {
+        "numerator": 0,
+        "denominator": 3,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 1,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "B04_copy-editor_2",
+      "sample": "B04",
+      "role": "copy-editor",
+      "attempt": 2,
+      "detected": {
+        "numerator": 0,
+        "denominator": 3,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 1,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "C01_copy-editor_1",
+      "sample": "C01",
+      "role": "copy-editor",
+      "attempt": 1,
+      "detected": {
+        "numerator": 0,
+        "denominator": 4,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 1,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "C01_copy-editor_2",
+      "sample": "C01",
+      "role": "copy-editor",
+      "attempt": 2,
+      "detected": {
+        "numerator": 0,
+        "denominator": 4,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 1,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "C02_copy-editor_1",
+      "sample": "C02",
+      "role": "copy-editor",
+      "attempt": 1,
+      "detected": {
+        "numerator": 1,
+        "denominator": 4,
+        "rate": 0.25,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 2,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "C02_copy-editor_2",
+      "sample": "C02",
+      "role": "copy-editor",
+      "attempt": 2,
+      "detected": {
+        "numerator": 1,
+        "denominator": 4,
+        "rate": 0.25,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 2,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "D01_copy-editor_1",
+      "sample": "D01",
+      "role": "copy-editor",
+      "attempt": 1,
+      "detected": {
+        "numerator": 0,
+        "denominator": 3,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 1,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "D01_copy-editor_2",
+      "sample": "D01",
+      "role": "copy-editor",
+      "attempt": 2,
+      "detected": {
+        "numerator": 0,
+        "denominator": 3,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 1,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "D02_copy-editor_1",
+      "sample": "D02",
+      "role": "copy-editor",
+      "attempt": 1,
+      "detected": {
+        "numerator": 1,
+        "denominator": 4,
+        "rate": 0.25,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 2,
+        "rate": 0.5,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "D02_copy-editor_2",
+      "sample": "D02",
+      "role": "copy-editor",
+      "attempt": 2,
+      "detected": {
+        "numerator": 1,
+        "denominator": 4,
+        "rate": 0.25,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 2,
+        "rate": 0.5,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "K01_copy-editor_1",
+      "sample": "K01",
+      "role": "copy-editor",
+      "attempt": 1,
+      "detected": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "K01_copy-editor_2",
+      "sample": "K01",
+      "role": "copy-editor",
+      "attempt": 2,
+      "detected": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "K02_copy-editor_1",
+      "sample": "K02",
+      "role": "copy-editor",
+      "attempt": 1,
+      "detected": {
+        "numerator": 0,
+        "denominator": 1,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "K02_copy-editor_2",
+      "sample": "K02",
+      "role": "copy-editor",
+      "attempt": 2,
+      "detected": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    }
+  ],
+  "attempts": [
+    {
+      "role": "copy-editor",
+      "attempt": 1,
+      "detected": {
+        "numerator": 10,
+        "denominator": 36,
+        "rate": 0.2777777777777778,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 8,
+        "denominator": 21,
+        "rate": 0.38095238095238093,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "role": "copy-editor",
+      "attempt": 2,
+      "detected": {
+        "numerator": 12,
+        "denominator": 36,
+        "rate": 0.3333333333333333,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 7,
+        "denominator": 21,
+        "rate": 0.3333333333333333,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    }
+  ],
+  "consistency": [
+    {
+      "role": "copy-editor",
+      "compared_attempts": "每样本前两次",
+      "detection_agreement": {
+        "numerator": 30,
+        "denominator": 36,
+        "rate": 0.8333333333333334,
+        "missing": 0
+      },
+      "severity_agreement": {
+        "numerator": 30,
+        "denominator": 36,
+        "rate": 0.8333333333333334,
+        "missing": 0
+      },
+      "positive_overlap": {
+        "numerator": 8,
+        "denominator": 14,
+        "rate": 0.5714285714285714,
+        "missing": 0
+      }
+    }
+  ],
+  "unions": [
+    {
+      "role": "copy-editor",
+      "supplemental_only": true,
+      "detected": {
+        "numerator": 14,
+        "denominator": 36,
+        "rate": 0.3888888888888889,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 9,
+        "denominator": 21,
+        "rate": 0.42857142857142855,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    }
+  ],
+  "repairs": [],
+  "output_hashes": {
+    "outputs/A01_copy-editor_1.md": "25ee9bb40b3725c0a7536a6d138b671968e7f94310bcc7fbdc799763d660f418",
+    "outputs/A01_copy-editor_2.md": "98e03c94e1a36fe54cd74e5da79280233a1a0681da530d4b4b5ef2a41692f8fb",
+    "outputs/A02_copy-editor_1.md": "fc7696dc5a6066e6272941fb2fb464a4d46084ec57575585f1b9360ecf99c0a8",
+    "outputs/A02_copy-editor_2.md": "d9e1e481f3f071b33c211fb61e994afb56e7a1fcc6ae77f6abb5a45b155cb674",
+    "outputs/A03_copy-editor_1.md": "5b29bf2850835d73a368a87eb86dce79be79cba095bdbc6d7a83f07be5e59d42",
+    "outputs/A03_copy-editor_2.md": "c1e76839ed135245c0df836aa51851d67e57f03b9fa8d5dea30a78234b179537",
+    "outputs/A04_copy-editor_1.md": "4f667f8d029881d48610a91691bf87d90c8d97be42991eef2c9012e9c84fbade",
+    "outputs/A04_copy-editor_2.md": "5348a5de61996f240c6e41c96a35109bf9a8c19e79fabf2f2051ab28a9d35a52",
+    "outputs/B01_copy-editor_1.md": "699a41a40222c2b60e21058a63f4b49d3c70ae440910898dd8c1a946ec89611c",
+    "outputs/B01_copy-editor_2.md": "593ad4c9e2254827580511b3fe3d09e9c79eb2f6d3d33fdfb9d0c240ce540126",
+    "outputs/B02_copy-editor_1.md": "622a27ac343bb140c9b645bfc44e29a493abc4e7f5a2b2d9278b171da92bdeae",
+    "outputs/B02_copy-editor_2.md": "ef1c5a899f9493b637707a389a90299c5b656e1a3f6eb0eefe37b99e347c9ffd",
+    "outputs/B03_copy-editor_1.md": "ce250517a96c401e2831a402bcfc5f5c362c7abb89fda21f069902053f2159ac",
+    "outputs/B03_copy-editor_2.md": "df834c4bdf91dfda64a2c36a7e479ceebc7bbcdfe57977bc084093ad28cfb6f8",
+    "outputs/B04_copy-editor_1.md": "5036a91eb8f9e96bc07000d48f8fce5361b1275c38531645300df95c547e631b",
+    "outputs/B04_copy-editor_2.md": "73f02d6e41c9872b34cfd724b4bb7ac457e5ea58cf8e4b13f812029decdc005a",
+    "outputs/C01_copy-editor_1.md": "258a3fac17bbff1b11b13ac8633c3fd29fc30ed663e005989bcecc5c22e0f20f",
+    "outputs/C01_copy-editor_2.md": "68813ba3b7627d715a6f99a1ac73df4abfaa0b8c87848976e58ab6e28013052a",
+    "outputs/C02_copy-editor_1.md": "b6277fc48793da7b42de1aa5066992a3edd9185a051d4ec302b603a4ab9a5778",
+    "outputs/C02_copy-editor_2.md": "84d704a0bb7360c8f0abff267ef91e5f6dcde8c0d028012c76e8d06a0eb0159d",
+    "outputs/D01_copy-editor_1.md": "1c362978b32e913b36b5bff31cde316ab8f61ac02ec35e5464a17d12d8ca4f63",
+    "outputs/D01_copy-editor_2.md": "d21a5d8090aeabb44386b151bee9ebcc7a6a6c38a20449140489123a9db573df",
+    "outputs/D02_copy-editor_1.md": "9bdc4d98e4a8f0560941293913d7378d38615e4d5b7f1fe1062b561e3c8b544f",
+    "outputs/D02_copy-editor_2.md": "51a42000ff6a0f1432de4881505d574adb48eaf18ae363105ff91851246c70d2",
+    "outputs/K01_copy-editor_1.md": "c612174d560d6328857c61341abb0a0032dec5662176fe16f662ad6a51a13b90",
+    "outputs/K01_copy-editor_2.md": "9ea1e13bd451854fe3ca50bd8b498985e85dbf49a54bfed2259987a890efb88c",
+    "outputs/K02_copy-editor_1.md": "acc6f2c33e5c32ab7de03b324ec080fdfb7e38ad4cd7abe433b63e03aa4433d9",
+    "outputs/K02_copy-editor_2.md": "72b4c1532bca8d510aee3869e2179b3ff4cc4d8bccf348e9a89a7e31901f7140"
+  },
+  "judgments_snapshot": "scores/收尾评分.judgments.json",
+  "judgments_sha256": "24e02aa598e7551f6cbccfe1d303b13fa68591ad2296825fb6e7abb99e35bed2"
+}

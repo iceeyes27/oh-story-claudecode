@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "quality_acceptance": "not_determined",
+  "status": "awaiting_completed_reports",
+  "execution_date": "2026-10-04",
+  "group": "after_regression",
+  "created_at": "2026-10-04T09:42:09.347053+00:00",
+  "manifest_path": "工具证据/after_regression/manifest.json",
+  "manifest_sha256": "f43feda9de12a8d2aca77fef51ed5c5238d72582817b31c1702b14cc45d1d884",
+  "runs": [],
+  "repairs": [],
+  "pending_run_ids": [
+    "after_regression_K01_1",
+    "after_regression_K02_1",
+    "after_regression_D01_1",
+    "after_regression_D02_1",
+    "after_regression_K02_2"
+  ],
+  "answer_inventory": [
+    {
+      "sample": "K01",
+      "issue_ids": [],
+      "protected_ids": []
+    },
+    {
+      "sample": "K02",
+      "issue_ids": [
+        "K02-1"
+      ],
+      "protected_ids": []
+    },
+    {
+      "sample": "D01",
+      "issue_ids": [
+        "D01-1",
+        "D01-2",
+        "D01-3"
+      ],
+      "protected_ids": [
+        "D01-protected-1",
+        "D01-protected-2",
+        "D01-protected-3"
+      ]
+    },
+    {
+      "sample": "D02",
+      "issue_ids": [
+        "D02-1",
+        "D02-2",
+        "D02-3",
+        "D02-4"
+      ],
+      "protected_ids": [
+        "D02-protected-1"
+      ]
+    }
+  ],
+  "notes": [
+    "仅记录冻结计划，尚无实际报告判分；没有给未完成项填写检出、未检出或零误报。",
+    "每个正向与负向语义判断均需实际报告原句；所有答案外正式条目另记。",
+    "原分母及答案保持不变。N03允许S3/S4或无问题，不设硬性保护项；K组答案外S1/S2按既有口径记误报。",
+    "本阶段不运行score，待收到完成报告及回执后逐项补判；后续另建版本，保留本文件。"
+  ]
+}

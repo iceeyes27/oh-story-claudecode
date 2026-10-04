@@ -14,6 +14,9 @@ import tempfile
 
 STATE = '追蹤/場景狀態.md'
 STATES = {'未開始', '撰寫中', '自動審閱中', '待審', '已通過', '待復核'}
+STATE_DISPLAY = {'未開始': '未开始', '撰寫中': '撰写中', '自動審閱中': '自动审阅中',
+                 '待審': '待审', '已通過': '已通过', '待復核': '待复核'}
+STATE_CANONICAL = {**{value: key for key, value in STATE_DISPLAY.items()}, **{key: key for key in STATES}}
 SCENE = re.compile(r'草稿/第(\d{3,})章/場景(\d{2,})\.md')
 CHAPTER = re.compile(r'正文/第(\d{3,})章\.md')
 # Written only through atomic() by the commands below; re.I because Windows ignores extension case.
@@ -159,25 +162,25 @@ def rows(root):
             continue
         require(len(cells) == 4, '場景狀態表必須是四欄')
         require(re.fullmatch(r'第\d{3,}章', cells[0]), '章號格式錯誤')
-        require(cells[1] == '收尾' or re.fullmatch(r'場景\d{2,}', cells[1]), '場景欄格式錯誤；舊修訂列請遷移到修訂任務')
+        require(cells[1] == '收尾' or re.fullmatch(r'(?:场景|場景)\d{2,}', cells[1]), '场景栏格式错误；旧修订列请迁移到修订任务')
         ch = int(cells[0][1:-1])
         sc = 0 if cells[1] == '收尾' else int(cells[1][2:])
         require(ch > 0 and (sc > 0 or cells[1] == '收尾'), '章與場景編號必須大於零')
         key = (ch, sc)
         require(key not in result, '場景狀態有重複列')
-        require(cells[2] in STATES, '場景狀態值不合法：' + cells[2])
+        require(cells[2] in STATE_CANONICAL, '场景状态值不合法：' + cells[2])
         meta = json.loads(cells[3]) if cells[3] else {}
         require(isinstance(meta, dict), '備註必須是工具產生的 JSON 物件')
-        result[key] = {'status': cells[2], 'meta': meta}
+        result[key] = {'status': STATE_CANONICAL[cells[2]], 'meta': meta}
     return result
 
 
 def table(data):
-    lines = ['# 場景狀態', '', '> 狀態由 novel.py 維護；備註包含確認與採用版本，請勿手改。', '', '| 章 | 場景 | 狀態 | 備註 |', '|---|---|---|---|']
+    lines = ['# 场景状态', '', '> 状态由 novel.py 维护；备注包含确认与采用版本，请勿手改。', '', '| 章 | 场景 | 状态 | 备注 |', '|---|---|---|---|']
     for (ch, sc), row in sorted(data.items(), key=lambda x: (x[0][0], x[0][1] or 10**9)):
-        unit = f'場景{sc:02d}' if sc else '收尾'
+        unit = f'场景{sc:02d}' if sc else '收尾'
         meta = json.dumps(row['meta'], ensure_ascii=False, separators=(',', ':')).replace('|', '\\u007c')
-        lines.append(f'| 第{ch:03d}章 | {unit} | {row["status"]} | {meta} |')
+        lines.append(f'| 第{ch:03d}章 | {unit} | {STATE_DISPLAY[row["status"]]} | {meta} |')
     return ('\n'.join(lines) + '\n').encode('utf-8')
 
 
@@ -188,9 +191,10 @@ def scene_path(ch, sc):
 def outline(root, ch):
     p = inside(root, f'大綱/細綱/第{ch:03d}章.md')
     content = text(p)
-    require(re.search(r'^- 狀態：已確認\s*$', content, re.M), '細綱未確認')
-    nums = [int(s) for s in re.findall(r'^## 場景(\d{2,})(?:\s|$)', content, re.M)]
-    require(nums and nums == list(range(1, len(nums) + 1)), '細綱場景必須由 01 連續編號且不重複')
+    statuses = re.findall(r'^- (?:状态|狀態)[：:]([^\r\n]*)$', content, re.M)
+    require(len(statuses) == 1 and statuses[0].strip() in {'已确认', '已確認'}, '细纲须有唯一的已确认状态，重复或冲突标签不可使用')
+    nums = [int(s) for s in re.findall(r'^## (?:场景|場景)(\d{2,})(?:\s|$)', content, re.M)]
+    require(nums and nums == list(range(1, len(nums) + 1)), '细纲场景必须由 01 连续编号且不重复')
     return p, nums
 
 
@@ -200,7 +204,7 @@ def journals(root):
 
 def idle(root):
     for p in journals(root):
-        require(load(p)['status'] not in {'applying', 'reverting'}, '有中斷的採用，請先 accept 恢復：' + p.parent.name)
+        require(load(p)['status'] not in {'applying', 'reverting', 'withdrawing'}, '有中断操作，请先恢复 accept、rollback 或 withdraw：' + p.parent.name)
 
 
 def tasks(root):
@@ -288,11 +292,114 @@ def begin(root, ch, sc, reopen=False):
     data[ch, sc]['status'] = '撰寫中'
     # An old prepared delivery can no longer match this state snapshot.
     data[ch, sc]['meta'].pop('delivery', None)
+    data[ch, sc]['meta'].pop('review', None)
     atomic(root / STATE, table(data))
+
+
+def withdraw(root, ch, sc, reason, approval):
+    """Withdraw only workflow authorization; preserve every candidate and author edit."""
+    require(reason.strip() and approval.strip(), '撤回须记录原因及作者明确授权；参数不能替代真人授权')
+    active = [(p, load(p)) for p in journals(root) if load(p)['status'] == 'withdrawing']
+    matching = [(p, j) for p, j in active if j.get('kind') == 'withdraw' and j.get('chapter') == ch and j.get('scene') == sc]
+    require(not active or len(active) == len(matching) == 1, '先恢复其他中断撤回')
+    if matching:
+        p, j = matching[0]
+    else:
+        idle(root)
+        data = rows(root); row = data.get((ch, sc))
+        require(row is not None and row['status'] in {'撰寫中', '自動審閱中', '待審'}, '只能撤回尚未采用的撰写中、自动审阅中或待审内容')
+        require(not row['meta'].get('text'), '已采用身份不能通过撤回清除，请走修订')
+        name = 'withdraw-' + digest(os.urandom(24))[:20]
+        p = inside(root, f'審閱/採用/{name}/journal.json')
+        invalidations = []
+        for jp in journals(root):
+            prior = load(jp)
+            binding = prior.get('binding', prior)
+            scoped = (binding.get('kind') in {'scene', 'chapter'} and binding.get('chapter') == ch and binding.get('scene', 0) == sc)
+            legacy_scoped = (prior.get('kind') in {'scene', 'chapter'} and
+                             any(e['target'] == scene_path(ch, sc) for e in prior.get('changes', [])))
+            if (scoped or legacy_scoped or prior['id'] in {row['meta'].get('delivery'), row['meta'].get('review')}) and prior['status'] in {'reviewing', 'prepared'}:
+                invalidations.append(prior['id'])
+        history = {'id': name, 'from': row['status'], 'reason': reason, 'approval': approval,
+                   'candidate': digest(read(root/scene_path(ch, sc) if sc else root/f'草稿/第{ch:03d}章/整章候選.md')),
+                   'delivery': row['meta'].get('delivery'), 'review': row['meta'].get('review')}
+        row['status'] = '未開始'
+        row['meta'].pop('delivery', None); row['meta'].pop('review', None)
+        row['meta'].setdefault('withdrawals', []).append(history)
+        j = {'version': 2, 'id': name, 'kind': 'withdraw', 'chapter': ch, 'scene': sc,
+             'status': 'withdrawing', 'reason': reason, 'approval': approval, 'invalidations': invalidations,
+             'changes': [change(root, STATE, table(data))]}
+        atomic(p, dump(j))
+    e = j['changes'][0]
+    require(digest(read(root/STATE)) in {e['before_hash'], e['after_hash']}, '撤回中断后状态被外部修改，保留现场并停止')
+    require(digest(base64.b64decode(e['after'])) == e['after_hash'], '撤回快照损坏')
+    for name in j['invalidations']:
+        jp = inside(root, f'審閱/採用/{ident(name)}/journal.json'); prior = load(jp)
+        require(prior['status'] in {'reviewing', 'prepared', 'withdrawn'}, '旧交付身份已改变，停止撤回')
+        if prior['status'] != 'withdrawn':
+            prior.update(status='withdrawn', withdrawal=j['id'], withdrawal_reason=j['reason'])
+            atomic(jp, dump(prior))
+    if digest(read(root/STATE)) != e['after_hash']:
+        atomic(root/STATE, base64.b64decode(e['after']))
+    j['status'] = 'complete'; atomic(p, dump(j))
+    return 'withdrawn'
+
+
+def rebind_plan(root, ch, reason, approval):
+    """Keep scene identities. Renumbering/removing started scenes needs explicit migration."""
+    idle(root); no_revision(root)
+    require(reason.strip() and approval.strip(), '重新绑定须记录新细纲确认、影响复核原因及作者明确授权')
+    data = rows(root)
+    require(not any(r['status'] in {'待審', '撰寫中', '自動審閱中', '待復核'} for r in data.values()), '先撤回进行中交付，并完成修订及依赖复核')
+    p, nums = outline(root, ch); previous_chapter(root, ch, data)
+    old = {sc: r for (c, sc), r in data.items() if c == ch}
+    require(old, '未登记的章节请使用 confirm-plan')
+    require(old.get(0, {}).get('status') != '已通過' or nums == sorted(sc for sc in old if sc), '整章已采用，增删场景须先制定正式章节修订和明确映射方案')
+    for sc, row in old.items():
+        require(sc == 0 or sc in nums or (row['status'] == '未開始' and not row['meta'].get('withdrawals')), '不能删除或重编号已开始场景；请先制定明确映射和修订方案')
+        if row['status'] == '已通過':
+            # Historical scene identities remain frozen after formal chapter adoption.
+            # revision_identity rejects editing those drafts, but rebinding must retain them.
+            meta = row['meta']; jp = inside(root, f'審閱/採用/{ident(meta.get("delivery", ""))}/journal.json')
+            require(jp.exists() and load(jp)['status'] == 'complete' and any(e['target'] == scene_path(ch, sc) and e['after_hash'] == meta.get('text') for e in load(jp)['changes']), '采用身份与完整记录不一致')
+            verify_adopted(root, ch, sc, data)
+    current = digest(p.read_bytes())
+    require(any(r['meta'].get('outline') != current for r in old.values()), '细纲版本未变更，无需重新绑定')
+    data = {k: v for k, v in data.items() if k[0] != ch}
+    for sc in [*nums, 0]:
+        row = old.get(sc, {'status': '未開始', 'meta': {}})
+        row['meta'].setdefault('plan_history', []).append({'outline': row['meta'].get('outline'), 'reason': reason, 'approval': approval})
+        row['meta']['outline'] = current
+        data[ch, sc] = row
+    atomic(root/STATE, table(data))
 
 
 def task_path(root, name):
     return inside(root, f'審閱/修訂/{ident(name)}/任務.json')
+
+
+def revision_identity(root, target, data=None):
+    """Check provenance, not current text: author hand edits remain valid review inputs."""
+    data = rows(root) if data is None else data
+    m = SCENE.fullmatch(target) or CHAPTER.fullmatch(target)
+    require(m is not None, '修订只接受章节或场景正文')
+    ch, sc = int(m[1]), int(m[2]) if len(m.groups()) == 2 else 0
+    if sc:
+        require(data.get((ch, 0), {}).get('status') != '已通過', '整章已采用，请修订正式章节而不是保留的场景草稿')
+    row = data.get((ch, sc))
+    if row is not None:
+        require(row['status'] in {'已通過', '待復核'} and row['meta'].get('text') and row['meta'].get('delivery'), '修订目标没有有效采用身份')
+        jp = inside(root, f'審閱/採用/{ident(row["meta"]["delivery"])}/journal.json')
+        require(jp.exists(), '采用记录不存在')
+        j = load(jp)
+        require(j['status'] == 'complete' and any(e['target'] == target and e['after_hash'] == row['meta']['text'] for e in j['changes']), '采用身份与完整记录不一致')
+        return {'kind': 'adoption', 'delivery': j['id'], 'text': row['meta']['text']}
+    ip = root / '導入/清單.json'
+    entry = (load(ip) if ip.exists() else {}).get(str(ch), {})
+    require(sc == 0 and entry.get('text') and entry.get('source_hash') and entry.get('source'), '修订目标没有有效采用或导入身份')
+    source = inside(root, entry['source'])
+    require(rel(root, source).startswith('導入/原稿/') and digest(read(source)) == entry['source_hash'], '导入身份对应的原稿备份已变更')
+    return {'kind': 'import', 'source': entry['source'], 'source_hash': entry['source_hash'], 'text': entry['text']}
 
 
 def revision_start(root, name, targets):
@@ -304,12 +411,10 @@ def revision_start(root, name, targets):
     for target in targets:
         t = rel(root, inside(root, target))
         require(SCENE.fullmatch(t) or CHAPTER.fullmatch(t), '修訂只接受章節或場景正文')
-        if SCENE.fullmatch(t):
-            c = int(SCENE.fullmatch(t)[1])
-            require(rows(root).get((c, 0), {}).get('status') != '已通過', '整章已採用，請修訂正式章節而不是保留的場景草稿')
+        identity = revision_identity(root, t)
         content = inside(root, t).read_bytes()
         require(t not in [e['target'] for e in entries], '重複修訂目標')
-        entries.append({'target': t, 'start_hash': digest(content), 'start_bytes': base64.b64encode(content).decode(), 'adopted': None})
+        entries.append({'target': t, 'identity': identity, 'start_hash': digest(content), 'start_bytes': base64.b64encode(content).decode(), 'adopted': None})
     require(entries, '修訂目標不可空白')
     atomic(p, dump({'status': 'active', 'targets': entries}))
 
@@ -319,16 +424,158 @@ def target_allowed(target):
                 (target.endswith('.md') and target.split('/')[0] in {'設定', '追蹤', '大綱'})) and target != STATE
 
 
+def review_binding(root, spec):
+    kind = spec['kind']
+    require(kind in {'scene', 'chapter', 'revision', 'revision-finish'}, '交付类型错误')
+    context = [rel(root, inside(root, x)) for x in spec.get('context', [])]
+    require(len(context) == len(set(context)), '上下文清单不可重复')
+    files = []
+    for item in spec['files']:
+        src, target = rel(root, inside(root, item['source'])), rel(root, inside(root, item['target']))
+        require(target_allowed(target), '不允许的采用目标：' + target)
+        require(target not in [x['target'] for x in files] and src not in [x['source'] for x in files], '候选来源及采用目标不可重复')
+        require(src.startswith(('草稿/', '審閱/')) and not src.startswith('審閱/採用/'), '候选必须位于草稿或审阅工作目录')
+        require(bool((read(root/src) or b'').strip()), '候选不可空白')
+        files.append({'source': src, 'target': target})
+    require(files, '采用清单不可空白')
+    ranges = spec.get('context_ranges', [])
+    require(isinstance(ranges, list) and all(isinstance(x, dict) for x in ranges), '上下文选取范围须为 JSON 对象清单')
+    # Freeze semantic ranges too, not just the source-file hashes.
+    ranges = json.loads(json.dumps(ranges, ensure_ascii=False))
+    for item in ranges:
+        require(isinstance(item.get('path'), str), '上下文范围缺少 path')
+        item['path'] = rel(root, inside(root, item['path']))
+        require(item['path'] in context, '选取范围的原始文件须列在 context：' + item['path'])
+        require(isinstance(item.get('start_line'), int) and isinstance(item.get('end_line'), int) and 0 < item['start_line'] <= item['end_line'], '上下文行范围不合法')
+        require(item['end_line'] <= len(text(root/item['path']).splitlines()), '上下文行范围超出原文')
+    binding = {'kind': kind, 'files': files, 'context': context, 'context_ranges': ranges}
+    if kind in {'scene', 'chapter'}:
+        ch, sc = int(spec['chapter']), int(spec.get('scene', 0))
+        require((kind == 'scene' and sc > 0) or (kind == 'chapter' and sc == 0), '章节或场景参数不一致')
+        prose = [x for x in files if SCENE.fullmatch(x['target']) or CHAPTER.fullmatch(x['target'])]
+        require(len(prose) == 1 and prose[0]['target'] == scene_path(ch, sc), '交付只能采用指定正文')
+        require(kind != 'scene' or len(files) == 1, '场景采用只更新场景；全书追踪在章节采用时更新')
+        require(kind != 'chapter' or any(x['target'] == '追蹤/追蹤.md' for x in files), '章節收尾必須交付最終追蹤，與正文一起採用')
+        binding.update(chapter=ch, scene=sc)
+    else:
+        binding['revision'] = ident(spec['revision'])
+    return binding
+
+
+def review_start(root, spec):
+    """Freeze inputs before independent readers begin, in the existing adoption journal."""
+    idle(root)
+    name = ident(spec['id']); binding = review_binding(root, spec)
+    dest = inside(root, f'審閱/採用/{name}/journal.json')
+    if dest.exists():
+        existing = load(dest)
+        require(existing.get('version') == 2 and existing['status'] == 'reviewing' and existing.get('binding') == binding, '交付识别码已存在，请使用新版本')
+        for source, expected in existing['frozen'].items():
+            allowed = {expected}
+            if source == STATE and existing.get('review_state'):
+                allowed.add(existing['review_state']['before_hash'])
+            require(digest(read(root/source)) in allowed, '已冻结的审阅输入已变更：' + source)
+        e = existing.get('review_state')
+        if e and digest(read(root/STATE)) == e['before_hash']:
+            require(digest(base64.b64decode(e['after'])) == e['after_hash'], '审阅开始快照损坏')
+            atomic(root/STATE, base64.b64decode(e['after']))
+        return 'already-reviewing'
+    require(not dest.parent.exists(), '交付识别码目录已存在，请使用新版本')
+    watches = {STATE: digest(read(root/STATE))}
+    def watch(source, required=True):
+        source = rel(root, inside(root, source)); content = read(root/source)
+        require(not required or bool(content), '上下文不存在或为空：' + source)
+        if content is not None: watches[source] = digest(content)
+    for item in binding['files']:
+        watch(item['source'])
+        watches[item['target']] = digest(read(root/item['target']))
+    for source in binding['context']:
+        watch(source)
+        if source.endswith('.json'):
+            packet = load(root/source)
+            if isinstance(packet, dict) and packet.get('version') == 1 and 'prose_ranges' in packet and 'input_hashes' in packet:
+                require(isinstance(packet.get('dependencies'), list) and isinstance(packet['input_hashes'], dict), '上下文清单格式错误')
+                require(set(packet['dependencies']) == set(packet['input_hashes']), '上下文清单来源集合不一致')
+                for dependency in packet['dependencies']:
+                    dependency = rel(root, inside(root, dependency))
+                    require(digest(read(root/dependency)) == packet['input_hashes'][dependency], '上下文清单已过期，请重新生成：' + dependency)
+                    watches[dependency] = packet['input_hashes'][dependency]
+                for role in ('blind', 'writer'):
+                    path = rel(root, inside(root, packet[role+'_path']))
+                    require(digest(read(root/path)) == packet[role+'_hash'], '上下文文档与清单版本不一致：' + path)
+                    watch(path)
+    for source in ['設定/設定.md', '設定/兌現登記.md', '設定/文風樣本.md', '大綱/大綱.md', '追蹤/追蹤.md']:
+        watch(source, False)
+    for p in sorted((root/'設定/角色').glob('*.md')): watch(rel(root, p))
+    state_change = None
+    kind = binding['kind']
+    if kind in {'scene', 'chapter'}:
+        ch, sc = binding['chapter'], binding['scene']
+        data = eligible(root, ch, sc)
+        require(data[ch, sc]['status'] in {'撰寫中', '自動審閱中'}, '先 begin 再开始审阅')
+        op, nums = outline(root, ch); watch(rel(root, op))
+        for n in nums if sc == 0 else range(1, sc):
+            source = scene_path(ch, n); watch(source)
+            identity = data[ch, n]['meta'].get('delivery')
+            if identity: watch(f'審閱/採用/{ident(identity)}/journal.json')
+        if ch > 1:
+            watch(scene_path(ch-1, 0)); watch('導入/清單.json', False)
+            identity = data.get((ch-1, 0), {}).get('meta', {}).get('delivery')
+            if identity: watch(f'審閱/採用/{ident(identity)}/journal.json')
+        data[ch, sc]['status'] = '自動審閱中'; data[ch, sc]['meta']['review'] = name
+        state_change = change(root, STATE, table(data))
+        watches[STATE] = state_change['after_hash']
+    else:
+        tp = task_path(root, binding['revision']); task = load(tp)
+        require(task['status'] == 'active', '修订任务不是进行中')
+        watch(rel(root, tp)); watch('導入/清單.json', False)
+        for entry in task['targets']:
+            watch(entry['target'])
+        if kind == 'revision':
+            prose = [x for x in binding['files'] if SCENE.fullmatch(x['target']) or CHAPTER.fullmatch(x['target'])]
+            require(len(prose) == len(binding['files']) == 1, '每次修订交付只采用一个正文')
+            entry = next((x for x in task['targets'] if x['target'] == prose[0]['target']), None)
+            require(entry is not None and entry['adopted'] is None, '目标不在修订范围或已采用')
+            require(digest(read(root/entry['target'])) == entry['start_hash'], '修订开始后原文已变化，请先 revision-refresh')
+            identity = revision_identity(root, entry['target'])
+            if identity['kind'] == 'adoption': watch(f'審閱/採用/{ident(identity["delivery"])}/journal.json')
+            else: watch(identity['source'])
+    candidates = {x['source']: base64.b64encode(read(root/x['source'])).decode() for x in binding['files']}
+    j = {'version': 2, 'id': name, 'kind': kind, 'status': 'reviewing', 'binding': binding,
+         'frozen': watches, 'review_candidates': candidates, 'review_state': state_change}
+    atomic(dest, dump(j))
+    if state_change: atomic(root/STATE, base64.b64decode(state_change['after']))
+    return name
+
+
+def verify_full_delivery(root, delivery, binding):
+    content = read(root/delivery)
+    require(content is not None, '交付文件不存在')
+    for item in binding['files']:
+        marker = ('<!-- novel-candidate:' + item['source'] + ' -->\n').encode('utf-8')
+        require(content.count(marker) == 1, '交付须逐场景展示唯一完整候选块：' + item['source'])
+        after = content.split(marker, 1)[1]
+        candidate, separator, _ = after.partition(b'\n<!-- /novel-candidate -->')
+        require(separator and candidate == read(root/item['source']), '交付全文与审阅候选不一致：' + item['source'])
+
+
 def prepare(root, spec):
     idle(root)
     name = ident(spec['id'])
     dest = inside(root, f'審閱/採用/{name}/journal.json')
-    require(not dest.parent.exists(), '交付識別碼已存在，請使用新版本')
+    require(dest.exists(), '先执行 review-start 冻结输入，再开始独立审阅')
+    frozen = load(dest)
+    require(frozen.get('version') == 2 and frozen['status'] == 'reviewing', '交付未处于当前版本审阅阶段，请使用新识别码')
+    binding = review_binding(root, spec)
+    require(frozen.get('binding') == binding, '审阅范围、候选或上下文清单已变更，须重新开始审阅')
+    for source, expected_hash in frozen['frozen'].items():
+        require(digest(read(root/source)) == expected_hash, '审阅开始后候选、正文身份或上下文已变更：' + source)
     kind = spec['kind']
     require(kind in {'scene', 'chapter', 'revision', 'revision-finish'}, '交付類型錯誤')
     delivery = rel(root, inside(root, spec['delivery']))
     require(delivery.startswith('審閱/') and delivery.endswith('.md'), '交付檔須在審閱目錄')
     require(bool(read(root / delivery)), '先寫好交付檔再 prepare')
+    verify_full_delivery(root, delivery, binding)
     task = None
     if kind in {'scene', 'chapter'}:
         ch, sc = int(spec['chapter']), int(spec.get('scene', 0))
@@ -344,7 +591,7 @@ def prepare(root, spec):
     expected = '完整' if kind == 'scene' else '章節' if kind == 'chapter' else review['mode']
     require(review['mode'] == expected, '新場景須完整模式，收尾須章節模式')
     pending = sorted(REVIEWERS[expected] - set(review['completed']))
-    watches = {delivery: digest((root / delivery).read_bytes())}
+    watches = {**frozen['frozen'], delivery: digest((root / delivery).read_bytes())}
     if task is not None:
         watches[STATE] = digest(read(root / STATE))
     for source in spec.get('context', []):
@@ -382,6 +629,7 @@ def prepare(root, spec):
         if STATE in watches:
             watches[STATE] = digest(waiting)
         data[ch, sc]['status'] = '已通過'
+        data[ch, sc]['meta'].pop('review', None)
         data[ch, sc]['meta']['text'] = prose[0]['after_hash']
         changes.append(change(root, STATE, table(data), before=waiting))
     elif kind == 'revision':
@@ -398,6 +646,7 @@ def prepare(root, spec):
         if (ch, sc) in data:
             data[ch, sc]['status'] = '已通過'
             data[ch, sc]['meta']['text'] = prose[0]['after_hash']
+            data[ch, sc]['meta']['delivery'] = name
             for (c, s), r in data.items():
                 if c == ch and sc > 0 and (s > sc or s == 0) and r['status'] in {'已通過', '待復核'}:
                     r['status'] = '待復核'
@@ -417,7 +666,7 @@ def prepare(root, spec):
         require(not any(r['status'] == '待復核' for r in rows(root).values()), '仍有依賴待復核，先將其納入修訂並採用')
         task['status'] = 'complete'
         changes.append(change(root, rel(root, tp), dump(task)))
-    journal = {'version': 1, 'id': name, 'kind': kind, 'status': 'prepared', 'review': review,
+    journal = {**frozen, 'version': 2, 'id': name, 'kind': kind, 'delivery': delivery, 'status': 'prepared', 'review': review,
                'missing_reviewers': pending, 'watches': watches, 'changes': changes}
     # Write journal first: interrupted preparation cannot authorize adoption.
     atomic(dest, dump(journal))
@@ -442,6 +691,7 @@ def accept(root, name, approval, override=''):
     if j['status'] == 'complete':
         return 'already-complete'
     require(j['status'] in {'prepared', 'applying'}, '交付不可採用')
+    require(j['status'] != 'prepared' or j.get('version') == 2, '旧协议待审交付缺少开读冻结，请撤回或 reopen 后重新审阅')
     if j['kind'] == 'chapter' and j['status'] == 'prepared':
         require(any(e['target'] == '追蹤/追蹤.md' for e in j['changes']), '舊章節交付缺少最終追蹤，請 reopen 後重新交付')
     if j['status'] == 'prepared' and j['kind'] in {'scene', 'chapter'}:
@@ -449,7 +699,7 @@ def accept(root, name, approval, override=''):
     require(approval.strip(), '須記錄作者明確採用的回覆；工具不能替作者授權')
     require(not (j['missing_reviewers'] or j['review']['unresolved']) or override.strip(), '審閱未完成或仍有未決問題，須記錄作者明確裁決')
     for other in journals(root):
-        require(other == p or load(other)['status'] not in {'applying', 'reverting'}, '先恢復另一個中斷採用')
+        require(other == p or load(other)['status'] not in {'applying', 'reverting', 'withdrawing'}, '先恢复另一中断采用或撤回')
     targets = {e['target']: e for e in j['changes']}
     for name, expected in j['watches'].items():
         current = digest(read(inside(root, name)))
@@ -507,12 +757,10 @@ def revision_extend(root, name, targets):
     for target in targets:
         target = rel(root, inside(root, target))
         require(SCENE.fullmatch(target) or CHAPTER.fullmatch(target), '只接受正文目標')
-        if SCENE.fullmatch(target):
-            ch = int(SCENE.fullmatch(target)[1])
-            require(rows(root).get((ch, 0), {}).get('status') != '已通過', '整章已採用，請修訂正式章節')
+        identity = revision_identity(root, target)
         require(target not in [x['target'] for x in t['targets']], '目標已在修訂中')
         content = inside(root, target).read_bytes()
-        t['targets'].append({'target': target, 'start_hash': digest(content), 'start_bytes': base64.b64encode(content).decode(), 'adopted': None})
+        t['targets'].append({'target': target, 'identity': identity, 'start_hash': digest(content), 'start_bytes': base64.b64encode(content).decode(), 'adopted': None})
     atomic(p, dump(t))
 
 
@@ -582,12 +830,16 @@ def safe_commit(root, paths, message):
         head = subprocess.run(['git', '-C', str(root), 'rev-parse', '--verify', 'HEAD'], capture_output=True)
         if head.returncode == 0:
             git('read-tree', 'HEAD', env=env)
-        git('add', '--', *names, env=env)
-        if not git('diff', '--cached', '--name-only', '-z', env=env).stdout:
+        git('--literal-pathspecs', 'add', '--', *names, env=env)
+        changed = set(git('diff', '--cached', '--name-only', '-z', '--no-renames', env=env).stdout.decode('utf-8').rstrip('\0').split('\0')) - {''}
+        require(changed <= set(names), '临时暂存出现未列明文件，停止提交并保留工作区')
+        if not changed:
             return 'no-changes'
         # Existing user index remains untouched during commit; reconcile only our paths afterwards.
         git('commit', '-m', message, env=env)
-        git('reset', '-q', 'HEAD', '--', *names)
+        committed = set(git('diff-tree', '--root', '--no-commit-id', '--name-only', '-r', '-z', '--no-renames', 'HEAD').stdout.decode('utf-8').rstrip('\0').split('\0')) - {''}
+        require(committed <= set(names), '提交钩子加入了未列明文件；提交已经产生，未自动调整原暂存，请人工核对该提交')
+        git('--literal-pathspecs', 'reset', '-q', 'HEAD', '--', *names)
     return 'committed'
 
 
@@ -597,9 +849,12 @@ def main(argv=None):
     sub = parser.add_subparsers(dest='command', required=True)
     p = sub.add_parser('check'); p.add_argument('path')
     p = sub.add_parser('confirm-plan'); p.add_argument('chapter', type=int)
+    p = sub.add_parser('rebind-plan'); p.add_argument('chapter', type=int); p.add_argument('--approval', required=True); p.add_argument('--reason', required=True)
     for name in ('begin', 'reopen'):
         p = sub.add_parser(name); p.add_argument('chapter', type=int); p.add_argument('scene', type=int, help='收尾使用 0')
-    p = sub.add_parser('prepare'); p.add_argument('spec')
+    p = sub.add_parser('withdraw'); p.add_argument('chapter', type=int); p.add_argument('scene', type=int, help='收尾使用 0'); p.add_argument('--approval', required=True); p.add_argument('--reason', required=True)
+    for name in ('review-start', 'prepare'):
+        p = sub.add_parser(name); p.add_argument('spec')
     p = sub.add_parser('rollback'); p.add_argument('id'); p.add_argument('--reason', required=True)
     p = sub.add_parser('accept'); p.add_argument('id'); p.add_argument('--approval', required=True); p.add_argument('--override', default='')
     for name in ('revision-start', 'revision-extend'):
@@ -614,7 +869,10 @@ def main(argv=None):
             c = args.command
             if c == 'check': check(root, args.path)
             elif c == 'confirm-plan': confirm_plan(root, args.chapter)
+            elif c == 'rebind-plan': rebind_plan(root, args.chapter, args.reason, args.approval)
             elif c in {'begin', 'reopen'}: begin(root, args.chapter, args.scene, c == 'reopen')
+            elif c == 'withdraw': print(withdraw(root, args.chapter, args.scene, args.reason, args.approval))
+            elif c == 'review-start': print(review_start(root, load(inside(root, args.spec))))
             elif c == 'prepare': print(prepare(root, load(inside(root, args.spec))))
             elif c == 'rollback': print(rollback(root, args.id, args.reason))
             elif c == 'accept': print(accept(root, args.id, args.approval, args.override))

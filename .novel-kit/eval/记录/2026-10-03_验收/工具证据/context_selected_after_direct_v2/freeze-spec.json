@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "scope": "review_only",
+  "label": "context_selected_after_direct_v2",
+  "inputs": [
+    {
+      "id": "i1",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/roles/copy-editor.md",
+      "kind": "role"
+    },
+    {
+      "id": "i2",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/standards/语文规格.md",
+      "kind": "standard"
+    },
+    {
+      "id": "i3",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/workflows/review-loop.md",
+      "kind": "standard"
+    },
+    {
+      "id": "i4",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/上下文对照/2026-10-03/文风样本.md",
+      "kind": "style"
+    },
+    {
+      "id": "i5",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/上下文对照/2026-10-03/P3-05/candidate.md",
+      "kind": "prose"
+    },
+    {
+      "id": "i6",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/上下文对照/2026-10-03/P3-05/selected_after.md",
+      "kind": "context"
+    },
+    {
+      "id": "answer_P3-05",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/上下文对照/2026-10-03/P3-05/answer.json",
+      "kind": "answer",
+      "audience": "coordinator"
+    }
+  ],
+  "runs": [
+    {
+      "id": "P3-05_selected_after_1",
+      "sample": "P3-05",
+      "role": "copy-editor",
+      "attempt": 1,
+      "phase": "review",
+      "context": [
+        "i1",
+        "i2",
+        "i3",
+        "i4",
+        "i5",
+        "i6"
+      ],
+      "prompt": "你在做 novel-kit 工具质量验收（非小说采用），请以copy-editor规则独立审阅。只完整读下列冻结文件：\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/roles/copy-editor.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/standards/语文规格.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/workflows/review-loop.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/上下文对照/2026-10-03/文风样本.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/上下文对照/2026-10-03/P3-05/candidate.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/上下文对照/2026-10-03/P3-05/selected_after.md\n除此之外不可读取答案、其他条件或轮次、任务/来源清单、累计事实、旧意见或汇总。候选完整，前文是给定原文范围，不能自行扩读。没有设定或细纲，不去找。报告含实际范围、理解摘要、逐条severity/category/location/evidence/issue/fix、前文不足及保留项。不能把合理口语、有意留白或供给不足直接定级正文错误；无问题如实说无，不凑数。仅创建新报告 /Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/outputs/P3-05_selected_after_1.md，不改输入或真实小说。确切模型ID未提供，如实注明继承未知；模型意见不是真人通过。其他代理也在工作，勿回退他人修改。完成仅回复路径和S1/S2数。\n\n执行控制：你本人已是本任务指定的独立审阅角色，直接完成此单项审阅。禁止调用任何子代理、团队、线程、委派或等待代理工具；不要把本任务再次分发。只用文件工具读取上述允许输入并写出指定报告，完成后结束。此约束不增加评判标准，不提供任何答案或前文解释。",
+      "independent_context": true,
+      "output": "outputs/P3-05_selected_after_1.md"
+    },
+    {
+      "id": "P3-05_selected_after_2",
+      "sample": "P3-05",
+      "role": "copy-editor",
+      "attempt": 2,
+      "phase": "review",
+      "context": [
+        "i1",
+        "i2",
+        "i3",
+        "i4",
+        "i5",
+        "i6"
+      ],
+      "prompt": "你在做 novel-kit 工具质量验收（非小说采用），请以copy-editor规则独立审阅。只完整读下列冻结文件：\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/roles/copy-editor.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/standards/语文规格.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/workflows/review-loop.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/上下文对照/2026-10-03/文风样本.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/上下文对照/2026-10-03/P3-05/candidate.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/上下文对照/2026-10-03/P3-05/selected_after.md\n除此之外不可读取答案、其他条件或轮次、任务/来源清单、累计事实、旧意见或汇总。候选完整，前文是给定原文范围，不能自行扩读。没有设定或细纲，不去找。报告含实际范围、理解摘要、逐条severity/category/location/evidence/issue/fix、前文不足及保留项。不能把合理口语、有意留白或供给不足直接定级正文错误；无问题如实说无，不凑数。仅创建新报告 /Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/outputs/P3-05_selected_after_2.md，不改输入或真实小说。确切模型ID未提供，如实注明继承未知；模型意见不是真人通过。其他代理也在工作，勿回退他人修改。完成仅回复路径和S1/S2数。\n\n执行控制：你本人已是本任务指定的独立审阅角色，直接完成此单项审阅。禁止调用任何子代理、团队、线程、委派或等待代理工具；不要把本任务再次分发。只用文件工具读取上述允许输入并写出指定报告，完成后结束。此约束不增加评判标准，不提供任何答案或前文解释。",
+      "independent_context": true,
+      "output": "outputs/P3-05_selected_after_2.md"
+    }
+  ],
+  "note": "评分封装沿用原质量规则和输入，仅部分缺项追加禁止嵌套委派的执行控制。每项实际提示、开读时间、完整输入哈希和执行结果另存直接执行_v2，旧项另见原执行记录；本清单不是事后补造历史开读凭据。"
+}

@@ -19,6 +19,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
+      - name: Check committed source adapters before generation
+        run: python novel.py setup --agent all --models quality --check-sources
       - name: Generate local adapters
         run: python novel.py setup --agent all
       - name: Check generated adapters

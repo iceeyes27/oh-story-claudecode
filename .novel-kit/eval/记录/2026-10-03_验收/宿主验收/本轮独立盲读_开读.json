@@ -1,0 +1,12 @@
+{
+  "started_at": "2026-10-04T00:14:04.184650+00:00",
+  "role": "copy-editor",
+  "fork_turns": "none",
+  "prompt": "这是 novel-kit 隔离工具验收。你已被指定为独立 copy-editor；直接完成一次独立三遍盲读，不再委派，也不调用任何协作、线程或等待工具。仅完整读取三个文件：/private/tmp/novel-kit-20261004-host-book/.novel-kit/roles/copy-editor.md、/private/tmp/novel-kit-20261004-host-book/.novel-kit/standards/语文规格.md、/private/tmp/novel-kit-20261004-host-book/草稿/第001章/場景01.md。不得读细纲、状态、其他报告、任务记录或作者意图。没有前文资料；不去寻找，必要时只列供给待核，不因资料缺失定正文错误。按角色要求在最终回复交出完整报告：实际阅读范围、理解摘要、带原句与位置及严重度的问题、前文不足、保留项；没问题不凑数。只读，不改任何文件。所有新报告用简体。说明结论仅为模型意见，不是作者采用。其他代理在工作，不撤销任何修改。\n",
+  "input_hashes": {
+    "/private/tmp/novel-kit-20261004-host-book/.novel-kit/roles/copy-editor.md": "e7a5f440c7853013d82e54538a9ce9f4f916a32011d414b60dd6c0841dc6712b",
+    "/private/tmp/novel-kit-20261004-host-book/.novel-kit/standards/语文规格.md": "232019a01049a085e36fc24d64f0922247a6c07a95722a5797a3c717d6dfaa18",
+    "/private/tmp/novel-kit-20261004-host-book/草稿/第001章/場景01.md": "8de989e88c995fc40e6a0b1f5604baa637b03ad3089134ada7eaff087cc87063"
+  },
+  "note": "最终报告由协调器原样保存；不给细纲和写手意见。"
+}

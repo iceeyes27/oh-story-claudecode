@@ -1,0 +1,174 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "quality_acceptance": "not_determined",
+  "group": "after_regression",
+  "execution_date": "2026-10-04",
+  "status": "four_of_five_semantically_scored",
+  "runs": [
+    {
+      "run_id": "after_regression_K01_1",
+      "execution_date": "2026-10-04",
+      "issues": [],
+      "protected": [],
+      "extra_findings": [],
+      "report_assessment": {
+        "formal_issue_count": 0,
+        "independent_s1_s2_count": 0,
+        "evidence": "本次未发现可据具体阅读损失成立的自然度问题，因此没有 PR 编号问题条目。",
+        "reason": "整份报告正式问题列表为空，短段、关系语气及收入尺度被逐一核对为不同功能；前文范围限制未定级，不算答案外问题。"
+      }
+    },
+    {
+      "run_id": "after_regression_K02_1",
+      "execution_date": "2026-10-04",
+      "issues": [
+        {
+          "issue_id": "K02-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "以下一处是局部轻微重复，不影响人物、动作或对白意图的理解，不作自动修改要求。",
+          "reason": "报告唯一PR-1诊断第26段嘴硬标签的局部重复；取水、倒壶、上灶均在保留项，没有诊断母亲先向壶底添火与后文架壶的接口，故冻结答案记未命中。此为L2承接项目，非自然度角色主要职责，不能因未报就自动判校准退步。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [
+        {
+          "id": "K02-extra-mouth-stubbornness-label",
+          "severity": "S3",
+          "evidence": "这里没有说话者混淆，也没有行动被明显延后，故仅定 S3，不把前面所有逞强表现合并升为 S2。",
+          "false_positive": false,
+          "reason": "PR-1只建议可选省去第26段还在嘴硬这一已明确叙述判断，让真不用与下一句推辞少一次停顿；报告承认只是轻微拖沓。同时保留第18段不自在/逞强的首次语气提示、第22段儿子没戳穿的回应选择和坐下后腿的状态。它不匹配唯一壶接口答案，是必须登记的答案外S3；K组允许S3以下，非硬性保护，故不计S1/S2误报。"
+        }
+      ],
+      "report_assessment": {
+        "formal_issue_count": 1,
+        "independent_s1_s2_count": 0,
+        "evidence": "父亲多次推辞分属不同动作节点，不能仅以出现频次认定累计损失。",
+        "reason": "实际报告仅一条S3，不得将其记成零发现或继续沿用旧报告的三处合并S2。"
+      }
+    },
+    {
+      "run_id": "after_regression_D01_1",
+      "execution_date": "2026-10-04",
+      "issues": [
+        {
+          "issue_id": "D01-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "三处夸张虽集中，却没有反复复述同一动作，也没有把胜负双方抹成同一情绪；不按数量合并成S2。",
+          "reason": "未报告冻结答案的套话密度问题，实际按场面阶段、物件运动、人群移动、败方反应区分功能。原答案只以超过三处升S2，与新版需具体损失的依据不同；保留未检出和原S2分母，不把合理分歧改成命中。"
+        },
+        {
+          "issue_id": "D01-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "末句虽未细分情绪名称，仍提供问答之后的新反应，不能仅因直接概括神色就判为无功能解释。",
+          "reason": "明确保留小满听到回答后神色改变与停止追问，未定级。冻结答案把此处视为替读者下结论，新版报告认为提供新反应；保留未检出并展示双方理由，不仅凭旧答案标签认定必须删改。"
+        },
+        {
+          "issue_id": "D01-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "胜率报告、提醒、故意错引及纠正各有推进",
+          "reason": "未诊断比赛结束后胜率提升的因果时点；报告仅把计算口径和发声方式列前文待核，不能等同命中冻结答案。此项为L3因果，非自然度角色主要职责；原答案及未检出记录保留。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "D01-protected-1",
+          "reported": false,
+          "evidence": "文本随即把错引揭成玩笑，不应作为作者知识错误或叙述者AI腔处理。",
+          "reason": "明确将故意错引及纠正视为角色互动，未误报。"
+        },
+        {
+          "protected_id": "D01-protected-2",
+          "reported": false,
+          "evidence": "具体话外指向列前文不足，不因处于结尾或使用对照就要求删除。",
+          "reason": "末句文学调侃被保留，未因化用或结尾位置定为AI腔。"
+        },
+        {
+          "protected_id": "D01-protected-3",
+          "reported": false,
+          "evidence": "“老板”“哦”“啦”“嘻嘻”属于同一说话者的口吻。",
+          "reason": "撒娇声线明确保留，未误报。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "D01-extra-broom-action-subject",
+          "severity": "S2",
+          "false_positive": false,
+          "evidence": "读到‘随后高高扬起了手臂’时，语法上仍承接‘扫帚’，读者必须把主语从扫帚临时改认成它的主人，才能完成这组动作的理解。",
+          "reason": "唯一PR-1有完整句子证据和明确主语错接位置，最小修法只点明找球手，不补重要事实。是答案外可成立的L1发现，不匹配三个应抓，不计作自然度改善或保护误报；报告跨到相关语文规格范围，也不等于完成copy-editor全项职责。"
+        }
+      ],
+      "report_assessment": {
+        "formal_issue_count": 1,
+        "independent_s1_s2_count": 1,
+        "evidence": "没有另将同一处主语问题重复计为自然度或节奏问题。",
+        "reason": "正式仅一条L1 S2；旧L4两项和L3一项均未报，不能把问题总数一条写成旧高严重度检出。"
+      }
+    },
+    {
+      "run_id": "after_regression_D02_1",
+      "execution_date": "2026-10-04",
+      "issues": [
+        {
+          "issue_id": "D02-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "职责覆盖为 L4 自然度及相关表达保护，不替代 copy-editor 的完整 L1/L2 检查",
+          "reason": "全报告只列PR-1局部重复，没有诊断露身后的缺字；原L1 S2项目未检出，保留高严重度分母。角色明确不替代copy-editor，不能直接把职责外漏字等同自然度规则退步。"
+        },
+        {
+          "issue_id": "D02-2",
+          "detected": true,
+          "severity": "S3",
+          "evidence": "损失限于局部节奏；清算风险提供新信息，钱袋发抖衔接付款，砸钱表现不甘，不能将整段反应一并判成无功能堆叠。",
+          "reason": "PR-1实质指出原答案涵盖的输不起、更赌不起与暴怒恐惧两处相邻概括重复，命中同段累计重复问题但仅S3。按冻结答案仍记检出、旧S2定级未达标；不因新版报告有功能区分理由就调低原预期或抹去下降，不把保留冰窖等词视为全段未审。"
+        },
+        {
+          "issue_id": "D02-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "当前文本未明确限定只能进入陈放的内心，文风样本也不足以证明全书采用固定人物限知视角，因此不能直接判成视角越界。",
+          "reason": "明确列供给待核且不定级，不是应抓命中。原答案以固定主角视角为前提，但当前供给未证明该约束；保留答案和未命中，标注答案前提待核。"
+        },
+        {
+          "issue_id": "D02-4",
+          "detected": false,
+          "severity": null,
+          "evidence": "分别处理藏机身、遮住机身外放声及控制本人说话幅度，不能因为都涉及隐蔽就合并成同一条无功能重复。",
+          "reason": "只从不同隐蔽动作的表达功能保留，未核对贴身拥抱距离下雨声是否足以遮蔽；原L3空间依据项目未检出。自然度保留不构成事实可靠性确认，仍保留原分母。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "D02-protected-1",
+          "reported": false,
+          "evidence": "是人物口语。不能因夸张或感叹号就磨平声线",
+          "reason": "粗口属于格里普斯金钱立场与怒气的表达，报告明确保留，未误报。"
+        }
+      ],
+      "extra_findings": [],
+      "report_assessment": {
+        "formal_issue_count": 1,
+        "independent_s1_s2_count": 0,
+        "evidence": "下列问题限于两处相邻的情绪概括，属于局部拖沓。",
+        "reason": "只有PR-1 S3，匹配D02-2；前文待核没有定级，不作为额外问题或应抓检出。"
+      }
+    }
+  ],
+  "repairs": [],
+  "pending_run_ids": [
+    "after_regression_K02_2"
+  ],
+  "notes": [
+    "已判K01、K02第一轮、D01和D02；K02第二轮未纳入，不据缺失报告计算稳定性。",
+    "第一轮原答案检出1/8，高严重度定级达标0/3；D02-2检出S3但旧S2未达标。四项保护均未误报。",
+    "D01新增L1主语错接S2单独登记，不匹配旧答案、不作自然度提升；K02新增嘴硬标签S3单独登记，不计K组S1/S2误报。",
+    "未命中中存在旧密度门槛、新信息功能判断、职责外项目和视角前提待核，不将所有低命中笼统解释为退步，也不抹去下降。",
+    "历史旧规则K02与本轮无同条件配对，本轮模型意见不能替代作者判断或全部质量验收。"
+  ]
+}

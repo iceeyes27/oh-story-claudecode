@@ -1,0 +1,141 @@
+{
+  "schema_version": 1,
+  "kind": "novel-kit-eval-score",
+  "created_at": "2026-10-04T09:48:08Z",
+  "quality_judgment_source": "model_comparison",
+  "quality_acceptance": "not_determined",
+  "scope": "review_only",
+  "evidence_complete": true,
+  "missing": [],
+  "runs": [
+    {
+      "run_id": "before_challenges_N01_1",
+      "sample": "N01",
+      "role": "prose-reviewer",
+      "attempt": 1,
+      "detected": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "before_challenges_N02_1",
+      "sample": "N02",
+      "role": "prose-reviewer",
+      "attempt": 1,
+      "detected": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "before_challenges_N03_1",
+      "sample": "N03",
+      "role": "prose-reviewer",
+      "attempt": 1,
+      "detected": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    }
+  ],
+  "attempts": [
+    {
+      "role": "prose-reviewer",
+      "attempt": 1,
+      "detected": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    }
+  ],
+  "consistency": [],
+  "unions": [
+    {
+      "role": "prose-reviewer",
+      "supplemental_only": true,
+      "detected": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    }
+  ],
+  "repairs": [],
+  "output_hashes": {
+    "outputs/before_challenges_N01_1.md": "8c48b4a8a4defdce1656ef43d6e30210419c7fed6a46fc4a1298bef0a0ed8cd2",
+    "outputs/before_challenges_N02_1.md": "ca4ac5b8a416bbeef5b01ae965d79c85fb0a31210638de49fe0f521e6ee485c9",
+    "outputs/before_challenges_N03_1.md": "52262fadbf1fddd8ce67124d92d5874edfdd3ed692a71fd4b758cc099ae1b06b"
+  },
+  "judgments_snapshot": "scores/收尾评分.judgments.json",
+  "judgments_sha256": "56751c13941d43705efe18ef69ad12f1b1ac2d1d891742fca88d7d73aeff4067"
+}

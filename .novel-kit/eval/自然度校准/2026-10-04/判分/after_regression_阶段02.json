@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "quality_acceptance": "not_determined",
+  "group": "after_regression",
+  "execution_date": "2026-10-04",
+  "status": "two_of_five_semantically_scored",
+  "runs": [
+    {
+      "run_id": "after_regression_K01_1",
+      "execution_date": "2026-10-04",
+      "issues": [],
+      "protected": [],
+      "extra_findings": [],
+      "report_assessment": {
+        "formal_issue_count": 0,
+        "independent_s1_s2_count": 0,
+        "evidence": "本次未发现可据具体阅读损失成立的自然度问题，因此没有 PR 编号问题条目。",
+        "reason": "整份报告正式问题列表为空，短段、关系语气及收入尺度被逐一核对为不同功能；前文范围限制未定级，不算答案外问题。"
+      }
+    },
+    {
+      "run_id": "after_regression_K02_1",
+      "execution_date": "2026-10-04",
+      "issues": [
+        {
+          "issue_id": "K02-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "以下一处是局部轻微重复，不影响人物、动作或对白意图的理解，不作自动修改要求。",
+          "reason": "报告唯一PR-1诊断第26段嘴硬标签的局部重复；取水、倒壶、上灶均在保留项，没有诊断母亲先向壶底添火与后文架壶的接口，故冻结答案记未命中。此为L2承接项目，非自然度角色主要职责，不能因未报就自动判校准退步。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [
+        {
+          "id": "K02-extra-mouth-stubbornness-label",
+          "severity": "S3",
+          "evidence": "这里没有说话者混淆，也没有行动被明显延后，故仅定 S3，不把前面所有逞强表现合并升为 S2。",
+          "false_positive": false,
+          "reason": "PR-1只建议可选省去第26段还在嘴硬这一已明确叙述判断，让真不用与下一句推辞少一次停顿；报告承认只是轻微拖沓。同时保留第18段不自在/逞强的首次语气提示、第22段儿子没戳穿的回应选择和坐下后腿的状态。它不匹配唯一壶接口答案，是必须登记的答案外S3；K组允许S3以下，非硬性保护，故不计S1/S2误报。"
+        }
+      ],
+      "report_assessment": {
+        "formal_issue_count": 1,
+        "independent_s1_s2_count": 0,
+        "evidence": "父亲多次推辞分属不同动作节点，不能仅以出现频次认定累计损失。",
+        "reason": "实际报告仅一条S3，不得将其记成零发现或继续沿用旧报告的三处合并S2。"
+      }
+    }
+  ],
+  "repairs": [],
+  "pending_run_ids": [
+    "after_regression_D01_1",
+    "after_regression_D02_1",
+    "after_regression_K02_2"
+  ],
+  "notes": [
+    "仅包含已完成的K01和K02第一轮，缺失三份不填未检出或零误报。",
+    "目前K01无问题，K02有一条答案外S3可选建议，不是S2误报；应抓壶接口仍未命中，保留原分母。",
+    "历史旧规则K02的S2作为回归参照；本轮没有重跑旧K02同条件配对，不夸大因果或稳定性。"
+  ]
+}

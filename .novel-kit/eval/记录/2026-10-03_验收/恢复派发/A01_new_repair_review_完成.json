@@ -1,0 +1,8 @@
+{
+  "finished_at": "2026-10-03T14:49:20.281225+00:00",
+  "agent": "/root/repair_a01_blind",
+  "final_received": true,
+  "report_sha256": "5207fd307de4b5d1f4548622a97c73c1e9f4fe574ad7817779f2d3d1eadf7af6",
+  "inputs_unchanged": true,
+  "opening_evidence": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/工具证据/new_repair_A01/manifest.json"
+}

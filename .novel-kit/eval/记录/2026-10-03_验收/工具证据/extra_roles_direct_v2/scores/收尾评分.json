@@ -1,0 +1,260 @@
+{
+  "schema_version": 1,
+  "kind": "novel-kit-eval-score",
+  "created_at": "2026-10-04T00:46:31Z",
+  "quality_judgment_source": "model_comparison",
+  "quality_acceptance": "not_determined",
+  "scope": "review_only",
+  "evidence_complete": true,
+  "missing": [],
+  "runs": [
+    {
+      "run_id": "D01_prose-reviewer_1",
+      "sample": "D01",
+      "role": "prose-reviewer",
+      "attempt": 1,
+      "detected": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "D02_prose-reviewer_1",
+      "sample": "D02",
+      "role": "prose-reviewer",
+      "attempt": 1,
+      "detected": {
+        "numerator": 1,
+        "denominator": 4,
+        "rate": 0.25,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 2,
+        "rate": 0.5,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "K01_prose-reviewer_1",
+      "sample": "K01",
+      "role": "prose-reviewer",
+      "attempt": 1,
+      "detected": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "K02_prose-reviewer_1",
+      "sample": "K02",
+      "role": "prose-reviewer",
+      "attempt": 1,
+      "detected": {
+        "numerator": 0,
+        "denominator": 1,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 1,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "C01_consistency-checker_1",
+      "sample": "C01",
+      "role": "consistency-checker",
+      "attempt": 1,
+      "detected": {
+        "numerator": 2,
+        "denominator": 4,
+        "rate": 0.5,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 1,
+        "rate": 0.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "C02_consistency-checker_1",
+      "sample": "C02",
+      "role": "consistency-checker",
+      "attempt": 1,
+      "detected": {
+        "numerator": 2,
+        "denominator": 4,
+        "rate": 0.5,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 2,
+        "rate": 0.5,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    }
+  ],
+  "attempts": [
+    {
+      "role": "consistency-checker",
+      "attempt": 1,
+      "detected": {
+        "numerator": 4,
+        "denominator": 8,
+        "rate": 0.5,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 3,
+        "rate": 0.3333333333333333,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "role": "prose-reviewer",
+      "attempt": 1,
+      "detected": {
+        "numerator": 3,
+        "denominator": 8,
+        "rate": 0.375,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 1,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    }
+  ],
+  "consistency": [],
+  "unions": [
+    {
+      "role": "consistency-checker",
+      "supplemental_only": true,
+      "detected": {
+        "numerator": 4,
+        "denominator": 8,
+        "rate": 0.5,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 3,
+        "rate": 0.3333333333333333,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "role": "prose-reviewer",
+      "supplemental_only": true,
+      "detected": {
+        "numerator": 3,
+        "denominator": 8,
+        "rate": 0.375,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 1,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    }
+  ],
+  "repairs": [],
+  "output_hashes": {
+    "outputs/D01_prose-reviewer_1.md": "33a46778f4ea74f8e3c107d093c433c501267a4bfc9f28fd42fa5f82c389509b",
+    "outputs/D02_prose-reviewer_1.md": "5ddc3beab81e224dd33ae3185ce36aa678f84c8a43fd48663f730a72c285d6c4",
+    "outputs/K01_prose-reviewer_1.md": "e39a53feeebc3db83a340bbe5481c7d7639b22e28a7a4c7c3ffcbf2e38922276",
+    "outputs/K02_prose-reviewer_1.md": "c8cfa6583be2b69026782053e7ee8b80128976ed44b568a5ab62e8b4b309a0a7",
+    "outputs/C01_consistency-checker_1.md": "d048d2ba70adca80c6313c3499a92a924abe1b9c7001ecf6aaef510fa2a33c11",
+    "outputs/C02_consistency-checker_1.md": "5297eefa9f91bcb24fd533362d6d9f311c308a8f9a804295c7a0bf7033af377e"
+  },
+  "judgments_snapshot": "scores/收尾评分.judgments.json",
+  "judgments_sha256": "ab06e291ca44c2b77430043c788a8b4f17cd89baa5060889670c66826eb957f1"
+}

@@ -1,0 +1,75 @@
+{
+  "finished_at": "2026-10-04T10:28:03.492605+00:00",
+  "checks": [
+    {
+      "name": "来源检查",
+      "command": [
+        "./novel",
+        "setup",
+        "--agent",
+        "all",
+        "--models",
+        "quality",
+        "--check-sources"
+      ],
+      "returncode": 0,
+      "log": "来源检查.log",
+      "log_sha256": "342460de2c3c1d33cd968242749474684cf5887ea53a6d3a606bf607ed7501bf"
+    },
+    {
+      "name": "适配检查",
+      "command": [
+        "./novel",
+        "setup",
+        "--agent",
+        "all",
+        "--models",
+        "quality",
+        "--check"
+      ],
+      "returncode": 0,
+      "log": "适配检查.log",
+      "log_sha256": "33eeb3106a8831bd798fcac7be1ef87992d34edeb6c01eca6ef28a3e6ba28c8c"
+    },
+    {
+      "name": "配置诊断",
+      "command": [
+        "./novel",
+        "doctor",
+        "--agent",
+        "all"
+      ],
+      "returncode": 0,
+      "log": "配置诊断.log",
+      "log_sha256": "9396fc46f7762f121cd4bb695c41ba0b8801533d8b5602cf7ad9a5aa9fb135f0"
+    },
+    {
+      "name": "差异格式",
+      "command": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "returncode": 0,
+      "log": "差异格式.log",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "完整测试",
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-v"
+      ],
+      "returncode": 0,
+      "log": "完整测试.log",
+      "log_sha256": "f4482336cc6de300af5738ff5172e42aa727bc8c22eff09edf6e83e1c129f9e5"
+    }
+  ],
+  "source_drift": [],
+  "all_commands_passed": true
+}

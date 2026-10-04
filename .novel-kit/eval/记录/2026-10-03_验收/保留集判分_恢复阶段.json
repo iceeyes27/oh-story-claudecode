@@ -1,0 +1,192 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "runs": [
+    {
+      "run_id": "H01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "H01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "问题在叙述中的容器状态和动作关系",
+          "reason": "CE-1明确指出空墨水瓶与往领子倒的动作不合，匹配答案，未自行补墨水。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "H01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "来都来了的调侃口语被明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "你告啊的挑衅短句未被列为问题，第二轮明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "学生两次弹飞惊呼未被列为无功能重复，第二轮明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "费尔奇不走近/不出声的旁观留白未被列为问题；第二轮默念赘语指向另一句，不误配保护项。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "H01-extra-rebound-sequence",
+          "severity": "S2",
+          "evidence": "没有标明回述刚才的碰撞，也没有写他重新扑向门框。",
+          "reason": "原文明确退远不再上前，后写学生等看清撞一下弹一下；报告定位已停与连续撞的时序表达，有局部证据，暂不判误报。可否顺读为回述前两次及S2必要性待作者裁决。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "H01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "H01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "本句给出的物件状态与动作不能直接拼合",
+          "reason": "CE-1明确指出空墨水瓶与往领子倒的动作不合，匹配答案，未自行补墨水。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "H01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "来都来了的调侃口语被明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "你告啊的挑衅短句未被列为问题，第二轮明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "学生两次弹飞惊呼未被列为无功能重复，第二轮明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "费尔奇不走近/不出声的旁观留白未被列为问题；第二轮默念赘语指向另一句，不误配保护项。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "H01-extra-silent-redundancy",
+          "severity": "S3",
+          "evidence": "“无声地”和“默念”重复交代没有发出声音。",
+          "reason": "无声地与默念确有同义重叠，报告仅列可选S3；不针对费尔奇旁观保护项，不判误报。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "H02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "H02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "原件最后一次明确转交是在伍德手里",
+          "reason": "CE-2明确指出伍德持纸到查理看地上被踩脏纸缺放下/掉落承接，匹配答案，实际S2。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "H02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "这啥的现场口语被明确保留。"
+        },
+        {
+          "protected_id": "H02-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "能抄我一份吗被明确保留为请求抄本的口语。"
+        },
+        {
+          "protected_id": "H02-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "压半寸到底多半寸被明确保留为新手尺度疑问。"
+        },
+        {
+          "protected_id": "H02-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "步骤式抬臀/重心对白未被列为电报体或病句。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "H02-extra-paper-return",
+          "severity": "S2",
+          "evidence": "没有写原件交回埃德蒙。",
+          "reason": "伍德抽走并举纸、拿铅笔描图之后，埃德蒙又把同纸塞进他手里，缺交回承接；这是与后续落地不同的转移点，原文支持的新发现，不判误报。持物动作是否可压缩及S2必要性待作者裁决。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "H02_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "H02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "图纸突然成为地上且已被踩脏的物件",
+          "reason": "同一羊皮纸持有状态缺少衔接已明确提出。预置答案为S3，本轮按需回读定S2；保留严重度分歧，不改答案。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "H02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "完整报告的问题栏只有图纸承接，四个口语及步骤保护项均未被列为问题。"
+        },
+        {
+          "protected_id": "H02-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "完整报告的问题栏只有图纸承接，四个口语及步骤保护项均未被列为问题。"
+        },
+        {
+          "protected_id": "H02-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "完整报告的问题栏只有图纸承接，四个口语及步骤保护项均未被列为问题。"
+        },
+        {
+          "protected_id": "H02-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "完整报告的问题栏只有图纸承接，四个口语及步骤保护项均未被列为问题。"
+        }
+      ],
+      "extra_findings": []
+    }
+  ],
+  "repairs": [],
+  "note": "仅4份已完成原始报告的阶段判分，不宣称8份全部完成。"
+}

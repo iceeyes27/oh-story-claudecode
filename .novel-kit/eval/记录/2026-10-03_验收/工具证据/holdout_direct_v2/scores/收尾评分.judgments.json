@@ -1,0 +1,465 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "runs": [
+    {
+      "run_id": "H01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "H01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "问题在叙述中的容器状态和动作关系",
+          "reason": "CE-1明确指出空墨水瓶与往领子倒的动作不合，匹配答案，未自行补墨水。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "H01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "来都来了的调侃口语被明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "你告啊的挑衅短句未被列为问题，第二轮明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "学生两次弹飞惊呼未被列为无功能重复，第二轮明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "费尔奇不走近/不出声的旁观留白未被列为问题；第二轮默念赘语指向另一句，不误配保护项。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "H01-extra-rebound-sequence",
+          "severity": "S2",
+          "evidence": "没有标明回述刚才的碰撞，也没有写他重新扑向门框。",
+          "reason": "原文明确退远不再上前，后写学生等看清撞一下弹一下；报告定位已停与连续撞的时序表达，有局部证据，暂不判误报。可否顺读为回述前两次及S2必要性待作者裁决。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "H01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "H01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "本句给出的物件状态与动作不能直接拼合",
+          "reason": "CE-1明确指出空墨水瓶与往领子倒的动作不合，匹配答案，未自行补墨水。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "H01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "来都来了的调侃口语被明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "你告啊的挑衅短句未被列为问题，第二轮明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "学生两次弹飞惊呼未被列为无功能重复，第二轮明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "费尔奇不走近/不出声的旁观留白未被列为问题；第二轮默念赘语指向另一句，不误配保护项。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "H01-extra-silent-redundancy",
+          "severity": "S3",
+          "evidence": "“无声地”和“默念”重复交代没有发出声音。",
+          "reason": "无声地与默念确有同义重叠，报告仅列可选S3；不针对费尔奇旁观保护项，不判误报。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "H02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "H02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "原件最后一次明确转交是在伍德手里",
+          "reason": "CE-2明确指出伍德持纸到查理看地上被踩脏纸缺放下/掉落承接，匹配答案，实际S2。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "H02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "这啥的现场口语被明确保留。"
+        },
+        {
+          "protected_id": "H02-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "能抄我一份吗被明确保留为请求抄本的口语。"
+        },
+        {
+          "protected_id": "H02-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "压半寸到底多半寸被明确保留为新手尺度疑问。"
+        },
+        {
+          "protected_id": "H02-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "步骤式抬臀/重心对白未被列为电报体或病句。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "H02-extra-paper-return",
+          "severity": "S2",
+          "evidence": "没有写原件交回埃德蒙。",
+          "reason": "伍德抽走并举纸、拿铅笔描图之后，埃德蒙又把同纸塞进他手里，缺交回承接；这是与后续落地不同的转移点，原文支持的新发现，不判误报。持物动作是否可压缩及S2必要性待作者裁决。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "H02_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "H02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "图纸突然成为地上且已被踩脏的物件",
+          "reason": "同一羊皮纸持有状态缺少衔接已明确提出。预置答案为S3，本轮按需回读定S2；保留严重度分歧，不改答案。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "H02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "完整报告的问题栏只有图纸承接，四个口语及步骤保护项均未被列为问题。"
+        },
+        {
+          "protected_id": "H02-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "完整报告的问题栏只有图纸承接，四个口语及步骤保护项均未被列为问题。"
+        },
+        {
+          "protected_id": "H02-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "完整报告的问题栏只有图纸承接，四个口语及步骤保护项均未被列为问题。"
+        },
+        {
+          "protected_id": "H02-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "完整报告的问题栏只有图纸承接，四个口语及步骤保护项均未被列为问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "H03_copy-editor_1",
+      "execution_date": "2026-10-04",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "H03-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "方言边个啊明确保留，未要求改普通话。"
+        },
+        {
+          "protected_id": "H03-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "后生仔等方言承担语言隔阂功能，被明确保留。"
+        },
+        {
+          "protected_id": "H03-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "报告明确不因中文中的方言词推断人物未换英语，未报该保护句。"
+        },
+        {
+          "protected_id": "H03-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "店铺一关容易、开着难的停顿对照明确保留。"
+        },
+        {
+          "protected_id": "H03-protected-5",
+          "reported": false,
+          "evidence": "",
+          "reason": "送回里间的物件明确是父亲留下的小壶，未报茶桌无茶壶。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "H03-extra-sign-count",
+          "severity": "S2",
+          "evidence": "叙述先明确说匾上有“三个金字”，随后独立列出的匾文“姜记”只有两个字。",
+          "reason": "准确定位同段数量与展示文字不合；冻结答案已列待裁决且建议S3，不纳入应抓分母。报告判S2并提出两种作者选择，保留严重度及匾文是否完整的争议，不直接判误报或作者认可。",
+          "false_positive": false
+        },
+        {
+          "id": "H03-extra-teapot-comparison",
+          "severity": "S2",
+          "evidence": "“那壶”明确指单只新取出的壶，“案上这套”则承接整套茶具。",
+          "reason": "新报单只壶与整套茶具比较对象不平行，原句支持；与保护项送回父亲小壶不同，不误配保护项。是否足够回读损失及S2仍留作者判断，不自动记误报。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "H03_copy-editor_2",
+      "execution_date": "2026-10-04",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "H03-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "方言边个啊明确保留，未要求改普通话。"
+        },
+        {
+          "protected_id": "H03-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "后生仔等方言承担语言隔阂功能，被明确保留。"
+        },
+        {
+          "protected_id": "H03-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "报告明确不因中文中的方言词推断人物未换英语，未报该保护句。"
+        },
+        {
+          "protected_id": "H03-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "店铺一关容易、开着难的停顿对照明确保留。"
+        },
+        {
+          "protected_id": "H03-protected-5",
+          "reported": false,
+          "evidence": "",
+          "reason": "送回里间的物件明确是父亲留下的小壶，未报茶桌无茶壶。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "H03-extra-sign-count",
+          "severity": "S2",
+          "evidence": "明确字数与紧接着呈现的文字不符",
+          "reason": "第二轮独立定位三个金字与姜记二字的局部不合；冻结答案将其列为待裁决并建议S3。保留严重度和匾文展示是否完整的争议，不加入应抓分母。",
+          "false_positive": false
+        },
+        {
+          "id": "H03-extra-teapot-comparison",
+          "severity": "S2",
+          "evidence": "比较的一端是一只壶，另一端承接的是一整套茶具。",
+          "reason": "与第一轮相同的新发现，原句支持单只壶与整套器物的比较对象疑点；没有误报送回父亲小壶的保护项。S2是否必要仍待作者裁决。",
+          "false_positive": false
+        },
+        {
+          "id": "H03-extra-action-sound",
+          "severity": "S2",
+          "evidence": "“递茶、布座、跟周伯说话”并列后，用“声音都是低的”统一收束",
+          "reason": "报告指向同一谓语如何分配给动作与说话，引用准确；但递茶布座也可能有轻微声响，整句可以表现做事与交谈皆轻。保留自然省略与必须拆句的判断分歧及S2过严疑虑，未由作者裁定，不登记确定误报。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "H04_copy-editor_1",
+      "execution_date": "2026-10-04",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "H04-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "傻妞答不上来作为知情局限保留，未强求揭明教授旧事。"
+        },
+        {
+          "protected_id": "H04-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "掀疤比喻和根据神态的情感猜测保留，不要求展开全部往事。"
+        },
+        {
+          "protected_id": "H04-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "知道了、不碰的短句与对象承接明确保留，未机械补宾语。"
+        },
+        {
+          "protected_id": "H04-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "大概明确人物推测，未误报跨地点视角越界。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "H04-extra-candlestick",
+          "severity": "S3",
+          "evidence": "这里以“烛台”借指其上的燃烧物，读者仍能直接理解为夜深、烛光低弱",
+          "reason": "两轮均定位烛台烧得低的搭配；第一轮认为借指可顺读而列S3，第二轮认为需重解为蜡烛而列S2。保留读感及定级分歧，不改原报告，不计入冻结应抓。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "H04_copy-editor_2",
+      "execution_date": "2026-10-04",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "H04-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "傻妞答不上来作为知情局限保留，未强求揭明教授旧事。"
+        },
+        {
+          "protected_id": "H04-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "掀疤比喻和根据神态的情感猜测保留，不要求展开全部往事。"
+        },
+        {
+          "protected_id": "H04-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "知道了、不碰的短句与对象承接明确保留，未机械补宾语。"
+        },
+        {
+          "protected_id": "H04-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "大概明确人物推测，未误报跨地点视角越界。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "H04-extra-candlestick",
+          "severity": "S2",
+          "evidence": "按字面则会读成烛台本身在燃烧、变低",
+          "reason": "两轮均定位烛台烧得低的搭配；第一轮认为借指可顺读而列S3，第二轮认为需重解为蜡烛而列S2。保留读感及定级分歧，不改原报告，不计入冻结应抓。",
+          "false_positive": false
+        },
+        {
+          "id": "H04-extra-book-pillow",
+          "severity": "S2",
+          "evidence": "两种画面均可成立，但当前写法没有说明两者中的哪一种",
+          "reason": "报告准确引用枕下与贴后颈，提出隔枕触感或露边两种解释。原文也可能允许读者自然补足枕缘和身体位置，未写完整接触几何不必然造成错误；与第一轮无此问题的判断并列保留，S2过严疑虑尚未经作者裁定。",
+          "false_positive": false
+        }
+      ]
+    }
+  ],
+  "repairs": [],
+  "note": "8份保留集完整语义判分。前4条沿用保留集判分_恢复阶段.json；H03/H04的空应抓不代表答案外问题必然误报。false_positive=false仅表示未裁定误报，不代表作者认可。H04第一次CLI失败后由新原生copy-editor逐字同提示完成。",
+  "quality_acceptance": "not_determined",
+  "status": "scored_input_complete",
+  "execution_provenance": [
+    {
+      "run_id": "H01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "unknown",
+      "source": "执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "a228dee1fd999f904ebcb4fe705d1524586c625b7c256c7e050a60ac71a1d45d"
+    },
+    {
+      "run_id": "H01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "started_utc": "unknown",
+      "source": "执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "952c0f4163f2aee35db59062ba750644406ecf26b552a5d2249aa15f4270f423"
+    },
+    {
+      "run_id": "H02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T12:19:49.577619+00:00",
+      "source": "CLI执行/H02_copy-editor_1/重试02/执行结果.json",
+      "completion_status": "cli_hash_match",
+      "report_sha256": "f0ebe42836f8edb88ed9395577ef99a90dfb754ee9da70a8bc09a8d0c05c3af6"
+    },
+    {
+      "run_id": "H02_copy-editor_2",
+      "engine": "native collaboration.spawn_agent",
+      "opening": ".novel-kit/eval/记录/2026-10-03_验收/恢复派发/H02_copy-editor_2_开读.json",
+      "completion": ".novel-kit/eval/记录/2026-10-03_验收/恢复派发/H02_copy-editor_2_完成.json",
+      "opening_sha256": "2f21a8af5d6b9fbe5cc1dd52864852583ca4b5d64d6ab41d93994fd06a75709e",
+      "completion_sha256": "998e73c3cd87c73da7624519709e194165c99a503883c83a86569a2b6217c9f5",
+      "report_sha256": "f3a815d812b2129e93cac41f64c53b487fe27bccd34382052eb330df8efeb5d0",
+      "note": "实际独立角色完成；精确时刻和重试见原记录，不补造CLI事件。"
+    },
+    {
+      "run_id": "H04_copy-editor_1",
+      "engine": "native collaboration.spawn_agent",
+      "opening": ".novel-kit/eval/记录/2026-10-03_验收/恢复派发/H04_copy-editor_1_原生开读.json",
+      "completion": ".novel-kit/eval/记录/2026-10-03_验收/恢复派发/H04_copy-editor_1_原生完成.json",
+      "opening_sha256": "e6231ca562dbf82897650cd3d0d10d063b8dcda2045135a43351e54fdfff5812",
+      "completion_sha256": "1e2d8e22f90853fbba10a694e5ffaa5dc8e18aca42dbf72c07afadc02e97a386",
+      "report_sha256": "9078701cd3d1778b01bf8c5ccd9b4c8e8f1fe04308da8d312aff0d31465d1b8e",
+      "note": "实际独立角色完成；精确时刻和重试见原记录，不补造CLI事件。"
+    },
+    {
+      "run_id": "H03_copy-editor_1",
+      "engine": "codex exec --ephemeral",
+      "completion": ".novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/H03_copy-editor_1/run-f0813262a5734d3cb99811d47bf189f6/result.json",
+      "completion_sha256": "5d239b382a4481b01697d55af3fcbebf79b9001ca7338a470632e75fc3a66cdd",
+      "report_sha256": "10d06b5e29c02e7ee7fb99f9882f49cdde89bd557b3e5fe4bd206bc1323e1405",
+      "nested_agent_calls": 0
+    },
+    {
+      "run_id": "H03_copy-editor_2",
+      "engine": "codex exec --ephemeral",
+      "completion": ".novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/H03_copy-editor_2/run-a0cf2359a4294636bfbba91abd503898/result.json",
+      "completion_sha256": "addfe7fd1c4a489e8c25a06bf2031d875289d639b40ed378ca21a72c45abfbe9",
+      "report_sha256": "a89852f235f7527617fe692c0e8331d0d7bfa980088b3eec5d6311c1936561fe",
+      "nested_agent_calls": 0
+    },
+    {
+      "run_id": "H04_copy-editor_2",
+      "engine": "codex exec --ephemeral",
+      "completion": ".novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/H04_copy-editor_2/run-9a671032970a4a5b9c71a9ef1146fd58/result.json",
+      "completion_sha256": "e5d2695043948730515a1fa3351ea27dbfd24923b24d43d36c03a76cde9e4a0e",
+      "report_sha256": "6d4607d24070c3045755c5d48231501f944633f6b744f053850e6de998f57e03",
+      "nested_agent_calls": 0
+    }
+  ],
+  "updated_at": "2026-10-04T00:41:23.804535+00:00"
+}

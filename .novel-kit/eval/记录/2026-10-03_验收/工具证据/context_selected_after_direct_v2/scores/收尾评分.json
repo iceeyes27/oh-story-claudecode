@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "kind": "novel-kit-eval-score",
+  "created_at": "2026-10-04T00:29:17Z",
+  "quality_judgment_source": "model_comparison",
+  "quality_acceptance": "not_determined",
+  "scope": "review_only",
+  "evidence_complete": true,
+  "missing": [],
+  "runs": [
+    {
+      "run_id": "P3-05_selected_after_1",
+      "sample": "P3-05",
+      "role": "copy-editor",
+      "attempt": 1,
+      "detected": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "run_id": "P3-05_selected_after_2",
+      "sample": "P3-05",
+      "role": "copy-editor",
+      "attempt": 2,
+      "detected": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    }
+  ],
+  "attempts": [
+    {
+      "role": "copy-editor",
+      "attempt": 1,
+      "detected": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "role": "copy-editor",
+      "attempt": 2,
+      "detected": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    }
+  ],
+  "consistency": [
+    {
+      "role": "copy-editor",
+      "compared_attempts": "每样本前两次",
+      "detection_agreement": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "severity_agreement": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "positive_overlap": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      }
+    }
+  ],
+  "unions": [
+    {
+      "role": "copy-editor",
+      "supplemental_only": true,
+      "detected": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 0,
+        "denominator": 0,
+        "rate": null,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    }
+  ],
+  "repairs": [],
+  "output_hashes": {
+    "outputs/P3-05_selected_after_1.md": "47bd638532569937f75d5a71ac6da4bcb5018d09f25b188bb1585e3a9d628a92",
+    "outputs/P3-05_selected_after_2.md": "c5f695e28181e85a30624366fc67bcef1f757f8c131ed2f61225d9edb1c2b70b"
+  },
+  "judgments_snapshot": "scores/收尾评分.judgments.json",
+  "judgments_sha256": "a45d2399692577e4636a61040f88922edb2cc7348c75bb14d6dde4a765cb2c41"
+}

@@ -71,6 +71,21 @@ class PatchGuard(PortableBook):
 
 
 class AdapterOwnership(PortableBook):
+    def test_source_check_detects_missing_and_stale_adapters_without_deployment(self):
+        agents = {'claude', 'codex'}
+        self.assertTrue(adapters.source_drift(self.root, agents))
+        # Deterministic files can be checked on a fresh checkout without ignored hooks/manifest.
+        for name, body in adapters.outputs(self.root, agents, 'posix').items():
+            if name.startswith(('.claude/skills/', '.claude/agents/', '.codex/agents/')):
+                path = self.root/name; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(body)
+        self.assertEqual(adapters.source_drift(self.root, agents), [])
+        self.assertFalse((self.root/'.novel-kit/adapters.json').exists())
+        self.assertFalse((self.root/'.codex/hooks.json').exists())
+        self.put('.novel-kit/roles/copy-editor.md',
+                 (self.root/'.novel-kit/roles/copy-editor.md').read_text(encoding='utf-8')+'\n新增阅读范围。\n')
+        differences = adapters.source_drift(self.root, agents)
+        self.assertEqual(set(differences), {'.claude/agents/copy-editor.md', '.codex/agents/copy-editor.toml'})
+
     def test_setup_check_and_doctor_for_both_agents(self):
         self.assertTrue(adapters.synchronize(self.root, {'claude','codex'}))
         self.assertEqual(adapters.synchronize(self.root, {'claude','codex'}, check=True), [])
@@ -86,6 +101,27 @@ class AdapterOwnership(PortableBook):
                 data = tomllib.loads(text)
                 self.assertEqual(data['name'], path.stem)
                 self.assertTrue(data['developer_instructions'])
+
+    def test_claude_model_policy_is_tiered_and_remembered(self):
+        def models():
+            found = {}
+            for path in (self.root/'.claude/agents').glob('*.md'):
+                front = path.read_text(encoding='utf-8').split('---')[1]
+                found[path.stem] = next((l.split(':', 1)[1].strip() for l in front.splitlines()
+                                         if l.startswith('model:')), None)
+            return found
+        adapters.synchronize(self.root, {'claude', 'codex'})
+        quality = models()
+        self.assertEqual(quality['scene-writer'], 'opus')
+        self.assertEqual(quality['copy-editor'], 'opus')
+        self.assertEqual({quality[n] for n in quality if n not in {'scene-writer', 'copy-editor'}}, {'sonnet'})
+        adapters.synchronize(self.root, {'claude', 'codex'}, models='inherit')
+        self.assertEqual(set(models().values()), {None})
+        # check and doctor reuse the remembered policy instead of reverting to the default.
+        self.assertEqual(adapters.synchronize(self.root, {'claude', 'codex'}, check=True), [])
+        self.assertEqual(adapters.doctor(self.root, {'claude', 'codex'}), 0)
+        for path in (self.root/'.codex/agents').glob('*.toml'):
+            self.assertNotIn('\nmodel =', path.read_text(encoding='utf-8'))
 
     def test_custom_adapters_are_not_overwritten_and_replacement_is_backed_up(self):
         path = self.put('.claude/skills/revise/SKILL.md', '作者自訂版本')

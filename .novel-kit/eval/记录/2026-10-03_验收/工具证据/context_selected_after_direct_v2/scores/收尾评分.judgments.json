@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "quality_acceptance": "not_determined",
+  "condition": "selected_after",
+  "runs": [
+    {
+      "run_id": "P3-05_selected_after_1",
+      "condition": "selected_after",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "P3-05-protected-1",
+          "reported": false,
+          "evidence": "她没碰桌角的红钮。",
+          "reason": "报告准确引用红钮用于全巷避难、封口未破只用铜盘的前因，保留不按红钮的动作。"
+        }
+      ],
+      "extra_findings": [],
+      "supply_check": {
+        "phase": "after",
+        "rule_meaning_understood": true,
+        "source_used_to_resolve_uncertainty": true,
+        "remaining_mechanism_supply_pending": false,
+        "mechanism_graded_as_text_error": false,
+        "full_answer_behavior_met": true,
+        "evidence": "铜盘指针拨到第三格，小铃响一声，表示送信的人平安抵达；红钮用于叫全巷避难。",
+        "resolution_evidence": "她没有碰红钮，是在执行前文已经说明的报平安操作。",
+        "reason": "准确复述新增试用场景的两种信号及信封未破条件，明确当前必要前因已供给；不是仅未报错，而是以原文说明了不按红钮的正确理由。试用曾手动复位未排除自动复位，不机械新增冲突。"
+      }
+    },
+    {
+      "run_id": "P3-05_selected_after_2",
+      "condition": "selected_after",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "P3-05-protected-1",
+          "reported": false,
+          "evidence": "她没碰桌角的红钮。",
+          "reason": "报告根据已供给的避难按钮用途和信封完好条件，明确保留不按红钮；不是仅对未知规则保持沉默。"
+        }
+      ],
+      "extra_findings": [],
+      "supply_check": {
+        "phase": "after",
+        "rule_meaning_understood": true,
+        "source_used_to_resolve_uncertainty": true,
+        "remaining_mechanism_supply_pending": false,
+        "mechanism_graded_as_text_error": false,
+        "full_answer_behavior_met": true,
+        "evidence": "本场行动的原因与结果可以顺读理解：封口完好，依已教过的办法报平安；没有启动避难通知。",
+        "resolution_evidence": "报信用途、操作条件、红钮功能、信件到手及封口状态均已在给定前文中交代。",
+        "reason": "准确复述第三格、一声铃、送信人平安与全巷避难的区别，以新给原文和封口状态解释当前行为；原机制疑点已解除，未把未给信件内文或装置原理追加成供给缺口。"
+      }
+    }
+  ],
+  "repairs": [],
+  "p3_05_supply_check": {
+    "status": "complete_six_reports",
+    "initial_conditions": [
+      "full",
+      "selected"
+    ],
+    "after_condition": "selected_after",
+    "required_initial_behavior": "初始 full 和 selected 均缺操作规则。需指出此前教陆青使用铜盘和红钮、说明两种信号含义的完整试用场景，列供给待核，不将第三格、一次铃声或不按红钮定级正文错误。",
+    "required_after_behavior": "补入完整试用原文后，以新独立盲读确认报平安与避难两种信号，原供给疑点解除；保留不按红钮，不新增硬解释。",
+    "observed_initial_correct": null,
+    "observed_after_resolved": true,
+    "note": "供给待核与补读效果单独列项，不用零应抓的分母代替。",
+    "initial_metrics": {
+      "explicit_supply_pending": {
+        "numerator": 3,
+        "denominator": 4
+      },
+      "mechanism_uncertainty_identified": {
+        "numerator": 4,
+        "denominator": 4
+      },
+      "source_range_identified": {
+        "numerator": 4,
+        "denominator": 4
+      },
+      "mechanism_graded_as_text_error": 0
+    },
+    "after_metrics": {
+      "source_used_to_resolve_uncertainty": {
+        "numerator": 2,
+        "denominator": 2
+      },
+      "remaining_supply_pending": 0,
+      "planned_after_reports": 2
+    },
+    "initial_by_condition": {
+      "full": {
+        "explicit_supply_pending": 1,
+        "reports": 2,
+        "mechanism_uncertainty_identified": 2
+      },
+      "selected": {
+        "explicit_supply_pending": 2,
+        "reports": 2,
+        "mechanism_uncertainty_identified": 2
+      }
+    }
+  },
+  "notes": [
+    "最终包含26份语义判分，按full v2、selected v3、selected_after v2分组；19份和25份阶段表完整保存在stage_history，原报告、旧答案及前三项判分未改。",
+    "P3-06 selected第1轮最终使用补充独立输出/P3-06_selected_1.md，runner job为P3-06_selected_1_direct_v3；旧委派报告仅留在历史阶段和v2证据目录，不进入最终分数。",
+    "三个条件均有完整报告、逐项判分与执行凭据。最早三项v2及三份历史P3-06没有runner实际代理计数字段，保持null；另据原始事件记录未观察到委派，不伪造旧回执字段。",
+    "检出和定级只针对冻结应抓条目；供给待核和补读效果另行判定。P3-05初始正式待核列项3/4，识别机制未核实和所需原文4/4，补读后用新增原文解除疑点2/2。",
+    "P3-05 full第2轮没有正式要求补料，属于当前行动可理解与精确信号需核验之间的合理边界分歧；不因未完全满足预置供给答案就称正文漏检。",
+    "P3-05 full第1轮额外S3节奏建议有冻结L2-7依据，明确是可选建议，false_positive=false；非K组不因答案外自动算误报，不据此要求作者必改。",
+    "所有结论来自model_comparison，quality_acceptance=not_determined。合成短样本与协调器预选上下文结果不能证明自动语义选取、整章读感或普遍质量提升。"
+  ]
+}

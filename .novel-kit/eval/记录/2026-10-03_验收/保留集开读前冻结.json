@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-03",
+  "inputs": {
+    ".novel-kit/eval/保留集/2026-10-03/样本/H01/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/保留集/2026-10-03/样本/H01/正文.md",
+      "snapshot": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/保留集/2026-10-03/样本/H01/正文.md",
+      "sha256": "8818e7fb3fc34bec799c4f94093312126ced6982573c6aebac9aa452a708cbd0",
+      "range": "全文"
+    },
+    ".novel-kit/eval/保留集/2026-10-03/样本/H02/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/保留集/2026-10-03/样本/H02/正文.md",
+      "snapshot": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/保留集/2026-10-03/样本/H02/正文.md",
+      "sha256": "caf2c27369fbe0b41b541f5f073d8f8db3c6351e6bc7ade2e0c034ec1e392f97",
+      "range": "全文"
+    },
+    ".novel-kit/eval/保留集/2026-10-03/样本/H03/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/保留集/2026-10-03/样本/H03/正文.md",
+      "snapshot": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/保留集/2026-10-03/样本/H03/正文.md",
+      "sha256": "b4dec28bd47ae1e481fe29dc07aad4e3792d75e758a1d3d1526504e7f5e5b7da",
+      "range": "全文"
+    },
+    ".novel-kit/eval/保留集/2026-10-03/样本/H04/前文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/保留集/2026-10-03/样本/H04/前文.md",
+      "snapshot": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/保留集/2026-10-03/样本/H04/前文.md",
+      "sha256": "3b8e239c35c27c668d6d4dca95ef8181c77858f38d8bda9c7b02c205d830d01d",
+      "range": "全文"
+    },
+    ".novel-kit/eval/保留集/2026-10-03/样本/H04/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/保留集/2026-10-03/样本/H04/正文.md",
+      "snapshot": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/保留集/2026-10-03/样本/H04/正文.md",
+      "sha256": "4bbff195dbec456348462d254e8a11055d1a4544598ace1ee55be1ab2b1ae1c1",
+      "range": "全文"
+    }
+  },
+  "context": "每样本每次fork_turns=none独立上下文",
+  "quality_judgment": "模型对照，非真人验收"
+}

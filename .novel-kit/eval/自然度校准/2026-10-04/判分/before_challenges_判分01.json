@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "quality_acceptance": "not_determined",
+  "group": "before_challenges",
+  "execution_date": "2026-10-04",
+  "runs": [
+    {
+      "run_id": "before_challenges_N01_1",
+      "execution_date": "2026-10-04",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "N01-protected-1",
+          "reported": false,
+          "evidence": "同一动作依次改变功能，推动登船、取物、开船三个环节。次数达到三次不等于无功能重复。",
+          "reason": "报告逐处解释拦车、等取秤砣、许可开船的不同信息与动作作用，未将三次抬手或三处解释定为任何级别的问题。"
+        },
+        {
+          "protected_id": "N01-protected-2",
+          "reported": false,
+          "evidence": "袋子得到安置，动作转向晃动的青菜，收尾保持在现场；不需要补写关于善意或体谅的结论。",
+          "reason": "结尾的布袋安置与护菜被明确保留，报告辨认其为现场动作而非总结升华，未因结尾位置定级。"
+        }
+      ],
+      "extra_findings": [],
+      "report_assessment": {
+        "formal_issue_count": 0,
+        "independent_s1_s2_count": 0,
+        "evidence": "没有足以填写 PR 问题条目的已证实自然度问题，故不编造问题编号、阅读损失或修改建议。",
+        "reason": "完整问题表与结论均为空，密度核查和保留项不是正式问题。"
+      }
+    },
+    {
+      "run_id": "before_challenges_N02_1",
+      "execution_date": "2026-10-04",
+      "issues": [
+        {
+          "issue_id": "N02-01",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "具体阅读损失发生在第3句起：读者已经知道他为什么藏价签，却要在同一个动作上再读两次说明，期间没有新增行动、阻力或情势变化。",
+          "reason": "唯一PR-1合并诊断同一藏价签动机的连续复述，明确指出后两次无新信息、店员递来另一件衣服被延后；保留第一句预想母亲反应的作用。实际S2命中，不把三句拆成三条。报告同时引用旧三处阈值，但并非仅计数，因为实际损失证据已写出。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [],
+      "report_assessment": {
+        "formal_issue_count": 1,
+        "independent_s1_s2_count": 1,
+        "evidence": "同一信息的无功能重复集中在第2段，与三处解释腔是同一问题，不重复计条。",
+        "reason": "正式条目仅PR-1；归根到底未另报套话，结尾找手套被保留，未见答案外正式条目。"
+      }
+    },
+    {
+      "run_id": "before_challenges_N03_1",
+      "execution_date": "2026-10-04",
+      "issues": [],
+      "protected": [],
+      "extra_findings": [],
+      "report_assessment": {
+        "formal_issue_count": 0,
+        "independent_s1_s2_count": 0,
+        "evidence": "两处比喻本身未造成可指认的阅读损失，不据数量或句式标签定级。",
+        "reason": "正式问题列表为空，两处比喻分别说明雨丝形态与裂壳声，被判有现场作用。无问题是冻结答案接受的结果；不把这两处转成额外硬保护，也不因未给S3/S4建议算遗漏。"
+      }
+    }
+  ],
+  "repairs": [],
+  "notes": [
+    "本组为三份旧规则合成挑战，只有一轮；分母仅N02一项，应抓检出与高严重度达标各1/1。N01两项保护未误报，N03允许无问题或轻微建议。",
+    "每个判定来自实际报告的诊断与上下文理由；引用证据仅供复核，不以关键词自动判分。",
+    "三个报告独立S1/S2总数为1，全部为N02 PR-1。没有答案外正式条目。",
+    "旧规则已经保护N01与N03，后续新版即使同样通过也不能用这三案宣称误报率改善。",
+    "新版及后续final_clarified另组计数，不并入此组分母。"
+  ]
+}

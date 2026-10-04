@@ -27,6 +27,17 @@ class Workflow(unittest.TestCase):
         p.write_bytes(content if isinstance(content, bytes) else content.encode('utf-8'))
         return p
 
+    def prepare(self, spec):
+        # Tests simulate completed readers; this helper verifies only protocol mechanics.
+        body = '隔离测试交付，不代表真人或独立模型审核\n\n'
+        for item in spec['files']:
+            body += '<!-- novel-candidate:' + item['source'] + ' -->\n'
+            body += (self.root/item['source']).read_text(encoding='utf-8')
+            body += '\n<!-- /novel-candidate -->\n'
+        self.write(spec['delivery'], body)
+        n.review_start(self.root, spec)
+        return n.prepare(self.root, spec)
+
     def plan(self, ch=1, scenes=2, confirmed=True):
         return self.write(f'大綱/細綱/第{ch:03d}章.md', '- 狀態：' + ('已確認' if confirmed else '草案') + '\n' + ''.join(f'## 場景{s:02d} 標題\n' for s in range(1, scenes+1)))
 
@@ -43,7 +54,7 @@ class Workflow(unittest.TestCase):
                 'review': {'mode': '完整', 'completed': sorted(n.REVIEWERS['完整']), 'unresolved': []}}
 
     def adopt_scene(self, sc=1):
-        s = self.scene_delivery(sc); n.prepare(self.root, s); n.accept(self.root, s['id'], '通過')
+        s = self.scene_delivery(sc); self.prepare( s); n.accept(self.root, s['id'], '通過')
 
     def chapter_delivery(self):
         self.ready(scenes=1); self.adopt_scene()
@@ -59,7 +70,7 @@ class Workflow(unittest.TestCase):
 
     def adopted_chapter(self):
         s = self.chapter_delivery()
-        n.prepare(self.root, s); n.accept(self.root, 'closure', '通過')
+        self.prepare( s); n.accept(self.root, 'closure', '通過')
 
     def revision_delivery(self, target=None, name='r1'):
         target = target or n.scene_path(1, 0)
@@ -76,9 +87,9 @@ class Workflow(unittest.TestCase):
     def test_unknown_and_duplicate_rows_rejected(self):
         self.ready()
         text = (self.root / n.STATE).read_text(encoding='utf-8')
-        self.write(n.STATE, text.replace('未開始', '未知', 1))
+        self.write(n.STATE, text.replace('未开始', '未知', 1))
         with self.assertRaises(n.Invalid): n.rows(self.root)
-        self.write(n.STATE, text + next(x for x in text.splitlines() if '場景01' in x) + '\n')
+        self.write(n.STATE, text + next(x for x in text.splitlines() if '场景01' in x) + '\n')
         with self.assertRaises(n.Invalid): n.rows(self.root)
 
     def test_outline_changed_after_confirmation(self):
@@ -90,23 +101,23 @@ class Workflow(unittest.TestCase):
         with self.assertRaises(n.Invalid): n.check(self.root, n.scene_path(1, 2))
 
     def test_pending_delivery_blocks_other_scene(self):
-        self.ready(); n.prepare(self.root, self.scene_delivery())
+        self.ready(); self.prepare( self.scene_delivery())
         with self.assertRaises(n.Invalid): n.begin(self.root, 1, 2)
         with self.assertRaises(n.Invalid): n.check(self.root, n.scene_path(1, 1))
 
     def test_reopen_invalidates_old_delivery(self):
-        self.ready(); n.prepare(self.root, self.scene_delivery())
+        self.ready(); self.prepare( self.scene_delivery())
         n.begin(self.root, 1, 1, reopen=True)
         with self.assertRaises(n.Invalid): n.accept(self.root, 's1', '通過')
 
     def test_changed_candidate_cannot_use_old_review(self):
-        self.ready(); n.prepare(self.root, self.scene_delivery())
+        self.ready(); self.prepare( self.scene_delivery())
         self.write(n.scene_path(1, 1), '作者新改')
         with self.assertRaises(n.Invalid): n.accept(self.root, 's1', '通過')
         self.assertEqual(n.rows(self.root)[1,1]['status'], '待審')
 
     def test_changed_delivery_is_stale(self):
-        self.ready(); n.prepare(self.root, self.scene_delivery())
+        self.ready(); self.prepare( self.scene_delivery())
         self.write('審閱/s1.md', '換了交付內容')
         with self.assertRaises(n.Invalid): n.accept(self.root, 's1', '通過')
 
@@ -116,7 +127,7 @@ class Workflow(unittest.TestCase):
 
     def test_missing_review_and_severe_issue_need_explicit_decision(self):
         self.ready(); s = self.scene_delivery(); s['review']['completed'] = ['copy-editor']; s['review']['unresolved'] = ['CC-1 S1']
-        n.prepare(self.root, s)
+        self.prepare( s)
         with self.assertRaises(n.Invalid): n.accept(self.root, 's1', '通過')
         n.accept(self.root, 's1', '作者明確採用此版本', '作者知道缺席及 CC-1，決定保留')
         j = json.loads((self.root/'審閱/採用/s1/journal.json').read_text(encoding='utf-8'))
@@ -124,12 +135,12 @@ class Workflow(unittest.TestCase):
 
     def test_new_scene_cannot_silently_use_text_mode(self):
         self.ready(); s = self.scene_delivery(); s['review']['mode']='文字'
-        with self.assertRaises(n.Invalid): n.prepare(self.root, s)
+        with self.assertRaises(n.Invalid): self.prepare( s)
 
     def test_scene_adoption_does_not_update_global_tracking(self):
         self.ready(); s = self.scene_delivery(); self.write('審閱/追蹤候選.md', '追蹤')
         s['files'].append({'source':'審閱/追蹤候選.md','target':'追蹤/追蹤.md'})
-        with self.assertRaises(n.Invalid): n.prepare(self.root, s)
+        with self.assertRaises(n.Invalid): self.prepare( s)
 
     def test_chapter_is_not_published_before_acceptance(self):
         self.ready(scenes=1); self.adopt_scene(); n.begin(self.root,1,0)
@@ -146,13 +157,13 @@ class Workflow(unittest.TestCase):
     def test_chapter_requires_tracking_before_any_delivery_side_effect(self):
         s = self.chapter_delivery(); s['files'].pop()
         state = (self.root/n.STATE).read_bytes()
-        with self.assertRaisesRegex(n.Invalid, '最終追蹤'): n.prepare(self.root, s)
+        with self.assertRaisesRegex(n.Invalid, '最終追蹤'): self.prepare( s)
         self.assertFalse((self.root/'審閱/採用/closure').exists())
         self.assertFalse((self.root/n.scene_path(1, 0)).exists())
         self.assertEqual((self.root/n.STATE).read_bytes(), state)
 
     def test_old_prepared_chapter_without_tracking_is_rejected(self):
-        s = self.chapter_delivery(); n.prepare(self.root, s)
+        s = self.chapter_delivery(); self.prepare( s)
         p = self.root/'審閱/採用/closure/journal.json'; j = n.load(p)
         j['changes'] = [e for e in j['changes'] if e['target'] != '追蹤/追蹤.md']
         n.atomic(p, n.dump(j))  # Simulate a journal prepared by the old version.
@@ -160,7 +171,7 @@ class Workflow(unittest.TestCase):
         self.assertFalse((self.root/n.scene_path(1, 0)).exists())
 
     def test_chapter_tracking_interruption_blocks_next_until_recovery(self):
-        s = self.chapter_delivery(); self.write('追蹤/追蹤.md', '舊追蹤'); n.prepare(self.root, s)
+        s = self.chapter_delivery(); self.write('追蹤/追蹤.md', '舊追蹤'); self.prepare( s)
         real = n.atomic
         def stop(path, data):
             if path == self.root/'追蹤/追蹤.md': raise OSError('tracking write interrupted')
@@ -175,25 +186,25 @@ class Workflow(unittest.TestCase):
 
     def test_revision_candidate_preserves_official_text(self):
         self.adopted_chapter(); target=n.scene_path(1,0)
-        n.revision_start(self.root,'fix',[target]); n.prepare(self.root,self.revision_delivery())
+        n.revision_start(self.root,'fix',[target]); self.prepare(self.revision_delivery())
         self.assertEqual((self.root/target).read_text(encoding='utf-8'), '已採用整章')
         self.plan(ch=2)
         with self.assertRaises(n.Invalid): n.confirm_plan(self.root,2)
 
     def test_last_revision_adoption_still_blocks_until_finalize(self):
         self.adopted_chapter(); target=n.scene_path(1,0)
-        n.revision_start(self.root,'fix',[target]); n.prepare(self.root,self.revision_delivery()); n.accept(self.root,'r1','通過')
+        n.revision_start(self.root,'fix',[target]); self.prepare(self.revision_delivery()); n.accept(self.root,'r1','通過')
         with self.assertRaises(n.Invalid): n.no_revision(self.root)
         self.write('審閱/修訂/fix/追蹤候選.md', '更新後追蹤'); self.write('審閱/end.md', '最終追蹤與登記')
         s={'id':'end','kind':'revision-finish','revision':'fix','delivery':'審閱/end.md',
            'files':[{'source':'審閱/修訂/fix/追蹤候選.md','target':'追蹤/追蹤.md'}],
            'review':{'mode':'文字','completed':sorted(n.REVIEWERS['文字']),'unresolved':[]}}
-        n.prepare(self.root,s); n.accept(self.root,'end','通過'); n.no_revision(self.root)
+        self.prepare(s); n.accept(self.root,'end','通過'); n.no_revision(self.root)
 
     def test_revision_invalidates_adopted_dependent_scenes(self):
         self.ready(); self.adopt_scene(1); self.adopt_scene(2)
         n.revision_start(self.root,'fix',[n.scene_path(1,1)])
-        n.prepare(self.root,self.revision_delivery(n.scene_path(1,1))); n.accept(self.root,'r1','通過')
+        self.prepare(self.revision_delivery(n.scene_path(1,1))); n.accept(self.root,'r1','通過')
         self.assertEqual(n.rows(self.root)[1,2]['status'],'待復核')
         n.revision_extend(self.root,'fix',[n.scene_path(1,2)])
         self.assertEqual(len(json.loads(n.task_path(self.root,'fix').read_text(encoding='utf-8'))['targets']),2)
@@ -202,18 +213,18 @@ class Workflow(unittest.TestCase):
         self.adopted_chapter(); n.revision_start(self.root,'fix',[n.scene_path(1,0)])
         n.revision_cancel(self.root,'fix'); n.no_revision(self.root)
         n.revision_start(self.root,'fix2',[n.scene_path(1,0)])
-        s=self.revision_delivery(); s['revision']='fix2'; n.prepare(self.root,s); n.accept(self.root,'r1','通過')
+        s=self.revision_delivery(); s['revision']='fix2'; self.prepare(s); n.accept(self.root,'r1','通過')
         with self.assertRaises(n.Invalid): n.revision_cancel(self.root,'fix2')
 
     def test_hand_edit_after_revision_start_is_preserved(self):
         self.adopted_chapter(); target=n.scene_path(1,0); n.revision_start(self.root,'fix',[target])
         self.write(target,'作者手改')
-        with self.assertRaises(n.Invalid): n.prepare(self.root,self.revision_delivery())
+        with self.assertRaises(n.Invalid): self.prepare(self.revision_delivery())
         self.assertEqual((self.root/target).read_text(encoding='utf-8'),'作者手改')
 
     def test_refresh_preserves_hand_edit_and_invalidates_prepared_revision(self):
         self.adopted_chapter(); target = n.scene_path(1, 0)
-        n.revision_start(self.root, 'fix', [target]); n.prepare(self.root, self.revision_delivery())
+        n.revision_start(self.root, 'fix', [target]); self.prepare( self.revision_delivery())
         state = (self.root/n.STATE).read_bytes()
         before = n.load(n.task_path(self.root, 'fix'))['targets'][0]
         self.write(target, '作者手改的新稿')
@@ -229,10 +240,10 @@ class Workflow(unittest.TestCase):
         with self.assertRaises(n.Invalid): n.no_revision(self.root)
         # A new review may adopt the author's unchanged text; refresh itself cannot.
         s = self.revision_delivery(name='r2'); self.write(s['files'][0]['source'], '作者手改的新稿')
-        n.prepare(self.root, s); n.accept(self.root, 'r2', '作者通過重新審閱版本')
+        self.prepare( s); n.accept(self.root, 'r2', '作者通過重新審閱版本')
         with self.assertRaises(n.Invalid): n.no_revision(self.root)
         self.write('審閱/結案追蹤.md', '手改事實已同步'); self.write('審閱/end.md', '修訂收尾')
-        n.prepare(self.root, {'id':'end','kind':'revision-finish','revision':'fix','delivery':'審閱/end.md',
+        self.prepare( {'id':'end','kind':'revision-finish','revision':'fix','delivery':'審閱/end.md',
             'files':[{'source':'審閱/結案追蹤.md','target':'追蹤/追蹤.md'}],
             'review':{'mode':'文字','completed':sorted(n.REVIEWERS['文字']),'unresolved':[]}})
         n.accept(self.root, 'end', '通過'); n.no_revision(self.root)
@@ -242,11 +253,13 @@ class Workflow(unittest.TestCase):
     def test_refresh_preserves_other_adoptions_and_stales_finish(self):
         self.adopted_chapter(); target = n.scene_path(1, 0); other = n.scene_path(2, 0)
         self.write(other, '已導入第二章')
+        self.write('導入/原稿/chapter2.txt', '已導入第二章')
+        n.confirm_import(self.root, [{'chapter': 2, 'source': '導入/原稿/chapter2.txt', 'location': '第二章', 'coverage': '詳細'}])
         n.revision_start(self.root, 'fix', [target, other])
         for path, name in [(target, 'r1'), (other, 'r2')]:
-            s = self.revision_delivery(path, name); n.prepare(self.root, s); n.accept(self.root, name, '通過')
+            s = self.revision_delivery(path, name); self.prepare( s); n.accept(self.root, name, '通過')
         self.write('審閱/結案追蹤.md', '結案追蹤'); self.write('審閱/end.md', '結案')
-        n.prepare(self.root, {'id':'end','kind':'revision-finish','revision':'fix','delivery':'審閱/end.md',
+        self.prepare( {'id':'end','kind':'revision-finish','revision':'fix','delivery':'審閱/end.md',
             'files':[{'source':'審閱/結案追蹤.md','target':'追蹤/追蹤.md'}],
             'review':{'mode':'文字','completed':sorted(n.REVIEWERS['文字']),'unresolved':[]}})
         old = n.load(n.task_path(self.root, 'fix'))
@@ -282,7 +295,7 @@ class Workflow(unittest.TestCase):
         n.revision_cancel(self.root, 'fix'); self.write(target, '作者新稿')
         with self.assertRaises(n.Invalid): n.revision_refresh(self.root, 'fix', target, '已結束')
         n.revision_start(self.root, 'next', [target])
-        s = self.revision_delivery(); s['revision'] = 'next'; n.prepare(self.root, s)
+        s = self.revision_delivery(); s['revision'] = 'next'; self.prepare( s)
         real = n.atomic
         def stop(path, data):
             if path.name == '任務.json': raise OSError('interrupted')
@@ -293,7 +306,7 @@ class Workflow(unittest.TestCase):
 
     def test_interruption_resumes_without_overwriting_external_edits(self):
         self.adopted_chapter(); n.revision_start(self.root,'fix',[n.scene_path(1,0)])
-        n.prepare(self.root,self.revision_delivery())
+        self.prepare(self.revision_delivery())
         real=n.atomic
         def stop_at_task(path,data):
             if path.name=='任務.json': raise OSError('simulated crash')
@@ -307,7 +320,7 @@ class Workflow(unittest.TestCase):
         n.idle(self.root)
 
     def test_interrupted_adoption_stops_on_external_edit(self):
-        self.adopted_chapter(); n.revision_start(self.root,'fix',[n.scene_path(1,0)]); n.prepare(self.root,self.revision_delivery())
+        self.adopted_chapter(); n.revision_start(self.root,'fix',[n.scene_path(1,0)]); self.prepare(self.revision_delivery())
         real=n.atomic
         def stop(path,data):
             if path.name=='任務.json': raise OSError('crash')
@@ -394,7 +407,7 @@ class Workflow(unittest.TestCase):
 
     def test_rollback_restores_interrupted_revision(self):
         self.adopted_chapter(); target=n.scene_path(1,0)
-        n.revision_start(self.root,'fix',[target]); n.prepare(self.root,self.revision_delivery())
+        n.revision_start(self.root,'fix',[target]); self.prepare(self.revision_delivery())
         real=n.atomic
         def stop(path,data):
             if path.name=='任務.json': raise OSError('crash')
@@ -416,7 +429,7 @@ class Workflow(unittest.TestCase):
            'files':[{'source':'草稿/第001章/整章候選.md','target':n.scene_path(1,0)},
                     {'source':'審閱/追蹤候選.md','target':'追蹤/追蹤.md'}],
            'review':{'mode':'章節','completed':sorted(n.REVIEWERS['章節']),'unresolved':[]}}
-        n.prepare(self.root,s); real=n.atomic
+        self.prepare(s); real=n.atomic
         def stop(path,data):
             if path==self.root/n.STATE: raise OSError('crash')
             real(path,data)

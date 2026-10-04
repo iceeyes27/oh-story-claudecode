@@ -1,5 +1,6 @@
 ---
 name: structure-reviewer
+tier: standard
 description: 結構與兌現審閱（唯讀）。檢查場景是否符合細綱、結尾狀態是否正確、兌現條目是否真的兌現；也做章節層級審閱與設定完善性檢查。只在協調器指派時使用。
 ---
 

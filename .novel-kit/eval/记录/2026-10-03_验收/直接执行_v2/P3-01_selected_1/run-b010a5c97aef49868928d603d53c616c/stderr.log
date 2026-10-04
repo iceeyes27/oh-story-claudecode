@@ -1,0 +1,14 @@
+2026-10-03T14:47:37.446857Z  WARN codex_skills::interface: ignoring interface.icon_small: icon path with '..' must resolve under plugin assets/
+2026-10-03T14:47:37.447052Z  WARN codex_skills::interface: ignoring interface.icon_large: icon path with '..' must resolve under plugin assets/
+2026-10-03T14:47:37.505904Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
+2026-10-03T14:47:37.544015Z  WARN codex_core::shell_snapshot: Failed to delete shell snapshot at "/Users/yolandahao/.codex/shell_snapshots/01a10237-e80c-7eb1-a4c6-f71901d9f338.1791038580808294000.sh": Os { code: 2, kind: NotFound, message: "No such file or directory" }
+2026-10-03T14:47:37.548411Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
+2026-10-03T14:47:37.552637Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
+2026-10-03T14:47:37.553135Z  WARN codex_core_plugins::manager: failed to warm featured plugin ids cache error=remote featured plugin request to https://chatgpt.com/backend-api/plugins/featured?platform=codex failed with status 401 Unauthorized: {"detail":"Unauthorized"}
+2026-10-03T14:47:37.585314Z  WARN codex_core::shell_snapshot: Failed to delete shell snapshot at "/Users/yolandahao/.codex/shell_snapshots/01a10237-e80c-7ff1-a995-c093404c31de.1791038580808275000.sh": Os { code: 2, kind: NotFound, message: "No such file or directory" }
+2026-10-03T14:47:37.592056Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
+2026-10-03T14:47:37.598642Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
+2026-10-03T14:47:37.605832Z  WARN codex_rollout::list: state db discrepancy during find_thread_path_by_id_str_in_subdir: falling_back
+2026-10-03T14:47:37.648217Z  WARN codex_core::shell_snapshot: Failed to delete shell snapshot at "/Users/yolandahao/.codex/shell_snapshots/01a10237-e80c-7cc1-80eb-08e8e2ce07e1.1791038580808275000.sh": Os { code: 2, kind: NotFound, message: "No such file or directory" }
+2026-10-03T14:47:38.475366Z  WARN codex_core_plugins::manifest: ignoring interface.defaultPrompt[0]: prompt must be at most 128 characters path=file:///Users/yolandahao/.codex/.tmp/plugins/plugins/ngs-analysis/.codex-plugin/plugin.json
+2026-10-03T14:47:38.478562Z  WARN codex_core_plugins::manifest: ignoring interface.defaultPrompt[0]: prompt must be at most 128 characters path=file:///Users/yolandahao/.codex/.tmp/plugins/plugins/ngs-analysis/.codex-plugin/plugin.json

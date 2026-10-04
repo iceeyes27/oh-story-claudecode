@@ -1,0 +1,182 @@
+{
+  "date": "2026-10-03",
+  "model": "继承宿主；API未提供精确标识",
+  "context": "每次审阅独立fork_turns=none",
+  "inputs": {
+    ".novel-kit/roles/copy-editor.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/roles/copy-editor.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/roles/copy-editor.md",
+      "sha256": "e7a5f440c7853013d82e54538a9ce9f4f916a32011d414b60dd6c0841dc6712b",
+      "range": "全文"
+    },
+    ".novel-kit/roles/prose-reviewer.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/roles/prose-reviewer.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/roles/prose-reviewer.md",
+      "sha256": "4cace3fbabbb9e59538e31a671373b16b7159327c9bf232435828326785c9372",
+      "range": "全文"
+    },
+    ".novel-kit/roles/consistency-checker.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/roles/consistency-checker.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/roles/consistency-checker.md",
+      "sha256": "0f762991ad00de7612bfa43c1111b73d09962a70336ded217d64ce363d155bb2",
+      "range": "全文"
+    },
+    ".novel-kit/standards/语文规格.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/standards/语文规格.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/standards/语文规格.md",
+      "sha256": "232019a01049a085e36fc24d64f0922247a6c07a95722a5797a3c717d6dfaa18",
+      "range": "全文"
+    },
+    ".novel-kit/workflows/review-loop.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/workflows/review-loop.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/workflows/review-loop.md",
+      "sha256": "01c74b91fa59aefa41e0237d3f4adc80e334a50a57a0f42ba07ae53eadfe12bc",
+      "range": "全文"
+    },
+    ".novel-kit/eval/文风样本.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/文风样本.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/文风样本.md",
+      "sha256": "77cee0cb5db58710dd37de1347c8243979b650d38e358a63c4f3a968f01f6a13",
+      "range": "全文"
+    },
+    ".novel-kit/eval/样本/A01/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A01/正文.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/样本/A01/正文.md",
+      "sha256": "5814fd130f1a6ce78ce2ca019210e2bb2f59f2b9be2c2f41cc959a9ace0c4c10",
+      "range": "全文"
+    },
+    ".novel-kit/eval/样本/A02/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A02/正文.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/样本/A02/正文.md",
+      "sha256": "a4bad6d8bcbd411db95f63a9f28e5f7a1d0c78d946646cf36775f4d48722c97d",
+      "range": "全文"
+    },
+    ".novel-kit/eval/样本/A03/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A03/正文.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/样本/A03/正文.md",
+      "sha256": "bceb60aaaeac3e08072d6d0185b035d44abcb2f93a191193a3780de2221591bf",
+      "range": "全文"
+    },
+    ".novel-kit/eval/样本/A04/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A04/正文.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/样本/A04/正文.md",
+      "sha256": "7ff49362993d89c2618669a701f3630ef7499bc80976a10a0030d281ae1dcf8d",
+      "range": "全文"
+    },
+    ".novel-kit/eval/样本/B01/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B01/正文.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/样本/B01/正文.md",
+      "sha256": "66fd13a7a67f89e94d6eee66a64fa1a4176a647b218dd9d6817dda5c75d6477f",
+      "range": "全文"
+    },
+    ".novel-kit/eval/样本/B02/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B02/正文.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/样本/B02/正文.md",
+      "sha256": "0c9554d97b8cc712d2293fa4d386a9079eb2047a484bd440a62fa322c31d3579",
+      "range": "全文"
+    },
+    ".novel-kit/eval/样本/B03/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B03/正文.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/样本/B03/正文.md",
+      "sha256": "ee11d53476ebcf3c1ab2b03fd9155b719f8b17c2847a6cb382b2983a4b3350b4",
+      "range": "全文"
+    },
+    ".novel-kit/eval/样本/B04/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B04/正文.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/样本/B04/正文.md",
+      "sha256": "ac9165764128cff94e37a976e3168e204238efaf2c8375d905e04af0ec3fc0af",
+      "range": "全文"
+    },
+    ".novel-kit/eval/样本/C01/前文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/C01/前文.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/样本/C01/前文.md",
+      "sha256": "c8d68f2a60e771cbc0ad44c8032881f081f591efc45ed673e1d2f66283ad49b1",
+      "range": "全文"
+    },
+    ".novel-kit/eval/样本/C01/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/C01/正文.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/样本/C01/正文.md",
+      "sha256": "0a92d3c15cdc4ac2bf13c6a0c6a5812360fc0f5785a4c2c413fff0d446c39c4c",
+      "range": "全文"
+    },
+    ".novel-kit/eval/样本/C02/前文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/C02/前文.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/样本/C02/前文.md",
+      "sha256": "3af7e1d6623a04bc1111c8a2f5631d8952d1dd89cd46bd6e655321a8eee3df94",
+      "range": "全文"
+    },
+    ".novel-kit/eval/样本/C02/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/C02/正文.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/样本/C02/正文.md",
+      "sha256": "1a189dbff7c403c50723526ab47951f6a3f7877d422bc09deaad1e5af71de20d",
+      "range": "全文"
+    },
+    ".novel-kit/eval/样本/D01/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/D01/正文.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/样本/D01/正文.md",
+      "sha256": "eab6c3dc4f2cc7dc39864d96eb7d1e9eeb5206120bb73cf8e56cb277e389eed8",
+      "range": "全文"
+    },
+    ".novel-kit/eval/样本/D02/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/D02/正文.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/样本/D02/正文.md",
+      "sha256": "1d68edd30e1cb4e66be6072b4a752988a21514b15223258a48f5514dbdebba6c",
+      "range": "全文"
+    },
+    ".novel-kit/eval/样本/K01/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/K01/正文.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/样本/K01/正文.md",
+      "sha256": "68bc3dfcea62896bc45b1f5691051914f8397ad760b0b71fbc485de4f8e380e1",
+      "range": "全文"
+    },
+    ".novel-kit/eval/样本/K02/正文.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/K02/正文.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/样本/K02/正文.md",
+      "sha256": "88dc189a6d850e49a64bc5a1d21613ec502e91f01307f5bfec0aa4a0e4c0167a",
+      "range": "全文"
+    },
+    ".novel-kit/eval/记录/2026-10-01_阶段一/修正/A01.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-01_阶段一/修正/A01.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/记录/2026-10-01_阶段一/修正/A01.md",
+      "sha256": "9e53f87f49778f133e37b3beddb3a640dcff212b5400f8efe6dd341b60bffe54",
+      "range": "全文"
+    },
+    ".novel-kit/eval/记录/2026-10-01_阶段一/修正/A02.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-01_阶段一/修正/A02.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/记录/2026-10-01_阶段一/修正/A02.md",
+      "sha256": "f5b97ce1141a1ae54f5bfd39457dff2491133f335330a21c436e978f52eab46d",
+      "range": "全文"
+    },
+    ".novel-kit/eval/记录/2026-10-01_阶段一/修正/A03.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-01_阶段一/修正/A03.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/记录/2026-10-01_阶段一/修正/A03.md",
+      "sha256": "10d44a909799d19016f5fc90086fe361a12719b7b4b2b6b78a7a2a7d7795b472",
+      "range": "全文"
+    },
+    ".novel-kit/eval/记录/2026-10-01_阶段一/修正/A04.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-01_阶段一/修正/A04.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/记录/2026-10-01_阶段一/修正/A04.md",
+      "sha256": "857b149153fafdb878245c2b06dc7f05bb78b6dd84e0e3ca14a0815ee548c177",
+      "range": "全文"
+    },
+    ".novel-kit/eval/记录/2026-10-01_阶段一/修正/B01.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-01_阶段一/修正/B01.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/记录/2026-10-01_阶段一/修正/B01.md",
+      "sha256": "e33c5b2be48245247c2db3780c4178554d378bcd64d4c7dc6d26cfaf8846ba5c",
+      "range": "全文"
+    },
+    ".novel-kit/eval/记录/2026-10-01_阶段一/修正/B02.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-01_阶段一/修正/B02.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/记录/2026-10-01_阶段一/修正/B02.md",
+      "sha256": "aa4a9ef5fc83c94248ce76774b1c51cc214912fe9bb73cfaa4d47e5bfb8f569e",
+      "range": "全文"
+    },
+    ".novel-kit/eval/记录/2026-10-01_阶段一/修正/B03.md": {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-01_阶段一/修正/B03.md",
+      "snapshot": "/private/tmp/novel-kit-20261003-review-inputs/.novel-kit/eval/记录/2026-10-01_阶段一/修正/B03.md",
+      "sha256": "9020dd19b02fa75702b74803ec4fd62a6ce80c32057467f0e3fecbc9c798735f",
+      "range": "全文"
+    }
+  },
+  "note": "旧阶段一审阅没有开读冻结记录；本快照仅证明本次新审阅输入，不补造旧冻结。"
+}

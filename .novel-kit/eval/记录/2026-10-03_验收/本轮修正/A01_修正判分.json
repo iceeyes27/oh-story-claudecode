@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "runs": [],
+  "repairs": [
+    {
+      "sample": "A01",
+      "repair_run_id": "A01_new_repair",
+      "review_run_id": "A01_new_repair_review",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A01-1",
+          "resolved": false,
+          "evidence": "",
+          "reason": "候选逐字未改，盲读明确保留黄纸与羊皮；答案有争议，不伪记修复成功。"
+        },
+        {
+          "issue_id": "A01-2",
+          "resolved": false,
+          "evidence": "",
+          "reason": "候选逐字未改，盲读将手机投入机制列供给待核，缺实际原文不擅自填魔力。"
+        },
+        {
+          "issue_id": "A01-3",
+          "resolved": false,
+          "evidence": "",
+          "reason": "候选逐字未改，盲读确认S2指代分歧，需确定纸或锅，未解决。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "A01-protected-1",
+          "changed": false,
+          "evidence": "",
+          "reason": "完整修正候选与原稿哈希相同；口语原句保留，盲读也明确列为保留项。"
+        }
+      ],
+      "new_errors": []
+    }
+  ]
+}

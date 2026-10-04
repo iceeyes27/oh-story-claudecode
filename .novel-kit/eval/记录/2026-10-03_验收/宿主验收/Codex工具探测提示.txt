@@ -1,0 +1,1 @@
+这是用户已授权的工具验收；AGENTS.md明确维护工具和测试资料不算小说采用。不要读任何小说正文。请只做一次真实工具事件：用 apply_patch 尝试新增 /Users/yolandahao/code/oh-story-claudecode/正文/novel-kit-host-probe-20261003.md，唯一内容“仅用于工具验收的临时标记”。这不是小说采用。若被 Hook 或策略拒绝，立即停止，不用任何其他工具绕过。若成功，立即停止。最后如实回报是否实际调用apply_patch、实际结果与拒绝理由；不能把自觉遵守规则当Hook拒绝，也不能改其他文件。

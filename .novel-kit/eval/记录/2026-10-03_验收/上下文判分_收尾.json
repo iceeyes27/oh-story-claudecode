@@ -1,0 +1,4300 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "quality_acceptance": "not_determined",
+  "status": "scored_26_of_26",
+  "scope": "review_only",
+  "runs": [
+    {
+      "run_id": "P3-01_full_1",
+      "condition": "full",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "P3-01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "没有承接他如何从已记住的开闸信号转为关闸判断。",
+          "reason": "报告 CE-1 正式定 S2，诊断已记住三下开闸、清楚敲三下、随后自认关严之间的认知与行动承接，匹配答案核心。没有把人物犯错本身定错，也没有推断闸门实际位置；答案的操作与结果相反应按此较窄证据理解。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "P3-01-protected-1",
+          "reported": false,
+          "evidence": "他以为只是雨急",
+          "reason": "报告将雨急限定为人物判断并保留，不把人物误判或水声原因留白另报成矛盾。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-01_full_2",
+      "condition": "full",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "P3-01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "这里缺少从既有正确认知转为相反判断的桥接。",
+          "reason": "报告 CE-1 正式定 S2，诊断已记住三下开闸、清楚敲三下、随后自认关严之间的认知与行动承接，匹配答案核心。没有把人物犯错本身定错，也没有推断闸门实际位置；答案的操作与结果相反应按此较窄证据理解。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "P3-01-protected-1",
+          "reported": false,
+          "evidence": "他以为只是雨急",
+          "reason": "报告将雨急限定为人物判断并保留，不把人物误判或水声原因留白另报成矛盾。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-01_selected_1",
+      "condition": "selected",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "P3-01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "前文已明确交代信号含义和陈岭记住该含义的状态；候选又特意写三下敲声清晰。",
+          "reason": "报告 CE-1 正式定 S2，诊断已记住三下开闸、清楚敲三下、随后自认关严之间的认知与行动承接，匹配答案核心。没有把人物犯错本身定错，也没有推断闸门实际位置；答案的操作与结果相反应按此较窄证据理解。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "P3-01-protected-1",
+          "reported": false,
+          "evidence": "他以为只是雨急",
+          "reason": "报告将雨急限定为人物判断并保留，不把人物误判或水声原因留白另报成矛盾。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-01_selected_2",
+      "condition": "selected",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "P3-01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "问题不在于人物不能犯错，也不在于对白必须可靠，而在于这个已知信息与现场判断的变化缺少可辨认的承接。",
+          "reason": "报告 CE-1 正式定 S2，诊断已记住三下开闸、清楚敲三下、随后自认关严之间的认知与行动承接，匹配答案核心。没有把人物犯错本身定错，也没有推断闸门实际位置；答案的操作与结果相反应按此较窄证据理解。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "P3-01-protected-1",
+          "reported": false,
+          "evidence": "他以为只是雨急",
+          "reason": "报告将雨急限定为人物判断并保留，不把人物误判或水声原因留白另报成矛盾。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-02_full_1",
+      "condition": "full",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "P3-02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "行动者本身没有指代歧义，问题是必要的物件交接没有承接，故定 S2，不升为 S1。",
+          "reason": "报告 CE-1 正式定 S2，对照唯一钥匙仍在顾婶右腕与许青从自己腰间取用、重新挂回的状态转换，命中同一次缺失交接；不把指代或一般钥匙来历另算问题。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "P3-02-protected-1",
+          "reported": false,
+          "evidence": "齐了",
+          "reason": "报告保留装载完成后的自然短答，没有要求补成书面完整句。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-02_full_2",
+      "condition": "full",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "P3-02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "同一场景连续行动中，钥匙的持有人和佩挂位置没有过渡就改变。",
+          "reason": "报告 CE-1 正式定 S2，对照唯一钥匙仍在顾婶右腕与许青从自己腰间取用、重新挂回的状态转换，命中同一次缺失交接；不把指代或一般钥匙来历另算问题。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "P3-02-protected-1",
+          "reported": false,
+          "evidence": "齐了",
+          "reason": "报告保留装载完成后的自然短答，没有要求补成书面完整句。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-02_selected_1",
+      "condition": "selected",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "P3-02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "问题是当前动作所需的道具转移缺少承接，不是“自己”的指代不清，也不只是钥匙旧来历未供给。",
+          "reason": "报告 CE-1 正式定 S2，对照唯一钥匙仍在顾婶右腕与许青从自己腰间取用、重新挂回的状态转换，命中同一次缺失交接；不把指代或一般钥匙来历另算问题。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "P3-02-protected-1",
+          "reported": false,
+          "evidence": "齐了",
+          "reason": "报告保留装载完成后的自然短答，没有要求补成书面完整句。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-02_selected_2",
+      "condition": "selected",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "P3-02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "前文又明确东仓只有这一把，不能顺读为许青另有备用钥匙。",
+          "reason": "报告 CE-1 正式定 S2，对照唯一钥匙仍在顾婶右腕与许青从自己腰间取用、重新挂回的状态转换，命中同一次缺失交接；不把指代或一般钥匙来历另算问题。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "P3-02-protected-1",
+          "reported": false,
+          "evidence": "齐了",
+          "reason": "报告保留装载完成后的自然短答，没有要求补成书面完整句。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-03_full_1",
+      "condition": "full",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "P3-03-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "候选没有时间跳转、账本归还或转移的提示，读者无法理解账本如何到了胡宁手里的纸盒中。",
+          "reason": "报告 CE-1 正式定 S2，明确三条折棱锁定青纸盒，账本仍随未归旧铁盒在隔壁，候选取账本及放回无法连续理解；命中物件身份和位置承接，不把两个表现重复计数。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "P3-03-protected-1",
+          "reported": false,
+          "evidence": "后厨传来许蔓的声音",
+          "reason": "报告保留明确的对白声源，不要求补许蔓走回桌旁或每一步递糕动作。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-03_full_2",
+      "condition": "full",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "P3-03-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "前文最后交接的是待装茶点的青纸盒，装账本的旧铁盒已被王姨带走且尚未送回；候选紧接着让胡宁从这个纸盒里取出同称为“店里的账本”的物件，没有取回、转放或时间跳接的交代。",
+          "reason": "报告 CE-1 正式定 S2，明确三条折棱锁定青纸盒，账本仍随未归旧铁盒在隔壁，候选取账本及放回无法连续理解；命中物件身份和位置承接，不把两个表现重复计数。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "P3-03-protected-1",
+          "reported": false,
+          "evidence": "后厨传来许蔓的声音",
+          "reason": "报告保留明确的对白声源，不要求补许蔓走回桌旁或每一步递糕动作。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-03_selected_1",
+      "condition": "selected",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "P3-03-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "问题在账本状态的承接，不在这个限定语；不宜删掉识别信息来掩盖问题。",
+          "reason": "报告 CE-1 正式定 S2，明确三条折棱锁定青纸盒，账本仍随未归旧铁盒在隔壁，候选取账本及放回无法连续理解；命中物件身份和位置承接，不把两个表现重复计数。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "P3-03-protected-1",
+          "reported": false,
+          "evidence": "后厨传来许蔓的声音",
+          "reason": "报告保留明确的对白声源，不要求补许蔓走回桌旁或每一步递糕动作。"
+        }
+      ],
+      "extra_findings": [],
+      "supply_observation": {
+        "evidence": "核账条的形成经过未供给，单列而不定级。",
+        "assessment": "报告另列核账条形成经过待核，同时明确当前叙述足以交代夹条人和用途、不妨碍理解、不要求必补核账戏。因此不计正文误报；相较其他三份报告，存在轻微、非必要的供给待核扩张，不宜当作必须补料的要求。"
+      }
+    },
+    {
+      "run_id": "P3-03_selected_2",
+      "condition": "selected",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "P3-03-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "这是已给原文之间的具体动作承接缺口，不是仅因缺少物件早期来历而报错；不另拆成多条重复计数。",
+          "reason": "报告 CE-1 正式定 S2，明确三条折棱锁定青纸盒，账本仍随未归旧铁盒在隔壁，候选取账本及放回无法连续理解；命中物件身份和位置承接，不把两个表现重复计数。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "P3-03-protected-1",
+          "reported": false,
+          "evidence": "后厨传来许蔓的声音",
+          "reason": "报告保留明确的对白声源，不要求补许蔓走回桌旁或每一步递糕动作。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-04_full_1",
+      "condition": "full",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "P3-04-protected-1",
+          "reported": false,
+          "evidence": "次日上午，北山邮亭",
+          "reason": "报告明确识别隔夜转线，不要求继承码头的雨、韩江视角或情绪。"
+        },
+        {
+          "protected_id": "P3-04-protected-2",
+          "reported": false,
+          "evidence": "开不开",
+          "reason": "报告保留开不开与开的现场问答，邮亭开门计划及翻牌动作足以限定省略对象。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-04_full_2",
+      "condition": "full",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "P3-04-protected-1",
+          "reported": false,
+          "evidence": "次日上午，北山邮亭",
+          "reason": "报告明确识别隔夜转线，不要求继承码头的雨、韩江视角或情绪。"
+        },
+        {
+          "protected_id": "P3-04-protected-2",
+          "reported": false,
+          "evidence": "开不开",
+          "reason": "报告保留开不开与开的现场问答，邮亭开门计划及翻牌动作足以限定省略对象。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-04_selected_1",
+      "condition": "selected",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "P3-04-protected-1",
+          "reported": false,
+          "evidence": "次日上午，北山邮亭",
+          "reason": "报告明确识别隔夜转线，不要求继承码头的雨、韩江视角或情绪。"
+        },
+        {
+          "protected_id": "P3-04-protected-2",
+          "reported": false,
+          "evidence": "开不开",
+          "reason": "报告保留开不开与开的现场问答，邮亭开门计划及翻牌动作足以限定省略对象。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-06_full_1",
+      "condition": "full",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "P3-06-protected-1",
+          "reported": false,
+          "evidence": "沈禾想问一句信上写了什么，嘴张了张，又闭上。",
+          "reason": "报告将信的内容与人物关系保留为未知，没有要求此场揭晓或追加正文错误。"
+        },
+        {
+          "protected_id": "P3-06-protected-2",
+          "reported": false,
+          "evidence": "出门时还好",
+          "reason": "报告明确保留沈禾只能确认离家时状况的知情范围和口语省略。"
+        },
+        {
+          "protected_id": "P3-06-protected-3",
+          "reported": false,
+          "evidence": "老人接过信，没立刻拆",
+          "reason": "报告保留老人暂不拆信的动作，不要求本场展示信中真相。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-06_full_2",
+      "condition": "full",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "P3-06-protected-1",
+          "reported": false,
+          "evidence": "沈禾想问一句信上写了什么，嘴张了张，又闭上。",
+          "reason": "报告将信的内容与人物关系保留为未知，没有要求此场揭晓或追加正文错误。"
+        },
+        {
+          "protected_id": "P3-06-protected-2",
+          "reported": false,
+          "evidence": "出门时还好",
+          "reason": "报告明确保留沈禾只能确认离家时状况的知情范围和口语省略。"
+        },
+        {
+          "protected_id": "P3-06-protected-3",
+          "reported": false,
+          "evidence": "老人接过信，没立刻拆",
+          "reason": "报告保留老人暂不拆信的动作，不要求本场展示信中真相。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-06_selected_1",
+      "condition": "selected",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "P3-06-protected-1",
+          "reported": false,
+          "evidence": "沈禾想问一句信上写了什么，嘴张了张，又闭上。",
+          "reason": "报告将信的内容与人物关系保留为未知，没有要求此场揭晓或追加正文错误。"
+        },
+        {
+          "protected_id": "P3-06-protected-2",
+          "reported": false,
+          "evidence": "出门时还好",
+          "reason": "报告明确保留沈禾只能确认离家时状况的知情范围和口语省略。"
+        },
+        {
+          "protected_id": "P3-06-protected-3",
+          "reported": false,
+          "evidence": "老人接过信，没立刻拆",
+          "reason": "报告保留老人暂不拆信的动作，不要求本场展示信中真相。"
+        }
+      ],
+      "extra_findings": [],
+      "source_output": "补充独立输出/P3-06_selected_1.md",
+      "runner_job_id": "P3-06_selected_1_direct_v3",
+      "replaces_historical_output": "outputs/P3-06_selected_1.md"
+    },
+    {
+      "run_id": "P3-06_selected_2",
+      "condition": "selected",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "P3-06-protected-1",
+          "reported": false,
+          "evidence": "沈禾想问一句信上写了什么，嘴张了张，又闭上。",
+          "reason": "报告将信的内容与人物关系保留为未知，没有要求此场揭晓或追加正文错误。"
+        },
+        {
+          "protected_id": "P3-06-protected-2",
+          "reported": false,
+          "evidence": "出门时还好",
+          "reason": "报告明确保留沈禾只能确认离家时状况的知情范围和口语省略。"
+        },
+        {
+          "protected_id": "P3-06-protected-3",
+          "reported": false,
+          "evidence": "老人接过信，没立刻拆",
+          "reason": "报告保留老人暂不拆信的动作，不要求本场展示信中真相。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-04_selected_2",
+      "condition": "selected",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "P3-04-protected-1",
+          "reported": false,
+          "evidence": "次日上午，北山邮亭",
+          "reason": "明确标记时空和叙事线，报告未强接码头人物或情绪。"
+        },
+        {
+          "protected_id": "P3-04-protected-2",
+          "reported": false,
+          "evidence": "开不开",
+          "reason": "报告保留由开门计划和翻营业牌限定的自然短答。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-05_full_1",
+      "condition": "full",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "P3-05-protected-1",
+          "reported": false,
+          "evidence": "她没碰桌角的红钮。",
+          "reason": "报告没有从红钮用途未供给推断必须按钮或正文写错，也未报成无功能重复。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "P3-05-extra-three-subject-comma-rhythm",
+          "severity": "S3",
+          "evidence": "这一句用逗号连续连接“灯”“送信的人”“她”三个不同主语的独立分句",
+          "false_positive": false,
+          "reason": "这是答案外可选节奏建议，依据冻结 L2-7 的三主语逗号规则且只建议第三分句改句号，报告承认意义及指代清楚。P3 不是 K 对照组，不能因答案没有收录便自动记误报；可保留为有规则依据的 S3 偏好，不升级正文硬错。其他报告保留此句说明建议不稳定。"
+        }
+      ],
+      "supply_check": {
+        "phase": "initial",
+        "mechanism_uncertainty_identified": true,
+        "source_range_identified": true,
+        "explicit_supply_pending": true,
+        "mechanism_graded_as_text_error": false,
+        "full_answer_behavior_met": true,
+        "evidence": "应提供此前首次说明或实际演示这套报信操作、红钮用途及“老规矩”的原文完整片段。",
+        "reason": "正式供给待核-1区分可顺读的行动与不可核实的精确信号，给出完整来源范围，不要求候选立刻解释。符合预置供给待核行为。"
+      }
+    },
+    {
+      "run_id": "P3-05_full_2",
+      "condition": "full",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "P3-05-protected-1",
+          "reported": false,
+          "evidence": "她没碰桌角的红钮。",
+          "reason": "报告没有从红钮用途未供给推断必须按钮或正文写错，也未报成无功能重复。"
+        }
+      ],
+      "extra_findings": [],
+      "supply_check": {
+        "phase": "initial",
+        "mechanism_uncertainty_identified": true,
+        "source_range_identified": true,
+        "explicit_supply_pending": false,
+        "mechanism_graded_as_text_error": false,
+        "full_answer_behavior_met": false,
+        "evidence": "未发现妨碍本场理解、需要补读才能判断的前文缺口。",
+        "source_evidence": "若另有核验装置机制的任务，所需原文应是首次说明铜盘刻度、铃声及红钮用途的段落",
+        "reason": "严格按预置答案必须列待核项计不达标，但报告没有假装机制已获确认，并提供条件式补读范围。人物遵嘱操作与应答可支持当前行动理解，精确规则是否此时必须向读者展示存在合理分歧；不应直接算机制漏检或错误断言。"
+      }
+    },
+    {
+      "run_id": "P3-05_selected_1",
+      "condition": "selected",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "P3-05-protected-1",
+          "reported": false,
+          "evidence": "她没碰桌角的红钮。",
+          "reason": "报告没有从红钮用途未供给推断必须按钮或正文写错，也未报成无功能重复。"
+        }
+      ],
+      "extra_findings": [],
+      "supply_check": {
+        "phase": "initial",
+        "mechanism_uncertainty_identified": true,
+        "source_range_identified": true,
+        "explicit_supply_pending": true,
+        "mechanism_graded_as_text_error": false,
+        "full_answer_behavior_met": true,
+        "evidence": "所需补读范围是更早介绍铜盘三格刻线、铃声与红钮用途，以及“报平安”操作约定的原文场景",
+        "reason": "正式列CE-Q1待核，承认行动可顺读与精确信号不能确认并存；不给正文定级，也不猜红钮用途。"
+      }
+    },
+    {
+      "run_id": "P3-05_selected_2",
+      "condition": "selected",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "P3-05-protected-1",
+          "reported": false,
+          "evidence": "她没碰桌角的红钮。",
+          "reason": "报告没有从红钮用途未供给推断必须按钮或正文写错，也未报成无功能重复。"
+        }
+      ],
+      "extra_findings": [],
+      "supply_check": {
+        "phase": "initial",
+        "mechanism_uncertainty_identified": true,
+        "source_range_identified": true,
+        "explicit_supply_pending": true,
+        "mechanism_graded_as_text_error": false,
+        "full_answer_behavior_met": true,
+        "evidence": "不能独立核实第三格、铃响一声与报平安之间的精确对应",
+        "source_evidence": "需要提供此前首次说明铜盘刻度、铃声与红钮用途的同源正文完整相关段落",
+        "reason": "正式列CE-SUP-1且说明不属于正文定级；补读请求只为规则核验，不要求已可理解的当前动作补解释。"
+      }
+    },
+    {
+      "run_id": "P3-05_selected_after_1",
+      "condition": "selected_after",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "P3-05-protected-1",
+          "reported": false,
+          "evidence": "她没碰桌角的红钮。",
+          "reason": "报告准确引用红钮用于全巷避难、封口未破只用铜盘的前因，保留不按红钮的动作。"
+        }
+      ],
+      "extra_findings": [],
+      "supply_check": {
+        "phase": "after",
+        "rule_meaning_understood": true,
+        "source_used_to_resolve_uncertainty": true,
+        "remaining_mechanism_supply_pending": false,
+        "mechanism_graded_as_text_error": false,
+        "full_answer_behavior_met": true,
+        "evidence": "铜盘指针拨到第三格，小铃响一声，表示送信的人平安抵达；红钮用于叫全巷避难。",
+        "resolution_evidence": "她没有碰红钮，是在执行前文已经说明的报平安操作。",
+        "reason": "准确复述新增试用场景的两种信号及信封未破条件，明确当前必要前因已供给；不是仅未报错，而是以原文说明了不按红钮的正确理由。试用曾手动复位未排除自动复位，不机械新增冲突。"
+      }
+    },
+    {
+      "run_id": "P3-05_selected_after_2",
+      "condition": "selected_after",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "P3-05-protected-1",
+          "reported": false,
+          "evidence": "她没碰桌角的红钮。",
+          "reason": "报告根据已供给的避难按钮用途和信封完好条件，明确保留不按红钮；不是仅对未知规则保持沉默。"
+        }
+      ],
+      "extra_findings": [],
+      "supply_check": {
+        "phase": "after",
+        "rule_meaning_understood": true,
+        "source_used_to_resolve_uncertainty": true,
+        "remaining_mechanism_supply_pending": false,
+        "mechanism_graded_as_text_error": false,
+        "full_answer_behavior_met": true,
+        "evidence": "本场行动的原因与结果可以顺读理解：封口完好，依已教过的办法报平安；没有启动避难通知。",
+        "resolution_evidence": "报信用途、操作条件、红钮功能、信件到手及封口状态均已在给定前文中交代。",
+        "reason": "准确复述第三格、一声铃、送信人平安与全巷避难的区别，以新给原文和封口状态解释当前行为；原机制疑点已解除，未把未给信件内文或装置原理追加成供给缺口。"
+      }
+    }
+  ],
+  "repairs": [],
+  "missing_run_ids": [],
+  "p3_05_supply_check": {
+    "status": "complete_six_reports",
+    "initial_conditions": [
+      "full",
+      "selected"
+    ],
+    "after_condition": "selected_after",
+    "required_initial_behavior": "初始 full 和 selected 均缺操作规则。需指出此前教陆青使用铜盘和红钮、说明两种信号含义的完整试用场景，列供给待核，不将第三格、一次铃声或不按红钮定级正文错误。",
+    "required_after_behavior": "补入完整试用原文后，以新独立盲读确认报平安与避难两种信号，原供给疑点解除；保留不按红钮，不新增硬解释。",
+    "observed_initial_correct": null,
+    "observed_after_resolved": true,
+    "note": "供给待核与补读效果单独列项，不用零应抓的分母代替。",
+    "initial_metrics": {
+      "explicit_supply_pending": {
+        "numerator": 3,
+        "denominator": 4
+      },
+      "mechanism_uncertainty_identified": {
+        "numerator": 4,
+        "denominator": 4
+      },
+      "source_range_identified": {
+        "numerator": 4,
+        "denominator": 4
+      },
+      "mechanism_graded_as_text_error": 0
+    },
+    "after_metrics": {
+      "source_used_to_resolve_uncertainty": {
+        "numerator": 2,
+        "denominator": 2
+      },
+      "remaining_supply_pending": 0,
+      "planned_after_reports": 2
+    },
+    "initial_by_condition": {
+      "full": {
+        "explicit_supply_pending": 1,
+        "reports": 2,
+        "mechanism_uncertainty_identified": 2
+      },
+      "selected": {
+        "explicit_supply_pending": 2,
+        "reports": 2,
+        "mechanism_uncertainty_identified": 2
+      }
+    }
+  },
+  "notes": [
+    "最终包含26份语义判分，按full v2、selected v3、selected_after v2分组；19份和25份阶段表完整保存在stage_history，原报告、旧答案及前三项判分未改。",
+    "P3-06 selected第1轮最终使用补充独立输出/P3-06_selected_1.md，runner job为P3-06_selected_1_direct_v3；旧委派报告仅留在历史阶段和v2证据目录，不进入最终分数。",
+    "三个条件均有完整报告、逐项判分与执行凭据。最早三项v2及三份历史P3-06没有runner实际代理计数字段，保持null；另据原始事件记录未观察到委派，不伪造旧回执字段。",
+    "检出和定级只针对冻结应抓条目；供给待核和补读效果另行判定。P3-05初始正式待核列项3/4，识别机制未核实和所需原文4/4，补读后用新增原文解除疑点2/2。",
+    "P3-05 full第2轮没有正式要求补料，属于当前行动可理解与精确信号需核验之间的合理边界分歧；不因未完全满足预置供给答案就称正文漏检。",
+    "P3-05 full第1轮额外S3节奏建议有冻结L2-7依据，明确是可选建议，false_positive=false；非K组不因答案外自动算误报，不据此要求作者必改。",
+    "所有结论来自model_comparison，quality_acceptance=not_determined。合成短样本与协调器预选上下文结果不能证明自动语义选取、整章读感或普遍质量提升。"
+  ],
+  "conditions": {
+    "full": {
+      "evidence_directory": "工具证据/context_full_direct_v2",
+      "planned_runs": 12,
+      "scored_run_ids": [
+        "P3-01_full_1",
+        "P3-01_full_2",
+        "P3-02_full_1",
+        "P3-02_full_2",
+        "P3-03_full_1",
+        "P3-03_full_2",
+        "P3-04_full_1",
+        "P3-04_full_2",
+        "P3-05_full_1",
+        "P3-05_full_2",
+        "P3-06_full_1",
+        "P3-06_full_2"
+      ],
+      "missing_run_ids": [],
+      "semantic_metrics": {
+        "reports": 12,
+        "detected": {
+          "numerator": 6,
+          "denominator": 6,
+          "rate": 1.0
+        },
+        "severity_attainment": {
+          "numerator": 6,
+          "denominator": 6,
+          "rate": 1.0
+        },
+        "protected_reported": 0,
+        "protected_decisions": 18,
+        "extra_findings": 1
+      },
+      "final_score_generated": true,
+      "score_path": "工具证据/context_full_direct_v2/scores/收尾评分.json",
+      "tool_metrics": {
+        "attempts": [
+          {
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "consistency": [
+          {
+            "role": "copy-editor",
+            "compared_attempts": "每样本前两次",
+            "detection_agreement": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_agreement": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "positive_overlap": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            }
+          }
+        ],
+        "unions": [
+          {
+            "role": "copy-editor",
+            "supplemental_only": true,
+            "detected": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ]
+      },
+      "score_sha256": "0955f9ec3e1b4a475a742ec064f7d4ad09c9d5dc09ee7436efad4fff74080460"
+    },
+    "selected": {
+      "evidence_directory": "工具证据/context_selected_direct_v3",
+      "planned_runs": 12,
+      "scored_run_ids": [
+        "P3-01_selected_1",
+        "P3-01_selected_2",
+        "P3-02_selected_1",
+        "P3-02_selected_2",
+        "P3-03_selected_1",
+        "P3-03_selected_2",
+        "P3-04_selected_1",
+        "P3-04_selected_2",
+        "P3-05_selected_1",
+        "P3-05_selected_2",
+        "P3-06_selected_1",
+        "P3-06_selected_2"
+      ],
+      "missing_run_ids": [],
+      "semantic_metrics": {
+        "reports": 12,
+        "detected": {
+          "numerator": 6,
+          "denominator": 6,
+          "rate": 1.0
+        },
+        "severity_attainment": {
+          "numerator": 6,
+          "denominator": 6,
+          "rate": 1.0
+        },
+        "protected_reported": 0,
+        "protected_decisions": 18,
+        "extra_findings": 0
+      },
+      "final_score_generated": true,
+      "score_path": "工具证据/context_selected_direct_v3/scores/收尾评分.json",
+      "tool_metrics": {
+        "attempts": [
+          {
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "consistency": [
+          {
+            "role": "copy-editor",
+            "compared_attempts": "每样本前两次",
+            "detection_agreement": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_agreement": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "positive_overlap": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            }
+          }
+        ],
+        "unions": [
+          {
+            "role": "copy-editor",
+            "supplemental_only": true,
+            "detected": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ]
+      },
+      "score_sha256": "bc9b7b7669f68187cccc7d299d65e1dfbf6444091c86db6f09b640b1f2b942b0"
+    },
+    "selected_after": {
+      "evidence_directory": "工具证据/context_selected_after_direct_v2",
+      "planned_runs": 2,
+      "scored_run_ids": [
+        "P3-05_selected_after_1",
+        "P3-05_selected_after_2"
+      ],
+      "missing_run_ids": [],
+      "semantic_metrics": {
+        "reports": 2,
+        "detected": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "severity_attainment": {
+          "numerator": 0,
+          "denominator": 0,
+          "rate": null
+        },
+        "protected_reported": 0,
+        "protected_decisions": 2,
+        "extra_findings": 0
+      },
+      "final_score_generated": true,
+      "score_path": "工具证据/context_selected_after_direct_v2/scores/收尾评分.json",
+      "tool_metrics": {
+        "attempts": [
+          {
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "consistency": [
+          {
+            "role": "copy-editor",
+            "compared_attempts": "每样本前两次",
+            "detection_agreement": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_agreement": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "positive_overlap": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            }
+          }
+        ],
+        "unions": [
+          {
+            "role": "copy-editor",
+            "supplemental_only": true,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ]
+      },
+      "score_sha256": "b43feb0fb18b76f3ae3ff3c87733e7781adce537de91237c0817fefbbba4c04b"
+    }
+  },
+  "execution_provenance": [
+    {
+      "run_id": "P3-01_full_1",
+      "runner_job_id": "P3-01_full_1",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-01_full_1.md",
+      "frozen_output": "工具证据/context_full_direct_v2/outputs/P3-01_full_1.md",
+      "receipt_path": "直接执行_v2/P3-01_full_1/run-3a2e2dd4794a41d880cf6486eb4ab982/result.json",
+      "opening_path": "直接执行_v2/P3-01_full_1/run-3a2e2dd4794a41d880cf6486eb4ab982/opening.json",
+      "events_path": "直接执行_v2/P3-01_full_1/run-3a2e2dd4794a41d880cf6486eb4ab982/events.jsonl",
+      "started_at": "2026-10-03T14:47:37.139945+00:00",
+      "finished_at": "2026-10-03T14:50:12.212178+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a1023c-20bb-7df3-9489-0955e18411d3"
+      ],
+      "report_sha256": "312aef1581f0a8b6cbbd1de250417c07384a9fd3c8f71ce3477fa0eaaf771c86",
+      "events_sha256": "163816e899c291b728f444871f662dfcc3ee1392f509b67de1141d7796d7c9e3",
+      "receipt_sha256": "5d9fb22760d1cd418c9077c63470fa9e6e906dcc4f84ec87a9c31a995f30b34e",
+      "opening_sha256": "212cf498a324292441bb1784d799df543f18bf2723ea7fd38923950e7f275620",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": null,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-01_full_2",
+      "runner_job_id": "P3-01_full_2",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-01_full_2.md",
+      "frozen_output": "工具证据/context_full_direct_v2/outputs/P3-01_full_2.md",
+      "receipt_path": "直接执行_v2/P3-01_full_2/run-56483ef77be1461189da4b57991e867a/result.json",
+      "opening_path": "直接执行_v2/P3-01_full_2/run-56483ef77be1461189da4b57991e867a/opening.json",
+      "events_path": "直接执行_v2/P3-01_full_2/run-56483ef77be1461189da4b57991e867a/events.jsonl",
+      "started_at": "2026-10-03T14:47:37.140915+00:00",
+      "finished_at": "2026-10-03T14:51:25.981187+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a1023c-20bb-7352-8fbb-909c5e05a578"
+      ],
+      "report_sha256": "27b04ae9de1f09161dd1cdac7d028f209613434e7434e224814c43187c9594f6",
+      "events_sha256": "6e1f0de69920d52a5b73a9ddbfc39f122871ae966b8f86058dbfae5ca8cf89fd",
+      "receipt_sha256": "867e6bdddd4127ea735dcf3b0b2e48d14ec0d3cde5122cf14c0b7973a7e127d7",
+      "opening_sha256": "020afccd23d12782ad1b30cdefb77e1e4b979d05db0ee7c2088374903c87693b",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": null,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-02_full_1",
+      "runner_job_id": "P3-02_full_1",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-02_full_1.md",
+      "frozen_output": "工具证据/context_full_direct_v2/outputs/P3-02_full_1.md",
+      "receipt_path": "直接执行_v2/P3-02_full_1/run-05bbdce1849a47858ceabc5929e04df1/result.json",
+      "opening_path": "直接执行_v2/P3-02_full_1/run-05bbdce1849a47858ceabc5929e04df1/opening.json",
+      "events_path": "直接执行_v2/P3-02_full_1/run-05bbdce1849a47858ceabc5929e04df1/events.jsonl",
+      "started_at": "2026-10-03T14:52:21.260713+00:00",
+      "finished_at": "2026-10-03T14:55:20.023943+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10240-7656-7611-ab36-697d1c5d14dc"
+      ],
+      "report_sha256": "a1178d8750ee4f3b97d26e00080e55a71d69d54574abfd9db811e8426b1cc3d2",
+      "events_sha256": "3eb8a8844c8c9488e3a3469e8ff3051a1c229ac601ae3acd64a7051ad8ba8f39",
+      "receipt_sha256": "a196eeac0b758165c4beb085d8283be87d592a4de962691c923b0f14076d7d9a",
+      "opening_sha256": "131f93f89ac9a3b44f391c4c201f9509335568300b6163feb6da85681ab51f81",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-02_full_2",
+      "runner_job_id": "P3-02_full_2",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-02_full_2.md",
+      "frozen_output": "工具证据/context_full_direct_v2/outputs/P3-02_full_2.md",
+      "receipt_path": "直接执行_v2/P3-02_full_2/run-d512c66b67324b5bbd16797fc9294c08/result.json",
+      "opening_path": "直接执行_v2/P3-02_full_2/run-d512c66b67324b5bbd16797fc9294c08/opening.json",
+      "events_path": "直接执行_v2/P3-02_full_2/run-d512c66b67324b5bbd16797fc9294c08/events.jsonl",
+      "started_at": "2026-10-03T14:52:21.260970+00:00",
+      "finished_at": "2026-10-03T14:55:12.861236+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10240-7656-7d70-ab68-7dcb9a58dd88"
+      ],
+      "report_sha256": "1872bc0a5cd35ecd75103ea67d9d475e808ba168b0ca96bf37145c80bff77c93",
+      "events_sha256": "769da90e59850184a6651d8a3b00e3de4065aa968b375362c273ba8fd8d34821",
+      "receipt_sha256": "0d9d0433bc4fd4f744675dc06749afa546b9ad02adb5cc7e97c61550fe1867d6",
+      "opening_sha256": "cf9aa74a5f5dff69779147be18d9a0f65213c65d26f76bb899fa4927c1ed5920",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-03_full_1",
+      "runner_job_id": "P3-03_full_1",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-03_full_1.md",
+      "frozen_output": "工具证据/context_full_direct_v2/outputs/P3-03_full_1.md",
+      "receipt_path": "直接执行_v2/P3-03_full_1/run-867ad1048b1d49bbb16e54d31e6d214a/result.json",
+      "opening_path": "直接执行_v2/P3-03_full_1/run-867ad1048b1d49bbb16e54d31e6d214a/opening.json",
+      "events_path": "直接执行_v2/P3-03_full_1/run-867ad1048b1d49bbb16e54d31e6d214a/events.jsonl",
+      "started_at": "2026-10-03T14:55:53.130075+00:00",
+      "finished_at": "2026-10-03T14:59:49.146632+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10243-b173-7f41-bba8-ac7b393dbe86"
+      ],
+      "report_sha256": "50539748f41ad5b5d23b53d592a1d008198edea5693c4d2d995ab2251ba23f4b",
+      "events_sha256": "227b5065a2d7d7a7a0a63f661409a9099db79ce4361eb1e9f5b39fb1a0b37784",
+      "receipt_sha256": "6be3824d6330f0522e5672ae8c0ab445946faea626aba152824e748edc94bdd6",
+      "opening_sha256": "37189852049b6f6682c5021f34a4948b302d70cd67f2d4b82dee9ec713247efe",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-03_full_2",
+      "runner_job_id": "P3-03_full_2",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-03_full_2.md",
+      "frozen_output": "工具证据/context_full_direct_v2/outputs/P3-03_full_2.md",
+      "receipt_path": "直接执行_v2/P3-03_full_2/run-b2045ca340e14776a5ec591c1a98c8cd/result.json",
+      "opening_path": "直接执行_v2/P3-03_full_2/run-b2045ca340e14776a5ec591c1a98c8cd/opening.json",
+      "events_path": "直接执行_v2/P3-03_full_2/run-b2045ca340e14776a5ec591c1a98c8cd/events.jsonl",
+      "started_at": "2026-10-03T15:00:29.750826+00:00",
+      "finished_at": "2026-10-03T15:04:24.534715+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10247-ea82-7a63-b0f3-7656421e0b94"
+      ],
+      "report_sha256": "25e2053e4ccc3b4d9ca331a597e1ba6fa9510c1e0a1efbd796f5d492742d5ab5",
+      "events_sha256": "d128008a066f1a4f5c0279ce960e33388e65988eaa9bf8da3428f5bc964f3c54",
+      "receipt_sha256": "b85230fc9094380ed98585ff8313a895dd0514511a024e1f74c907112f53baca",
+      "opening_sha256": "813e1a4c8fd2531b69864b76b4f86d3ae0735e452a98196ccc8013321eefecdb",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-04_full_1",
+      "runner_job_id": "P3-04_full_1",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-04_full_1.md",
+      "frozen_output": "工具证据/context_full_direct_v2/outputs/P3-04_full_1.md",
+      "receipt_path": "直接执行_v2/P3-04_full_1/run-11f818972f80439d8ba509f53ef58283/result.json",
+      "opening_path": "直接执行_v2/P3-04_full_1/run-11f818972f80439d8ba509f53ef58283/opening.json",
+      "events_path": "直接执行_v2/P3-04_full_1/run-11f818972f80439d8ba509f53ef58283/events.jsonl",
+      "started_at": "2026-10-03T15:03:47.599339+00:00",
+      "finished_at": "2026-10-03T15:06:34.574827+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a1024a-ef21-7341-b876-a48dbced2df2"
+      ],
+      "report_sha256": "95d32a492e997166637746e93df8075e61516627b8f9796ad4549c98e9bcc82c",
+      "events_sha256": "39ce260ad243f1a150e359f474adc387a0151a0b517b89c158d149e622ce8a2b",
+      "receipt_sha256": "6fe57a1d0a0f2bf3e2b76b0ca77e9c5b5aa219c221aaf96a28225182db4baa1e",
+      "opening_sha256": "042dba21107de08ae9cfd80f99cec314a5412b70840e4f4da1a20cde366b01a4",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-04_full_2",
+      "runner_job_id": "P3-04_full_2",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-04_full_2.md",
+      "frozen_output": "工具证据/context_full_direct_v2/outputs/P3-04_full_2.md",
+      "receipt_path": "直接执行_v2/P3-04_full_2/run-08e4233a78844e8bb1924b2184581d5b/result.json",
+      "opening_path": "直接执行_v2/P3-04_full_2/run-08e4233a78844e8bb1924b2184581d5b/opening.json",
+      "events_path": "直接执行_v2/P3-04_full_2/run-08e4233a78844e8bb1924b2184581d5b/events.jsonl",
+      "started_at": "2026-10-03T15:04:09.485278+00:00",
+      "finished_at": "2026-10-03T15:06:47.896049+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a1024b-444e-7001-af45-a3fa1c9a91f6"
+      ],
+      "report_sha256": "1f54f2ff8f8f420c1746ded4296215a9a0b3013bb5184e880e170200ab17d1b0",
+      "events_sha256": "de917406a819db1459b01d393fbdb46852a29eef72e214db2a2da1474add7ee5",
+      "receipt_sha256": "07dfccfc94a7802a3d3c6da7de46c272ffccd756240595fe3ea9f50f6ab70842",
+      "opening_sha256": "dc48b48212039e54abe63b574839dbc1a8eb789a547f82590fdc74fe0426860d",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-05_full_1",
+      "runner_job_id": "P3-05_full_1",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-05_full_1.md",
+      "frozen_output": "工具证据/context_full_direct_v2/outputs/P3-05_full_1.md",
+      "receipt_path": "直接执行_v2/P3-05_full_1/run-2ae2e75d237f4278bef75dd8fc2d70b3/result.json",
+      "opening_path": "直接执行_v2/P3-05_full_1/run-2ae2e75d237f4278bef75dd8fc2d70b3/opening.json",
+      "events_path": "直接执行_v2/P3-05_full_1/run-2ae2e75d237f4278bef75dd8fc2d70b3/events.jsonl",
+      "started_at": "2026-10-04T00:12:57.139430+00:00",
+      "finished_at": "2026-10-04T00:15:44.458234+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10441-b406-7ef1-9aea-2496405541de"
+      ],
+      "report_sha256": "75a52b42f163279d5cdb2437494dc408fc648180baa735c43148136e872a9bcf",
+      "events_sha256": "b69e6bf0104c7d2a278a6844779a447b990ac0ba09e3c9fc5740ba09bb376209",
+      "receipt_sha256": "34f53f7e0a6f1a31641bfa6ba9792f2d89b0b516e94757a91622df01d3c88c91",
+      "opening_sha256": "310cae23c4a74a531b899d30533daeef3cbcc95d2ecd7f52a5ce6d314b6798ff",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-05_full_2",
+      "runner_job_id": "P3-05_full_2",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-05_full_2.md",
+      "frozen_output": "工具证据/context_full_direct_v2/outputs/P3-05_full_2.md",
+      "receipt_path": "直接执行_v2/P3-05_full_2/run-7122b52c1c334a2ca010b6239bc6f61d/result.json",
+      "opening_path": "直接执行_v2/P3-05_full_2/run-7122b52c1c334a2ca010b6239bc6f61d/opening.json",
+      "events_path": "直接执行_v2/P3-05_full_2/run-7122b52c1c334a2ca010b6239bc6f61d/events.jsonl",
+      "started_at": "2026-10-04T00:12:57.139387+00:00",
+      "finished_at": "2026-10-04T00:15:16.228315+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10441-b407-75a1-bc13-08351b0eab8b"
+      ],
+      "report_sha256": "36d252469b6cba516d78b749381441ebae16971df148e9ffc85d721bd2e4b906",
+      "events_sha256": "2509e1c60e8665c6377ff46282ba89c091c6457c993f6e1bf6c5281fe205bedc",
+      "receipt_sha256": "591cc5daa6cf062fbe58696e7bf037db428102241621ac7fee75da419f0be25e",
+      "opening_sha256": "8cab6feb40393dd195c29e1c2c46946f5b5b44d28a699b0a651041dad8bde88e",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-06_full_1",
+      "runner_job_id": "P3-06_full_1",
+      "execution_kind": "historical_events_checked",
+      "source_output": "outputs/P3-06_full_1.md",
+      "frozen_output": "工具证据/context_full_direct_v2/outputs/P3-06_full_1.md",
+      "receipt_path": "CLI执行/P3-06_full_1/批次1/执行结果.json",
+      "opening_path": "CLI执行/P3-06_full_1/批次1/开读冻结.json",
+      "events_path": "CLI执行/P3-06_full_1/批次1/events.jsonl",
+      "started_at": "2026-10-03T13:46:17.429007+00:00",
+      "finished_at": "2026-10-03T13:49:05.037757+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10203-fad2-7f33-97c0-1f1ae7de0254"
+      ],
+      "report_sha256": "b73b4309d2ce59fb6d2418a7a6eed2493f491b44eb1670158d2ef70d2499bee6",
+      "events_sha256": "60d9d093014ee4f7d58d67224ba60bc18ce65c7f6c88961f2352c51c8c198d44",
+      "receipt_sha256": "bfd88cfcc2aa86baea3c7533e9ae2977c89790b1ebbc2b6933e91b7c11f8a73a",
+      "opening_sha256": "ec1cd374a6d2b3cde05ca2f7772bfe81acc4353777092acc713c134dd6a925b0",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": null,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-06_full_2",
+      "runner_job_id": "P3-06_full_2",
+      "execution_kind": "historical_events_checked",
+      "source_output": "outputs/P3-06_full_2.md",
+      "frozen_output": "工具证据/context_full_direct_v2/outputs/P3-06_full_2.md",
+      "receipt_path": "CLI执行/P3-06_full_2/批次1/执行结果.json",
+      "opening_path": "CLI执行/P3-06_full_2/批次1/开读冻结.json",
+      "events_path": "CLI执行/P3-06_full_2/批次1/events.jsonl",
+      "started_at": "2026-10-03T13:43:26.265309+00:00",
+      "finished_at": "2026-10-03T13:46:17.422093+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10201-5e4f-7330-88ba-d952514c54a0"
+      ],
+      "report_sha256": "175987033bbb362c51e0d54cc8297f9896cd89c8191f7556b595b77a24cceac8",
+      "events_sha256": "cefb46578dc3b2e5a986a5e02615f5c4c8935122df000baba5151a07001a020f",
+      "receipt_sha256": "9545267cb92fef1bf9b367379b39b9a25c257765ebec512e4b0a832a94690699",
+      "opening_sha256": "d009b80f51ee382440cc180ae1d094a73eeaf26597fa607ffb9583786fb67bf9",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": null,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-01_selected_1",
+      "runner_job_id": "P3-01_selected_1",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-01_selected_1.md",
+      "frozen_output": "工具证据/context_selected_direct_v3/outputs/P3-01_selected_1.md",
+      "receipt_path": "直接执行_v2/P3-01_selected_1/run-b010a5c97aef49868928d603d53c616c/result.json",
+      "opening_path": "直接执行_v2/P3-01_selected_1/run-b010a5c97aef49868928d603d53c616c/opening.json",
+      "events_path": "直接执行_v2/P3-01_selected_1/run-b010a5c97aef49868928d603d53c616c/events.jsonl",
+      "started_at": "2026-10-03T14:47:37.140961+00:00",
+      "finished_at": "2026-10-03T14:50:40.996393+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a1023c-20bc-7a13-9b65-cefbb5bae3ed"
+      ],
+      "report_sha256": "bf15dc5f19fb1a644590a932ed4bab17c7554393cde33b35c5fbac41693135a9",
+      "events_sha256": "ba3cc768db65e043fa42df7663aa33230baf661b8c6158f35deb3d13a4010235",
+      "receipt_sha256": "3e2986c341a545750825da88d11702b181384a4d17186ae06618477e4b8ad1eb",
+      "opening_sha256": "9d026d401800e1bc2548ce7a34a4190a91973c65ede34158954c72b3592716fe",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": null,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-01_selected_2",
+      "runner_job_id": "P3-01_selected_2",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-01_selected_2.md",
+      "frozen_output": "工具证据/context_selected_direct_v3/outputs/P3-01_selected_2.md",
+      "receipt_path": "直接执行_v2/P3-01_selected_2/run-219c94a834a3448c911d39dc710b5972/result.json",
+      "opening_path": "直接执行_v2/P3-01_selected_2/run-219c94a834a3448c911d39dc710b5972/opening.json",
+      "events_path": "直接执行_v2/P3-01_selected_2/run-219c94a834a3448c911d39dc710b5972/events.jsonl",
+      "started_at": "2026-10-03T14:52:21.261014+00:00",
+      "finished_at": "2026-10-03T14:55:53.127611+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10240-7656-7183-b338-35c5b1f9e2fb"
+      ],
+      "report_sha256": "9ff134a161cb0c578f90104958ccd8977ccdd9a22209fe228ca59541ce4518ad",
+      "events_sha256": "505d7ba7e930f474bd677d8354f9983ae19d1494233c023a00caedb0317b9ef6",
+      "receipt_sha256": "952e705ba96d48a32e4233b0b585ba41571c91a344aeba1a8b46d5fe95f7a0b7",
+      "opening_sha256": "6dbda579729c7ab9ec09b63f986d33d2537a6d8918a3a9f2d0c02cb1482ce0b5",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-02_selected_1",
+      "runner_job_id": "P3-02_selected_1",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-02_selected_1.md",
+      "frozen_output": "工具证据/context_selected_direct_v3/outputs/P3-02_selected_1.md",
+      "receipt_path": "直接执行_v2/P3-02_selected_1/run-be1bb7e55edd49e3821090b2a55589f2/result.json",
+      "opening_path": "直接执行_v2/P3-02_selected_1/run-be1bb7e55edd49e3821090b2a55589f2/opening.json",
+      "events_path": "直接执行_v2/P3-02_selected_1/run-be1bb7e55edd49e3821090b2a55589f2/events.jsonl",
+      "started_at": "2026-10-03T14:55:12.863933+00:00",
+      "finished_at": "2026-10-03T14:58:18.194381+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10243-14a6-71f0-8b5f-6ae5d4166e5b"
+      ],
+      "report_sha256": "ed8a22e3d2fedfff81fb8da078bd80c0626218795982f3c86e1bbe4507341e9c",
+      "events_sha256": "56f3bc1046b38cd8302b092be9244faa47077dc65f62a1d38e29b8992922d107",
+      "receipt_sha256": "760b13639fc56ca4a2ae926c03c7a43fad959a8d25f78900bf7425251894acbb",
+      "opening_sha256": "fe0b91179ab3faccc895310c4ac0e150d40609892ed7a466e155248bac5d6614",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-02_selected_2",
+      "runner_job_id": "P3-02_selected_2",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-02_selected_2.md",
+      "frozen_output": "工具证据/context_selected_direct_v3/outputs/P3-02_selected_2.md",
+      "receipt_path": "直接执行_v2/P3-02_selected_2/run-e9992a4a72ff4863ae33fc8620ee8fc3/result.json",
+      "opening_path": "直接执行_v2/P3-02_selected_2/run-e9992a4a72ff4863ae33fc8620ee8fc3/opening.json",
+      "events_path": "直接执行_v2/P3-02_selected_2/run-e9992a4a72ff4863ae33fc8620ee8fc3/events.jsonl",
+      "started_at": "2026-10-03T14:55:20.025802+00:00",
+      "finished_at": "2026-10-03T14:58:42.294120+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10243-3012-7020-b9a6-3ee21127544d"
+      ],
+      "report_sha256": "9b72c6c279d273c0c2f5b2c3e404ccff356a50f38f6f9765d5781a6b9e4cdc97",
+      "events_sha256": "e0b5a3df063d0ae41730d9fb89f60bc5ddef8cdef6663dce6377655f1e939c0d",
+      "receipt_sha256": "e3abd609f356a0a3436cb0db2a23f778f103584ab810f07b0c5fb8fb1b0ac51a",
+      "opening_sha256": "07953afa6ee21c611676bd1b62368bce76b7fff0de43cdbb2b29a7ea66bdfd07",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-03_selected_1",
+      "runner_job_id": "P3-03_selected_1",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-03_selected_1.md",
+      "frozen_output": "工具证据/context_selected_direct_v3/outputs/P3-03_selected_1.md",
+      "receipt_path": "直接执行_v2/P3-03_selected_1/run-f954b4871c5a41b5aa3c824bbf02d96f/result.json",
+      "opening_path": "直接执行_v2/P3-03_selected_1/run-f954b4871c5a41b5aa3c824bbf02d96f/opening.json",
+      "events_path": "直接执行_v2/P3-03_selected_1/run-f954b4871c5a41b5aa3c824bbf02d96f/events.jsonl",
+      "started_at": "2026-10-03T15:00:29.749862+00:00",
+      "finished_at": "2026-10-03T15:04:09.483155+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10247-ea83-7f21-8769-74f9025a8816"
+      ],
+      "report_sha256": "289672b34dc0d32931ba9db23289fcfc1305a97404965ea9f1b813d4bb8ab23b",
+      "events_sha256": "7e7b98514b96c2dede239c14e2ab17a57b9ff21bfbf2ccfcd782fff33d7c088a",
+      "receipt_sha256": "330c8fff885c577aa47f3af3a723f600f8ad1092693ade580d5e3a95846f8972",
+      "opening_sha256": "73e9f1d99712986ca7110619ee11317ccf8cfc4389a76ef010ef46f2d4a625ae",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-03_selected_2",
+      "runner_job_id": "P3-03_selected_2",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-03_selected_2.md",
+      "frozen_output": "工具证据/context_selected_direct_v3/outputs/P3-03_selected_2.md",
+      "receipt_path": "直接执行_v2/P3-03_selected_2/run-af0284b6e88d4672892eec28399dafa8/result.json",
+      "opening_path": "直接执行_v2/P3-03_selected_2/run-af0284b6e88d4672892eec28399dafa8/opening.json",
+      "events_path": "直接执行_v2/P3-03_selected_2/run-af0284b6e88d4672892eec28399dafa8/events.jsonl",
+      "started_at": "2026-10-03T15:00:29.750105+00:00",
+      "finished_at": "2026-10-03T15:03:47.597031+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10247-ea82-7dc0-8afa-376fabfb7e52"
+      ],
+      "report_sha256": "1587eab65181c47aba557f8f27522e1d7d39b7bd2c18170495942b0bfc3012a8",
+      "events_sha256": "1c1c04050ab64b4085336c955d81281edc3b90a30b7e967338a7b0a6f37bf1b7",
+      "receipt_sha256": "adb461df5a318f777b10b767e939e6e50c147fbcffd9876bc9928ffede55b807",
+      "opening_sha256": "7b18fb86fd1c58e49df5e05829eaa4ce09eaedaf74d35d83725a5445c6750b59",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-04_selected_1",
+      "runner_job_id": "P3-04_selected_1",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-04_selected_1.md",
+      "frozen_output": "工具证据/context_selected_direct_v3/outputs/P3-04_selected_1.md",
+      "receipt_path": "直接执行_v2/P3-04_selected_1/run-8be4a361c4d64bb08945acf3d4b12fe8/result.json",
+      "opening_path": "直接执行_v2/P3-04_selected_1/run-8be4a361c4d64bb08945acf3d4b12fe8/opening.json",
+      "events_path": "直接执行_v2/P3-04_selected_1/run-8be4a361c4d64bb08945acf3d4b12fe8/events.jsonl",
+      "started_at": "2026-10-03T15:04:24.537243+00:00",
+      "finished_at": "2026-10-03T15:07:32.108174+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a1024b-7f16-7be0-9f27-4f421b4eab1b"
+      ],
+      "report_sha256": "793008d04cf1593b6cc32acf0b21b10e656b0d461994b1cc5a4ba019e866fc4c",
+      "events_sha256": "cdb584016e3c0ea5a6ddc259fdbbece61cca15074f72a1c5c1d1c22c2c7881f2",
+      "receipt_sha256": "6d9ca7d08779dc27870dd41cd9eaac8e8f2c2bd896dfb3609f26db48bb44e418",
+      "opening_sha256": "ba7b7187a7ad5a1661fa6e59284b6c4f9eae33ba829661276e8398db32563c93",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-04_selected_2",
+      "runner_job_id": "P3-04_selected_2",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-04_selected_2.md",
+      "frozen_output": "工具证据/context_selected_direct_v3/outputs/P3-04_selected_2.md",
+      "receipt_path": "直接执行_v2/P3-04_selected_2/run-89ee697688c743c287efd43ea0821ee8/result.json",
+      "opening_path": "直接执行_v2/P3-04_selected_2/run-89ee697688c743c287efd43ea0821ee8/opening.json",
+      "events_path": "直接执行_v2/P3-04_selected_2/run-89ee697688c743c287efd43ea0821ee8/events.jsonl",
+      "started_at": "2026-10-04T00:12:57.138799+00:00",
+      "finished_at": "2026-10-04T00:15:06.993249+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10441-b407-7333-ab9a-e61f09acbd2e"
+      ],
+      "report_sha256": "6b4a73d1f4b3ff39d14ca87e09a7d29eae684938cf174e707460111e5b17e84d",
+      "events_sha256": "9f92b28295de281e2537aa3fea3d0e480ac21f27d065400db8a6c10ef84a79ce",
+      "receipt_sha256": "b51d3c993b67209313a46154218856d3084ab07cdfd70411122b77a00fdefe46",
+      "opening_sha256": "a7135dbd1c9652e9f0179e5d9e3a404ac3ad74f34f69e2675523445662535529",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-05_selected_1",
+      "runner_job_id": "P3-05_selected_1",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-05_selected_1.md",
+      "frozen_output": "工具证据/context_selected_direct_v3/outputs/P3-05_selected_1.md",
+      "receipt_path": "直接执行_v2/P3-05_selected_1/run-4300928ae7a8400fbffdd903b664f1af/result.json",
+      "opening_path": "直接执行_v2/P3-05_selected_1/run-4300928ae7a8400fbffdd903b664f1af/opening.json",
+      "events_path": "直接执行_v2/P3-05_selected_1/run-4300928ae7a8400fbffdd903b664f1af/events.jsonl",
+      "started_at": "2026-10-04T00:15:06.995627+00:00",
+      "finished_at": "2026-10-04T00:18:02.360889+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10443-af2a-7552-b94a-4a3bfd2a354d"
+      ],
+      "report_sha256": "a851aa7f667252e0ae77b4f60040927e997b619dfd1487466afe3e1b15c34569",
+      "events_sha256": "6df79931ad2105737dd78b9895019ad2ac94855314334dd6507be91a3ca7674b",
+      "receipt_sha256": "61dd92e51362922a1473814691da48cdcaa373f12a5c05a0cae69cbabf7e46b9",
+      "opening_sha256": "e85e3b9e4292992ed96c56826be509ed295de54af302a23e1e1f433ed0b9c334",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-05_selected_2",
+      "runner_job_id": "P3-05_selected_2",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-05_selected_2.md",
+      "frozen_output": "工具证据/context_selected_direct_v3/outputs/P3-05_selected_2.md",
+      "receipt_path": "直接执行_v2/P3-05_selected_2/run-d91547318bd841f2b5ca2a3317a00335/result.json",
+      "opening_path": "直接执行_v2/P3-05_selected_2/run-d91547318bd841f2b5ca2a3317a00335/opening.json",
+      "events_path": "直接执行_v2/P3-05_selected_2/run-d91547318bd841f2b5ca2a3317a00335/events.jsonl",
+      "started_at": "2026-10-04T00:15:16.230129+00:00",
+      "finished_at": "2026-10-04T00:18:03.606379+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10443-d340-73e1-804d-b2e228a266ca"
+      ],
+      "report_sha256": "356405522f3824db556b20e7275a3411e091a749e834b8f8f7e89fdf1726a580",
+      "events_sha256": "9cab9e90e6f742bdd494f487a616abf1db1f135b716b7db8c03c4ae11fbf1905",
+      "receipt_sha256": "b83378f8f06a1f05c9a089f3d934b200d016b4f528a2c59c9a5b7f4436ee853c",
+      "opening_sha256": "4a90f422a0702a60bf471c5b53078a759047854bdd565dc61c457db6d728fc4f",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-06_selected_1",
+      "runner_job_id": "P3-06_selected_1_direct_v3",
+      "execution_kind": "direct_v3_replacement",
+      "source_output": "补充独立输出/P3-06_selected_1.md",
+      "frozen_output": "工具证据/context_selected_direct_v3/outputs/P3-06_selected_1.md",
+      "receipt_path": "直接执行_v2/P3-06_selected_1_direct_v3/run-325e64f318c742c4bf59ec18471e5a11/result.json",
+      "opening_path": "直接执行_v2/P3-06_selected_1_direct_v3/run-325e64f318c742c4bf59ec18471e5a11/opening.json",
+      "events_path": "直接执行_v2/P3-06_selected_1_direct_v3/run-325e64f318c742c4bf59ec18471e5a11/events.jsonl",
+      "started_at": "2026-10-04T00:19:27.588661+00:00",
+      "finished_at": "2026-10-04T00:22:00.659830+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10447-a97b-7fc1-8106-d1019cf89f2b"
+      ],
+      "report_sha256": "95d97d7cfa6864ae7fa4c5fdea17140e8c8ee0885e2c443ddd3f032cd41e248a",
+      "events_sha256": "1d87e01527f7f8a1e45830465085f094681da6097b91490f2e8650dcd31b538f",
+      "receipt_sha256": "4e043b1fcc07a8731a73df1069b7461e5d44c6d5c5c82a9ade8ebf49755cfd53",
+      "opening_sha256": "0af8fbd9f6fe98de98c61d3e6d1bb1d5bc15785738b700220eddf9fffd1a9f43",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-06_selected_2",
+      "runner_job_id": "P3-06_selected_2",
+      "execution_kind": "historical_events_checked",
+      "source_output": "outputs/P3-06_selected_2.md",
+      "frozen_output": "工具证据/context_selected_direct_v3/outputs/P3-06_selected_2.md",
+      "receipt_path": "CLI执行/P3-06_selected_2/批次1/执行结果.json",
+      "opening_path": "CLI执行/P3-06_selected_2/批次1/开读冻结.json",
+      "events_path": "CLI执行/P3-06_selected_2/批次1/events.jsonl",
+      "started_at": "2026-10-03T13:33:49.842964+00:00",
+      "finished_at": "2026-10-03T13:37:38.378724+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a101f8-92d3-7d91-a03a-5a98b2977abe"
+      ],
+      "report_sha256": "7cb4e659e86935b1ebb288ea6773892f0e47ec0bc06c5321619679a944b856b6",
+      "events_sha256": "c8e15aa3b6c9094f406cc9cab34b8e0a770d748efed9c16d1b468dec7334d9f3",
+      "receipt_sha256": "a959a0d32be1c476254f9c1e30912fc3aca0cf8c78d2b936804b5df6dceaba0b",
+      "opening_sha256": "ad4eb869b3771f6b40ccd3673edaf430aa63f4f0db99004a512a1f1f50121d61",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": null,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-05_selected_after_1",
+      "runner_job_id": "P3-05_selected_after_1",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-05_selected_after_1.md",
+      "frozen_output": "工具证据/context_selected_after_direct_v2/outputs/P3-05_selected_after_1.md",
+      "receipt_path": "直接执行_v2/P3-05_selected_after_1/run-da703000d7aa4297b7a8196509a667ce/result.json",
+      "opening_path": "直接执行_v2/P3-05_selected_after_1/run-da703000d7aa4297b7a8196509a667ce/opening.json",
+      "events_path": "直接执行_v2/P3-05_selected_after_1/run-da703000d7aa4297b7a8196509a667ce/events.jsonl",
+      "started_at": "2026-10-04T00:15:44.460401+00:00",
+      "finished_at": "2026-10-04T00:19:07.964213+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10444-418d-7232-b41d-ad86c52ab787"
+      ],
+      "report_sha256": "47bd638532569937f75d5a71ac6da4bcb5018d09f25b188bb1585e3a9d628a92",
+      "events_sha256": "4754c217abaedbad290af89e443a7c091e21e29eb3957774f7c990a1a3414099",
+      "receipt_sha256": "c2bbc5706a666084dcfefdae47448259745e8017629c079faf36d34b69a8c43f",
+      "opening_sha256": "be54e98ff0640929abf333ff28f06973bcf1fc69da2f93e28ca41ad78463c8c0",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    },
+    {
+      "run_id": "P3-05_selected_after_2",
+      "runner_job_id": "P3-05_selected_after_2",
+      "execution_kind": "direct_v2",
+      "source_output": "outputs/P3-05_selected_after_2.md",
+      "frozen_output": "工具证据/context_selected_after_direct_v2/outputs/P3-05_selected_after_2.md",
+      "receipt_path": "直接执行_v2/P3-05_selected_after_2/run-feb994fd8d40431e9a80bedb6e1aea6f/result.json",
+      "opening_path": "直接执行_v2/P3-05_selected_after_2/run-feb994fd8d40431e9a80bedb6e1aea6f/opening.json",
+      "events_path": "直接执行_v2/P3-05_selected_after_2/run-feb994fd8d40431e9a80bedb6e1aea6f/events.jsonl",
+      "started_at": "2026-10-04T00:19:27.588310+00:00",
+      "finished_at": "2026-10-04T00:21:21.511575+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10447-a97b-7c73-ac32-b9743ae69264"
+      ],
+      "report_sha256": "c5f695e28181e85a30624366fc67bcef1f757f8c131ed2f61225d9edb1c2b70b",
+      "events_sha256": "8c3117c3bda1ca909e225979abbf1d67584cda1fd75e86a79e0667d1e8b3e127",
+      "receipt_sha256": "f4afdb9c810d2af38c1b66488b0fadc0bf1eacfc458569971bfafde0b559436f",
+      "opening_sha256": "d32a98c67f58d9e3c0f0c76663bb7cc06bc123ca83f38e46bba66bd2bf93857b",
+      "prompt_matches_frozen_manifest": true,
+      "six_allowed_inputs_read_in_events": true,
+      "source_and_frozen_output_identical": true,
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_calls": [],
+      "observed_collaboration_call_count": 0,
+      "execution_eligibility": "events_checked_no_nested_calls"
+    }
+  ],
+  "updated_at": "2026-10-04T00:32:01.220660+00:00",
+  "validation": {
+    "all_26_judgment_rows_complete": true,
+    "all_evidence_present_in_raw_reports": true,
+    "all_26_report_hashes_match_receipts_and_frozen_copies": true,
+    "all_26_actual_prompts_match_group_manifests": true,
+    "all_26_parent_events_checked_no_collaboration_calls": true,
+    "verify_with_require_outputs": {
+      "full": {
+        "ok": true,
+        "checked_at": "2026-10-04T00:29:17Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "selected": {
+        "ok": true,
+        "checked_at": "2026-10-04T00:29:17Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "selected_after": {
+        "ok": true,
+        "checked_at": "2026-10-04T00:29:17Z",
+        "problems": [],
+        "missing_outputs": []
+      }
+    },
+    "final_score_generated": true
+  },
+  "stage_history": [
+    {
+      "stage": "19_reports",
+      "source_sha256": "a732b57bd57b598ffa182385689c6e84c9141e90d6a9efde081eaeb25fc59ed2",
+      "table": {
+        "schema_version": 1,
+        "quality_judgment_source": "model_comparison",
+        "quality_acceptance": "not_determined",
+        "status": "partial_19_of_26",
+        "scope": "review_only",
+        "runs": [
+          {
+            "run_id": "P3-01_full_1",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-01-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "没有承接他如何从已记住的开闸信号转为关闸判断。",
+                "reason": "报告 CE-1 正式定 S2，诊断已记住三下开闸、清楚敲三下、随后自认关严之间的认知与行动承接，匹配答案核心。没有把人物犯错本身定错，也没有推断闸门实际位置；答案的操作与结果相反应按此较窄证据理解。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-01-protected-1",
+                "reported": false,
+                "evidence": "他以为只是雨急",
+                "reason": "报告将雨急限定为人物判断并保留，不把人物误判或水声原因留白另报成矛盾。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-01_full_2",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-01-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "这里缺少从既有正确认知转为相反判断的桥接。",
+                "reason": "报告 CE-1 正式定 S2，诊断已记住三下开闸、清楚敲三下、随后自认关严之间的认知与行动承接，匹配答案核心。没有把人物犯错本身定错，也没有推断闸门实际位置；答案的操作与结果相反应按此较窄证据理解。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-01-protected-1",
+                "reported": false,
+                "evidence": "他以为只是雨急",
+                "reason": "报告将雨急限定为人物判断并保留，不把人物误判或水声原因留白另报成矛盾。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-01_selected_1",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-01-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "前文已明确交代信号含义和陈岭记住该含义的状态；候选又特意写三下敲声清晰。",
+                "reason": "报告 CE-1 正式定 S2，诊断已记住三下开闸、清楚敲三下、随后自认关严之间的认知与行动承接，匹配答案核心。没有把人物犯错本身定错，也没有推断闸门实际位置；答案的操作与结果相反应按此较窄证据理解。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-01-protected-1",
+                "reported": false,
+                "evidence": "他以为只是雨急",
+                "reason": "报告将雨急限定为人物判断并保留，不把人物误判或水声原因留白另报成矛盾。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-01_selected_2",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-01-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "问题不在于人物不能犯错，也不在于对白必须可靠，而在于这个已知信息与现场判断的变化缺少可辨认的承接。",
+                "reason": "报告 CE-1 正式定 S2，诊断已记住三下开闸、清楚敲三下、随后自认关严之间的认知与行动承接，匹配答案核心。没有把人物犯错本身定错，也没有推断闸门实际位置；答案的操作与结果相反应按此较窄证据理解。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-01-protected-1",
+                "reported": false,
+                "evidence": "他以为只是雨急",
+                "reason": "报告将雨急限定为人物判断并保留，不把人物误判或水声原因留白另报成矛盾。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-02_full_1",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-02-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "行动者本身没有指代歧义，问题是必要的物件交接没有承接，故定 S2，不升为 S1。",
+                "reason": "报告 CE-1 正式定 S2，对照唯一钥匙仍在顾婶右腕与许青从自己腰间取用、重新挂回的状态转换，命中同一次缺失交接；不把指代或一般钥匙来历另算问题。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-02-protected-1",
+                "reported": false,
+                "evidence": "齐了",
+                "reason": "报告保留装载完成后的自然短答，没有要求补成书面完整句。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-02_full_2",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-02-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "同一场景连续行动中，钥匙的持有人和佩挂位置没有过渡就改变。",
+                "reason": "报告 CE-1 正式定 S2，对照唯一钥匙仍在顾婶右腕与许青从自己腰间取用、重新挂回的状态转换，命中同一次缺失交接；不把指代或一般钥匙来历另算问题。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-02-protected-1",
+                "reported": false,
+                "evidence": "齐了",
+                "reason": "报告保留装载完成后的自然短答，没有要求补成书面完整句。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-02_selected_1",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-02-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "问题是当前动作所需的道具转移缺少承接，不是“自己”的指代不清，也不只是钥匙旧来历未供给。",
+                "reason": "报告 CE-1 正式定 S2，对照唯一钥匙仍在顾婶右腕与许青从自己腰间取用、重新挂回的状态转换，命中同一次缺失交接；不把指代或一般钥匙来历另算问题。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-02-protected-1",
+                "reported": false,
+                "evidence": "齐了",
+                "reason": "报告保留装载完成后的自然短答，没有要求补成书面完整句。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-02_selected_2",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-02-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "前文又明确东仓只有这一把，不能顺读为许青另有备用钥匙。",
+                "reason": "报告 CE-1 正式定 S2，对照唯一钥匙仍在顾婶右腕与许青从自己腰间取用、重新挂回的状态转换，命中同一次缺失交接；不把指代或一般钥匙来历另算问题。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-02-protected-1",
+                "reported": false,
+                "evidence": "齐了",
+                "reason": "报告保留装载完成后的自然短答，没有要求补成书面完整句。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-03_full_1",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-03-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "候选没有时间跳转、账本归还或转移的提示，读者无法理解账本如何到了胡宁手里的纸盒中。",
+                "reason": "报告 CE-1 正式定 S2，明确三条折棱锁定青纸盒，账本仍随未归旧铁盒在隔壁，候选取账本及放回无法连续理解；命中物件身份和位置承接，不把两个表现重复计数。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-03-protected-1",
+                "reported": false,
+                "evidence": "后厨传来许蔓的声音",
+                "reason": "报告保留明确的对白声源，不要求补许蔓走回桌旁或每一步递糕动作。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-03_full_2",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-03-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "前文最后交接的是待装茶点的青纸盒，装账本的旧铁盒已被王姨带走且尚未送回；候选紧接着让胡宁从这个纸盒里取出同称为“店里的账本”的物件，没有取回、转放或时间跳接的交代。",
+                "reason": "报告 CE-1 正式定 S2，明确三条折棱锁定青纸盒，账本仍随未归旧铁盒在隔壁，候选取账本及放回无法连续理解；命中物件身份和位置承接，不把两个表现重复计数。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-03-protected-1",
+                "reported": false,
+                "evidence": "后厨传来许蔓的声音",
+                "reason": "报告保留明确的对白声源，不要求补许蔓走回桌旁或每一步递糕动作。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-03_selected_1",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-03-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "问题在账本状态的承接，不在这个限定语；不宜删掉识别信息来掩盖问题。",
+                "reason": "报告 CE-1 正式定 S2，明确三条折棱锁定青纸盒，账本仍随未归旧铁盒在隔壁，候选取账本及放回无法连续理解；命中物件身份和位置承接，不把两个表现重复计数。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-03-protected-1",
+                "reported": false,
+                "evidence": "后厨传来许蔓的声音",
+                "reason": "报告保留明确的对白声源，不要求补许蔓走回桌旁或每一步递糕动作。"
+              }
+            ],
+            "extra_findings": [],
+            "supply_observation": {
+              "evidence": "核账条的形成经过未供给，单列而不定级。",
+              "assessment": "报告另列核账条形成经过待核，同时明确当前叙述足以交代夹条人和用途、不妨碍理解、不要求必补核账戏。因此不计正文误报；相较其他三份报告，存在轻微、非必要的供给待核扩张，不宜当作必须补料的要求。"
+            }
+          },
+          {
+            "run_id": "P3-03_selected_2",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-03-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "这是已给原文之间的具体动作承接缺口，不是仅因缺少物件早期来历而报错；不另拆成多条重复计数。",
+                "reason": "报告 CE-1 正式定 S2，明确三条折棱锁定青纸盒，账本仍随未归旧铁盒在隔壁，候选取账本及放回无法连续理解；命中物件身份和位置承接，不把两个表现重复计数。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-03-protected-1",
+                "reported": false,
+                "evidence": "后厨传来许蔓的声音",
+                "reason": "报告保留明确的对白声源，不要求补许蔓走回桌旁或每一步递糕动作。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-04_full_1",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-04-protected-1",
+                "reported": false,
+                "evidence": "次日上午，北山邮亭",
+                "reason": "报告明确识别隔夜转线，不要求继承码头的雨、韩江视角或情绪。"
+              },
+              {
+                "protected_id": "P3-04-protected-2",
+                "reported": false,
+                "evidence": "开不开",
+                "reason": "报告保留开不开与开的现场问答，邮亭开门计划及翻牌动作足以限定省略对象。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-04_full_2",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-04-protected-1",
+                "reported": false,
+                "evidence": "次日上午，北山邮亭",
+                "reason": "报告明确识别隔夜转线，不要求继承码头的雨、韩江视角或情绪。"
+              },
+              {
+                "protected_id": "P3-04-protected-2",
+                "reported": false,
+                "evidence": "开不开",
+                "reason": "报告保留开不开与开的现场问答，邮亭开门计划及翻牌动作足以限定省略对象。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-04_selected_1",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-04-protected-1",
+                "reported": false,
+                "evidence": "次日上午，北山邮亭",
+                "reason": "报告明确识别隔夜转线，不要求继承码头的雨、韩江视角或情绪。"
+              },
+              {
+                "protected_id": "P3-04-protected-2",
+                "reported": false,
+                "evidence": "开不开",
+                "reason": "报告保留开不开与开的现场问答，邮亭开门计划及翻牌动作足以限定省略对象。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-06_full_1",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-06-protected-1",
+                "reported": false,
+                "evidence": "沈禾想问一句信上写了什么，嘴张了张，又闭上。",
+                "reason": "报告将信的内容与人物关系保留为未知，没有要求此场揭晓或追加正文错误。"
+              },
+              {
+                "protected_id": "P3-06-protected-2",
+                "reported": false,
+                "evidence": "出门时还好",
+                "reason": "报告明确保留沈禾只能确认离家时状况的知情范围和口语省略。"
+              },
+              {
+                "protected_id": "P3-06-protected-3",
+                "reported": false,
+                "evidence": "老人接过信，没立刻拆",
+                "reason": "报告保留老人暂不拆信的动作，不要求本场展示信中真相。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-06_full_2",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-06-protected-1",
+                "reported": false,
+                "evidence": "沈禾想问一句信上写了什么，嘴张了张，又闭上。",
+                "reason": "报告将信的内容与人物关系保留为未知，没有要求此场揭晓或追加正文错误。"
+              },
+              {
+                "protected_id": "P3-06-protected-2",
+                "reported": false,
+                "evidence": "出门时还好",
+                "reason": "报告明确保留沈禾只能确认离家时状况的知情范围和口语省略。"
+              },
+              {
+                "protected_id": "P3-06-protected-3",
+                "reported": false,
+                "evidence": "老人接过信，没立刻拆",
+                "reason": "报告保留老人暂不拆信的动作，不要求本场展示信中真相。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-06_selected_1",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-06-protected-1",
+                "reported": false,
+                "evidence": "沈禾想问一句信上写了什么，嘴张了张，又闭上。",
+                "reason": "报告将信的内容与人物关系保留为未知，没有要求此场揭晓或追加正文错误。"
+              },
+              {
+                "protected_id": "P3-06-protected-2",
+                "reported": false,
+                "evidence": "出门时还好",
+                "reason": "报告明确保留沈禾只能确认离家时状况的知情范围和口语省略。"
+              },
+              {
+                "protected_id": "P3-06-protected-3",
+                "reported": false,
+                "evidence": "老人接过信，没立刻拆",
+                "reason": "报告保留老人暂不拆信的动作，不要求本场展示信中真相。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-06_selected_2",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-06-protected-1",
+                "reported": false,
+                "evidence": "沈禾想问一句信上写了什么，嘴张了张，又闭上。",
+                "reason": "报告将信的内容与人物关系保留为未知，没有要求此场揭晓或追加正文错误。"
+              },
+              {
+                "protected_id": "P3-06-protected-2",
+                "reported": false,
+                "evidence": "出门时还好",
+                "reason": "报告明确保留沈禾只能确认离家时状况的知情范围和口语省略。"
+              },
+              {
+                "protected_id": "P3-06-protected-3",
+                "reported": false,
+                "evidence": "老人接过信，没立刻拆",
+                "reason": "报告保留老人暂不拆信的动作，不要求本场展示信中真相。"
+              }
+            ],
+            "extra_findings": []
+          }
+        ],
+        "repairs": [],
+        "missing_run_ids": [
+          "P3-04_selected_2",
+          "P3-05_full_1",
+          "P3-05_full_2",
+          "P3-05_selected_1",
+          "P3-05_selected_2",
+          "P3-05_selected_after_1",
+          "P3-05_selected_after_2"
+        ],
+        "p3_05_supply_check": {
+          "status": "not_evaluated_missing_all_six_reports",
+          "initial_conditions": [
+            "full",
+            "selected"
+          ],
+          "after_condition": "selected_after",
+          "required_initial_behavior": "初始 full 和 selected 均缺操作规则。需指出此前教陆青使用铜盘和红钮、说明两种信号含义的完整试用场景，列供给待核，不将第三格、一次铃声或不按红钮定级正文错误。",
+          "required_after_behavior": "补入完整试用原文后，以新独立盲读确认报平安与避难两种信号，原供给疑点解除；保留不按红钮，不新增硬解释。",
+          "observed_initial_correct": null,
+          "observed_after_resolved": null,
+          "note": "供给待核与补读效果不是工具内置应抓分母，须另作语义记录；无报告不填 false 或成功。"
+        },
+        "notes": [
+          "本阶段仅保存现有 19 份报告的语义判分，不启动模型，不运行最终 score，不修改答案、规则、原始回执或报告。",
+          "收齐后按 condition 分组评分。父会话通知最终 selected 改用 context_selected_direct_v3 及补充独立输出/P3-06_selected_1.md；本阶段旧报告仅保留历史语义判断。",
+          "quality_acceptance 保持 not_determined，答案是协调器预置、未获作者核验。",
+          "前三项判分经原报告核验后采用，证据换成更直接的诊断原句；上下文判分_前三项.json 保留。",
+          "P3-06 历史执行资格由另一个代理审计。父会话已确认只有 selected 第 1 轮须补跑，本阶段不把它计作已验证直接盲读。",
+          "缺失输出不算未检出、不算零误报，也不算两轮一致。现有报告无答案外正式定级问题。"
+        ],
+        "conditions": {
+          "full": {
+            "evidence_directory": "工具证据/context_full_direct_v2",
+            "planned_runs": 12,
+            "scored_run_ids": [
+              "P3-01_full_1",
+              "P3-01_full_2",
+              "P3-02_full_1",
+              "P3-02_full_2",
+              "P3-03_full_1",
+              "P3-03_full_2",
+              "P3-04_full_1",
+              "P3-04_full_2",
+              "P3-06_full_1",
+              "P3-06_full_2"
+            ],
+            "missing_run_ids": [
+              "P3-05_full_1",
+              "P3-05_full_2"
+            ],
+            "semantic_metrics_observed_only": {
+              "reports": 10,
+              "detected": {
+                "numerator": 6,
+                "denominator": 6,
+                "rate": 1.0
+              },
+              "severity_attainment": {
+                "numerator": 6,
+                "denominator": 6,
+                "rate": 1.0
+              },
+              "protected_reported": 0,
+              "protected_decisions": 16,
+              "extra_findings": 0
+            },
+            "final_score_generated": false
+          },
+          "selected": {
+            "evidence_directory": "工具证据/context_selected_direct_v2",
+            "planned_runs": 12,
+            "scored_run_ids": [
+              "P3-01_selected_1",
+              "P3-01_selected_2",
+              "P3-02_selected_1",
+              "P3-02_selected_2",
+              "P3-03_selected_1",
+              "P3-03_selected_2",
+              "P3-04_selected_1",
+              "P3-06_selected_1",
+              "P3-06_selected_2"
+            ],
+            "missing_run_ids": [
+              "P3-04_selected_2",
+              "P3-05_selected_1",
+              "P3-05_selected_2"
+            ],
+            "semantic_metrics_observed_only": {
+              "reports": 9,
+              "detected": {
+                "numerator": 6,
+                "denominator": 6,
+                "rate": 1.0
+              },
+              "severity_attainment": {
+                "numerator": 6,
+                "denominator": 6,
+                "rate": 1.0
+              },
+              "protected_reported": 0,
+              "protected_decisions": 14,
+              "extra_findings": 0
+            },
+            "final_score_generated": false
+          },
+          "selected_after": {
+            "evidence_directory": "工具证据/context_selected_after_direct_v2",
+            "planned_runs": 2,
+            "scored_run_ids": [],
+            "missing_run_ids": [
+              "P3-05_selected_after_1",
+              "P3-05_selected_after_2"
+            ],
+            "semantic_metrics_observed_only": {
+              "reports": 0,
+              "detected": {
+                "numerator": 0,
+                "denominator": 0,
+                "rate": null
+              },
+              "severity_attainment": {
+                "numerator": 0,
+                "denominator": 0,
+                "rate": null
+              },
+              "protected_reported": 0,
+              "protected_decisions": 0,
+              "extra_findings": 0
+            },
+            "final_score_generated": false
+          }
+        },
+        "execution_provenance": [
+          {
+            "run_id": "P3-01_full_1",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-01_full_1/run-3a2e2dd4794a41d880cf6486eb4ab982/result.json",
+            "opening_path": "直接执行_v2/P3-01_full_1/run-3a2e2dd4794a41d880cf6486eb4ab982/opening.json",
+            "events_path": "直接执行_v2/P3-01_full_1/run-3a2e2dd4794a41d880cf6486eb4ab982/events.jsonl",
+            "started_at": "2026-10-03T14:47:37.139945+00:00",
+            "finished_at": "2026-10-03T14:50:12.212178+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a1023c-20bb-7df3-9489-0955e18411d3"
+            ],
+            "report_sha256": "312aef1581f0a8b6cbbd1de250417c07384a9fd3c8f71ce3477fa0eaaf771c86",
+            "events_sha256": "163816e899c291b728f444871f662dfcc3ee1392f509b67de1141d7796d7c9e3",
+            "receipt_sha256": "5d9fb22760d1cd418c9077c63470fa9e6e906dcc4f84ec87a9c31a995f30b34e",
+            "opening_sha256": "212cf498a324292441bb1784d799df543f18bf2723ea7fd38923950e7f275620",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": null,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-01_full_2",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-01_full_2/run-56483ef77be1461189da4b57991e867a/result.json",
+            "opening_path": "直接执行_v2/P3-01_full_2/run-56483ef77be1461189da4b57991e867a/opening.json",
+            "events_path": "直接执行_v2/P3-01_full_2/run-56483ef77be1461189da4b57991e867a/events.jsonl",
+            "started_at": "2026-10-03T14:47:37.140915+00:00",
+            "finished_at": "2026-10-03T14:51:25.981187+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a1023c-20bb-7352-8fbb-909c5e05a578"
+            ],
+            "report_sha256": "27b04ae9de1f09161dd1cdac7d028f209613434e7434e224814c43187c9594f6",
+            "events_sha256": "6e1f0de69920d52a5b73a9ddbfc39f122871ae966b8f86058dbfae5ca8cf89fd",
+            "receipt_sha256": "867e6bdddd4127ea735dcf3b0b2e48d14ec0d3cde5122cf14c0b7973a7e127d7",
+            "opening_sha256": "020afccd23d12782ad1b30cdefb77e1e4b979d05db0ee7c2088374903c87693b",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": null,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-02_full_1",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-02_full_1/run-05bbdce1849a47858ceabc5929e04df1/result.json",
+            "opening_path": "直接执行_v2/P3-02_full_1/run-05bbdce1849a47858ceabc5929e04df1/opening.json",
+            "events_path": "直接执行_v2/P3-02_full_1/run-05bbdce1849a47858ceabc5929e04df1/events.jsonl",
+            "started_at": "2026-10-03T14:52:21.260713+00:00",
+            "finished_at": "2026-10-03T14:55:20.023943+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10240-7656-7611-ab36-697d1c5d14dc"
+            ],
+            "report_sha256": "a1178d8750ee4f3b97d26e00080e55a71d69d54574abfd9db811e8426b1cc3d2",
+            "events_sha256": "3eb8a8844c8c9488e3a3469e8ff3051a1c229ac601ae3acd64a7051ad8ba8f39",
+            "receipt_sha256": "a196eeac0b758165c4beb085d8283be87d592a4de962691c923b0f14076d7d9a",
+            "opening_sha256": "131f93f89ac9a3b44f391c4c201f9509335568300b6163feb6da85681ab51f81",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-02_full_2",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-02_full_2/run-d512c66b67324b5bbd16797fc9294c08/result.json",
+            "opening_path": "直接执行_v2/P3-02_full_2/run-d512c66b67324b5bbd16797fc9294c08/opening.json",
+            "events_path": "直接执行_v2/P3-02_full_2/run-d512c66b67324b5bbd16797fc9294c08/events.jsonl",
+            "started_at": "2026-10-03T14:52:21.260970+00:00",
+            "finished_at": "2026-10-03T14:55:12.861236+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10240-7656-7d70-ab68-7dcb9a58dd88"
+            ],
+            "report_sha256": "1872bc0a5cd35ecd75103ea67d9d475e808ba168b0ca96bf37145c80bff77c93",
+            "events_sha256": "769da90e59850184a6651d8a3b00e3de4065aa968b375362c273ba8fd8d34821",
+            "receipt_sha256": "0d9d0433bc4fd4f744675dc06749afa546b9ad02adb5cc7e97c61550fe1867d6",
+            "opening_sha256": "cf9aa74a5f5dff69779147be18d9a0f65213c65d26f76bb899fa4927c1ed5920",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-03_full_1",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-03_full_1/run-867ad1048b1d49bbb16e54d31e6d214a/result.json",
+            "opening_path": "直接执行_v2/P3-03_full_1/run-867ad1048b1d49bbb16e54d31e6d214a/opening.json",
+            "events_path": "直接执行_v2/P3-03_full_1/run-867ad1048b1d49bbb16e54d31e6d214a/events.jsonl",
+            "started_at": "2026-10-03T14:55:53.130075+00:00",
+            "finished_at": "2026-10-03T14:59:49.146632+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10243-b173-7f41-bba8-ac7b393dbe86"
+            ],
+            "report_sha256": "50539748f41ad5b5d23b53d592a1d008198edea5693c4d2d995ab2251ba23f4b",
+            "events_sha256": "227b5065a2d7d7a7a0a63f661409a9099db79ce4361eb1e9f5b39fb1a0b37784",
+            "receipt_sha256": "6be3824d6330f0522e5672ae8c0ab445946faea626aba152824e748edc94bdd6",
+            "opening_sha256": "37189852049b6f6682c5021f34a4948b302d70cd67f2d4b82dee9ec713247efe",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-03_full_2",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-03_full_2/run-b2045ca340e14776a5ec591c1a98c8cd/result.json",
+            "opening_path": "直接执行_v2/P3-03_full_2/run-b2045ca340e14776a5ec591c1a98c8cd/opening.json",
+            "events_path": "直接执行_v2/P3-03_full_2/run-b2045ca340e14776a5ec591c1a98c8cd/events.jsonl",
+            "started_at": "2026-10-03T15:00:29.750826+00:00",
+            "finished_at": "2026-10-03T15:04:24.534715+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10247-ea82-7a63-b0f3-7656421e0b94"
+            ],
+            "report_sha256": "25e2053e4ccc3b4d9ca331a597e1ba6fa9510c1e0a1efbd796f5d492742d5ab5",
+            "events_sha256": "d128008a066f1a4f5c0279ce960e33388e65988eaa9bf8da3428f5bc964f3c54",
+            "receipt_sha256": "b85230fc9094380ed98585ff8313a895dd0514511a024e1f74c907112f53baca",
+            "opening_sha256": "813e1a4c8fd2531b69864b76b4f86d3ae0735e452a98196ccc8013321eefecdb",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-04_full_1",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-04_full_1/run-11f818972f80439d8ba509f53ef58283/result.json",
+            "opening_path": "直接执行_v2/P3-04_full_1/run-11f818972f80439d8ba509f53ef58283/opening.json",
+            "events_path": "直接执行_v2/P3-04_full_1/run-11f818972f80439d8ba509f53ef58283/events.jsonl",
+            "started_at": "2026-10-03T15:03:47.599339+00:00",
+            "finished_at": "2026-10-03T15:06:34.574827+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a1024a-ef21-7341-b876-a48dbced2df2"
+            ],
+            "report_sha256": "95d32a492e997166637746e93df8075e61516627b8f9796ad4549c98e9bcc82c",
+            "events_sha256": "39ce260ad243f1a150e359f474adc387a0151a0b517b89c158d149e622ce8a2b",
+            "receipt_sha256": "6fe57a1d0a0f2bf3e2b76b0ca77e9c5b5aa219c221aaf96a28225182db4baa1e",
+            "opening_sha256": "042dba21107de08ae9cfd80f99cec314a5412b70840e4f4da1a20cde366b01a4",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-04_full_2",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-04_full_2/run-08e4233a78844e8bb1924b2184581d5b/result.json",
+            "opening_path": "直接执行_v2/P3-04_full_2/run-08e4233a78844e8bb1924b2184581d5b/opening.json",
+            "events_path": "直接执行_v2/P3-04_full_2/run-08e4233a78844e8bb1924b2184581d5b/events.jsonl",
+            "started_at": "2026-10-03T15:04:09.485278+00:00",
+            "finished_at": "2026-10-03T15:06:47.896049+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a1024b-444e-7001-af45-a3fa1c9a91f6"
+            ],
+            "report_sha256": "1f54f2ff8f8f420c1746ded4296215a9a0b3013bb5184e880e170200ab17d1b0",
+            "events_sha256": "de917406a819db1459b01d393fbdb46852a29eef72e214db2a2da1474add7ee5",
+            "receipt_sha256": "07dfccfc94a7802a3d3c6da7de46c272ffccd756240595fe3ea9f50f6ab70842",
+            "opening_sha256": "dc48b48212039e54abe63b574839dbc1a8eb789a547f82590fdc74fe0426860d",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-06_full_1",
+            "execution_kind": "historical",
+            "receipt_path": "CLI执行/P3-06_full_1/批次1/执行结果.json",
+            "opening_path": "CLI执行/P3-06_full_1/批次1/开读冻结.json",
+            "events_path": "CLI执行/P3-06_full_1/批次1/events.jsonl",
+            "started_at": "2026-10-03T13:46:17.429007+00:00",
+            "finished_at": "2026-10-03T13:49:05.037757+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10203-fad2-7f33-97c0-1f1ae7de0254"
+            ],
+            "report_sha256": "b73b4309d2ce59fb6d2418a7a6eed2493f491b44eb1670158d2ef70d2499bee6",
+            "events_sha256": "60d9d093014ee4f7d58d67224ba60bc18ce65c7f6c88961f2352c51c8c198d44",
+            "receipt_sha256": "bfd88cfcc2aa86baea3c7533e9ae2977c89790b1ebbc2b6933e91b7c11f8a73a",
+            "opening_sha256": "ec1cd374a6d2b3cde05ca2f7772bfe81acc4353777092acc713c134dd6a925b0",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": null,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "external_historical_audit"
+          },
+          {
+            "run_id": "P3-06_full_2",
+            "execution_kind": "historical",
+            "receipt_path": "CLI执行/P3-06_full_2/批次1/执行结果.json",
+            "opening_path": "CLI执行/P3-06_full_2/批次1/开读冻结.json",
+            "events_path": "CLI执行/P3-06_full_2/批次1/events.jsonl",
+            "started_at": "2026-10-03T13:43:26.265309+00:00",
+            "finished_at": "2026-10-03T13:46:17.422093+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10201-5e4f-7330-88ba-d952514c54a0"
+            ],
+            "report_sha256": "175987033bbb362c51e0d54cc8297f9896cd89c8191f7556b595b77a24cceac8",
+            "events_sha256": "cefb46578dc3b2e5a986a5e02615f5c4c8935122df000baba5151a07001a020f",
+            "receipt_sha256": "9545267cb92fef1bf9b367379b39b9a25c257765ebec512e4b0a832a94690699",
+            "opening_sha256": "d009b80f51ee382440cc180ae1d094a73eeaf26597fa607ffb9583786fb67bf9",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": null,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "external_historical_audit"
+          },
+          {
+            "run_id": "P3-01_selected_1",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-01_selected_1/run-b010a5c97aef49868928d603d53c616c/result.json",
+            "opening_path": "直接执行_v2/P3-01_selected_1/run-b010a5c97aef49868928d603d53c616c/opening.json",
+            "events_path": "直接执行_v2/P3-01_selected_1/run-b010a5c97aef49868928d603d53c616c/events.jsonl",
+            "started_at": "2026-10-03T14:47:37.140961+00:00",
+            "finished_at": "2026-10-03T14:50:40.996393+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a1023c-20bc-7a13-9b65-cefbb5bae3ed"
+            ],
+            "report_sha256": "bf15dc5f19fb1a644590a932ed4bab17c7554393cde33b35c5fbac41693135a9",
+            "events_sha256": "ba3cc768db65e043fa42df7663aa33230baf661b8c6158f35deb3d13a4010235",
+            "receipt_sha256": "3e2986c341a545750825da88d11702b181384a4d17186ae06618477e4b8ad1eb",
+            "opening_sha256": "9d026d401800e1bc2548ce7a34a4190a91973c65ede34158954c72b3592716fe",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": null,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-01_selected_2",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-01_selected_2/run-219c94a834a3448c911d39dc710b5972/result.json",
+            "opening_path": "直接执行_v2/P3-01_selected_2/run-219c94a834a3448c911d39dc710b5972/opening.json",
+            "events_path": "直接执行_v2/P3-01_selected_2/run-219c94a834a3448c911d39dc710b5972/events.jsonl",
+            "started_at": "2026-10-03T14:52:21.261014+00:00",
+            "finished_at": "2026-10-03T14:55:53.127611+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10240-7656-7183-b338-35c5b1f9e2fb"
+            ],
+            "report_sha256": "9ff134a161cb0c578f90104958ccd8977ccdd9a22209fe228ca59541ce4518ad",
+            "events_sha256": "505d7ba7e930f474bd677d8354f9983ae19d1494233c023a00caedb0317b9ef6",
+            "receipt_sha256": "952e705ba96d48a32e4233b0b585ba41571c91a344aeba1a8b46d5fe95f7a0b7",
+            "opening_sha256": "6dbda579729c7ab9ec09b63f986d33d2537a6d8918a3a9f2d0c02cb1482ce0b5",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-02_selected_1",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-02_selected_1/run-be1bb7e55edd49e3821090b2a55589f2/result.json",
+            "opening_path": "直接执行_v2/P3-02_selected_1/run-be1bb7e55edd49e3821090b2a55589f2/opening.json",
+            "events_path": "直接执行_v2/P3-02_selected_1/run-be1bb7e55edd49e3821090b2a55589f2/events.jsonl",
+            "started_at": "2026-10-03T14:55:12.863933+00:00",
+            "finished_at": "2026-10-03T14:58:18.194381+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10243-14a6-71f0-8b5f-6ae5d4166e5b"
+            ],
+            "report_sha256": "ed8a22e3d2fedfff81fb8da078bd80c0626218795982f3c86e1bbe4507341e9c",
+            "events_sha256": "56f3bc1046b38cd8302b092be9244faa47077dc65f62a1d38e29b8992922d107",
+            "receipt_sha256": "760b13639fc56ca4a2ae926c03c7a43fad959a8d25f78900bf7425251894acbb",
+            "opening_sha256": "fe0b91179ab3faccc895310c4ac0e150d40609892ed7a466e155248bac5d6614",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-02_selected_2",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-02_selected_2/run-e9992a4a72ff4863ae33fc8620ee8fc3/result.json",
+            "opening_path": "直接执行_v2/P3-02_selected_2/run-e9992a4a72ff4863ae33fc8620ee8fc3/opening.json",
+            "events_path": "直接执行_v2/P3-02_selected_2/run-e9992a4a72ff4863ae33fc8620ee8fc3/events.jsonl",
+            "started_at": "2026-10-03T14:55:20.025802+00:00",
+            "finished_at": "2026-10-03T14:58:42.294120+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10243-3012-7020-b9a6-3ee21127544d"
+            ],
+            "report_sha256": "9b72c6c279d273c0c2f5b2c3e404ccff356a50f38f6f9765d5781a6b9e4cdc97",
+            "events_sha256": "e0b5a3df063d0ae41730d9fb89f60bc5ddef8cdef6663dce6377655f1e939c0d",
+            "receipt_sha256": "e3abd609f356a0a3436cb0db2a23f778f103584ab810f07b0c5fb8fb1b0ac51a",
+            "opening_sha256": "07953afa6ee21c611676bd1b62368bce76b7fff0de43cdbb2b29a7ea66bdfd07",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-03_selected_1",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-03_selected_1/run-f954b4871c5a41b5aa3c824bbf02d96f/result.json",
+            "opening_path": "直接执行_v2/P3-03_selected_1/run-f954b4871c5a41b5aa3c824bbf02d96f/opening.json",
+            "events_path": "直接执行_v2/P3-03_selected_1/run-f954b4871c5a41b5aa3c824bbf02d96f/events.jsonl",
+            "started_at": "2026-10-03T15:00:29.749862+00:00",
+            "finished_at": "2026-10-03T15:04:09.483155+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10247-ea83-7f21-8769-74f9025a8816"
+            ],
+            "report_sha256": "289672b34dc0d32931ba9db23289fcfc1305a97404965ea9f1b813d4bb8ab23b",
+            "events_sha256": "7e7b98514b96c2dede239c14e2ab17a57b9ff21bfbf2ccfcd782fff33d7c088a",
+            "receipt_sha256": "330c8fff885c577aa47f3af3a723f600f8ad1092693ade580d5e3a95846f8972",
+            "opening_sha256": "73e9f1d99712986ca7110619ee11317ccf8cfc4389a76ef010ef46f2d4a625ae",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-03_selected_2",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-03_selected_2/run-af0284b6e88d4672892eec28399dafa8/result.json",
+            "opening_path": "直接执行_v2/P3-03_selected_2/run-af0284b6e88d4672892eec28399dafa8/opening.json",
+            "events_path": "直接执行_v2/P3-03_selected_2/run-af0284b6e88d4672892eec28399dafa8/events.jsonl",
+            "started_at": "2026-10-03T15:00:29.750105+00:00",
+            "finished_at": "2026-10-03T15:03:47.597031+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10247-ea82-7dc0-8afa-376fabfb7e52"
+            ],
+            "report_sha256": "1587eab65181c47aba557f8f27522e1d7d39b7bd2c18170495942b0bfc3012a8",
+            "events_sha256": "1c1c04050ab64b4085336c955d81281edc3b90a30b7e967338a7b0a6f37bf1b7",
+            "receipt_sha256": "adb461df5a318f777b10b767e939e6e50c147fbcffd9876bc9928ffede55b807",
+            "opening_sha256": "7b18fb86fd1c58e49df5e05829eaa4ce09eaedaf74d35d83725a5445c6750b59",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-04_selected_1",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-04_selected_1/run-8be4a361c4d64bb08945acf3d4b12fe8/result.json",
+            "opening_path": "直接执行_v2/P3-04_selected_1/run-8be4a361c4d64bb08945acf3d4b12fe8/opening.json",
+            "events_path": "直接执行_v2/P3-04_selected_1/run-8be4a361c4d64bb08945acf3d4b12fe8/events.jsonl",
+            "started_at": "2026-10-03T15:04:24.537243+00:00",
+            "finished_at": "2026-10-03T15:07:32.108174+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a1024b-7f16-7be0-9f27-4f421b4eab1b"
+            ],
+            "report_sha256": "793008d04cf1593b6cc32acf0b21b10e656b0d461994b1cc5a4ba019e866fc4c",
+            "events_sha256": "cdb584016e3c0ea5a6ddc259fdbbece61cca15074f72a1c5c1d1c22c2c7881f2",
+            "receipt_sha256": "6d9ca7d08779dc27870dd41cd9eaac8e8f2c2bd896dfb3609f26db48bb44e418",
+            "opening_sha256": "ba7b7187a7ad5a1661fa6e59284b6c4f9eae33ba829661276e8398db32563c93",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-06_selected_1",
+            "execution_kind": "historical",
+            "receipt_path": "CLI执行/P3-06_selected_1/批次1/执行结果.json",
+            "opening_path": "CLI执行/P3-06_selected_1/批次1/开读冻结.json",
+            "events_path": "CLI执行/P3-06_selected_1/批次1/events.jsonl",
+            "started_at": "2026-10-03T13:37:38.384519+00:00",
+            "finished_at": "2026-10-03T13:43:26.257238+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a101fc-0f41-7e43-aecb-84732728d486"
+            ],
+            "report_sha256": "ba614fd89f749a7331cb55ba5ef49f8c5424f70e9a9fc7959b1f6db03c4b4dbf",
+            "events_sha256": "14ea313ee787e90e8860c726e5a2c7b53ba4a9ba144edaa805a0e946a64b94db",
+            "receipt_sha256": "a733b95b0d494e3e94e26585a23964bc640ff00239d8f0478054fef3518ee60a",
+            "opening_sha256": "dd107a6cd1e5b39f60821ff4e2ba71dd5fffe6d62fd8c69cd19a1c03e12e3fc2",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": null,
+            "observed_collaboration_calls": [
+              {
+                "tool": "wait",
+                "event_lines": [
+                  18,
+                  19
+                ]
+              },
+              {
+                "tool": "wait",
+                "event_lines": [
+                  20,
+                  21
+                ]
+              },
+              {
+                "tool": "wait",
+                "event_lines": [
+                  23,
+                  24
+                ]
+              },
+              {
+                "tool": "wait",
+                "event_lines": [
+                  25,
+                  26
+                ]
+              }
+            ],
+            "observed_collaboration_call_count": 4,
+            "execution_eligibility": "replacement_required_confirmed_by_parent",
+            "replacement_output": "补充独立输出/P3-06_selected_1.md"
+          },
+          {
+            "run_id": "P3-06_selected_2",
+            "execution_kind": "historical",
+            "receipt_path": "CLI执行/P3-06_selected_2/批次1/执行结果.json",
+            "opening_path": "CLI执行/P3-06_selected_2/批次1/开读冻结.json",
+            "events_path": "CLI执行/P3-06_selected_2/批次1/events.jsonl",
+            "started_at": "2026-10-03T13:33:49.842964+00:00",
+            "finished_at": "2026-10-03T13:37:38.378724+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a101f8-92d3-7d91-a03a-5a98b2977abe"
+            ],
+            "report_sha256": "7cb4e659e86935b1ebb288ea6773892f0e47ec0bc06c5321619679a944b856b6",
+            "events_sha256": "c8e15aa3b6c9094f406cc9cab34b8e0a770d748efed9c16d1b468dec7334d9f3",
+            "receipt_sha256": "a959a0d32be1c476254f9c1e30912fc3aca0cf8c78d2b936804b5df6dceaba0b",
+            "opening_sha256": "ad4eb869b3771f6b40ccd3673edaf430aa63f4f0db99004a512a1f1f50121d61",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": null,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "external_historical_audit"
+          }
+        ],
+        "updated_at": "2026-10-04T00:13:54.638836+00:00",
+        "validation": {
+          "all_19_judgment_rows_complete": true,
+          "all_evidence_present_in_raw_reports": true,
+          "all_19_report_hashes_match_receipts_and_frozen_copies": true,
+          "all_19_actual_prompts_match_group_manifests": true,
+          "verify_without_require_outputs": {
+            "full": {
+              "ok": true,
+              "checked_at": "2026-10-04T00:13:54Z",
+              "problems": [],
+              "missing_outputs": [
+                "outputs/P3-05_full_1.md",
+                "outputs/P3-05_full_2.md"
+              ]
+            },
+            "selected": {
+              "ok": true,
+              "checked_at": "2026-10-04T00:13:54Z",
+              "problems": [],
+              "missing_outputs": [
+                "outputs/P3-04_selected_2.md",
+                "outputs/P3-05_selected_1.md",
+                "outputs/P3-05_selected_2.md"
+              ]
+            },
+            "selected_after": {
+              "ok": true,
+              "checked_at": "2026-10-04T00:13:54Z",
+              "problems": [],
+              "missing_outputs": [
+                "outputs/P3-05_selected_after_1.md",
+                "outputs/P3-05_selected_after_2.md"
+              ]
+            }
+          },
+          "final_score_generated": false
+        }
+      }
+    },
+    {
+      "stage": "25_reports_before_final_receipts",
+      "source_sha256": "2e8d61969fe0cfb0c71aeb188d2e1dd6c3e3a7abe4fae0a2f4d7b73dd2cebd80",
+      "table": {
+        "schema_version": 1,
+        "quality_judgment_source": "model_comparison",
+        "quality_acceptance": "not_determined",
+        "status": "partial_25_of_26_pending_replacement",
+        "scope": "review_only",
+        "runs": [
+          {
+            "run_id": "P3-01_full_1",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-01-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "没有承接他如何从已记住的开闸信号转为关闸判断。",
+                "reason": "报告 CE-1 正式定 S2，诊断已记住三下开闸、清楚敲三下、随后自认关严之间的认知与行动承接，匹配答案核心。没有把人物犯错本身定错，也没有推断闸门实际位置；答案的操作与结果相反应按此较窄证据理解。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-01-protected-1",
+                "reported": false,
+                "evidence": "他以为只是雨急",
+                "reason": "报告将雨急限定为人物判断并保留，不把人物误判或水声原因留白另报成矛盾。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-01_full_2",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-01-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "这里缺少从既有正确认知转为相反判断的桥接。",
+                "reason": "报告 CE-1 正式定 S2，诊断已记住三下开闸、清楚敲三下、随后自认关严之间的认知与行动承接，匹配答案核心。没有把人物犯错本身定错，也没有推断闸门实际位置；答案的操作与结果相反应按此较窄证据理解。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-01-protected-1",
+                "reported": false,
+                "evidence": "他以为只是雨急",
+                "reason": "报告将雨急限定为人物判断并保留，不把人物误判或水声原因留白另报成矛盾。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-01_selected_1",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-01-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "前文已明确交代信号含义和陈岭记住该含义的状态；候选又特意写三下敲声清晰。",
+                "reason": "报告 CE-1 正式定 S2，诊断已记住三下开闸、清楚敲三下、随后自认关严之间的认知与行动承接，匹配答案核心。没有把人物犯错本身定错，也没有推断闸门实际位置；答案的操作与结果相反应按此较窄证据理解。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-01-protected-1",
+                "reported": false,
+                "evidence": "他以为只是雨急",
+                "reason": "报告将雨急限定为人物判断并保留，不把人物误判或水声原因留白另报成矛盾。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-01_selected_2",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-01-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "问题不在于人物不能犯错，也不在于对白必须可靠，而在于这个已知信息与现场判断的变化缺少可辨认的承接。",
+                "reason": "报告 CE-1 正式定 S2，诊断已记住三下开闸、清楚敲三下、随后自认关严之间的认知与行动承接，匹配答案核心。没有把人物犯错本身定错，也没有推断闸门实际位置；答案的操作与结果相反应按此较窄证据理解。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-01-protected-1",
+                "reported": false,
+                "evidence": "他以为只是雨急",
+                "reason": "报告将雨急限定为人物判断并保留，不把人物误判或水声原因留白另报成矛盾。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-02_full_1",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-02-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "行动者本身没有指代歧义，问题是必要的物件交接没有承接，故定 S2，不升为 S1。",
+                "reason": "报告 CE-1 正式定 S2，对照唯一钥匙仍在顾婶右腕与许青从自己腰间取用、重新挂回的状态转换，命中同一次缺失交接；不把指代或一般钥匙来历另算问题。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-02-protected-1",
+                "reported": false,
+                "evidence": "齐了",
+                "reason": "报告保留装载完成后的自然短答，没有要求补成书面完整句。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-02_full_2",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-02-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "同一场景连续行动中，钥匙的持有人和佩挂位置没有过渡就改变。",
+                "reason": "报告 CE-1 正式定 S2，对照唯一钥匙仍在顾婶右腕与许青从自己腰间取用、重新挂回的状态转换，命中同一次缺失交接；不把指代或一般钥匙来历另算问题。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-02-protected-1",
+                "reported": false,
+                "evidence": "齐了",
+                "reason": "报告保留装载完成后的自然短答，没有要求补成书面完整句。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-02_selected_1",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-02-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "问题是当前动作所需的道具转移缺少承接，不是“自己”的指代不清，也不只是钥匙旧来历未供给。",
+                "reason": "报告 CE-1 正式定 S2，对照唯一钥匙仍在顾婶右腕与许青从自己腰间取用、重新挂回的状态转换，命中同一次缺失交接；不把指代或一般钥匙来历另算问题。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-02-protected-1",
+                "reported": false,
+                "evidence": "齐了",
+                "reason": "报告保留装载完成后的自然短答，没有要求补成书面完整句。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-02_selected_2",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-02-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "前文又明确东仓只有这一把，不能顺读为许青另有备用钥匙。",
+                "reason": "报告 CE-1 正式定 S2，对照唯一钥匙仍在顾婶右腕与许青从自己腰间取用、重新挂回的状态转换，命中同一次缺失交接；不把指代或一般钥匙来历另算问题。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-02-protected-1",
+                "reported": false,
+                "evidence": "齐了",
+                "reason": "报告保留装载完成后的自然短答，没有要求补成书面完整句。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-03_full_1",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-03-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "候选没有时间跳转、账本归还或转移的提示，读者无法理解账本如何到了胡宁手里的纸盒中。",
+                "reason": "报告 CE-1 正式定 S2，明确三条折棱锁定青纸盒，账本仍随未归旧铁盒在隔壁，候选取账本及放回无法连续理解；命中物件身份和位置承接，不把两个表现重复计数。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-03-protected-1",
+                "reported": false,
+                "evidence": "后厨传来许蔓的声音",
+                "reason": "报告保留明确的对白声源，不要求补许蔓走回桌旁或每一步递糕动作。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-03_full_2",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-03-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "前文最后交接的是待装茶点的青纸盒，装账本的旧铁盒已被王姨带走且尚未送回；候选紧接着让胡宁从这个纸盒里取出同称为“店里的账本”的物件，没有取回、转放或时间跳接的交代。",
+                "reason": "报告 CE-1 正式定 S2，明确三条折棱锁定青纸盒，账本仍随未归旧铁盒在隔壁，候选取账本及放回无法连续理解；命中物件身份和位置承接，不把两个表现重复计数。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-03-protected-1",
+                "reported": false,
+                "evidence": "后厨传来许蔓的声音",
+                "reason": "报告保留明确的对白声源，不要求补许蔓走回桌旁或每一步递糕动作。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-03_selected_1",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-03-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "问题在账本状态的承接，不在这个限定语；不宜删掉识别信息来掩盖问题。",
+                "reason": "报告 CE-1 正式定 S2，明确三条折棱锁定青纸盒，账本仍随未归旧铁盒在隔壁，候选取账本及放回无法连续理解；命中物件身份和位置承接，不把两个表现重复计数。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-03-protected-1",
+                "reported": false,
+                "evidence": "后厨传来许蔓的声音",
+                "reason": "报告保留明确的对白声源，不要求补许蔓走回桌旁或每一步递糕动作。"
+              }
+            ],
+            "extra_findings": [],
+            "supply_observation": {
+              "evidence": "核账条的形成经过未供给，单列而不定级。",
+              "assessment": "报告另列核账条形成经过待核，同时明确当前叙述足以交代夹条人和用途、不妨碍理解、不要求必补核账戏。因此不计正文误报；相较其他三份报告，存在轻微、非必要的供给待核扩张，不宜当作必须补料的要求。"
+            }
+          },
+          {
+            "run_id": "P3-03_selected_2",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [
+              {
+                "issue_id": "P3-03-1",
+                "detected": true,
+                "severity": "S2",
+                "evidence": "这是已给原文之间的具体动作承接缺口，不是仅因缺少物件早期来历而报错；不另拆成多条重复计数。",
+                "reason": "报告 CE-1 正式定 S2，明确三条折棱锁定青纸盒，账本仍随未归旧铁盒在隔壁，候选取账本及放回无法连续理解；命中物件身份和位置承接，不把两个表现重复计数。"
+              }
+            ],
+            "protected": [
+              {
+                "protected_id": "P3-03-protected-1",
+                "reported": false,
+                "evidence": "后厨传来许蔓的声音",
+                "reason": "报告保留明确的对白声源，不要求补许蔓走回桌旁或每一步递糕动作。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-04_full_1",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-04-protected-1",
+                "reported": false,
+                "evidence": "次日上午，北山邮亭",
+                "reason": "报告明确识别隔夜转线，不要求继承码头的雨、韩江视角或情绪。"
+              },
+              {
+                "protected_id": "P3-04-protected-2",
+                "reported": false,
+                "evidence": "开不开",
+                "reason": "报告保留开不开与开的现场问答，邮亭开门计划及翻牌动作足以限定省略对象。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-04_full_2",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-04-protected-1",
+                "reported": false,
+                "evidence": "次日上午，北山邮亭",
+                "reason": "报告明确识别隔夜转线，不要求继承码头的雨、韩江视角或情绪。"
+              },
+              {
+                "protected_id": "P3-04-protected-2",
+                "reported": false,
+                "evidence": "开不开",
+                "reason": "报告保留开不开与开的现场问答，邮亭开门计划及翻牌动作足以限定省略对象。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-04_selected_1",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-04-protected-1",
+                "reported": false,
+                "evidence": "次日上午，北山邮亭",
+                "reason": "报告明确识别隔夜转线，不要求继承码头的雨、韩江视角或情绪。"
+              },
+              {
+                "protected_id": "P3-04-protected-2",
+                "reported": false,
+                "evidence": "开不开",
+                "reason": "报告保留开不开与开的现场问答，邮亭开门计划及翻牌动作足以限定省略对象。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-06_full_1",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-06-protected-1",
+                "reported": false,
+                "evidence": "沈禾想问一句信上写了什么，嘴张了张，又闭上。",
+                "reason": "报告将信的内容与人物关系保留为未知，没有要求此场揭晓或追加正文错误。"
+              },
+              {
+                "protected_id": "P3-06-protected-2",
+                "reported": false,
+                "evidence": "出门时还好",
+                "reason": "报告明确保留沈禾只能确认离家时状况的知情范围和口语省略。"
+              },
+              {
+                "protected_id": "P3-06-protected-3",
+                "reported": false,
+                "evidence": "老人接过信，没立刻拆",
+                "reason": "报告保留老人暂不拆信的动作，不要求本场展示信中真相。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-06_full_2",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-06-protected-1",
+                "reported": false,
+                "evidence": "沈禾想问一句信上写了什么，嘴张了张，又闭上。",
+                "reason": "报告将信的内容与人物关系保留为未知，没有要求此场揭晓或追加正文错误。"
+              },
+              {
+                "protected_id": "P3-06-protected-2",
+                "reported": false,
+                "evidence": "出门时还好",
+                "reason": "报告明确保留沈禾只能确认离家时状况的知情范围和口语省略。"
+              },
+              {
+                "protected_id": "P3-06-protected-3",
+                "reported": false,
+                "evidence": "老人接过信，没立刻拆",
+                "reason": "报告保留老人暂不拆信的动作，不要求本场展示信中真相。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-06_selected_1",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-06-protected-1",
+                "reported": false,
+                "evidence": "沈禾想问一句信上写了什么，嘴张了张，又闭上。",
+                "reason": "报告将信的内容与人物关系保留为未知，没有要求此场揭晓或追加正文错误。"
+              },
+              {
+                "protected_id": "P3-06-protected-2",
+                "reported": false,
+                "evidence": "出门时还好",
+                "reason": "报告明确保留沈禾只能确认离家时状况的知情范围和口语省略。"
+              },
+              {
+                "protected_id": "P3-06-protected-3",
+                "reported": false,
+                "evidence": "老人接过信，没立刻拆",
+                "reason": "报告保留老人暂不拆信的动作，不要求本场展示信中真相。"
+              }
+            ],
+            "extra_findings": [],
+            "source_output": "补充独立输出/P3-06_selected_1.md",
+            "runner_job_id": "P3-06_selected_1_direct_v3",
+            "replaces_historical_output": "outputs/P3-06_selected_1.md"
+          },
+          {
+            "run_id": "P3-06_selected_2",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-06-protected-1",
+                "reported": false,
+                "evidence": "沈禾想问一句信上写了什么，嘴张了张，又闭上。",
+                "reason": "报告将信的内容与人物关系保留为未知，没有要求此场揭晓或追加正文错误。"
+              },
+              {
+                "protected_id": "P3-06-protected-2",
+                "reported": false,
+                "evidence": "出门时还好",
+                "reason": "报告明确保留沈禾只能确认离家时状况的知情范围和口语省略。"
+              },
+              {
+                "protected_id": "P3-06-protected-3",
+                "reported": false,
+                "evidence": "老人接过信，没立刻拆",
+                "reason": "报告保留老人暂不拆信的动作，不要求本场展示信中真相。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-04_selected_2",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-04-protected-1",
+                "reported": false,
+                "evidence": "次日上午，北山邮亭",
+                "reason": "明确标记时空和叙事线，报告未强接码头人物或情绪。"
+              },
+              {
+                "protected_id": "P3-04-protected-2",
+                "reported": false,
+                "evidence": "开不开",
+                "reason": "报告保留由开门计划和翻营业牌限定的自然短答。"
+              }
+            ],
+            "extra_findings": []
+          },
+          {
+            "run_id": "P3-05_full_1",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-05-protected-1",
+                "reported": false,
+                "evidence": "她没碰桌角的红钮。",
+                "reason": "报告没有从红钮用途未供给推断必须按钮或正文写错，也未报成无功能重复。"
+              }
+            ],
+            "extra_findings": [
+              {
+                "id": "P3-05-extra-three-subject-comma-rhythm",
+                "severity": "S3",
+                "evidence": "这一句用逗号连续连接“灯”“送信的人”“她”三个不同主语的独立分句",
+                "false_positive": false,
+                "reason": "这是答案外可选节奏建议，依据冻结 L2-7 的三主语逗号规则且只建议第三分句改句号，报告承认意义及指代清楚。P3 不是 K 对照组，不能因答案没有收录便自动记误报；可保留为有规则依据的 S3 偏好，不升级正文硬错。其他报告保留此句说明建议不稳定。"
+              }
+            ],
+            "supply_check": {
+              "phase": "initial",
+              "mechanism_uncertainty_identified": true,
+              "source_range_identified": true,
+              "explicit_supply_pending": true,
+              "mechanism_graded_as_text_error": false,
+              "full_answer_behavior_met": true,
+              "evidence": "应提供此前首次说明或实际演示这套报信操作、红钮用途及“老规矩”的原文完整片段。",
+              "reason": "正式供给待核-1区分可顺读的行动与不可核实的精确信号，给出完整来源范围，不要求候选立刻解释。符合预置供给待核行为。"
+            }
+          },
+          {
+            "run_id": "P3-05_full_2",
+            "condition": "full",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-05-protected-1",
+                "reported": false,
+                "evidence": "她没碰桌角的红钮。",
+                "reason": "报告没有从红钮用途未供给推断必须按钮或正文写错，也未报成无功能重复。"
+              }
+            ],
+            "extra_findings": [],
+            "supply_check": {
+              "phase": "initial",
+              "mechanism_uncertainty_identified": true,
+              "source_range_identified": true,
+              "explicit_supply_pending": false,
+              "mechanism_graded_as_text_error": false,
+              "full_answer_behavior_met": false,
+              "evidence": "未发现妨碍本场理解、需要补读才能判断的前文缺口。",
+              "source_evidence": "若另有核验装置机制的任务，所需原文应是首次说明铜盘刻度、铃声及红钮用途的段落",
+              "reason": "严格按预置答案必须列待核项计不达标，但报告没有假装机制已获确认，并提供条件式补读范围。人物遵嘱操作与应答可支持当前行动理解，精确规则是否此时必须向读者展示存在合理分歧；不应直接算机制漏检或错误断言。"
+            }
+          },
+          {
+            "run_id": "P3-05_selected_1",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-05-protected-1",
+                "reported": false,
+                "evidence": "她没碰桌角的红钮。",
+                "reason": "报告没有从红钮用途未供给推断必须按钮或正文写错，也未报成无功能重复。"
+              }
+            ],
+            "extra_findings": [],
+            "supply_check": {
+              "phase": "initial",
+              "mechanism_uncertainty_identified": true,
+              "source_range_identified": true,
+              "explicit_supply_pending": true,
+              "mechanism_graded_as_text_error": false,
+              "full_answer_behavior_met": true,
+              "evidence": "所需补读范围是更早介绍铜盘三格刻线、铃声与红钮用途，以及“报平安”操作约定的原文场景",
+              "reason": "正式列CE-Q1待核，承认行动可顺读与精确信号不能确认并存；不给正文定级，也不猜红钮用途。"
+            }
+          },
+          {
+            "run_id": "P3-05_selected_2",
+            "condition": "selected",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-05-protected-1",
+                "reported": false,
+                "evidence": "她没碰桌角的红钮。",
+                "reason": "报告没有从红钮用途未供给推断必须按钮或正文写错，也未报成无功能重复。"
+              }
+            ],
+            "extra_findings": [],
+            "supply_check": {
+              "phase": "initial",
+              "mechanism_uncertainty_identified": true,
+              "source_range_identified": true,
+              "explicit_supply_pending": true,
+              "mechanism_graded_as_text_error": false,
+              "full_answer_behavior_met": true,
+              "evidence": "不能独立核实第三格、铃响一声与报平安之间的精确对应",
+              "source_evidence": "需要提供此前首次说明铜盘刻度、铃声与红钮用途的同源正文完整相关段落",
+              "reason": "正式列CE-SUP-1且说明不属于正文定级；补读请求只为规则核验，不要求已可理解的当前动作补解释。"
+            }
+          },
+          {
+            "run_id": "P3-05_selected_after_1",
+            "condition": "selected_after",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-05-protected-1",
+                "reported": false,
+                "evidence": "她没碰桌角的红钮。",
+                "reason": "报告准确引用红钮用于全巷避难、封口未破只用铜盘的前因，保留不按红钮的动作。"
+              }
+            ],
+            "extra_findings": [],
+            "supply_check": {
+              "phase": "after",
+              "rule_meaning_understood": true,
+              "source_used_to_resolve_uncertainty": true,
+              "remaining_mechanism_supply_pending": false,
+              "mechanism_graded_as_text_error": false,
+              "full_answer_behavior_met": true,
+              "evidence": "铜盘指针拨到第三格，小铃响一声，表示送信的人平安抵达；红钮用于叫全巷避难。",
+              "resolution_evidence": "她没有碰红钮，是在执行前文已经说明的报平安操作。",
+              "reason": "准确复述新增试用场景的两种信号及信封未破条件，明确当前必要前因已供给；不是仅未报错，而是以原文说明了不按红钮的正确理由。试用曾手动复位未排除自动复位，不机械新增冲突。"
+            }
+          },
+          {
+            "run_id": "P3-05_selected_after_2",
+            "condition": "selected_after",
+            "execution_date": "2026-10-03",
+            "issues": [],
+            "protected": [
+              {
+                "protected_id": "P3-05-protected-1",
+                "reported": false,
+                "evidence": "她没碰桌角的红钮。",
+                "reason": "报告根据已供给的避难按钮用途和信封完好条件，明确保留不按红钮；不是仅对未知规则保持沉默。"
+              }
+            ],
+            "extra_findings": [],
+            "supply_check": {
+              "phase": "after",
+              "rule_meaning_understood": true,
+              "source_used_to_resolve_uncertainty": true,
+              "remaining_mechanism_supply_pending": false,
+              "mechanism_graded_as_text_error": false,
+              "full_answer_behavior_met": true,
+              "evidence": "本场行动的原因与结果可以顺读理解：封口完好，依已教过的办法报平安；没有启动避难通知。",
+              "resolution_evidence": "报信用途、操作条件、红钮功能、信件到手及封口状态均已在给定前文中交代。",
+              "reason": "准确复述第三格、一声铃、送信人平安与全巷避难的区别，以新给原文和封口状态解释当前行为；原机制疑点已解除，未把未给信件内文或装置原理追加成供给缺口。"
+            }
+          }
+        ],
+        "repairs": [],
+        "missing_run_ids": [
+          "P3-05_selected_after_2"
+        ],
+        "p3_05_supply_check": {
+          "status": "complete_six_reports",
+          "initial_conditions": [
+            "full",
+            "selected"
+          ],
+          "after_condition": "selected_after",
+          "required_initial_behavior": "初始 full 和 selected 均缺操作规则。需指出此前教陆青使用铜盘和红钮、说明两种信号含义的完整试用场景，列供给待核，不将第三格、一次铃声或不按红钮定级正文错误。",
+          "required_after_behavior": "补入完整试用原文后，以新独立盲读确认报平安与避难两种信号，原供给疑点解除；保留不按红钮，不新增硬解释。",
+          "observed_initial_correct": null,
+          "observed_after_resolved": true,
+          "note": "供给待核与补读效果不是工具内置应抓分母，须另作语义记录；无报告不填 false 或成功。",
+          "initial_metrics": {
+            "explicit_supply_pending": {
+              "numerator": 3,
+              "denominator": 4
+            },
+            "mechanism_uncertainty_identified": {
+              "numerator": 4,
+              "denominator": 4
+            },
+            "source_range_identified": {
+              "numerator": 4,
+              "denominator": 4
+            },
+            "mechanism_graded_as_text_error": 0
+          },
+          "after_metrics": {
+            "source_used_to_resolve_uncertainty": {
+              "numerator": 2,
+              "denominator": 2
+            },
+            "remaining_supply_pending": 0,
+            "planned_after_reports": 2
+          },
+          "initial_by_condition": {
+            "full": {
+              "explicit_supply_pending": 1,
+              "reports": 2,
+              "mechanism_uncertainty_identified": 2
+            },
+            "selected": {
+              "explicit_supply_pending": 2,
+              "reports": 2,
+              "mechanism_uncertainty_identified": 2
+            }
+          }
+        },
+        "notes": [
+          "本阶段仅保存现有 19 份报告的语义判分，不启动模型，不运行最终 score，不修改答案、规则、原始回执或报告。",
+          "收齐后按 condition 分组评分。父会话通知最终 selected 改用 context_selected_direct_v3 及补充独立输出/P3-06_selected_1.md；本阶段旧报告仅保留历史语义判断。",
+          "quality_acceptance 保持 not_determined，答案是协调器预置、未获作者核验。",
+          "前三项判分经原报告核验后采用，证据换成更直接的诊断原句；上下文判分_前三项.json 保留。",
+          "P3-06 历史执行资格由另一个代理审计。父会话已确认只有 selected 第 1 轮须补跑，本阶段不把它计作已验证直接盲读。",
+          "缺失输出不算未检出、不算零误报，也不算两轮一致。现有报告无答案外正式定级问题。"
+        ],
+        "conditions": {
+          "full": {
+            "evidence_directory": "工具证据/context_full_direct_v2",
+            "planned_runs": 12,
+            "scored_run_ids": [
+              "P3-01_full_1",
+              "P3-01_full_2",
+              "P3-02_full_1",
+              "P3-02_full_2",
+              "P3-03_full_1",
+              "P3-03_full_2",
+              "P3-04_full_1",
+              "P3-04_full_2",
+              "P3-06_full_1",
+              "P3-06_full_2"
+            ],
+            "missing_run_ids": [
+              "P3-05_full_1",
+              "P3-05_full_2"
+            ],
+            "semantic_metrics_observed_only": {
+              "reports": 10,
+              "detected": {
+                "numerator": 6,
+                "denominator": 6,
+                "rate": 1.0
+              },
+              "severity_attainment": {
+                "numerator": 6,
+                "denominator": 6,
+                "rate": 1.0
+              },
+              "protected_reported": 0,
+              "protected_decisions": 16,
+              "extra_findings": 0
+            },
+            "final_score_generated": false
+          },
+          "selected": {
+            "evidence_directory": "工具证据/context_selected_direct_v2",
+            "planned_runs": 12,
+            "scored_run_ids": [
+              "P3-01_selected_1",
+              "P3-01_selected_2",
+              "P3-02_selected_1",
+              "P3-02_selected_2",
+              "P3-03_selected_1",
+              "P3-03_selected_2",
+              "P3-04_selected_1",
+              "P3-06_selected_1",
+              "P3-06_selected_2"
+            ],
+            "missing_run_ids": [
+              "P3-04_selected_2",
+              "P3-05_selected_1",
+              "P3-05_selected_2"
+            ],
+            "semantic_metrics_observed_only": {
+              "reports": 9,
+              "detected": {
+                "numerator": 6,
+                "denominator": 6,
+                "rate": 1.0
+              },
+              "severity_attainment": {
+                "numerator": 6,
+                "denominator": 6,
+                "rate": 1.0
+              },
+              "protected_reported": 0,
+              "protected_decisions": 14,
+              "extra_findings": 0
+            },
+            "final_score_generated": false
+          },
+          "selected_after": {
+            "evidence_directory": "工具证据/context_selected_after_direct_v2",
+            "planned_runs": 2,
+            "scored_run_ids": [],
+            "missing_run_ids": [
+              "P3-05_selected_after_1",
+              "P3-05_selected_after_2"
+            ],
+            "semantic_metrics_observed_only": {
+              "reports": 0,
+              "detected": {
+                "numerator": 0,
+                "denominator": 0,
+                "rate": null
+              },
+              "severity_attainment": {
+                "numerator": 0,
+                "denominator": 0,
+                "rate": null
+              },
+              "protected_reported": 0,
+              "protected_decisions": 0,
+              "extra_findings": 0
+            },
+            "final_score_generated": false
+          }
+        },
+        "execution_provenance": [
+          {
+            "run_id": "P3-01_full_1",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-01_full_1/run-3a2e2dd4794a41d880cf6486eb4ab982/result.json",
+            "opening_path": "直接执行_v2/P3-01_full_1/run-3a2e2dd4794a41d880cf6486eb4ab982/opening.json",
+            "events_path": "直接执行_v2/P3-01_full_1/run-3a2e2dd4794a41d880cf6486eb4ab982/events.jsonl",
+            "started_at": "2026-10-03T14:47:37.139945+00:00",
+            "finished_at": "2026-10-03T14:50:12.212178+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a1023c-20bb-7df3-9489-0955e18411d3"
+            ],
+            "report_sha256": "312aef1581f0a8b6cbbd1de250417c07384a9fd3c8f71ce3477fa0eaaf771c86",
+            "events_sha256": "163816e899c291b728f444871f662dfcc3ee1392f509b67de1141d7796d7c9e3",
+            "receipt_sha256": "5d9fb22760d1cd418c9077c63470fa9e6e906dcc4f84ec87a9c31a995f30b34e",
+            "opening_sha256": "212cf498a324292441bb1784d799df543f18bf2723ea7fd38923950e7f275620",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": null,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-01_full_2",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-01_full_2/run-56483ef77be1461189da4b57991e867a/result.json",
+            "opening_path": "直接执行_v2/P3-01_full_2/run-56483ef77be1461189da4b57991e867a/opening.json",
+            "events_path": "直接执行_v2/P3-01_full_2/run-56483ef77be1461189da4b57991e867a/events.jsonl",
+            "started_at": "2026-10-03T14:47:37.140915+00:00",
+            "finished_at": "2026-10-03T14:51:25.981187+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a1023c-20bb-7352-8fbb-909c5e05a578"
+            ],
+            "report_sha256": "27b04ae9de1f09161dd1cdac7d028f209613434e7434e224814c43187c9594f6",
+            "events_sha256": "6e1f0de69920d52a5b73a9ddbfc39f122871ae966b8f86058dbfae5ca8cf89fd",
+            "receipt_sha256": "867e6bdddd4127ea735dcf3b0b2e48d14ec0d3cde5122cf14c0b7973a7e127d7",
+            "opening_sha256": "020afccd23d12782ad1b30cdefb77e1e4b979d05db0ee7c2088374903c87693b",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": null,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-02_full_1",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-02_full_1/run-05bbdce1849a47858ceabc5929e04df1/result.json",
+            "opening_path": "直接执行_v2/P3-02_full_1/run-05bbdce1849a47858ceabc5929e04df1/opening.json",
+            "events_path": "直接执行_v2/P3-02_full_1/run-05bbdce1849a47858ceabc5929e04df1/events.jsonl",
+            "started_at": "2026-10-03T14:52:21.260713+00:00",
+            "finished_at": "2026-10-03T14:55:20.023943+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10240-7656-7611-ab36-697d1c5d14dc"
+            ],
+            "report_sha256": "a1178d8750ee4f3b97d26e00080e55a71d69d54574abfd9db811e8426b1cc3d2",
+            "events_sha256": "3eb8a8844c8c9488e3a3469e8ff3051a1c229ac601ae3acd64a7051ad8ba8f39",
+            "receipt_sha256": "a196eeac0b758165c4beb085d8283be87d592a4de962691c923b0f14076d7d9a",
+            "opening_sha256": "131f93f89ac9a3b44f391c4c201f9509335568300b6163feb6da85681ab51f81",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-02_full_2",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-02_full_2/run-d512c66b67324b5bbd16797fc9294c08/result.json",
+            "opening_path": "直接执行_v2/P3-02_full_2/run-d512c66b67324b5bbd16797fc9294c08/opening.json",
+            "events_path": "直接执行_v2/P3-02_full_2/run-d512c66b67324b5bbd16797fc9294c08/events.jsonl",
+            "started_at": "2026-10-03T14:52:21.260970+00:00",
+            "finished_at": "2026-10-03T14:55:12.861236+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10240-7656-7d70-ab68-7dcb9a58dd88"
+            ],
+            "report_sha256": "1872bc0a5cd35ecd75103ea67d9d475e808ba168b0ca96bf37145c80bff77c93",
+            "events_sha256": "769da90e59850184a6651d8a3b00e3de4065aa968b375362c273ba8fd8d34821",
+            "receipt_sha256": "0d9d0433bc4fd4f744675dc06749afa546b9ad02adb5cc7e97c61550fe1867d6",
+            "opening_sha256": "cf9aa74a5f5dff69779147be18d9a0f65213c65d26f76bb899fa4927c1ed5920",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-03_full_1",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-03_full_1/run-867ad1048b1d49bbb16e54d31e6d214a/result.json",
+            "opening_path": "直接执行_v2/P3-03_full_1/run-867ad1048b1d49bbb16e54d31e6d214a/opening.json",
+            "events_path": "直接执行_v2/P3-03_full_1/run-867ad1048b1d49bbb16e54d31e6d214a/events.jsonl",
+            "started_at": "2026-10-03T14:55:53.130075+00:00",
+            "finished_at": "2026-10-03T14:59:49.146632+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10243-b173-7f41-bba8-ac7b393dbe86"
+            ],
+            "report_sha256": "50539748f41ad5b5d23b53d592a1d008198edea5693c4d2d995ab2251ba23f4b",
+            "events_sha256": "227b5065a2d7d7a7a0a63f661409a9099db79ce4361eb1e9f5b39fb1a0b37784",
+            "receipt_sha256": "6be3824d6330f0522e5672ae8c0ab445946faea626aba152824e748edc94bdd6",
+            "opening_sha256": "37189852049b6f6682c5021f34a4948b302d70cd67f2d4b82dee9ec713247efe",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-03_full_2",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-03_full_2/run-b2045ca340e14776a5ec591c1a98c8cd/result.json",
+            "opening_path": "直接执行_v2/P3-03_full_2/run-b2045ca340e14776a5ec591c1a98c8cd/opening.json",
+            "events_path": "直接执行_v2/P3-03_full_2/run-b2045ca340e14776a5ec591c1a98c8cd/events.jsonl",
+            "started_at": "2026-10-03T15:00:29.750826+00:00",
+            "finished_at": "2026-10-03T15:04:24.534715+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10247-ea82-7a63-b0f3-7656421e0b94"
+            ],
+            "report_sha256": "25e2053e4ccc3b4d9ca331a597e1ba6fa9510c1e0a1efbd796f5d492742d5ab5",
+            "events_sha256": "d128008a066f1a4f5c0279ce960e33388e65988eaa9bf8da3428f5bc964f3c54",
+            "receipt_sha256": "b85230fc9094380ed98585ff8313a895dd0514511a024e1f74c907112f53baca",
+            "opening_sha256": "813e1a4c8fd2531b69864b76b4f86d3ae0735e452a98196ccc8013321eefecdb",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-04_full_1",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-04_full_1/run-11f818972f80439d8ba509f53ef58283/result.json",
+            "opening_path": "直接执行_v2/P3-04_full_1/run-11f818972f80439d8ba509f53ef58283/opening.json",
+            "events_path": "直接执行_v2/P3-04_full_1/run-11f818972f80439d8ba509f53ef58283/events.jsonl",
+            "started_at": "2026-10-03T15:03:47.599339+00:00",
+            "finished_at": "2026-10-03T15:06:34.574827+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a1024a-ef21-7341-b876-a48dbced2df2"
+            ],
+            "report_sha256": "95d32a492e997166637746e93df8075e61516627b8f9796ad4549c98e9bcc82c",
+            "events_sha256": "39ce260ad243f1a150e359f474adc387a0151a0b517b89c158d149e622ce8a2b",
+            "receipt_sha256": "6fe57a1d0a0f2bf3e2b76b0ca77e9c5b5aa219c221aaf96a28225182db4baa1e",
+            "opening_sha256": "042dba21107de08ae9cfd80f99cec314a5412b70840e4f4da1a20cde366b01a4",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-04_full_2",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-04_full_2/run-08e4233a78844e8bb1924b2184581d5b/result.json",
+            "opening_path": "直接执行_v2/P3-04_full_2/run-08e4233a78844e8bb1924b2184581d5b/opening.json",
+            "events_path": "直接执行_v2/P3-04_full_2/run-08e4233a78844e8bb1924b2184581d5b/events.jsonl",
+            "started_at": "2026-10-03T15:04:09.485278+00:00",
+            "finished_at": "2026-10-03T15:06:47.896049+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a1024b-444e-7001-af45-a3fa1c9a91f6"
+            ],
+            "report_sha256": "1f54f2ff8f8f420c1746ded4296215a9a0b3013bb5184e880e170200ab17d1b0",
+            "events_sha256": "de917406a819db1459b01d393fbdb46852a29eef72e214db2a2da1474add7ee5",
+            "receipt_sha256": "07dfccfc94a7802a3d3c6da7de46c272ffccd756240595fe3ea9f50f6ab70842",
+            "opening_sha256": "dc48b48212039e54abe63b574839dbc1a8eb789a547f82590fdc74fe0426860d",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-06_full_1",
+            "execution_kind": "historical",
+            "receipt_path": "CLI执行/P3-06_full_1/批次1/执行结果.json",
+            "opening_path": "CLI执行/P3-06_full_1/批次1/开读冻结.json",
+            "events_path": "CLI执行/P3-06_full_1/批次1/events.jsonl",
+            "started_at": "2026-10-03T13:46:17.429007+00:00",
+            "finished_at": "2026-10-03T13:49:05.037757+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10203-fad2-7f33-97c0-1f1ae7de0254"
+            ],
+            "report_sha256": "b73b4309d2ce59fb6d2418a7a6eed2493f491b44eb1670158d2ef70d2499bee6",
+            "events_sha256": "60d9d093014ee4f7d58d67224ba60bc18ce65c7f6c88961f2352c51c8c198d44",
+            "receipt_sha256": "bfd88cfcc2aa86baea3c7533e9ae2977c89790b1ebbc2b6933e91b7c11f8a73a",
+            "opening_sha256": "ec1cd374a6d2b3cde05ca2f7772bfe81acc4353777092acc713c134dd6a925b0",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": null,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "external_historical_audit"
+          },
+          {
+            "run_id": "P3-06_full_2",
+            "execution_kind": "historical",
+            "receipt_path": "CLI执行/P3-06_full_2/批次1/执行结果.json",
+            "opening_path": "CLI执行/P3-06_full_2/批次1/开读冻结.json",
+            "events_path": "CLI执行/P3-06_full_2/批次1/events.jsonl",
+            "started_at": "2026-10-03T13:43:26.265309+00:00",
+            "finished_at": "2026-10-03T13:46:17.422093+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10201-5e4f-7330-88ba-d952514c54a0"
+            ],
+            "report_sha256": "175987033bbb362c51e0d54cc8297f9896cd89c8191f7556b595b77a24cceac8",
+            "events_sha256": "cefb46578dc3b2e5a986a5e02615f5c4c8935122df000baba5151a07001a020f",
+            "receipt_sha256": "9545267cb92fef1bf9b367379b39b9a25c257765ebec512e4b0a832a94690699",
+            "opening_sha256": "d009b80f51ee382440cc180ae1d094a73eeaf26597fa607ffb9583786fb67bf9",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": null,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "external_historical_audit"
+          },
+          {
+            "run_id": "P3-01_selected_1",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-01_selected_1/run-b010a5c97aef49868928d603d53c616c/result.json",
+            "opening_path": "直接执行_v2/P3-01_selected_1/run-b010a5c97aef49868928d603d53c616c/opening.json",
+            "events_path": "直接执行_v2/P3-01_selected_1/run-b010a5c97aef49868928d603d53c616c/events.jsonl",
+            "started_at": "2026-10-03T14:47:37.140961+00:00",
+            "finished_at": "2026-10-03T14:50:40.996393+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a1023c-20bc-7a13-9b65-cefbb5bae3ed"
+            ],
+            "report_sha256": "bf15dc5f19fb1a644590a932ed4bab17c7554393cde33b35c5fbac41693135a9",
+            "events_sha256": "ba3cc768db65e043fa42df7663aa33230baf661b8c6158f35deb3d13a4010235",
+            "receipt_sha256": "3e2986c341a545750825da88d11702b181384a4d17186ae06618477e4b8ad1eb",
+            "opening_sha256": "9d026d401800e1bc2548ce7a34a4190a91973c65ede34158954c72b3592716fe",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": null,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-01_selected_2",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-01_selected_2/run-219c94a834a3448c911d39dc710b5972/result.json",
+            "opening_path": "直接执行_v2/P3-01_selected_2/run-219c94a834a3448c911d39dc710b5972/opening.json",
+            "events_path": "直接执行_v2/P3-01_selected_2/run-219c94a834a3448c911d39dc710b5972/events.jsonl",
+            "started_at": "2026-10-03T14:52:21.261014+00:00",
+            "finished_at": "2026-10-03T14:55:53.127611+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10240-7656-7183-b338-35c5b1f9e2fb"
+            ],
+            "report_sha256": "9ff134a161cb0c578f90104958ccd8977ccdd9a22209fe228ca59541ce4518ad",
+            "events_sha256": "505d7ba7e930f474bd677d8354f9983ae19d1494233c023a00caedb0317b9ef6",
+            "receipt_sha256": "952e705ba96d48a32e4233b0b585ba41571c91a344aeba1a8b46d5fe95f7a0b7",
+            "opening_sha256": "6dbda579729c7ab9ec09b63f986d33d2537a6d8918a3a9f2d0c02cb1482ce0b5",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-02_selected_1",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-02_selected_1/run-be1bb7e55edd49e3821090b2a55589f2/result.json",
+            "opening_path": "直接执行_v2/P3-02_selected_1/run-be1bb7e55edd49e3821090b2a55589f2/opening.json",
+            "events_path": "直接执行_v2/P3-02_selected_1/run-be1bb7e55edd49e3821090b2a55589f2/events.jsonl",
+            "started_at": "2026-10-03T14:55:12.863933+00:00",
+            "finished_at": "2026-10-03T14:58:18.194381+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10243-14a6-71f0-8b5f-6ae5d4166e5b"
+            ],
+            "report_sha256": "ed8a22e3d2fedfff81fb8da078bd80c0626218795982f3c86e1bbe4507341e9c",
+            "events_sha256": "56f3bc1046b38cd8302b092be9244faa47077dc65f62a1d38e29b8992922d107",
+            "receipt_sha256": "760b13639fc56ca4a2ae926c03c7a43fad959a8d25f78900bf7425251894acbb",
+            "opening_sha256": "fe0b91179ab3faccc895310c4ac0e150d40609892ed7a466e155248bac5d6614",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-02_selected_2",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-02_selected_2/run-e9992a4a72ff4863ae33fc8620ee8fc3/result.json",
+            "opening_path": "直接执行_v2/P3-02_selected_2/run-e9992a4a72ff4863ae33fc8620ee8fc3/opening.json",
+            "events_path": "直接执行_v2/P3-02_selected_2/run-e9992a4a72ff4863ae33fc8620ee8fc3/events.jsonl",
+            "started_at": "2026-10-03T14:55:20.025802+00:00",
+            "finished_at": "2026-10-03T14:58:42.294120+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10243-3012-7020-b9a6-3ee21127544d"
+            ],
+            "report_sha256": "9b72c6c279d273c0c2f5b2c3e404ccff356a50f38f6f9765d5781a6b9e4cdc97",
+            "events_sha256": "e0b5a3df063d0ae41730d9fb89f60bc5ddef8cdef6663dce6377655f1e939c0d",
+            "receipt_sha256": "e3abd609f356a0a3436cb0db2a23f778f103584ab810f07b0c5fb8fb1b0ac51a",
+            "opening_sha256": "07953afa6ee21c611676bd1b62368bce76b7fff0de43cdbb2b29a7ea66bdfd07",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-03_selected_1",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-03_selected_1/run-f954b4871c5a41b5aa3c824bbf02d96f/result.json",
+            "opening_path": "直接执行_v2/P3-03_selected_1/run-f954b4871c5a41b5aa3c824bbf02d96f/opening.json",
+            "events_path": "直接执行_v2/P3-03_selected_1/run-f954b4871c5a41b5aa3c824bbf02d96f/events.jsonl",
+            "started_at": "2026-10-03T15:00:29.749862+00:00",
+            "finished_at": "2026-10-03T15:04:09.483155+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10247-ea83-7f21-8769-74f9025a8816"
+            ],
+            "report_sha256": "289672b34dc0d32931ba9db23289fcfc1305a97404965ea9f1b813d4bb8ab23b",
+            "events_sha256": "7e7b98514b96c2dede239c14e2ab17a57b9ff21bfbf2ccfcd782fff33d7c088a",
+            "receipt_sha256": "330c8fff885c577aa47f3af3a723f600f8ad1092693ade580d5e3a95846f8972",
+            "opening_sha256": "73e9f1d99712986ca7110619ee11317ccf8cfc4389a76ef010ef46f2d4a625ae",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-03_selected_2",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-03_selected_2/run-af0284b6e88d4672892eec28399dafa8/result.json",
+            "opening_path": "直接执行_v2/P3-03_selected_2/run-af0284b6e88d4672892eec28399dafa8/opening.json",
+            "events_path": "直接执行_v2/P3-03_selected_2/run-af0284b6e88d4672892eec28399dafa8/events.jsonl",
+            "started_at": "2026-10-03T15:00:29.750105+00:00",
+            "finished_at": "2026-10-03T15:03:47.597031+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a10247-ea82-7dc0-8afa-376fabfb7e52"
+            ],
+            "report_sha256": "1587eab65181c47aba557f8f27522e1d7d39b7bd2c18170495942b0bfc3012a8",
+            "events_sha256": "1c1c04050ab64b4085336c955d81281edc3b90a30b7e967338a7b0a6f37bf1b7",
+            "receipt_sha256": "adb461df5a318f777b10b767e939e6e50c147fbcffd9876bc9928ffede55b807",
+            "opening_sha256": "7b18fb86fd1c58e49df5e05829eaa4ce09eaedaf74d35d83725a5445c6750b59",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-04_selected_1",
+            "execution_kind": "direct_v2",
+            "receipt_path": "直接执行_v2/P3-04_selected_1/run-8be4a361c4d64bb08945acf3d4b12fe8/result.json",
+            "opening_path": "直接执行_v2/P3-04_selected_1/run-8be4a361c4d64bb08945acf3d4b12fe8/opening.json",
+            "events_path": "直接执行_v2/P3-04_selected_1/run-8be4a361c4d64bb08945acf3d4b12fe8/events.jsonl",
+            "started_at": "2026-10-03T15:04:24.537243+00:00",
+            "finished_at": "2026-10-03T15:07:32.108174+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a1024b-7f16-7be0-9f27-4f421b4eab1b"
+            ],
+            "report_sha256": "793008d04cf1593b6cc32acf0b21b10e656b0d461994b1cc5a4ba019e866fc4c",
+            "events_sha256": "cdb584016e3c0ea5a6ddc259fdbbece61cca15074f72a1c5c1d1c22c2c7881f2",
+            "receipt_sha256": "6d9ca7d08779dc27870dd41cd9eaac8e8f2c2bd896dfb3609f26db48bb44e418",
+            "opening_sha256": "ba7b7187a7ad5a1661fa6e59284b6c4f9eae33ba829661276e8398db32563c93",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": 0,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "events_checked_no_nested_calls"
+          },
+          {
+            "run_id": "P3-06_selected_1",
+            "execution_kind": "historical",
+            "receipt_path": "CLI执行/P3-06_selected_1/批次1/执行结果.json",
+            "opening_path": "CLI执行/P3-06_selected_1/批次1/开读冻结.json",
+            "events_path": "CLI执行/P3-06_selected_1/批次1/events.jsonl",
+            "started_at": "2026-10-03T13:37:38.384519+00:00",
+            "finished_at": "2026-10-03T13:43:26.257238+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a101fc-0f41-7e43-aecb-84732728d486"
+            ],
+            "report_sha256": "ba614fd89f749a7331cb55ba5ef49f8c5424f70e9a9fc7959b1f6db03c4b4dbf",
+            "events_sha256": "14ea313ee787e90e8860c726e5a2c7b53ba4a9ba144edaa805a0e946a64b94db",
+            "receipt_sha256": "a733b95b0d494e3e94e26585a23964bc640ff00239d8f0478054fef3518ee60a",
+            "opening_sha256": "dd107a6cd1e5b39f60821ff4e2ba71dd5fffe6d62fd8c69cd19a1c03e12e3fc2",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": null,
+            "observed_collaboration_calls": [
+              {
+                "tool": "wait",
+                "event_lines": [
+                  18,
+                  19
+                ]
+              },
+              {
+                "tool": "wait",
+                "event_lines": [
+                  20,
+                  21
+                ]
+              },
+              {
+                "tool": "wait",
+                "event_lines": [
+                  23,
+                  24
+                ]
+              },
+              {
+                "tool": "wait",
+                "event_lines": [
+                  25,
+                  26
+                ]
+              }
+            ],
+            "observed_collaboration_call_count": 4,
+            "execution_eligibility": "replacement_required_confirmed_by_parent",
+            "replacement_output": "补充独立输出/P3-06_selected_1.md"
+          },
+          {
+            "run_id": "P3-06_selected_2",
+            "execution_kind": "historical",
+            "receipt_path": "CLI执行/P3-06_selected_2/批次1/执行结果.json",
+            "opening_path": "CLI执行/P3-06_selected_2/批次1/开读冻结.json",
+            "events_path": "CLI执行/P3-06_selected_2/批次1/events.jsonl",
+            "started_at": "2026-10-03T13:33:49.842964+00:00",
+            "finished_at": "2026-10-03T13:37:38.378724+00:00",
+            "model_id": "unknown",
+            "thread_ids": [
+              "01a101f8-92d3-7d91-a03a-5a98b2977abe"
+            ],
+            "report_sha256": "7cb4e659e86935b1ebb288ea6773892f0e47ec0bc06c5321619679a944b856b6",
+            "events_sha256": "c8e15aa3b6c9094f406cc9cab34b8e0a770d748efed9c16d1b468dec7334d9f3",
+            "receipt_sha256": "a959a0d32be1c476254f9c1e30912fc3aca0cf8c78d2b936804b5df6dceaba0b",
+            "opening_sha256": "ad4eb869b3771f6b40ccd3673edaf430aa63f4f0db99004a512a1f1f50121d61",
+            "prompt_matches_frozen_manifest": true,
+            "six_allowed_inputs_read_in_parent_events": true,
+            "source_and_frozen_output_identical": true,
+            "runner_nested_agent_calls": null,
+            "observed_collaboration_calls": [],
+            "observed_collaboration_call_count": 0,
+            "execution_eligibility": "external_historical_audit"
+          }
+        ],
+        "updated_at": "2026-10-04T00:13:54.638836+00:00",
+        "validation": {
+          "all_19_judgment_rows_complete": true,
+          "all_evidence_present_in_raw_reports": true,
+          "all_19_report_hashes_match_receipts_and_frozen_copies": true,
+          "all_19_actual_prompts_match_group_manifests": true,
+          "verify_without_require_outputs": {
+            "full": {
+              "ok": true,
+              "checked_at": "2026-10-04T00:13:54Z",
+              "problems": [],
+              "missing_outputs": [
+                "outputs/P3-05_full_1.md",
+                "outputs/P3-05_full_2.md"
+              ]
+            },
+            "selected": {
+              "ok": true,
+              "checked_at": "2026-10-04T00:13:54Z",
+              "problems": [],
+              "missing_outputs": [
+                "outputs/P3-04_selected_2.md",
+                "outputs/P3-05_selected_1.md",
+                "outputs/P3-05_selected_2.md"
+              ]
+            },
+            "selected_after": {
+              "ok": true,
+              "checked_at": "2026-10-04T00:13:54Z",
+              "problems": [],
+              "missing_outputs": [
+                "outputs/P3-05_selected_after_1.md",
+                "outputs/P3-05_selected_after_2.md"
+              ]
+            }
+          },
+          "final_score_generated": false
+        },
+        "pending_replacement_run_ids": [
+          "P3-06_selected_1"
+        ]
+      }
+    }
+  ],
+  "pending_replacement_run_ids": [],
+  "execution_date_timezone": "America/Los_Angeles"
+}

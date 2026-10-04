@@ -1,0 +1,24 @@
+{
+  "created_at": "2026-10-04T11:03:33.359637+00:00",
+  "说明": "只整理使用指引，不修改规则和实现；保存本次核对依据版本。",
+  "sources": {
+    "AGENTS.md": "cf21134ce304d4a71062ee6e2be9ccef6b7a1cdb9f55d163b3f4b0133ff5dba4",
+    "README.md": "74a6c5cebc38a692fd2e68d4e1e5ff7cbe50ef30336a799741470f9af5aa0d61",
+    ".novel-kit/workflows/progressive-disclosure.md": "e0cabde9611cc4bbeab4e3bb9adcd0b9a91e0e241a40213763a372ac27051ede",
+    ".novel-kit/workflows/review-loop.md": "01c74b91fa59aefa41e0237d3f4adc80e334a50a57a0f42ba07ae53eadfe12bc",
+    ".novel-kit/workflows/adoption.md": "c03b3878a01d1662731a6f2c27e650e1988f17622d1ea23a570618bcfcf748d7",
+    ".novel-kit/scripts/novel.py": "2dac3e6a0a9c9c4faeb9e80ce5a541934c89c4fc49c1b9c19d3769ae8f098fdf",
+    ".novel-kit/scripts/context_packets.py": "0569ffdb00f2590ffe93d30ede91b9bb90336e7ed9453108b0333118c3571eff",
+    ".novel-kit/roles/scene-writer.md": "69af0fc316eff5bcd391ade953e7caa1e12d9fa9b1e1f86e7261cf4716cc494f",
+    ".novel-kit/roles/copy-editor.md": "e7a5f440c7853013d82e54538a9ce9f4f916a32011d414b60dd6c0841dc6712b",
+    ".novel-kit/roles/prose-reviewer.md": "3c4483311cedf035d401a27112cfb99f79d2572d4bf98842ceeb2908f70489c5",
+    ".novel-kit/standards/语文规格.md": "232019a01049a085e36fc24d64f0922247a6c07a95722a5797a3c717d6dfaa18",
+    ".agents/skills/fiction-scene-polishing/SKILL.md": "88e25e493bae656daa0de5377c7f80e080958457b91fad55b63482f309d5c4d5",
+    ".agents/skills/import-book/SKILL.md": "7ab6ce914c7155b4206c3598a8c5b089d08a0dd99fc670f2d84a316273d09400",
+    ".agents/skills/new-book/SKILL.md": "a7cb191a88abe9bf013ff18ccc6526376ab06cec94bc0cde2bf4dd6c45fc1fd5",
+    ".agents/skills/plan-chapter/SKILL.md": "cd485063eb9003fe8601819554d5a072ac482c9453b45a4f40e1e2b194a7f06d",
+    ".agents/skills/revise/SKILL.md": "675c2409fd6183b5f5f56045b54ed1a2b21701cfdb5508f0e64011cb03cb4ea2",
+    ".agents/skills/write-scene/SKILL.md": "f1d6511e3aa1b1503b5e3cd61a94c9d9939f2b6ddd65fe8593bd192eb207fb65"
+  },
+  "previous_guide_sha256": "8ecd4907e62ef441177b8b72d5760997bd40b596246953680593e9a30b6905b3"
+}

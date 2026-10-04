@@ -1,0 +1,107 @@
+{
+  "说明": "依据实际事件中读取命令及其返回全文核对五份冻结输入；不把模型自述的已读当成唯一凭据，也不声称可审计宿主自动注入上下文。",
+  "runs": [
+    {
+      "job": "before_challenges_N01_1",
+      "frozen_input_full_text_observed": {
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/role.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/language.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/workflow.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/style.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/body_N01.md": true
+      },
+      "short_commands": [
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/language.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/workflow.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/role.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/style.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/body_N01.md'\""
+      ]
+    },
+    {
+      "job": "before_challenges_N02_1",
+      "frozen_input_full_text_observed": {
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/role.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/language.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/workflow.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/style.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/body_N02.md": true
+      },
+      "short_commands": [
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/language.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/style.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/body_N02.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/role.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/workflow.md'\""
+      ]
+    },
+    {
+      "job": "before_challenges_N03_1",
+      "frozen_input_full_text_observed": {
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/role.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/language.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/workflow.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/style.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/body_N03.md": true
+      },
+      "short_commands": [
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/workflow.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/role.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/language.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/body_N03.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/style.md'\""
+      ]
+    },
+    {
+      "job": "after_challenges_N01_1",
+      "frozen_input_full_text_observed": {
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/role.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/language.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/workflow.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/style.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/body_N01.md": true
+      },
+      "short_commands": [
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/workflow.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/style.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/role.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/language.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/body_N01.md'\""
+      ]
+    },
+    {
+      "job": "after_challenges_N02_1",
+      "frozen_input_full_text_observed": {
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/role.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/language.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/workflow.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/style.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/body_N02.md": true
+      },
+      "short_commands": [
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/style.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/role.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/workflow.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/body_N02.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/language.md'\""
+      ]
+    },
+    {
+      "job": "after_challenges_N03_1",
+      "frozen_input_full_text_observed": {
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/role.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/language.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/workflow.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/style.md": true,
+        "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/body_N03.md": true
+      },
+      "short_commands": [
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/style.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/body_N03.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/language.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/workflow.md'\"",
+        "/bin/zsh -lc \"cat '/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/role.md'\""
+      ]
+    }
+  ]
+}

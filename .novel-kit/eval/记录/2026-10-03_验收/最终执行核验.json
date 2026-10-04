@@ -1,0 +1,3414 @@
+{
+  "checked_at": "2026-10-04T00:46:53.783683+00:00",
+  "scope": "68项原计划审阅及7组本轮修正与新盲读；旧7项修后任务由明确记录替换；P3-06 selected1使用独立补跑。",
+  "score_groups": [
+    {
+      "group": "regression",
+      "verify": {
+        "ok": true,
+        "checked_at": "2026-10-04T00:46:53Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "score_sha256": "cdd1afc13b92342913dd1fb38ec189fd313d393e8bfec11fbc9b70a7e4f5ae21",
+      "score": {
+        "schema_version": 1,
+        "kind": "novel-kit-eval-score",
+        "created_at": "2026-10-03T14:27:59Z",
+        "quality_judgment_source": "model_comparison",
+        "quality_acceptance": "not_determined",
+        "scope": "review_only",
+        "evidence_complete": true,
+        "missing": [],
+        "runs": [
+          {
+            "run_id": "A01_copy-editor_1",
+            "sample": "A01",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 1,
+              "denominator": 3,
+              "rate": 0.3333333333333333,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 3,
+              "rate": 0.3333333333333333,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "A01_copy-editor_2",
+            "sample": "A01",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 1,
+              "denominator": 3,
+              "rate": 0.3333333333333333,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 3,
+              "rate": 0.3333333333333333,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "A02_copy-editor_1",
+            "sample": "A02",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 3,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 1,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "A02_copy-editor_2",
+            "sample": "A02",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 1,
+              "denominator": 3,
+              "rate": 0.3333333333333333,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 1,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "A03_copy-editor_1",
+            "sample": "A03",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 1,
+              "denominator": 2,
+              "rate": 0.5,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 2,
+              "rate": 0.5,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "A03_copy-editor_2",
+            "sample": "A03",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 2,
+              "denominator": 2,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 2,
+              "rate": 0.5,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "A04_copy-editor_1",
+            "sample": "A04",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 2,
+              "denominator": 3,
+              "rate": 0.6666666666666666,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 3,
+              "rate": 0.3333333333333333,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "A04_copy-editor_2",
+            "sample": "A04",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 1,
+              "denominator": 3,
+              "rate": 0.3333333333333333,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 3,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "B01_copy-editor_1",
+            "sample": "B01",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 1,
+              "denominator": 2,
+              "rate": 0.5,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 2,
+              "rate": 0.5,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "B01_copy-editor_2",
+            "sample": "B01",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 1,
+              "denominator": 2,
+              "rate": 0.5,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 2,
+              "rate": 0.5,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "B02_copy-editor_1",
+            "sample": "B02",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 2,
+              "denominator": 3,
+              "rate": 0.6666666666666666,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 2,
+              "denominator": 2,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "B02_copy-editor_2",
+            "sample": "B02",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 2,
+              "denominator": 3,
+              "rate": 0.6666666666666666,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 2,
+              "denominator": 2,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "B03_copy-editor_1",
+            "sample": "B03",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "B03_copy-editor_2",
+            "sample": "B03",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "B04_copy-editor_1",
+            "sample": "B04",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 3,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 1,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "B04_copy-editor_2",
+            "sample": "B04",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 0,
+              "denominator": 3,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 1,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "C01_copy-editor_1",
+            "sample": "C01",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 4,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 1,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "C01_copy-editor_2",
+            "sample": "C01",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 0,
+              "denominator": 4,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 1,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "C02_copy-editor_1",
+            "sample": "C02",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 1,
+              "denominator": 4,
+              "rate": 0.25,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 2,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "C02_copy-editor_2",
+            "sample": "C02",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 1,
+              "denominator": 4,
+              "rate": 0.25,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 2,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "D01_copy-editor_1",
+            "sample": "D01",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 3,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 1,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "D01_copy-editor_2",
+            "sample": "D01",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 0,
+              "denominator": 3,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 1,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "D02_copy-editor_1",
+            "sample": "D02",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 1,
+              "denominator": 4,
+              "rate": 0.25,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 2,
+              "rate": 0.5,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "D02_copy-editor_2",
+            "sample": "D02",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 1,
+              "denominator": 4,
+              "rate": 0.25,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 2,
+              "rate": 0.5,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "K01_copy-editor_1",
+            "sample": "K01",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "K01_copy-editor_2",
+            "sample": "K01",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "K02_copy-editor_1",
+            "sample": "K02",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 1,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "K02_copy-editor_2",
+            "sample": "K02",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "attempts": [
+          {
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 10,
+              "denominator": 36,
+              "rate": 0.2777777777777778,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 8,
+              "denominator": 21,
+              "rate": 0.38095238095238093,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 12,
+              "denominator": 36,
+              "rate": 0.3333333333333333,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 7,
+              "denominator": 21,
+              "rate": 0.3333333333333333,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "consistency": [
+          {
+            "role": "copy-editor",
+            "compared_attempts": "每样本前两次",
+            "detection_agreement": {
+              "numerator": 30,
+              "denominator": 36,
+              "rate": 0.8333333333333334,
+              "missing": 0
+            },
+            "severity_agreement": {
+              "numerator": 30,
+              "denominator": 36,
+              "rate": 0.8333333333333334,
+              "missing": 0
+            },
+            "positive_overlap": {
+              "numerator": 8,
+              "denominator": 14,
+              "rate": 0.5714285714285714,
+              "missing": 0
+            }
+          }
+        ],
+        "unions": [
+          {
+            "role": "copy-editor",
+            "supplemental_only": true,
+            "detected": {
+              "numerator": 14,
+              "denominator": 36,
+              "rate": 0.3888888888888889,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 9,
+              "denominator": 21,
+              "rate": 0.42857142857142855,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "repairs": [],
+        "output_hashes": {
+          "outputs/A01_copy-editor_1.md": "25ee9bb40b3725c0a7536a6d138b671968e7f94310bcc7fbdc799763d660f418",
+          "outputs/A01_copy-editor_2.md": "98e03c94e1a36fe54cd74e5da79280233a1a0681da530d4b4b5ef2a41692f8fb",
+          "outputs/A02_copy-editor_1.md": "fc7696dc5a6066e6272941fb2fb464a4d46084ec57575585f1b9360ecf99c0a8",
+          "outputs/A02_copy-editor_2.md": "d9e1e481f3f071b33c211fb61e994afb56e7a1fcc6ae77f6abb5a45b155cb674",
+          "outputs/A03_copy-editor_1.md": "5b29bf2850835d73a368a87eb86dce79be79cba095bdbc6d7a83f07be5e59d42",
+          "outputs/A03_copy-editor_2.md": "c1e76839ed135245c0df836aa51851d67e57f03b9fa8d5dea30a78234b179537",
+          "outputs/A04_copy-editor_1.md": "4f667f8d029881d48610a91691bf87d90c8d97be42991eef2c9012e9c84fbade",
+          "outputs/A04_copy-editor_2.md": "5348a5de61996f240c6e41c96a35109bf9a8c19e79fabf2f2051ab28a9d35a52",
+          "outputs/B01_copy-editor_1.md": "699a41a40222c2b60e21058a63f4b49d3c70ae440910898dd8c1a946ec89611c",
+          "outputs/B01_copy-editor_2.md": "593ad4c9e2254827580511b3fe3d09e9c79eb2f6d3d33fdfb9d0c240ce540126",
+          "outputs/B02_copy-editor_1.md": "622a27ac343bb140c9b645bfc44e29a493abc4e7f5a2b2d9278b171da92bdeae",
+          "outputs/B02_copy-editor_2.md": "ef1c5a899f9493b637707a389a90299c5b656e1a3f6eb0eefe37b99e347c9ffd",
+          "outputs/B03_copy-editor_1.md": "ce250517a96c401e2831a402bcfc5f5c362c7abb89fda21f069902053f2159ac",
+          "outputs/B03_copy-editor_2.md": "df834c4bdf91dfda64a2c36a7e479ceebc7bbcdfe57977bc084093ad28cfb6f8",
+          "outputs/B04_copy-editor_1.md": "5036a91eb8f9e96bc07000d48f8fce5361b1275c38531645300df95c547e631b",
+          "outputs/B04_copy-editor_2.md": "73f02d6e41c9872b34cfd724b4bb7ac457e5ea58cf8e4b13f812029decdc005a",
+          "outputs/C01_copy-editor_1.md": "258a3fac17bbff1b11b13ac8633c3fd29fc30ed663e005989bcecc5c22e0f20f",
+          "outputs/C01_copy-editor_2.md": "68813ba3b7627d715a6f99a1ac73df4abfaa0b8c87848976e58ab6e28013052a",
+          "outputs/C02_copy-editor_1.md": "b6277fc48793da7b42de1aa5066992a3edd9185a051d4ec302b603a4ab9a5778",
+          "outputs/C02_copy-editor_2.md": "84d704a0bb7360c8f0abff267ef91e5f6dcde8c0d028012c76e8d06a0eb0159d",
+          "outputs/D01_copy-editor_1.md": "1c362978b32e913b36b5bff31cde316ab8f61ac02ec35e5464a17d12d8ca4f63",
+          "outputs/D01_copy-editor_2.md": "d21a5d8090aeabb44386b151bee9ebcc7a6a6c38a20449140489123a9db573df",
+          "outputs/D02_copy-editor_1.md": "9bdc4d98e4a8f0560941293913d7378d38615e4d5b7f1fe1062b561e3c8b544f",
+          "outputs/D02_copy-editor_2.md": "51a42000ff6a0f1432de4881505d574adb48eaf18ae363105ff91851246c70d2",
+          "outputs/K01_copy-editor_1.md": "c612174d560d6328857c61341abb0a0032dec5662176fe16f662ad6a51a13b90",
+          "outputs/K01_copy-editor_2.md": "9ea1e13bd451854fe3ca50bd8b498985e85dbf49a54bfed2259987a890efb88c",
+          "outputs/K02_copy-editor_1.md": "acc6f2c33e5c32ab7de03b324ec080fdfb7e38ad4cd7abe433b63e03aa4433d9",
+          "outputs/K02_copy-editor_2.md": "72b4c1532bca8d510aee3869e2179b3ff4cc4d8bccf348e9a89a7e31901f7140"
+        },
+        "judgments_snapshot": "scores/收尾评分.judgments.json",
+        "judgments_sha256": "24e02aa598e7551f6cbccfe1d303b13fa68591ad2296825fb6e7abb99e35bed2"
+      }
+    },
+    {
+      "group": "holdout_direct_v2",
+      "verify": {
+        "ok": true,
+        "checked_at": "2026-10-04T00:46:53Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "score_sha256": "336529c1c35f3e48ac128395255ddaa14d887582b33eaecbcd37e41c091e9c12",
+      "score": {
+        "schema_version": 1,
+        "kind": "novel-kit-eval-score",
+        "created_at": "2026-10-04T00:41:24Z",
+        "quality_judgment_source": "model_comparison",
+        "quality_acceptance": "not_determined",
+        "scope": "review_only",
+        "evidence_complete": true,
+        "missing": [],
+        "runs": [
+          {
+            "run_id": "H01_copy-editor_1",
+            "sample": "H01",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "H01_copy-editor_2",
+            "sample": "H01",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "H02_copy-editor_1",
+            "sample": "H02",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "H02_copy-editor_2",
+            "sample": "H02",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "H03_copy-editor_1",
+            "sample": "H03",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "H03_copy-editor_2",
+            "sample": "H03",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "H04_copy-editor_1",
+            "sample": "H04",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "H04_copy-editor_2",
+            "sample": "H04",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "attempts": [
+          {
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 2,
+              "denominator": 2,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 2,
+              "denominator": 2,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "consistency": [
+          {
+            "role": "copy-editor",
+            "compared_attempts": "每样本前两次",
+            "detection_agreement": {
+              "numerator": 2,
+              "denominator": 2,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_agreement": {
+              "numerator": 2,
+              "denominator": 2,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "positive_overlap": {
+              "numerator": 2,
+              "denominator": 2,
+              "rate": 1.0,
+              "missing": 0
+            }
+          }
+        ],
+        "unions": [
+          {
+            "role": "copy-editor",
+            "supplemental_only": true,
+            "detected": {
+              "numerator": 2,
+              "denominator": 2,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "repairs": [],
+        "output_hashes": {
+          "outputs/H01_copy-editor_1.md": "a228dee1fd999f904ebcb4fe705d1524586c625b7c256c7e050a60ac71a1d45d",
+          "outputs/H01_copy-editor_2.md": "952c0f4163f2aee35db59062ba750644406ecf26b552a5d2249aa15f4270f423",
+          "outputs/H02_copy-editor_1.md": "f0ebe42836f8edb88ed9395577ef99a90dfb754ee9da70a8bc09a8d0c05c3af6",
+          "outputs/H02_copy-editor_2.md": "f3a815d812b2129e93cac41f64c53b487fe27bccd34382052eb330df8efeb5d0",
+          "outputs/H03_copy-editor_1.md": "10d06b5e29c02e7ee7fb99f9882f49cdde89bd557b3e5fe4bd206bc1323e1405",
+          "outputs/H03_copy-editor_2.md": "a89852f235f7527617fe692c0e8331d0d7bfa980088b3eec5d6311c1936561fe",
+          "outputs/H04_copy-editor_1.md": "9078701cd3d1778b01bf8c5ccd9b4c8e8f1fe04308da8d312aff0d31465d1b8e",
+          "outputs/H04_copy-editor_2.md": "6d4607d24070c3045755c5d48231501f944633f6b744f053850e6de998f57e03"
+        },
+        "judgments_snapshot": "scores/收尾评分.judgments.json",
+        "judgments_sha256": "a4aaa4c5bb94825ec52fa325d3fa9a8fede9c8d3ae3c1ce398a5d7778b74e5a4"
+      }
+    },
+    {
+      "group": "extra_roles_direct_v2",
+      "verify": {
+        "ok": true,
+        "checked_at": "2026-10-04T00:46:53Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "score_sha256": "300368382279d60985022dee03669a2c82917e4cbd5a350b07b3e3644651f92a",
+      "score": {
+        "schema_version": 1,
+        "kind": "novel-kit-eval-score",
+        "created_at": "2026-10-04T00:46:31Z",
+        "quality_judgment_source": "model_comparison",
+        "quality_acceptance": "not_determined",
+        "scope": "review_only",
+        "evidence_complete": true,
+        "missing": [],
+        "runs": [
+          {
+            "run_id": "D01_prose-reviewer_1",
+            "sample": "D01",
+            "role": "prose-reviewer",
+            "attempt": 1,
+            "detected": {
+              "numerator": 2,
+              "denominator": 3,
+              "rate": 0.6666666666666666,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "D02_prose-reviewer_1",
+            "sample": "D02",
+            "role": "prose-reviewer",
+            "attempt": 1,
+            "detected": {
+              "numerator": 1,
+              "denominator": 4,
+              "rate": 0.25,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 2,
+              "rate": 0.5,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "K01_prose-reviewer_1",
+            "sample": "K01",
+            "role": "prose-reviewer",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "K02_prose-reviewer_1",
+            "sample": "K02",
+            "role": "prose-reviewer",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 1,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 1,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "C01_consistency-checker_1",
+            "sample": "C01",
+            "role": "consistency-checker",
+            "attempt": 1,
+            "detected": {
+              "numerator": 2,
+              "denominator": 4,
+              "rate": 0.5,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 1,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "C02_consistency-checker_1",
+            "sample": "C02",
+            "role": "consistency-checker",
+            "attempt": 1,
+            "detected": {
+              "numerator": 2,
+              "denominator": 4,
+              "rate": 0.5,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 2,
+              "rate": 0.5,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "attempts": [
+          {
+            "role": "consistency-checker",
+            "attempt": 1,
+            "detected": {
+              "numerator": 4,
+              "denominator": 8,
+              "rate": 0.5,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 3,
+              "rate": 0.3333333333333333,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "role": "prose-reviewer",
+            "attempt": 1,
+            "detected": {
+              "numerator": 3,
+              "denominator": 8,
+              "rate": 0.375,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 2,
+              "denominator": 3,
+              "rate": 0.6666666666666666,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 1,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "consistency": [],
+        "unions": [
+          {
+            "role": "consistency-checker",
+            "supplemental_only": true,
+            "detected": {
+              "numerator": 4,
+              "denominator": 8,
+              "rate": 0.5,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 3,
+              "rate": 0.3333333333333333,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "role": "prose-reviewer",
+            "supplemental_only": true,
+            "detected": {
+              "numerator": 3,
+              "denominator": 8,
+              "rate": 0.375,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 2,
+              "denominator": 3,
+              "rate": 0.6666666666666666,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 1,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "repairs": [],
+        "output_hashes": {
+          "outputs/D01_prose-reviewer_1.md": "33a46778f4ea74f8e3c107d093c433c501267a4bfc9f28fd42fa5f82c389509b",
+          "outputs/D02_prose-reviewer_1.md": "5ddc3beab81e224dd33ae3185ce36aa678f84c8a43fd48663f730a72c285d6c4",
+          "outputs/K01_prose-reviewer_1.md": "e39a53feeebc3db83a340bbe5481c7d7639b22e28a7a4c7c3ffcbf2e38922276",
+          "outputs/K02_prose-reviewer_1.md": "c8cfa6583be2b69026782053e7ee8b80128976ed44b568a5ab62e8b4b309a0a7",
+          "outputs/C01_consistency-checker_1.md": "d048d2ba70adca80c6313c3499a92a924abe1b9c7001ecf6aaef510fa2a33c11",
+          "outputs/C02_consistency-checker_1.md": "5297eefa9f91bcb24fd533362d6d9f311c308a8f9a804295c7a0bf7033af377e"
+        },
+        "judgments_snapshot": "scores/收尾评分.judgments.json",
+        "judgments_sha256": "ab06e291ca44c2b77430043c788a8b4f17cd89baa5060889670c66826eb957f1"
+      }
+    },
+    {
+      "group": "context_full_direct_v2",
+      "verify": {
+        "ok": true,
+        "checked_at": "2026-10-04T00:46:53Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "score_sha256": "0955f9ec3e1b4a475a742ec064f7d4ad09c9d5dc09ee7436efad4fff74080460",
+      "score": {
+        "schema_version": 1,
+        "kind": "novel-kit-eval-score",
+        "created_at": "2026-10-04T00:29:17Z",
+        "quality_judgment_source": "model_comparison",
+        "quality_acceptance": "not_determined",
+        "scope": "review_only",
+        "evidence_complete": true,
+        "missing": [],
+        "runs": [
+          {
+            "run_id": "P3-01_full_1",
+            "sample": "P3-01",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-01_full_2",
+            "sample": "P3-01",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-02_full_1",
+            "sample": "P3-02",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-02_full_2",
+            "sample": "P3-02",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-03_full_1",
+            "sample": "P3-03",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-03_full_2",
+            "sample": "P3-03",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-04_full_1",
+            "sample": "P3-04",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-04_full_2",
+            "sample": "P3-04",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-05_full_1",
+            "sample": "P3-05",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-05_full_2",
+            "sample": "P3-05",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-06_full_1",
+            "sample": "P3-06",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-06_full_2",
+            "sample": "P3-06",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "attempts": [
+          {
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "consistency": [
+          {
+            "role": "copy-editor",
+            "compared_attempts": "每样本前两次",
+            "detection_agreement": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_agreement": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "positive_overlap": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            }
+          }
+        ],
+        "unions": [
+          {
+            "role": "copy-editor",
+            "supplemental_only": true,
+            "detected": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "repairs": [],
+        "output_hashes": {
+          "outputs/P3-01_full_1.md": "312aef1581f0a8b6cbbd1de250417c07384a9fd3c8f71ce3477fa0eaaf771c86",
+          "outputs/P3-01_full_2.md": "27b04ae9de1f09161dd1cdac7d028f209613434e7434e224814c43187c9594f6",
+          "outputs/P3-02_full_1.md": "a1178d8750ee4f3b97d26e00080e55a71d69d54574abfd9db811e8426b1cc3d2",
+          "outputs/P3-02_full_2.md": "1872bc0a5cd35ecd75103ea67d9d475e808ba168b0ca96bf37145c80bff77c93",
+          "outputs/P3-03_full_1.md": "50539748f41ad5b5d23b53d592a1d008198edea5693c4d2d995ab2251ba23f4b",
+          "outputs/P3-03_full_2.md": "25e2053e4ccc3b4d9ca331a597e1ba6fa9510c1e0a1efbd796f5d492742d5ab5",
+          "outputs/P3-04_full_1.md": "95d32a492e997166637746e93df8075e61516627b8f9796ad4549c98e9bcc82c",
+          "outputs/P3-04_full_2.md": "1f54f2ff8f8f420c1746ded4296215a9a0b3013bb5184e880e170200ab17d1b0",
+          "outputs/P3-05_full_1.md": "75a52b42f163279d5cdb2437494dc408fc648180baa735c43148136e872a9bcf",
+          "outputs/P3-05_full_2.md": "36d252469b6cba516d78b749381441ebae16971df148e9ffc85d721bd2e4b906",
+          "outputs/P3-06_full_1.md": "b73b4309d2ce59fb6d2418a7a6eed2493f491b44eb1670158d2ef70d2499bee6",
+          "outputs/P3-06_full_2.md": "175987033bbb362c51e0d54cc8297f9896cd89c8191f7556b595b77a24cceac8"
+        },
+        "judgments_snapshot": "scores/收尾评分.judgments.json",
+        "judgments_sha256": "4976a5c0a3edff3ae89e3e8458bbfabac2cf6449a78cfbd29b89f8d6d878c17c"
+      }
+    },
+    {
+      "group": "context_selected_direct_v3",
+      "verify": {
+        "ok": true,
+        "checked_at": "2026-10-04T00:46:53Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "score_sha256": "bc9b7b7669f68187cccc7d299d65e1dfbf6444091c86db6f09b640b1f2b942b0",
+      "score": {
+        "schema_version": 1,
+        "kind": "novel-kit-eval-score",
+        "created_at": "2026-10-04T00:29:17Z",
+        "quality_judgment_source": "model_comparison",
+        "quality_acceptance": "not_determined",
+        "scope": "review_only",
+        "evidence_complete": true,
+        "missing": [],
+        "runs": [
+          {
+            "run_id": "P3-01_selected_1",
+            "sample": "P3-01",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-01_selected_2",
+            "sample": "P3-01",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-02_selected_1",
+            "sample": "P3-02",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-02_selected_2",
+            "sample": "P3-02",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-03_selected_1",
+            "sample": "P3-03",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-03_selected_2",
+            "sample": "P3-03",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-04_selected_1",
+            "sample": "P3-04",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-04_selected_2",
+            "sample": "P3-04",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-05_selected_1",
+            "sample": "P3-05",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-05_selected_2",
+            "sample": "P3-05",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-06_selected_1",
+            "sample": "P3-06",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-06_selected_2",
+            "sample": "P3-06",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "attempts": [
+          {
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "consistency": [
+          {
+            "role": "copy-editor",
+            "compared_attempts": "每样本前两次",
+            "detection_agreement": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_agreement": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "positive_overlap": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            }
+          }
+        ],
+        "unions": [
+          {
+            "role": "copy-editor",
+            "supplemental_only": true,
+            "detected": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 3,
+              "denominator": 3,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "repairs": [],
+        "output_hashes": {
+          "outputs/P3-01_selected_1.md": "bf15dc5f19fb1a644590a932ed4bab17c7554393cde33b35c5fbac41693135a9",
+          "outputs/P3-01_selected_2.md": "9ff134a161cb0c578f90104958ccd8977ccdd9a22209fe228ca59541ce4518ad",
+          "outputs/P3-02_selected_1.md": "ed8a22e3d2fedfff81fb8da078bd80c0626218795982f3c86e1bbe4507341e9c",
+          "outputs/P3-02_selected_2.md": "9b72c6c279d273c0c2f5b2c3e404ccff356a50f38f6f9765d5781a6b9e4cdc97",
+          "outputs/P3-03_selected_1.md": "289672b34dc0d32931ba9db23289fcfc1305a97404965ea9f1b813d4bb8ab23b",
+          "outputs/P3-03_selected_2.md": "1587eab65181c47aba557f8f27522e1d7d39b7bd2c18170495942b0bfc3012a8",
+          "outputs/P3-04_selected_1.md": "793008d04cf1593b6cc32acf0b21b10e656b0d461994b1cc5a4ba019e866fc4c",
+          "outputs/P3-04_selected_2.md": "6b4a73d1f4b3ff39d14ca87e09a7d29eae684938cf174e707460111e5b17e84d",
+          "outputs/P3-05_selected_1.md": "a851aa7f667252e0ae77b4f60040927e997b619dfd1487466afe3e1b15c34569",
+          "outputs/P3-05_selected_2.md": "356405522f3824db556b20e7275a3411e091a749e834b8f8f7e89fdf1726a580",
+          "outputs/P3-06_selected_1.md": "95d97d7cfa6864ae7fa4c5fdea17140e8c8ee0885e2c443ddd3f032cd41e248a",
+          "outputs/P3-06_selected_2.md": "7cb4e659e86935b1ebb288ea6773892f0e47ec0bc06c5321619679a944b856b6"
+        },
+        "judgments_snapshot": "scores/收尾评分.judgments.json",
+        "judgments_sha256": "904ea28b75471c238449d177dd3acc073ae50cce5282c9d469df7ec30d44c835"
+      }
+    },
+    {
+      "group": "context_selected_after_direct_v2",
+      "verify": {
+        "ok": true,
+        "checked_at": "2026-10-04T00:46:53Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "score_sha256": "b43feb0fb18b76f3ae3ff3c87733e7781adce537de91237c0817fefbbba4c04b",
+      "score": {
+        "schema_version": 1,
+        "kind": "novel-kit-eval-score",
+        "created_at": "2026-10-04T00:29:17Z",
+        "quality_judgment_source": "model_comparison",
+        "quality_acceptance": "not_determined",
+        "scope": "review_only",
+        "evidence_complete": true,
+        "missing": [],
+        "runs": [
+          {
+            "run_id": "P3-05_selected_after_1",
+            "sample": "P3-05",
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "run_id": "P3-05_selected_after_2",
+            "sample": "P3-05",
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "attempts": [
+          {
+            "role": "copy-editor",
+            "attempt": 1,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          },
+          {
+            "role": "copy-editor",
+            "attempt": 2,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "consistency": [
+          {
+            "role": "copy-editor",
+            "compared_attempts": "每样本前两次",
+            "detection_agreement": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_agreement": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "positive_overlap": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            }
+          }
+        ],
+        "unions": [
+          {
+            "role": "copy-editor",
+            "supplemental_only": true,
+            "detected": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "severity_attainment": {
+              "numerator": 0,
+              "denominator": 0,
+              "rate": null,
+              "missing": 0
+            },
+            "false_positives": {
+              "control_s1_s2": 0,
+              "protected_reported": 0,
+              "other_explicit": 0,
+              "missing": 0
+            }
+          }
+        ],
+        "repairs": [],
+        "output_hashes": {
+          "outputs/P3-05_selected_after_1.md": "47bd638532569937f75d5a71ac6da4bcb5018d09f25b188bb1585e3a9d628a92",
+          "outputs/P3-05_selected_after_2.md": "c5f695e28181e85a30624366fc67bcef1f757f8c131ed2f61225d9edb1c2b70b"
+        },
+        "judgments_snapshot": "scores/收尾评分.judgments.json",
+        "judgments_sha256": "a45d2399692577e4636a61040f88922edb2cc7348c75bb14d6dde4a765cb2c41"
+      }
+    },
+    {
+      "group": "new_repair_A01",
+      "verify": {
+        "ok": true,
+        "checked_at": "2026-10-04T00:46:53Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "score_sha256": "5ebdc69eb914d901fcc891ad03a9c235cb4762c463f2a71325c6b3ee3ac63a1e",
+      "score": {
+        "schema_version": 1,
+        "kind": "novel-kit-eval-score",
+        "created_at": "2026-10-03T14:49:20Z",
+        "quality_judgment_source": "model_comparison",
+        "quality_acceptance": "not_determined",
+        "scope": "full",
+        "evidence_complete": true,
+        "missing": [],
+        "runs": [],
+        "attempts": [],
+        "consistency": [],
+        "unions": [],
+        "repairs": [
+          {
+            "sample": "A01",
+            "repair_run_id": "A01_new_repair",
+            "review_run_id": "A01_new_repair_review",
+            "resolved": {
+              "numerator": 0,
+              "denominator": 3,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "new_errors": 0,
+            "new_s1_s2_errors": 0,
+            "protected_changed": 0,
+            "protected_missing": 0
+          }
+        ],
+        "output_hashes": {
+          "outputs/A01_新规则修正.md": "5814fd130f1a6ce78ce2ca019210e2bb2f59f2b9be2c2f41cc959a9ace0c4c10",
+          "outputs/A01_新修正盲读.md": "5207fd307de4b5d1f4548622a97c73c1e9f4fe574ad7817779f2d3d1eadf7af6"
+        },
+        "judgments_snapshot": "scores/收尾评分.judgments.json",
+        "judgments_sha256": "fb1340b18c45a9dc3a5001f7d2fea712c94a10cb20386c6f271f9ad2d7423236"
+      }
+    },
+    {
+      "group": "new_repair_A02",
+      "verify": {
+        "ok": true,
+        "checked_at": "2026-10-04T00:46:53Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "score_sha256": "333cf0e08f0bdbde66c7b7609069a4baa28ab2ff0456e713cb91b2831be7dbaa",
+      "score": {
+        "schema_version": 1,
+        "kind": "novel-kit-eval-score",
+        "created_at": "2026-10-04T00:10:35Z",
+        "quality_judgment_source": "model_comparison",
+        "quality_acceptance": "not_determined",
+        "scope": "full",
+        "evidence_complete": true,
+        "missing": [],
+        "runs": [],
+        "attempts": [],
+        "consistency": [],
+        "unions": [],
+        "repairs": [
+          {
+            "sample": "A02",
+            "repair_run_id": "A02_new_repair",
+            "review_run_id": "A02_new_repair_review",
+            "resolved": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "new_errors": 0,
+            "new_s1_s2_errors": 0,
+            "protected_changed": 0,
+            "protected_missing": 0
+          }
+        ],
+        "output_hashes": {
+          "outputs/A02_新规则修正.md": "5c10cb0e69fb0d7c475159fcd73db853ac905bcb1afa1395ccab56ca45e80708",
+          "outputs/A02_新修正盲读.md": "431e9507ec1b2dc3fb0efb8628a18d85a91f097d47bdc97ebd00f7a4ce76ac38"
+        },
+        "judgments_snapshot": "scores/收尾评分.judgments.json",
+        "judgments_sha256": "3d6d129209dce6b7ec735f91880d4bf5b7522e546cf5536e2c8d8e29a9c98c29"
+      }
+    },
+    {
+      "group": "new_repair_A03",
+      "verify": {
+        "ok": true,
+        "checked_at": "2026-10-04T00:46:53Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "score_sha256": "d0ac4800c76f957c7932d9eb29b69182c72808f2dbc807c351d9d197badb75c2",
+      "score": {
+        "schema_version": 1,
+        "kind": "novel-kit-eval-score",
+        "created_at": "2026-10-04T00:10:35Z",
+        "quality_judgment_source": "model_comparison",
+        "quality_acceptance": "not_determined",
+        "scope": "full",
+        "evidence_complete": true,
+        "missing": [],
+        "runs": [],
+        "attempts": [],
+        "consistency": [],
+        "unions": [],
+        "repairs": [
+          {
+            "sample": "A03",
+            "repair_run_id": "A03_new_repair",
+            "review_run_id": "A03_new_repair_review",
+            "resolved": {
+              "numerator": 1,
+              "denominator": 2,
+              "rate": 0.5,
+              "missing": 0
+            },
+            "new_errors": 0,
+            "new_s1_s2_errors": 0,
+            "protected_changed": 0,
+            "protected_missing": 0
+          }
+        ],
+        "output_hashes": {
+          "outputs/A03_新规则修正.md": "54c7d9f39383bdb1e855b7488e8dd6a8a67075effe203c7685b2501578247cac",
+          "outputs/A03_新修正盲读.md": "92f2af0f38f51e1ec3bc76f8cd64c323fff89e739ad01f2eacc13ffe1abdeecb"
+        },
+        "judgments_snapshot": "scores/收尾评分.judgments.json",
+        "judgments_sha256": "8c8cc5884ee7fc5c61afcda5be82b0a82a192a8f705694ef08c63679f6caff5f"
+      }
+    },
+    {
+      "group": "new_repair_A04",
+      "verify": {
+        "ok": true,
+        "checked_at": "2026-10-04T00:46:53Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "score_sha256": "267fa5d92157d2f97d16ed946d8226e954740167d5a0dbde1fd65774a84fa4f2",
+      "score": {
+        "schema_version": 1,
+        "kind": "novel-kit-eval-score",
+        "created_at": "2026-10-04T00:35:22Z",
+        "quality_judgment_source": "model_comparison",
+        "quality_acceptance": "not_determined",
+        "scope": "full",
+        "evidence_complete": true,
+        "missing": [],
+        "runs": [],
+        "attempts": [],
+        "consistency": [],
+        "unions": [],
+        "repairs": [
+          {
+            "sample": "A04",
+            "repair_run_id": "A04_new_repair",
+            "review_run_id": "A04_new_repair_review",
+            "resolved": {
+              "numerator": 2,
+              "denominator": 3,
+              "rate": 0.6666666666666666,
+              "missing": 0
+            },
+            "new_errors": 0,
+            "new_s1_s2_errors": 0,
+            "protected_changed": 0,
+            "protected_missing": 0
+          }
+        ],
+        "output_hashes": {
+          "outputs/A04_新规则修正.md": "933417f84ff59db8e39cfff681d8339875e549ad45292fdc0ddb83d8db92372a",
+          "outputs/A04_新修正盲读.md": "28b77f81b715063650331cdbf12aa47a205d4513ca277b9fc863a2dcbdd8e713"
+        },
+        "judgments_snapshot": "scores/收尾评分.judgments.json",
+        "judgments_sha256": "97e742d231e1981e8a1fcb53abf06f1cf80773653a186861672d4960ba8816e9"
+      }
+    },
+    {
+      "group": "new_repair_B01",
+      "verify": {
+        "ok": true,
+        "checked_at": "2026-10-04T00:46:53Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "score_sha256": "a1295e861a4d016e40df5e8ba9ee41d8b0fb7b5bc8517292c5ee8077edf83a91",
+      "score": {
+        "schema_version": 1,
+        "kind": "novel-kit-eval-score",
+        "created_at": "2026-10-04T00:16:13Z",
+        "quality_judgment_source": "model_comparison",
+        "quality_acceptance": "not_determined",
+        "scope": "full",
+        "evidence_complete": true,
+        "missing": [],
+        "runs": [],
+        "attempts": [],
+        "consistency": [],
+        "unions": [],
+        "repairs": [
+          {
+            "sample": "B01",
+            "repair_run_id": "B01_new_repair",
+            "review_run_id": "B01_new_repair_review",
+            "resolved": {
+              "numerator": 0,
+              "denominator": 2,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "new_errors": 0,
+            "new_s1_s2_errors": 0,
+            "protected_changed": 0,
+            "protected_missing": 0
+          }
+        ],
+        "output_hashes": {
+          "outputs/B01_新规则修正.md": "66fd13a7a67f89e94d6eee66a64fa1a4176a647b218dd9d6817dda5c75d6477f",
+          "outputs/B01_新修正盲读.md": "dc91fb16c0fd6218da9039015da728f5d28816f2022b4d8bb3983f33277f9857"
+        },
+        "judgments_snapshot": "scores/收尾评分.judgments.json",
+        "judgments_sha256": "fd39c8a1c826402b461b03e3958724460e0f8bd9e44aa848861144ca3377d2ca"
+      }
+    },
+    {
+      "group": "new_repair_B02",
+      "verify": {
+        "ok": true,
+        "checked_at": "2026-10-04T00:46:53Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "score_sha256": "0c2d509b33d4a26966f539018eb1d2488f7dbbd0077cfa023347d98b56b5d34e",
+      "score": {
+        "schema_version": 1,
+        "kind": "novel-kit-eval-score",
+        "created_at": "2026-10-04T00:16:13Z",
+        "quality_judgment_source": "model_comparison",
+        "quality_acceptance": "not_determined",
+        "scope": "full",
+        "evidence_complete": true,
+        "missing": [],
+        "runs": [],
+        "attempts": [],
+        "consistency": [],
+        "unions": [],
+        "repairs": [
+          {
+            "sample": "B02",
+            "repair_run_id": "B02_new_repair",
+            "review_run_id": "B02_new_repair_review",
+            "resolved": {
+              "numerator": 0,
+              "denominator": 2,
+              "rate": 0.0,
+              "missing": 0
+            },
+            "new_errors": 0,
+            "new_s1_s2_errors": 0,
+            "protected_changed": 0,
+            "protected_missing": 0
+          }
+        ],
+        "output_hashes": {
+          "outputs/B02_新规则修正.md": "0c9554d97b8cc712d2293fa4d386a9079eb2047a484bd440a62fa322c31d3579",
+          "outputs/B02_新修正盲读.md": "15d216b5e32dbad81efacfecdce401e7fa16654d4e896898408d827277f0ef0b"
+        },
+        "judgments_snapshot": "scores/收尾评分.judgments.json",
+        "judgments_sha256": "25ca1487a001ce9a3c86fec45ea9d48c6526f24a7d9e50ac26f455ed2df81b35"
+      }
+    },
+    {
+      "group": "new_repair_B03",
+      "verify": {
+        "ok": true,
+        "checked_at": "2026-10-04T00:46:53Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "score_sha256": "b71d0d21ed5f65aaa595fe18ef6aac087406735bc1108f7b2f0ac543748e16a4",
+      "score": {
+        "schema_version": 1,
+        "kind": "novel-kit-eval-score",
+        "created_at": "2026-10-04T00:16:13Z",
+        "quality_judgment_source": "model_comparison",
+        "quality_acceptance": "not_determined",
+        "scope": "full",
+        "evidence_complete": true,
+        "missing": [],
+        "runs": [],
+        "attempts": [],
+        "consistency": [],
+        "unions": [],
+        "repairs": [
+          {
+            "sample": "B03",
+            "repair_run_id": "B03_new_repair",
+            "review_run_id": "B03_new_repair_review",
+            "resolved": {
+              "numerator": 1,
+              "denominator": 1,
+              "rate": 1.0,
+              "missing": 0
+            },
+            "new_errors": 0,
+            "new_s1_s2_errors": 0,
+            "protected_changed": 0,
+            "protected_missing": 0
+          }
+        ],
+        "output_hashes": {
+          "outputs/B03_新规则修正.md": "3219ef39b180ecda15e8ab372e1ac96860b58586f841a60e339c504dd5e0a1b7",
+          "outputs/B03_新修正盲读.md": "ec31d0f292dd5b1a8aea09ec79ac20334d3d805f56df1a631f083e13e36beffe"
+        },
+        "judgments_snapshot": "scores/收尾评分.judgments.json",
+        "judgments_sha256": "e64361f0fb5d01a1f129d19931613e4176ab9ff2ac1c3c67dd6f71c811868a44"
+      }
+    }
+  ],
+  "direct_runner_status_counts": {
+    "completed": 38,
+    "timeout": 4
+  },
+  "direct_completed_receipt_checks": [
+    {
+      "job_id": "A02_new_repair_review",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/A02_new_repair_review/run-2eacbf23c5de4953a442056ba09f4337/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10438-fe22-7603-84e5-84686df059b3"
+      ]
+    },
+    {
+      "job_id": "A03_new_repair",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/A03_new_repair/run-7bdfbb78a2f14e3da7e7c65522cf81ee/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a1024e-e660-7323-9e75-ff90f2d79fe7"
+      ]
+    },
+    {
+      "job_id": "A03_new_repair_review",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/A03_new_repair_review/run-5f0eecd707864f6fbbe0597dcc0ef8be/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10438-fe22-75e3-a85d-411fd7a09ac8"
+      ]
+    },
+    {
+      "job_id": "A04_new_repair",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/A04_new_repair/run-ef49e211169d4dc2b00c27e4ad8fe81c/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10438-fe22-7631-bf37-abb9d18a6d2e"
+      ]
+    },
+    {
+      "job_id": "B01_new_repair",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/B01_new_repair/run-48ebca7c3bd24ff1989cf5275fcda0b9/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a1024e-e661-7571-be46-87670c4026b4"
+      ]
+    },
+    {
+      "job_id": "B01_new_repair_review",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/B01_new_repair_review/run-0b969ffbbf3149068a147043aa65209f/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a1043c-3aa3-7810-90e1-bb53c2233252"
+      ]
+    },
+    {
+      "job_id": "B02_new_repair",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/B02_new_repair/run-218e5bbf558249b2b0e48dd5347074db/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10251-bdad-73d2-b34e-85d4564dab33"
+      ]
+    },
+    {
+      "job_id": "B02_new_repair_review",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/B02_new_repair_review/run-2c1c5c69757243cba39ba00e5a0a6aa6/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a1043c-688b-7440-924d-6ad7bd3efb94"
+      ]
+    },
+    {
+      "job_id": "B03_new_repair",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/B03_new_repair/run-38062eb0f68641f6a2c9fcd047963088/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10251-d3c4-7551-b67e-26ddcc16e7de"
+      ]
+    },
+    {
+      "job_id": "B03_new_repair_review",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/B03_new_repair_review/run-9af21251fecf40c7b6e493f02bd9e3b3/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a1043c-d8e3-7ae3-ba70-216c0f17d8f7"
+      ]
+    },
+    {
+      "job_id": "C01_consistency-checker_1",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/C01_consistency-checker_1/run-2a009fa70e304d21bed209249ae0f268/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10453-b0ba-74f0-afdc-dff538939449"
+      ]
+    },
+    {
+      "job_id": "C02_consistency-checker_1",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/C02_consistency-checker_1/run-65a9d2894f6c4152a1b4367ecd7abf6b/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10453-b0ba-78b3-a6e2-9439c8a820d9"
+      ]
+    },
+    {
+      "job_id": "H03_copy-editor_1",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/H03_copy-editor_1/run-f0813262a5734d3cb99811d47bf189f6/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10449-66c4-7b80-92eb-e650fa0ccc96"
+      ]
+    },
+    {
+      "job_id": "H03_copy-editor_2",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/H03_copy-editor_2/run-a0cf2359a4294636bfbba91abd503898/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10449-ff28-7710-9754-8cab1fa56f1e"
+      ]
+    },
+    {
+      "job_id": "H04_copy-editor_2",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/H04_copy-editor_2/run-9a671032970a4a5b9c71a9ef1146fd58/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10453-b0ba-75b2-8c12-19101d50eda6"
+      ]
+    },
+    {
+      "job_id": "P3-01_full_1",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-01_full_1/run-3a2e2dd4794a41d880cf6486eb4ab982/result.json",
+      "runner_schema_version": 2,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a1023c-20bb-7df3-9489-0955e18411d3"
+      ]
+    },
+    {
+      "job_id": "P3-01_full_2",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-01_full_2/run-56483ef77be1461189da4b57991e867a/result.json",
+      "runner_schema_version": 2,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a1023c-20bb-7352-8fbb-909c5e05a578"
+      ]
+    },
+    {
+      "job_id": "P3-01_selected_1",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-01_selected_1/run-b010a5c97aef49868928d603d53c616c/result.json",
+      "runner_schema_version": 2,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a1023c-20bc-7a13-9b65-cefbb5bae3ed"
+      ]
+    },
+    {
+      "job_id": "P3-01_selected_2",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-01_selected_2/run-219c94a834a3448c911d39dc710b5972/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10240-7656-7183-b338-35c5b1f9e2fb"
+      ]
+    },
+    {
+      "job_id": "P3-02_full_1",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-02_full_1/run-05bbdce1849a47858ceabc5929e04df1/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10240-7656-7611-ab36-697d1c5d14dc"
+      ]
+    },
+    {
+      "job_id": "P3-02_full_2",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-02_full_2/run-d512c66b67324b5bbd16797fc9294c08/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10240-7656-7d70-ab68-7dcb9a58dd88"
+      ]
+    },
+    {
+      "job_id": "P3-02_selected_1",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-02_selected_1/run-be1bb7e55edd49e3821090b2a55589f2/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10243-14a6-71f0-8b5f-6ae5d4166e5b"
+      ]
+    },
+    {
+      "job_id": "P3-02_selected_2",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-02_selected_2/run-e9992a4a72ff4863ae33fc8620ee8fc3/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10243-3012-7020-b9a6-3ee21127544d"
+      ]
+    },
+    {
+      "job_id": "P3-03_full_1",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-03_full_1/run-867ad1048b1d49bbb16e54d31e6d214a/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10243-b173-7f41-bba8-ac7b393dbe86"
+      ]
+    },
+    {
+      "job_id": "P3-03_full_2",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-03_full_2/run-b2045ca340e14776a5ec591c1a98c8cd/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10247-ea82-7a63-b0f3-7656421e0b94"
+      ]
+    },
+    {
+      "job_id": "P3-03_selected_1",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-03_selected_1/run-f954b4871c5a41b5aa3c824bbf02d96f/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10247-ea83-7f21-8769-74f9025a8816"
+      ]
+    },
+    {
+      "job_id": "P3-03_selected_2",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-03_selected_2/run-af0284b6e88d4672892eec28399dafa8/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10247-ea82-7dc0-8afa-376fabfb7e52"
+      ]
+    },
+    {
+      "job_id": "P3-04_full_1",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-04_full_1/run-11f818972f80439d8ba509f53ef58283/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a1024a-ef21-7341-b876-a48dbced2df2"
+      ]
+    },
+    {
+      "job_id": "P3-04_full_2",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-04_full_2/run-08e4233a78844e8bb1924b2184581d5b/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a1024b-444e-7001-af45-a3fa1c9a91f6"
+      ]
+    },
+    {
+      "job_id": "P3-04_selected_1",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-04_selected_1/run-8be4a361c4d64bb08945acf3d4b12fe8/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a1024b-7f16-7be0-9f27-4f421b4eab1b"
+      ]
+    },
+    {
+      "job_id": "P3-04_selected_2",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-04_selected_2/run-89ee697688c743c287efd43ea0821ee8/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10441-b407-7333-ab9a-e61f09acbd2e"
+      ]
+    },
+    {
+      "job_id": "P3-05_full_1",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-05_full_1/run-2ae2e75d237f4278bef75dd8fc2d70b3/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10441-b406-7ef1-9aea-2496405541de"
+      ]
+    },
+    {
+      "job_id": "P3-05_full_2",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-05_full_2/run-7122b52c1c334a2ca010b6239bc6f61d/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10441-b407-75a1-bc13-08351b0eab8b"
+      ]
+    },
+    {
+      "job_id": "P3-05_selected_1",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-05_selected_1/run-4300928ae7a8400fbffdd903b664f1af/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10443-af2a-7552-b94a-4a3bfd2a354d"
+      ]
+    },
+    {
+      "job_id": "P3-05_selected_2",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-05_selected_2/run-d91547318bd841f2b5ca2a3317a00335/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10443-d340-73e1-804d-b2e228a266ca"
+      ]
+    },
+    {
+      "job_id": "P3-05_selected_after_1",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-05_selected_after_1/run-da703000d7aa4297b7a8196509a667ce/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10444-418d-7232-b41d-ad86c52ab787"
+      ]
+    },
+    {
+      "job_id": "P3-05_selected_after_2",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-05_selected_after_2/run-feb994fd8d40431e9a80bedb6e1aea6f/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10447-a97b-7c73-ac32-b9743ae69264"
+      ]
+    },
+    {
+      "job_id": "P3-06_selected_1_direct_v3",
+      "receipt": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/直接执行_v2/P3-06_selected_1_direct_v3/run-325e64f318c742c4bf59ec18471e5a11/result.json",
+      "runner_schema_version": 3,
+      "checks": {
+        "report_sha256": true,
+        "events_sha256": true,
+        "opening_sha256": true,
+        "input_hashes": true,
+        "no_nested_calls": true,
+        "returncode": true,
+        "turn_completed": true
+      },
+      "thread_ids": [
+        "01a10447-a97b-7fc1-8106-d1019cf89f2b"
+      ]
+    }
+  ],
+  "problems": [],
+  "note": "其他历史CLI和原生角色执行凭据见各组判分中的execution_provenance及恢复派发。评分完整不等于文学质量通过；不得改写历史凭据。"
+}

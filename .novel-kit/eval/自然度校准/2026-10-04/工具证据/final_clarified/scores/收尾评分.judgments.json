@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "quality_acceptance": "not_determined",
+  "group": "final_clarified",
+  "execution_date": "2026-10-04",
+  "runs": [
+    {
+      "run_id": "final_clarified_K02_1",
+      "execution_date": "2026-10-04",
+      "issues": [
+        {
+          "issue_id": "K02-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "父亲坐下后推辞进一步照料，儿子以具体行动回应，属于互动推进。",
+          "reason": "完整报告唯一PR-1为嘴硬标签，壶底添火与后文架壶分列保留项，未诊断同一壶的动作接口，故原L2应抓未命中。保留分母，职责外未报不自动算自然度规则退步。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [
+        {
+          "id": "K02-extra-mouth-stubbornness-label",
+          "severity": "S3",
+          "false_positive": false,
+          "evidence": "损失局限于这一句，没有明显拖延整段行动或造成误解，因此定 S3，不定 S2。",
+          "reason": "只把第26段重复态度命名列为可选S3，明确区分并保留前段不自在的关系反应与没戳穿的儿子回应。与壶接口答案无关，须登记答案外；依K组口径不算S1/S2误报，也不增设硬保护。"
+        }
+      ],
+      "report_assessment": {
+        "formal_issue_count": 1,
+        "independent_s1_s2_count": 0,
+        "evidence": "本次只报告第26段的局部重复。",
+        "reason": "正式仅PR-1 S3，前文供给说明不定级；没有把功能不同的三处说明捆为S2。"
+      }
+    },
+    {
+      "run_id": "final_clarified_N02_1",
+      "execution_date": "2026-10-04",
+      "issues": [
+        {
+          "issue_id": "N02-01",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "两句完整的因果重述连续占据该段后半部分，使试衣动作明显停滞；不是仅因出现解释句或“归根到底”而报问题，也不是因删后尚能猜懂而认定冗余。",
+          "reason": "PR-1核对后两句动作、对象、担忧与认识均无增量，指出店员递来另一件衣服前连续同义说明造成累计停滞；实际S2命中。保留第一次具体预想母亲退衣的动机，不是一律删除心理说明。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [],
+      "report_assessment": {
+        "formal_issue_count": 1,
+        "independent_s1_s2_count": 1,
+        "evidence": "适合合并为一个问题，不拆成多个套话或解释腔问题重复计数。",
+        "reason": "正式仅一条PR-1 S2，没有答案外独立条目，不把两句重述虚算两个S2。"
+      }
+    }
+  ],
+  "repairs": [],
+  "notes": [
+    "最终措辞只确认K02与N02各一份，与原12项分组计数；没有用最终措辞全量重测，也不跨组计算独立双轮一致率。",
+    "N02为一项S2累计复述；K02为一项答案外S3嘴硬标签建议，原壶接口仍未检出。",
+    "模型继承宿主且具体ID未知，仅模型比较，不是作者质量验收。"
+  ],
+  "execution_provenance": [
+    {
+      "run_id": "final_clarified_K02_1",
+      "receipt_path": "执行凭据/final_clarified_K02_1/run-a2be3adb8cdb4ef5a3c97ad7c28476ec/result.json",
+      "opening_path": "执行凭据/final_clarified_K02_1/run-a2be3adb8cdb4ef5a3c97ad7c28476ec/opening.json",
+      "events_path": "执行凭据/final_clarified_K02_1/run-a2be3adb8cdb4ef5a3c97ad7c28476ec/events.jsonl",
+      "started_at": "2026-10-04T09:54:02.970130+00:00",
+      "finished_at": "2026-10-04T09:56:45.562713+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10655-b70a-71a0-a761-82ba53466bf0"
+      ],
+      "report_sha256": "243af6f32d97ba26da6d9430109957d20b738293cc6955ab9ca93f48967e8f3a",
+      "events_sha256": "fb8e08a286c289a1ee9e1948a58b21129ce8a72afa4d35df7bb75471d2619f25",
+      "opening_sha256": "97523a0797fd940734bc289b770dda8c13184698264b32972bf6f59154ebeac2",
+      "receipt_sha256": "b1306affb7d5fd90d24fd86511ada5b8041c0486356420e067bf99dc3fe6e77a",
+      "actual_prompt_matches_manifest": true,
+      "nested_agent_calls": 0,
+      "observed_collaboration_calls": {}
+    },
+    {
+      "run_id": "final_clarified_N02_1",
+      "receipt_path": "执行凭据/final_clarified_N02_1/run-914b310687944d3598bf24119087c98a/result.json",
+      "opening_path": "执行凭据/final_clarified_N02_1/run-914b310687944d3598bf24119087c98a/opening.json",
+      "events_path": "执行凭据/final_clarified_N02_1/run-914b310687944d3598bf24119087c98a/events.jsonl",
+      "started_at": "2026-10-04T09:54:02.970412+00:00",
+      "finished_at": "2026-10-04T09:56:11.457868+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a10655-b70a-7812-bf38-9c6fe04562c5"
+      ],
+      "report_sha256": "0868c167ec852ef4c9472d035bb26e7ccdddf3186209f189130d105a8ee7b321",
+      "events_sha256": "fbd4c8307ffde412d51f357b184b3bf07a34f6910e1ddc3e9127aca055ed17eb",
+      "opening_sha256": "3a6498537297625e6a916ac1a77b57cfe7edcf8314b81f5ed550edbe4994c7f7",
+      "receipt_sha256": "2514cfdeb0584c2aca41f2ba71e57269644f531491da818c6908cca07f70cc71",
+      "actual_prompt_matches_manifest": true,
+      "nested_agent_calls": 0,
+      "observed_collaboration_calls": {}
+    }
+  ],
+  "validation": {
+    "decision_rows_complete": true,
+    "all_evidence_present": true,
+    "verify_with_require_outputs": {
+      "ok": true,
+      "checked_at": "2026-10-04T10:00:34Z",
+      "problems": [],
+      "missing_outputs": []
+    }
+  }
+}

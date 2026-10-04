@@ -1,0 +1,17 @@
+$ ./novel setup --agent all --models quality --replace
+已更新：.claude/agents/prose-reviewer.md, .codex/agents/prose-reviewer.toml
+共用入口就緒；搬動目錄或切換作業系統後重新 setup。
+請重啟所選 Agent，核對專案規則與技能已載入。
+Codex 需在 /hooks 檢視並信任本地 Hook。
+
+$ ./novel setup --agent all --models quality --check-sources
+来源副本差异：无差异
+
+$ ./novel setup --agent all --models quality --check
+待更新：無差異
+
+$ ./novel doctor --agent all
+claude: 配置一致；啟動命令允許設定、拒絕正式正文（未寫入檔案）
+codex: 配置一致；啟動命令允許設定、拒絕正式正文（未寫入檔案）
+共享技能與規則：.agents/skills、AGENTS.md；Agent 內的載入與 Hook 信任仍需實際會話確認。
+

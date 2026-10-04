@@ -1,0 +1,476 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "quality_acceptance": "not_determined",
+  "runs": [
+    {
+      "run_id": "D01_prose-reviewer_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "D01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "本场四处使用现成的强度标签交代反应，密度使不同层次的反应都被推到极端。",
+          "reason": "PR-1明确以死一般寂静、彻底沸腾、眼眸亮得吓人等四处密度报S2，匹配冻结答案的同场套话密度问题；不要求报告接受答案列出的每一个具体套话。"
+        },
+        {
+          "issue_id": "D01-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "第21段先用“亮得吓人”概括小满的眼神，第28段再断言眼神“彻底变了”，两次都没有给出可辨认的变化。",
+          "reason": "报告明确诊断神色彻底变化为解释腔且并入PR-1，不是只引用同一句。实际合并条目为S2，按原级别记S2，不另造S3；与D01-1是同一报告条目，不算两个独立S2。"
+        },
+        {
+          "issue_id": "D01-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "没有依据判断胜率计算、声音是否被旁人听见或能力限制。",
+          "reason": "胜率口径列为前文不足，没有定级因果问题。历史答案计未命中；L3因果事实不是本次自然度角色主要职责，且过去式提升可有回顾读法，不能直接算能力漏检。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "D01-protected-1",
+          "reported": false,
+          "evidence": "典故出现在人物对白，随后的查证与识破形成明确的错引玩笑。",
+          "reason": "报告明确保留故意错引，未报成事实或AI味问题。"
+        },
+        {
+          "protected_id": "D01-protected-2",
+          "reported": false,
+          "evidence": "保留口语重复“体面是体面”。",
+          "reason": "末句典故对白及现场指向被明确保留，没有报总结升华或要求解释典故。"
+        },
+        {
+          "protected_id": "D01-protected-3",
+          "reported": false,
+          "evidence": "“老板”“哦”“啦”“嘻嘻”属于这段人物说话方式，不能按叙述者套话或AI腔报告。",
+          "reason": "撒娇语气和口头称呼明确受保护。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "D02_prose-reviewer_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "D02-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "原报告没有将露身后的漏字列为问题。保留历史分母与未命中事实，但这是L1文字编辑覆盖，不能据此判自然度角色能力退步。"
+        },
+        {
+          "issue_id": "D02-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "普通读者已经理解他被压住，却还要经过坠冰窖、情绪撕扯、破风箱、手爪剧抖和咬碎尖牙，才看到钱款动作推进。",
+          "reason": "PR-1以同场恐惧反应及情绪复述密度报S2，明确包含答案列出的冰窖、情绪撕扯、咬碎尖牙等，核心诊断一致。虽保留砸钱与设备收尾，不妨碍匹配密度问题。"
+        },
+        {
+          "issue_id": "D02-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "没有给出全书视角约定，不能仅因第5段写到格里普斯的判断就判定叙述视角越界。",
+          "reason": "报告明确未判越界，理由是缺少固定视角约定。属于同职责的合理证据分歧；不能把提到视角待核算检出，也不能仅凭旧答案认定漏检。"
+        },
+        {
+          "issue_id": "D02-4",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "没有正式报告雨声遮蔽问题。该项为L3时空/听觉事实，非本角色主要职责；当前范围未证明贴身必定听清，保留历史未命中但不直接判能力漏检。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "D02-protected-1",
+          "reported": false,
+          "evidence": "对白中的口语、粗话和问叹属于人物声气，不改成书面表达",
+          "reason": "报告明确保护格里普斯的粗口和叫骂，PR-1仅收束叙述恐惧反应。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "K01_prose-reviewer_1",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [],
+      "extra_findings": []
+    },
+    {
+      "run_id": "K02_prose-reviewer_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "K02-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "日常劳作使场景保有生活节奏，不必为了突出疼痛而给母亲追加戏剧化表情或内心解释。",
+          "reason": "壶底添火仅在保留项中出现，没有诊断与后文上灶的动作接口，不能因引用同一句而算检出。历史计未命中，L2道具状态不作本角色能力缺陷的直接依据。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [
+        {
+          "id": "K02-extra-explanation-density",
+          "severity": "S2",
+          "evidence": "三处共同形成反复解释人物表现的阅读损失。第18段在父亲说话前先以“逞强”定性；第21段已让“能走”的宣称与腿颠的动作发生落差，第22段又把儿子的回应框定为“没戳穿”；第24段已写伤腿僵直、不敢弯，第25段父亲还说“真不用”，第26段再插入“嘴硬”判词。",
+          "false_positive": true,
+          "reason": "该S2针对逞强/没戳穿/嘴硬三处解释密度，与冻结答案唯一允许的壶接口K02-1不同。README规定K组答案外S1/S2一律计误报，因此记1条对照组误报，不因符合角色三处密度规则而豁免。审阅理由有原文依据，但文学上是否偏好删减应由作者裁决，不能自动作为S2修正要求。"
+        }
+      ]
+    },
+    {
+      "run_id": "C01_consistency-checker_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "C01-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "未能核实的是手机如何识别这名女孩，以及资料是否覆盖她。",
+          "reason": "CC-4正式列为待核，不属于S1-S4问题，故按冻结答案记未命中。报告区分角色从屏幕得名和手机识别能力未供给，不把能力未展示等同不存在；属于证据边界分歧，不能因提到姓名就算检出。"
+        },
+        {
+          "issue_id": "C01-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "“魔法孤儿”作为对当前身份的自述性概括，与父母正在照料、送行的事实冲突。",
+          "reason": "CC-1对照母亲拥抱、称爸及父母送站，诊断孤儿身份概括冲突，命中答案。报告实际为S2而答案预期S3，如实记录，不为对齐旧答案改级；身份误读是否达到S2仍可由作者裁决。"
+        },
+        {
+          "issue_id": "C01-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "报告没有诊断口径确定时间。前文先在母亲拥抱时录入口径，随后分配资金、买杖、躺床，旧答案有顺序依据；临睡前若严格理解为紧邻入睡会显得不准，宽泛理解为当晚睡前则可相容。记录低严重度时间表述未覆盖，不据此升级为确定的硬事实矛盾。"
+        },
+        {
+          "issue_id": "C01-4",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "前文明确限定了唤醒条件，正文却从取出手机、拨开皮套铜扣直接进入亮屏和语音响应，没有落实按物理键唤醒的必要动作。",
+          "reason": "CC-2命中答案说明中的物理按键唤醒约束，按真实级别S2记检出。覆盖答案合并条目中的唤醒动作，报告同时拒绝据0.3%与0.2%推断续航必然不可能；只算一个答案编号，不声称续航部分也被证实或另算漏报。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "C01-protected-1",
+          "reported": false,
+          "evidence": "口语省略没有制造事实冲突，保留声线和停顿，不补成书面问句。",
+          "reason": "哎哟我的妈及现场问话明确列为保留，未当作事实或表达错误。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "C01-extra-phone-pocket-lap-position",
+          "severity": "S2",
+          "evidence": "读者会回读确认他是在向藏于口袋的设备说话，还是低头向膝上的设备说话；两种画面影响女孩究竟看到了什么、为何追问。",
+          "false_positive": false,
+          "reason": "CC-3是答案外发现：手机已从内袋取出，女孩却见他对口袋说话，随后又盯着膝上皮套，位置及被观察动作存在具体接口。此项与姓名、孤儿、时间、唤醒均不同，有同段原文依据，非K组也非保护项，不自动判误报。可仅统一既有位置与说话朝向，不新增往返收放事实。"
+        }
+      ]
+    },
+    {
+      "run_id": "C02_consistency-checker_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "C02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "两套关系起点没有得到解释。",
+          "reason": "CC-1依据互报姓名、年级学院及初见反应，与去年领入学院的共同经历冲突，命中S2；报告没有借外部设定认定格兰芬多学生不能为赫奇帕奇学生领路。"
+        },
+        {
+          "issue_id": "C02-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "正文并非只回顾曾被没收，而是让比尔提出未来去讨回，并让埃德蒙道谢、比尔承诺帮忙，将本子仍在教授手里作为当前对话的前提。",
+          "reason": "CC-2把已归还的卷边本子与仍待讨回的整组对话对照，命中道具去向。实际报告为S2，旧答案预期S3且保留同一本条件；记录定级分歧，不编造第二次没收或倒叙，不把这条拆成多个问题。"
+        },
+        {
+          "issue_id": "C02-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "紧接的纠正与笑声支持这是调侃，不能据“教授的本子”另报一次所有权冲突。",
+          "reason": "报告明确保留这句：后一句是斯内普自己收走及继续大笑支持调侃读法。历史答案计未命中；对白并未可靠断言所有权，不能机械由教授的本子四字判病句或能力漏检。"
+        },
+        {
+          "issue_id": "C02-4",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "报告没有把两次你倒好列为问题。该项是L4自然度，不属一致性角色主要职责；两次分别承接运动能力与笔记调侃，也可能形成声线。保留历史未命中，不自动算一致性能力缺陷。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "C02-protected-1",
+          "reported": false,
+          "evidence": "相邻内容已提供比尔忙不过来的话题依据，随后继续介绍查理。",
+          "reason": "报告未把我顾不过来了或相邻简短应答列为问题，明确相关话题已有依据，未要求书面化扩写。"
+        }
+      ],
+      "extra_findings": []
+    }
+  ],
+  "repairs": [],
+  "missing_run_ids": [],
+  "notes": [
+    "额外角色六份报告已完成逐项判分；原四份阶段判分、原报告、冻结输入与答案保持不变。",
+    "按冻结答案全部条目保留历史分母，角色职责、待核与合理分歧另写reason；没有把待核事项当成已检出问题。",
+    "D01两个答案编号由同一PR-1 S2覆盖；C01-4由物理按键唤醒子问题覆盖，不代表低电量续航也已证实为错。",
+    "C01额外手机位置S2有原文依据，false_positive=false；K02解释腔答案外S2依K组协议保留false_positive=true，不能以三处密度规则豁免。",
+    "各样本只有一次该角色执行，两轮一致率不适用。额外角色覆盖不能代替copy-editor双轮回归。",
+    "质量判断为model_comparison，quality_acceptance=not_determined；数据收齐与工具核验通过不代表作者文学质量通过。"
+  ],
+  "execution_provenance": [
+    {
+      "run_id": "D01_prose-reviewer_1",
+      "source": "CLI执行/D01_prose-reviewer_1/批次2/执行结果.json",
+      "opening_path": "CLI执行/D01_prose-reviewer_1/批次2/开读冻结.json",
+      "events_path": "CLI执行/D01_prose-reviewer_1/批次2/events.jsonl",
+      "started_at": "2026-10-03T14:02:12.121066+00:00",
+      "finished_at": "2026-10-03T14:08:02.626311+00:00",
+      "thread_ids": [
+        "01a10212-8beb-75b0-a746-cf1d153a9e83"
+      ],
+      "model_id": "unknown",
+      "report_sha256": "33a46778f4ea74f8e3c107d093c433c501267a4bfc9f28fd42fa5f82c389509b",
+      "receipt_sha256": "36e1326fc4d3ca08a427faf461483b30ed5b51ec76dd228885d7b3e04bad9c22",
+      "events_sha256": "e2dde19da7af438e9ffe1f6b4b7296754f799336e1613267a0c7fc7f0d2b513b",
+      "opening_sha256": "3b2c48dfbed05e7ab2b61201a0accd213de99af0da4a5c556bd3c716423529ef",
+      "runner_nested_agent_calls": null,
+      "observed_collaboration_call_count": 0,
+      "actual_prompt_matches_manifest": true,
+      "read_paths_with_complete_cat_output": 5,
+      "allowed_input_paths": 5
+    },
+    {
+      "run_id": "D02_prose-reviewer_1",
+      "source": "CLI执行/D02_prose-reviewer_1/批次2/执行结果.json",
+      "opening_path": "CLI执行/D02_prose-reviewer_1/批次2/开读冻结.json",
+      "events_path": "CLI执行/D02_prose-reviewer_1/批次2/events.jsonl",
+      "started_at": "2026-10-03T14:08:02.632920+00:00",
+      "finished_at": "2026-10-03T14:15:57.404875+00:00",
+      "thread_ids": [
+        "01a10217-e537-7573-a202-540c0de296d1"
+      ],
+      "model_id": "unknown",
+      "report_sha256": "5ddc3beab81e224dd33ae3185ce36aa678f84c8a43fd48663f730a72c285d6c4",
+      "receipt_sha256": "1e331ed6774e9ef5a2a4cb0dd59442b47b1b01527613f3b109b1d9ec2ebdbe1c",
+      "events_sha256": "8c6992321b6c60b045a6e79c9addee6d402e306bd213ee56f7ecc7c8865593b7",
+      "opening_sha256": "f80527d5b32a1337ecc4cf60d200f7929d14cdfdb5be6db7d4c2fdb6282c8c6f",
+      "runner_nested_agent_calls": null,
+      "observed_collaboration_call_count": 0,
+      "actual_prompt_matches_manifest": true,
+      "read_paths_with_complete_cat_output": 5,
+      "allowed_input_paths": 5
+    },
+    {
+      "run_id": "K01_prose-reviewer_1",
+      "source": "CLI执行/K01_prose-reviewer_1/批次2/执行结果.json",
+      "opening_path": "CLI执行/K01_prose-reviewer_1/批次2/开读冻结.json",
+      "events_path": "CLI执行/K01_prose-reviewer_1/批次2/events.jsonl",
+      "started_at": "2026-10-03T14:09:17.909715+00:00",
+      "finished_at": "2026-10-03T14:16:33.009407+00:00",
+      "thread_ids": [
+        "01a10219-0b21-7c42-9cc0-cea52c589da9"
+      ],
+      "model_id": "unknown",
+      "report_sha256": "e39a53feeebc3db83a340bbe5481c7d7639b22e28a7a4c7c3ffcbf2e38922276",
+      "receipt_sha256": "74e3ba02f96c1c603988ef1e90bd6714513fdfa6165424a396b89ec7447fbaeb",
+      "events_sha256": "b69386aec65b401b2aa147918f569bcf35f0d85c4ed5ff0ddfa6c7b43ba09398",
+      "opening_sha256": "05733502c1110400af6d586b8bb2e8d3b572ab82c5e4e4d43648209cf2d66899",
+      "runner_nested_agent_calls": null,
+      "observed_collaboration_call_count": 0,
+      "actual_prompt_matches_manifest": true,
+      "read_paths_with_complete_cat_output": 5,
+      "allowed_input_paths": 5
+    },
+    {
+      "run_id": "K02_prose-reviewer_1",
+      "source": "CLI执行/K02_prose-reviewer_1/批次2/执行结果.json",
+      "opening_path": "CLI执行/K02_prose-reviewer_1/批次2/开读冻结.json",
+      "events_path": "CLI执行/K02_prose-reviewer_1/批次2/events.jsonl",
+      "started_at": "2026-10-03T14:15:57.459264+00:00",
+      "finished_at": "2026-10-03T14:20:30.241970+00:00",
+      "thread_ids": [
+        "01a1021f-23dd-7641-af82-955d07d746a3"
+      ],
+      "model_id": "unknown",
+      "report_sha256": "c8cfa6583be2b69026782053e7ee8b80128976ed44b568a5ab62e8b4b309a0a7",
+      "receipt_sha256": "19ec03f327b4ab434b36afd1b7380be16935fdd321cee400268b48d5170b6666",
+      "events_sha256": "87c57a6246ef314fc94ed2d5c3d63b7adaeb294962b7a8a081d718cd062a0a40",
+      "opening_sha256": "88c400d8f0732cbb3244d8b69b1638191d8b6513174d018e7014491562d064dc",
+      "runner_nested_agent_calls": null,
+      "observed_collaboration_call_count": 0,
+      "actual_prompt_matches_manifest": true,
+      "read_paths_with_complete_cat_output": 5,
+      "allowed_input_paths": 5
+    },
+    {
+      "run_id": "C01_consistency-checker_1",
+      "source": "直接执行_v2/C01_consistency-checker_1/run-2a009fa70e304d21bed209249ae0f268/result.json",
+      "opening_path": "直接执行_v2/C01_consistency-checker_1/run-2a009fa70e304d21bed209249ae0f268/opening.json",
+      "events_path": "直接执行_v2/C01_consistency-checker_1/run-2a009fa70e304d21bed209249ae0f268/events.jsonl",
+      "started_at": "2026-10-04T00:32:35.783230+00:00",
+      "finished_at": "2026-10-04T00:38:04.658328+00:00",
+      "thread_ids": [
+        "01a10453-b0ba-74f0-afdc-dff538939449"
+      ],
+      "model_id": "unknown",
+      "report_sha256": "d048d2ba70adca80c6313c3499a92a924abe1b9c7001ecf6aaef510fa2a33c11",
+      "receipt_sha256": "f9703c48666183c81c7cdee292beb64699803fd4936576a32e68ce3bef189c43",
+      "events_sha256": "da5cac9d5bb410e2d38eb8eac8425f21b1de8deb6404277b3024aa17806d6f4f",
+      "opening_sha256": "334a037690fc5aca3fd3f7e742ecc73cea5790ab1ed4981b1b462aa01c7105fc",
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_call_count": 0,
+      "actual_prompt_matches_manifest": true,
+      "read_paths_with_complete_cat_output": 6,
+      "allowed_input_paths": 6
+    },
+    {
+      "run_id": "C02_consistency-checker_1",
+      "source": "直接执行_v2/C02_consistency-checker_1/run-65a9d2894f6c4152a1b4367ecd7abf6b/result.json",
+      "opening_path": "直接执行_v2/C02_consistency-checker_1/run-65a9d2894f6c4152a1b4367ecd7abf6b/opening.json",
+      "events_path": "直接执行_v2/C02_consistency-checker_1/run-65a9d2894f6c4152a1b4367ecd7abf6b/events.jsonl",
+      "started_at": "2026-10-04T00:32:35.783809+00:00",
+      "finished_at": "2026-10-04T00:37:44.101728+00:00",
+      "thread_ids": [
+        "01a10453-b0ba-78b3-a6e2-9439c8a820d9"
+      ],
+      "model_id": "unknown",
+      "report_sha256": "5297eefa9f91bcb24fd533362d6d9f311c308a8f9a804295c7a0bf7033af377e",
+      "receipt_sha256": "e88ddff4ab5599fcc60960b6953d46188d2f0348460527c8824192163c8c9780",
+      "events_sha256": "63cb18d051ac4c8337187e7a17163e4c3534e49375a7e6270f8ab18057780e5d",
+      "opening_sha256": "de9391287131444200bb65e768e005a3a71edacf67c1c64c1886ee4833c3fb6f",
+      "runner_nested_agent_calls": 0,
+      "observed_collaboration_call_count": 0,
+      "actual_prompt_matches_manifest": true,
+      "read_paths_with_complete_cat_output": 6,
+      "allowed_input_paths": 6
+    }
+  ],
+  "validation": {
+    "judgment_rows_complete": true,
+    "all_evidence_present_in_raw_reports": true,
+    "all_report_hashes_match_completed_receipts_and_frozen_copies": true,
+    "all_actual_prompts_match_frozen_manifest": true,
+    "all_parent_events_observed_no_collaboration_calls": true,
+    "verify_with_require_outputs": {
+      "ok": true,
+      "checked_at": "2026-10-04T00:46:31Z",
+      "problems": [],
+      "missing_outputs": []
+    },
+    "final_score_generated": true
+  },
+  "status": "scored_six_of_six",
+  "source_stage": "额外角色判分_阶段.json",
+  "source_stage_sha256": "7de89a6de6148ca95de680d42c0963197df9fae037c429cc3363a7dab1f48e28",
+  "execution_date_timezone": "America/Los_Angeles",
+  "updated_at": "2026-10-04T00:46:02.460998+00:00",
+  "tool_metrics": {
+    "attempts": [
+      {
+        "role": "consistency-checker",
+        "attempt": 1,
+        "detected": {
+          "numerator": 4,
+          "denominator": 8,
+          "rate": 0.5,
+          "missing": 0
+        },
+        "severity_attainment": {
+          "numerator": 1,
+          "denominator": 3,
+          "rate": 0.3333333333333333,
+          "missing": 0
+        },
+        "false_positives": {
+          "control_s1_s2": 0,
+          "protected_reported": 0,
+          "other_explicit": 0,
+          "missing": 0
+        }
+      },
+      {
+        "role": "prose-reviewer",
+        "attempt": 1,
+        "detected": {
+          "numerator": 3,
+          "denominator": 8,
+          "rate": 0.375,
+          "missing": 0
+        },
+        "severity_attainment": {
+          "numerator": 2,
+          "denominator": 3,
+          "rate": 0.6666666666666666,
+          "missing": 0
+        },
+        "false_positives": {
+          "control_s1_s2": 1,
+          "protected_reported": 0,
+          "other_explicit": 0,
+          "missing": 0
+        }
+      }
+    ],
+    "consistency": [],
+    "unions": [
+      {
+        "role": "consistency-checker",
+        "supplemental_only": true,
+        "detected": {
+          "numerator": 4,
+          "denominator": 8,
+          "rate": 0.5,
+          "missing": 0
+        },
+        "severity_attainment": {
+          "numerator": 1,
+          "denominator": 3,
+          "rate": 0.3333333333333333,
+          "missing": 0
+        },
+        "false_positives": {
+          "control_s1_s2": 0,
+          "protected_reported": 0,
+          "other_explicit": 0,
+          "missing": 0
+        }
+      },
+      {
+        "role": "prose-reviewer",
+        "supplemental_only": true,
+        "detected": {
+          "numerator": 3,
+          "denominator": 8,
+          "rate": 0.375,
+          "missing": 0
+        },
+        "severity_attainment": {
+          "numerator": 2,
+          "denominator": 3,
+          "rate": 0.6666666666666666,
+          "missing": 0
+        },
+        "false_positives": {
+          "control_s1_s2": 1,
+          "protected_reported": 0,
+          "other_explicit": 0,
+          "missing": 0
+        }
+      }
+    ]
+  },
+  "evidence_complete": true,
+  "score_path": "工具证据/extra_roles_direct_v2/scores/收尾评分.json"
+}

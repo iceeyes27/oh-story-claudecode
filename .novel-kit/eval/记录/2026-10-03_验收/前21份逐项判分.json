@@ -1,0 +1,846 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "runs": [
+    {
+      "run_id": "A01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "纸是练字用的次等羊皮",
+          "reason": "报告明确指出同一局部问题。"
+        },
+        {
+          "issue_id": "A01-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐项对照，报告未将答案所列问题作为已定级正文问题；供给待核和保留项不算检出。"
+        },
+        {
+          "issue_id": "A01-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐项对照，报告未将答案所列问题作为已定级正文问题；供给待核和保留项不算检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "A01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "A01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "纸是练字用的次等羊皮",
+          "reason": "报告明确指出同一局部问题。"
+        },
+        {
+          "issue_id": "A01-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐项对照，报告未将答案所列问题作为已定级正文问题；供给待核和保留项不算检出。"
+        },
+        {
+          "issue_id": "A01-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐项对照，报告未将答案所列问题作为已定级正文问题；供给待核和保留项不算检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "A01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "A02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A02-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐项对照，报告未将答案所列问题作为已定级正文问题；供给待核和保留项不算检出。"
+        },
+        {
+          "issue_id": "A02-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐项对照，报告未将答案所列问题作为已定级正文问题；供给待核和保留项不算检出。"
+        },
+        {
+          "issue_id": "A02-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐项对照，报告未将答案所列问题作为已定级正文问题；供给待核和保留项不算检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "A02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        },
+        {
+          "protected_id": "A02-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "A02_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A02-1",
+          "detected": true,
+          "severity": "S3",
+          "evidence": "比较双方不够齐整",
+          "reason": "报告明确指出同一局部问题。报告定级与预置答案不同，保留分歧，不替作者更改答案。"
+        },
+        {
+          "issue_id": "A02-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐项对照，报告未将答案所列问题作为已定级正文问题；供给待核和保留项不算检出。"
+        },
+        {
+          "issue_id": "A02-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐项对照，报告未将答案所列问题作为已定级正文问题；供给待核和保留项不算检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "A02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        },
+        {
+          "protected_id": "A02-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "A03_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A03-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐项对照，报告未将答案所列问题作为已定级正文问题；供给待核和保留项不算检出。"
+        },
+        {
+          "issue_id": "A03-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "金属的凉意与粗糙纸币贴在一起",
+          "reason": "报告明确指出同一局部问题。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "A03-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "A03_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A03-1",
+          "detected": true,
+          "severity": "S3",
+          "evidence": "十镑英镑",
+          "reason": "报告明确指出同一局部问题。报告定级与预置答案不同，保留分歧，不替作者更改答案。"
+        },
+        {
+          "issue_id": "A03-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "金属的凉意与粗糙纸币贴在一起",
+          "reason": "报告明确指出同一局部问题。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "A03-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "A04_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A04-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "自己的左边袖口",
+          "reason": "报告明确指出同一局部问题。"
+        },
+        {
+          "issue_id": "A04-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "报告未判“缺关联词”错误；第一轮同句的节奏建议指向其他原因，不因同句出现就算匹配。"
+        },
+        {
+          "issue_id": "A04-3",
+          "detected": true,
+          "severity": "S3",
+          "evidence": "右引号与“亚瑟”之间多了空格",
+          "reason": "报告明确指出同一局部问题。报告定级与预置答案不同，保留分歧，不替作者更改答案。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [
+        {
+          "id": "A04-extra-dense",
+          "severity": "S3",
+          "evidence": "多个盘点对象连续更换",
+          "reason": "盘点节奏建议；并非答案所列关联词缺失问题。",
+          "false_positive": false
+        },
+        {
+          "id": "A04-extra-sound",
+          "severity": "S3",
+          "evidence": "兜里只叮当揣着几个找零的西可",
+          "reason": "搭配整理为可选建议，未改变金额。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "A04_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A04-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐项对照，报告未将答案所列问题作为已定级正文问题；供给待核和保留项不算检出。"
+        },
+        {
+          "issue_id": "A04-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "报告未判“缺关联词”错误；第一轮同句的节奏建议指向其他原因，不因同句出现就算匹配。"
+        },
+        {
+          "issue_id": "A04-3",
+          "detected": true,
+          "severity": "S3",
+          "evidence": "后引号后有一个多余空格",
+          "reason": "报告明确指出同一局部问题。报告定级与预置答案不同，保留分歧，不替作者更改答案。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [
+        {
+          "id": "A04-extra-money-table",
+          "severity": "S2",
+          "evidence": "桌上的余钱",
+          "reason": "局部正文仅写采购物品上桌，钱仍在兜里或只写余额，放钱动作没有落点。",
+          "false_positive": false
+        },
+        {
+          "id": "A04-extra-sound",
+          "severity": "S3",
+          "evidence": "叮当",
+          "reason": "同一声音词搭配建议，列可选，不认定为强制修改。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "B01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "B01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "先停下",
+          "reason": "报告明确指出同一局部问题。"
+        },
+        {
+          "issue_id": "B01-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐项对照，报告未将答案所列问题作为已定级正文问题；供给待核和保留项不算检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "B01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        },
+        {
+          "protected_id": "B01-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "B01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "B01-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐项对照，报告未将答案所列问题作为已定级正文问题；供给待核和保留项不算检出。"
+        },
+        {
+          "issue_id": "B01-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "真看着被死册子折腾成这样",
+          "reason": "报告明确指出同一局部问题。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "B01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        },
+        {
+          "protected_id": "B01-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "B02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "B02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "空间承接",
+          "reason": "报告明确指出同一局部问题。"
+        },
+        {
+          "issue_id": "B02-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "面粉袋",
+          "reason": "报告明确指出同一局部问题。"
+        },
+        {
+          "issue_id": "B02-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐项对照，报告未将答案所列问题作为已定级正文问题；供给待核和保留项不算检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "B02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "B02-extra-paper-position",
+          "severity": "S2",
+          "evidence": "锅沿下",
+          "reason": "前文纸在锅底，末段仍观察底部却改称锅沿；当前正文内部物件位置不一致。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "B02_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "B02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "操作台中央",
+          "reason": "报告明确指出同一局部问题。"
+        },
+        {
+          "issue_id": "B02-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "面粉袋",
+          "reason": "报告明确指出同一局部问题。"
+        },
+        {
+          "issue_id": "B02-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐项对照，报告未将答案所列问题作为已定级正文问题；供给待核和保留项不算检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "B02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "B02-extra-paper-position",
+          "severity": "S2",
+          "evidence": "锅沿下",
+          "reason": "与第一轮同一黄纸位置问题，答案未列。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "H01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "H01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "空墨水瓶",
+          "reason": "报告明确指出同一局部问题。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "H01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        },
+        {
+          "protected_id": "H01-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        },
+        {
+          "protected_id": "H01-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        },
+        {
+          "protected_id": "H01-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "H01-extra-repeated-collision",
+          "severity": "S2",
+          "evidence": "撞一下弹一下",
+          "reason": "停止并远离门框后又以正在碰撞叙述；可疑接口待作者裁决，按模型对照记为额外发现。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "H01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "H01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "空墨水瓶",
+          "reason": "报告明确指出同一局部问题。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "H01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        },
+        {
+          "protected_id": "H01-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        },
+        {
+          "protected_id": "H01-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        },
+        {
+          "protected_id": "H01-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "已核对原报告问题栏，未将该保护项列为问题。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "H01-extra-silent",
+          "severity": "S3",
+          "evidence": "无声地",
+          "reason": "无声与默念重复的可选整理，未误改保护项。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "B03_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "B03-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "近距离用尖锐木棍指着他人",
+          "reason": "同一持有/动作承接问题已明确列出。严重度与预置答案不同时保留双方依据。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "B03-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "问题栏没有把该保护项列为问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "B03_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "B03-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "近距离用尖锐木棍指着他人",
+          "reason": "同一持有/动作承接问题已明确列出。严重度与预置答案不同时保留双方依据。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "B03-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "问题栏没有把该保护项列为问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "B04_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "B04-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐字核对后未在已定级问题栏找到该应抓项目；保留或供给待核不当作检出。"
+        },
+        {
+          "issue_id": "B04-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐字核对后未在已定级问题栏找到该应抓项目；保留或供给待核不当作检出。"
+        },
+        {
+          "issue_id": "B04-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐字核对后未在已定级问题栏找到该应抓项目；保留或供给待核不当作检出。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [
+        {
+          "id": "B04-extra-touch",
+          "severity": "S2",
+          "evidence": "金属的凉意与粗糙纸币贴在一起",
+          "reason": "感觉与实物参与同一接触动作，与A03重复取样；单列重叠。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "B04_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "B04-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐字核对后未在已定级问题栏找到该应抓项目；保留或供给待核不当作检出。"
+        },
+        {
+          "issue_id": "B04-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐字核对后未在已定级问题栏找到该应抓项目；保留或供给待核不当作检出。"
+        },
+        {
+          "issue_id": "B04-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐字核对后未在已定级问题栏找到该应抓项目；保留或供给待核不当作检出。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [
+        {
+          "id": "B04-extra-touch",
+          "severity": "S2",
+          "evidence": "金属的凉意与粗糙纸币贴在一起",
+          "reason": "感觉与实物参与同一接触动作，与A03重复取样；单列重叠。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "C01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "C01-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐字核对后未在已定级问题栏找到该应抓项目；保留或供给待核不当作检出。"
+        },
+        {
+          "issue_id": "C01-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐字核对后未在已定级问题栏找到该应抓项目；保留或供给待核不当作检出。"
+        },
+        {
+          "issue_id": "C01-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐字核对后未在已定级问题栏找到该应抓项目；保留或供给待核不当作检出。"
+        },
+        {
+          "issue_id": "C01-4",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐字核对后未在已定级问题栏找到该应抓项目；保留或供给待核不当作检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "C01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "问题栏没有把该保护项列为问题。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "C01-extra-phone-position",
+          "severity": "S2",
+          "evidence": "对着口袋",
+          "reason": "已取出的手机又与口袋、膝头位置切换，没有放置落点，列原文接口问题。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "C01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "C01-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐字核对后未在已定级问题栏找到该应抓项目；保留或供给待核不当作检出。"
+        },
+        {
+          "issue_id": "C01-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐字核对后未在已定级问题栏找到该应抓项目；保留或供给待核不当作检出。"
+        },
+        {
+          "issue_id": "C01-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐字核对后未在已定级问题栏找到该应抓项目；保留或供给待核不当作检出。"
+        },
+        {
+          "issue_id": "C01-4",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "逐字核对后未在已定级问题栏找到该应抓项目；保留或供给待核不当作检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "C01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "问题栏没有把该保护项列为问题。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "C01-extra-wand-subject",
+          "severity": "S1",
+          "evidence": "父亲淘的那根旧货一进他手里",
+          "reason": "试杖主体指代；原文多男性先行词，报告认为行动者被读错。保留给作者裁决。",
+          "false_positive": false
+        },
+        {
+          "id": "C01-extra-drawing-subject",
+          "severity": "S1",
+          "evidence": "皮面上那圈云纹是他自己描的",
+          "reason": "亚瑟后继续他，绘制及经历主体存在歧义；报告S1定级保留裁决。",
+          "false_positive": false
+        },
+        {
+          "id": "C01-extra-face",
+          "severity": "S3",
+          "evidence": "对着口袋动嘴皮子的脸",
+          "reason": "撞见动作落到脸的可选措辞建议。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "H02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "H02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "地上那张被踩脏的羊皮纸",
+          "reason": "同一持有/动作承接问题已明确列出。严重度与预置答案不同时保留双方依据。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "H02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "问题栏没有把该保护项列为问题。"
+        },
+        {
+          "protected_id": "H02-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "问题栏没有把该保护项列为问题。"
+        },
+        {
+          "protected_id": "H02-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "问题栏没有把该保护项列为问题。"
+        },
+        {
+          "protected_id": "H02-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "问题栏没有把该保护项列为问题。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "H02-extra-original-return",
+          "severity": "S2",
+          "evidence": "原件从伍德回到埃德蒙手里",
+          "reason": "先被伍德取走，后埃德蒙塞纸的另一个转移点；预置答案没列，原始依据已在报告。",
+          "false_positive": false
+        }
+      ]
+    }
+  ],
+  "repairs": [],
+  "note": "协调器逐项对照；不是作者核验，额外发现和答案争议需保留裁决。"
+}

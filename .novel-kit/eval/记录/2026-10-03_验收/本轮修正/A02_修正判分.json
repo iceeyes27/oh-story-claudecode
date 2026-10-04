@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "runs": [],
+  "repairs": [
+    {
+      "sample": "A02",
+      "repair_run_id": "A02_new_repair",
+      "review_run_id": "A02_new_repair_review",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A02-1",
+          "resolved": true,
+          "evidence": "“这道符线”和“他贴在锅底那张纸上的符线”比较对象同类。",
+          "reason": "逐字对照原稿与冻结候选，仅授权句由“那个起笔的架构，和他贴在锅底那张出自同一种画法”改为“从起笔的架构看，这道符线和他贴在锅底那张纸上的符线出自同一种画法”。前文已写宣纸上的符线，后文已写锅底纸的起笔线，两道符线均有原文依据；改句没有删去同一种画法的判断，也未新增事实。新独立盲读明确确认比较对象同类，因此记已解决；不是仅凭未报问题判断。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "A02-protected-1",
+          "changed": false,
+          "evidence": "对白中的省略与句号式问句依保护清单及文风样本保留。",
+          "reason": "原稿与候选逐字对照，“那你呢。”埃德蒙反问完整原样保留，问句句号未改；全文差异只在第10段授权句。盲读保留句号式问句。"
+        },
+        {
+          "protected_id": "A02-protected-2",
+          "changed": false,
+          "evidence": "“你一个英国混血，哪来的法器。”",
+          "reason": "保护句在原稿与冻结候选中逐字一致，盲读在保留项中逐字引用，并说明问意由语境明确、不机械改为问号。"
+        }
+      ],
+      "new_errors": []
+    }
+  ]
+}

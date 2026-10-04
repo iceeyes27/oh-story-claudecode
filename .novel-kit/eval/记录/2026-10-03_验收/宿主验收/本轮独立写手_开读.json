@@ -1,0 +1,13 @@
+{
+  "started_at": "2026-10-04T00:11:04.829686+00:00",
+  "role": "scene-writer",
+  "fork_turns": "none",
+  "prompt": "这是 novel-kit 工具的实际宿主隔离验收，不是真实小说写作或采用。你已被明确指定为 scene-writer；直接完成自己的写手任务，不再委派或调用任何协作、线程、等待工具。只读取 /private/tmp/novel-kit-20261004-host-book/.novel-kit/roles/scene-writer.md、/private/tmp/novel-kit-20261004-host-book/.novel-kit/standards/语文规格.md 和 /private/tmp/novel-kit-20261004-host-book/大綱/細綱/第001章.md。细纲已由测试命令确认并 begin。先在该隔离目录实际执行 ./novel check 草稿/第001章/場景01.md；通过后用真实 apply_patch 创建 /private/tmp/novel-kit-20261004-host-book/草稿/第001章/場景01.md，完整80至120字纯正文。除此之外不写任何文件；不采用、不读前一次隔离测试或其他审阅。若工具被宿主拒绝，原样报告原因且不绕过。所有正文用简体，明确回报实际读写路径、check结果和自查，结束本次任务。其他代理在工作，不回退别人的修改。\n",
+  "input_hashes": {
+    "/private/tmp/novel-kit-20261004-host-book/.novel-kit/roles/scene-writer.md": "69af0fc316eff5bcd391ade953e7caa1e12d9fa9b1e1f86e7261cf4716cc494f",
+    "/private/tmp/novel-kit-20261004-host-book/.novel-kit/standards/语文规格.md": "232019a01049a085e36fc24d64f0922247a6c07a95722a5797a3c717d6dfaa18",
+    "/private/tmp/novel-kit-20261004-host-book/大綱/細綱/第001章.md": "9e5dc4313cfc54df6eca8d6043bd0ba4b86ca490374304dc1b170145a125a9b4"
+  },
+  "output": "/private/tmp/novel-kit-20261004-host-book/草稿/第001章/場景01.md",
+  "note": "开读前记录；派发结果与完成另记。"
+}

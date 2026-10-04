@@ -1,0 +1,47 @@
+[
+  {
+    "command": [
+      "./novel",
+      "setup",
+      "--agent",
+      "all",
+      "--models",
+      "quality",
+      "--replace"
+    ],
+    "returncode": 0
+  },
+  {
+    "command": [
+      "./novel",
+      "setup",
+      "--agent",
+      "all",
+      "--models",
+      "quality",
+      "--check-sources"
+    ],
+    "returncode": 0
+  },
+  {
+    "command": [
+      "./novel",
+      "setup",
+      "--agent",
+      "all",
+      "--models",
+      "quality",
+      "--check"
+    ],
+    "returncode": 0
+  },
+  {
+    "command": [
+      "./novel",
+      "doctor",
+      "--agent",
+      "all"
+    ],
+    "returncode": 0
+  }
+]

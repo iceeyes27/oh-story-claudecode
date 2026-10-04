@@ -1,0 +1,193 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "quality_acceptance": "not_determined",
+  "runs": [
+    {
+      "run_id": "D01_prose-reviewer_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "D01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "本场四处使用现成的强度标签交代反应，密度使不同层次的反应都被推到极端。",
+          "reason": "PR-1明确以死一般寂静、彻底沸腾、眼眸亮得吓人等四处密度报S2，匹配冻结答案的同场套话密度问题；不要求报告接受答案列出的每一个具体套话。"
+        },
+        {
+          "issue_id": "D01-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "第21段先用“亮得吓人”概括小满的眼神，第28段再断言眼神“彻底变了”，两次都没有给出可辨认的变化。",
+          "reason": "报告明确诊断神色彻底变化为解释腔且并入PR-1，不是只引用同一句。实际合并条目为S2，按原级别记S2，不另造S3；与D01-1是同一报告条目，不算两个独立S2。"
+        },
+        {
+          "issue_id": "D01-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "没有依据判断胜率计算、声音是否被旁人听见或能力限制。",
+          "reason": "胜率口径列为前文不足，没有定级因果问题。历史答案计未命中；L3因果事实不是本次自然度角色主要职责，且过去式提升可有回顾读法，不能直接算能力漏检。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "D01-protected-1",
+          "reported": false,
+          "evidence": "典故出现在人物对白，随后的查证与识破形成明确的错引玩笑。",
+          "reason": "报告明确保留故意错引，未报成事实或AI味问题。"
+        },
+        {
+          "protected_id": "D01-protected-2",
+          "reported": false,
+          "evidence": "保留口语重复“体面是体面”。",
+          "reason": "末句典故对白及现场指向被明确保留，没有报总结升华或要求解释典故。"
+        },
+        {
+          "protected_id": "D01-protected-3",
+          "reported": false,
+          "evidence": "“老板”“哦”“啦”“嘻嘻”属于这段人物说话方式，不能按叙述者套话或AI腔报告。",
+          "reason": "撒娇语气和口头称呼明确受保护。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "D02_prose-reviewer_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "D02-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "原报告没有将露身后的漏字列为问题。保留历史分母与未命中事实，但这是L1文字编辑覆盖，不能据此判自然度角色能力退步。"
+        },
+        {
+          "issue_id": "D02-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "普通读者已经理解他被压住，却还要经过坠冰窖、情绪撕扯、破风箱、手爪剧抖和咬碎尖牙，才看到钱款动作推进。",
+          "reason": "PR-1以同场恐惧反应及情绪复述密度报S2，明确包含答案列出的冰窖、情绪撕扯、咬碎尖牙等，核心诊断一致。虽保留砸钱与设备收尾，不妨碍匹配密度问题。"
+        },
+        {
+          "issue_id": "D02-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "没有给出全书视角约定，不能仅因第5段写到格里普斯的判断就判定叙述视角越界。",
+          "reason": "报告明确未判越界，理由是缺少固定视角约定。属于同职责的合理证据分歧；不能把提到视角待核算检出，也不能仅凭旧答案认定漏检。"
+        },
+        {
+          "issue_id": "D02-4",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "没有正式报告雨声遮蔽问题。该项为L3时空/听觉事实，非本角色主要职责；当前范围未证明贴身必定听清，保留历史未命中但不直接判能力漏检。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "D02-protected-1",
+          "reported": false,
+          "evidence": "对白中的口语、粗话和问叹属于人物声气，不改成书面表达",
+          "reason": "报告明确保护格里普斯的粗口和叫骂，PR-1仅收束叙述恐惧反应。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "K01_prose-reviewer_1",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [],
+      "extra_findings": []
+    },
+    {
+      "run_id": "K02_prose-reviewer_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "K02-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "日常劳作使场景保有生活节奏，不必为了突出疼痛而给母亲追加戏剧化表情或内心解释。",
+          "reason": "壶底添火仅在保留项中出现，没有诊断与后文上灶的动作接口，不能因引用同一句而算检出。历史计未命中，L2道具状态不作本角色能力缺陷的直接依据。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [
+        {
+          "id": "K02-extra-explanation-density",
+          "severity": "S2",
+          "evidence": "三处共同形成反复解释人物表现的阅读损失。第18段在父亲说话前先以“逞强”定性；第21段已让“能走”的宣称与腿颠的动作发生落差，第22段又把儿子的回应框定为“没戳穿”；第24段已写伤腿僵直、不敢弯，第25段父亲还说“真不用”，第26段再插入“嘴硬”判词。",
+          "false_positive": true,
+          "reason": "该S2针对逞强/没戳穿/嘴硬三处解释密度，与冻结答案唯一允许的壶接口K02-1不同。README规定K组答案外S1/S2一律计误报，因此记1条对照组误报，不因符合角色三处密度规则而豁免。审阅理由有原文依据，但文学上是否偏好删减应由作者裁决，不能自动作为S2修正要求。"
+        }
+      ]
+    }
+  ],
+  "repairs": [],
+  "missing_run_ids": [
+    "C01_consistency-checker_1",
+    "C02_consistency-checker_1"
+  ],
+  "notes": [
+    "本阶段只含四份已完成prose-reviewer报告，不给缺失的一致性检查填虚假false，不等待其完成。",
+    "D01的两个答案编号由同一PR-1 S2覆盖，D02的密度问题由一条PR-1 S2覆盖；答案命中数与独立问题条数不同。",
+    "按冻结答案全部条目计历史指标；角色职责和答案分歧在reason另列，不修改计分分母。",
+    "K02解释腔S2按对照组协议记1条误报；不因规则字面三处阈值自动豁免。",
+    "判分表可供eval_evidence.score读取；本阶段不修改已冻结回归评分、原报告、答案或规则，quality_acceptance保持not_determined。"
+  ],
+  "execution_provenance": [
+    {
+      "run_id": "D01_prose-reviewer_1",
+      "source": "CLI执行/D01_prose-reviewer_1/批次2/执行结果.json",
+      "started_at": "2026-10-03T14:02:12.121066+00:00",
+      "finished_at": "2026-10-03T14:08:02.626311+00:00",
+      "thread_ids": [
+        "01a10212-8beb-75b0-a746-cf1d153a9e83"
+      ],
+      "model_id": "unknown",
+      "report_sha256": "33a46778f4ea74f8e3c107d093c433c501267a4bfc9f28fd42fa5f82c389509b"
+    },
+    {
+      "run_id": "D02_prose-reviewer_1",
+      "source": "CLI执行/D02_prose-reviewer_1/批次2/执行结果.json",
+      "started_at": "2026-10-03T14:08:02.632920+00:00",
+      "finished_at": "2026-10-03T14:15:57.404875+00:00",
+      "thread_ids": [
+        "01a10217-e537-7573-a202-540c0de296d1"
+      ],
+      "model_id": "unknown",
+      "report_sha256": "5ddc3beab81e224dd33ae3185ce36aa678f84c8a43fd48663f730a72c285d6c4"
+    },
+    {
+      "run_id": "K01_prose-reviewer_1",
+      "source": "CLI执行/K01_prose-reviewer_1/批次2/执行结果.json",
+      "started_at": "2026-10-03T14:09:17.909715+00:00",
+      "finished_at": "2026-10-03T14:16:33.009407+00:00",
+      "thread_ids": [
+        "01a10219-0b21-7c42-9cc0-cea52c589da9"
+      ],
+      "model_id": "unknown",
+      "report_sha256": "e39a53feeebc3db83a340bbe5481c7d7639b22e28a7a4c7c3ffcbf2e38922276"
+    },
+    {
+      "run_id": "K02_prose-reviewer_1",
+      "source": "CLI执行/K02_prose-reviewer_1/批次2/执行结果.json",
+      "started_at": "2026-10-03T14:15:57.459264+00:00",
+      "finished_at": "2026-10-03T14:20:30.241970+00:00",
+      "thread_ids": [
+        "01a1021f-23dd-7641-af82-955d07d746a3"
+      ],
+      "model_id": "unknown",
+      "report_sha256": "c8cfa6583be2b69026782053e7ee8b80128976ed44b568a5ab62e8b4b309a0a7"
+    }
+  ],
+  "validation": {
+    "judgment_rows_complete": true,
+    "all_evidence_present_in_raw_reports": true,
+    "all_report_hashes_match_completed_cli_receipts": true,
+    "frozen_manifest_run_ids_match": true,
+    "note": "仅验证这四条判分；未修改冻结评分或给缺失运行补结果。"
+  }
+}

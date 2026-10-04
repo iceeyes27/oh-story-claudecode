@@ -1,0 +1,34 @@
+{
+  "fixture": "/private/tmp/novel-kit-20261004-host-book",
+  "note": "全新隔离测试；不复用历史超时报告或候选；不模拟作者采用。",
+  "checks": [
+    {
+      "args": [
+        "confirm-plan",
+        "1"
+      ],
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "begin",
+        "1",
+        "1"
+      ],
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "check",
+        "草稿/第001章/場景01.md"
+      ],
+      "code": 0,
+      "stdout": "",
+      "stderr": ""
+    }
+  ]
+}

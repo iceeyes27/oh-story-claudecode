@@ -1,0 +1,5 @@
+{
+  "time": "2026-10-03T15:05:13.574277+00:00",
+  "status": "dispatch_failed",
+  "reason": "collaboration spawn返回agent thread limit reached；转独立CLI，尚未执行盲读。"
+}

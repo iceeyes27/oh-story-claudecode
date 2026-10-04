@@ -1,0 +1,20 @@
+{
+  "版本": 1,
+  "冻结时间": "2026-10-02T15:19:42.963427+00:00",
+  "冻结规则说明": "在确定本轮最终样本连续范围、创建答案和运行盲读前冻结当前规则。此前仅做可读来源与旧集范围排查；不根据本轮样本修改规则。",
+  "哈希算法": "SHA-256",
+  "规则哈希": {
+    "AGENTS.md": "cf21134ce304d4a71062ee6e2be9ccef6b7a1cdb9f55d163b3f4b0133ff5dba4",
+    ".novel-kit/workflows/review-loop.md": "01c74b91fa59aefa41e0237d3f4adc80e334a50a57a0f42ba07ae53eadfe12bc",
+    ".novel-kit/standards/语文规格.md": "232019a01049a085e36fc24d64f0922247a6c07a95722a5797a3c717d6dfaa18",
+    ".novel-kit/eval/文风样本.md": "77cee0cb5db58710dd37de1347c8243979b650d38e358a63c4f3a968f01f6a13",
+    ".novel-kit/roles/chapter-extractor.md": "4a64d97d315901cb96067cc40eaf8a8f1a56b8df5e91a5b72df27cf5da4e2ead",
+    ".novel-kit/roles/character-reviewer.md": "774db1b7ac920c4bca33077ee3af91268b7aac26ea17a60c5e1808e97560a8f2",
+    ".novel-kit/roles/consistency-checker.md": "0f762991ad00de7612bfa43c1111b73d09962a70336ded217d64ce363d155bb2",
+    ".novel-kit/roles/copy-editor.md": "e7a5f440c7853013d82e54538a9ce9f4f916a32011d414b60dd6c0841dc6712b",
+    ".novel-kit/roles/prose-reviewer.md": "4cace3fbabbb9e59538e31a671373b16b7159327c9bf232435828326785c9372",
+    ".novel-kit/roles/scene-writer.md": "69af0fc316eff5bcd391ade953e7caa1e12d9fa9b1e1f86e7261cf4716cc494f",
+    ".novel-kit/roles/structure-reviewer.md": "08ec6eb99a236ba7c7e1253b7c63b1b8df67c61368f4a2b78a165e1e1285e109"
+  },
+  "限制": "哈希冻结是本轮审阅输入版本证据，不代表样本从未被作者或模型见过。此保留集不得用于调参后的同轮验收。"
+}

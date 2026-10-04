@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "quality_acceptance": "not_determined",
+  "group": "after_challenges",
+  "execution_date": "2026-10-04",
+  "status": "four_of_four_semantically_scored_pending_tool_verification",
+  "runs": [
+    {
+      "run_id": "after_challenges_N01_1",
+      "execution_date": "2026-10-04",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "N01-protected-1",
+          "reported": false,
+          "evidence": "每次都改变当前行动安排，不能按同一动作出现三次直接合并为重复问题。",
+          "reason": "报告分别核对拦车安全、取袋等待、允许离岸的不同功能，正式问题为空；没有把有新信息的动作解释计入缺陷密度。"
+        },
+        {
+          "protected_id": "N01-protected-2",
+          "reported": false,
+          "evidence": "没有代替读者总结阿满的品性或拔高帮忙的意义。",
+          "reason": "报告将系袋和扶菜判为开船后的动作收束，未按结尾位置报总结腔或其他级别问题。"
+        }
+      ],
+      "extra_findings": [],
+      "report_assessment": {
+        "formal_issue_count": 0,
+        "independent_s1_s2_count": 0,
+        "evidence": "正文中的动作重复与简短解释均有本场功能；没有证据表明它们反复复述同一内容、明显延后行动或使声线失真",
+        "reason": "所有严重度为0；功能说明和保留项不是正式问题。"
+      }
+    },
+    {
+      "run_id": "after_challenges_N02_1",
+      "execution_date": "2026-10-04",
+      "issues": [
+        {
+          "issue_id": "N02-01",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "阅读因此连续停留在同一个已完成的藏价动作上，直到第3段店员拿来另一件，试衣过程才继续。",
+          "reason": "PR-1仅针对第2段后两句同义复述，解释其没有新动作、新顾虑或不同人物反应，明确拖延拿衣与接衣动作，构成实际节奏损失；保留首次动机说明，匹配唯一N02-01且真实级别S2。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [],
+      "report_assessment": {
+        "formal_issue_count": 1,
+        "independent_s1_s2_count": 1,
+        "evidence": "同一处累计重复合并为一项，不按句数拆报。",
+        "reason": "唯一正式问题PR-1；没有将直接写动机、特定词语或结尾形式单独定级。"
+      }
+    },
+    {
+      "run_id": "after_challenges_N03_1",
+      "execution_date": "2026-10-04",
+      "issues": [],
+      "protected": [],
+      "extra_findings": [],
+      "report_assessment": {
+        "formal_issue_count": 0,
+        "independent_s1_s2_count": 0,
+        "evidence": "两处比喻分别服务于雨中护袋的处境和剥栗子的声响，没有连续复述同一情绪或替代行动。",
+        "reason": "实际报告无正式问题，符合N03允许无问题或S3/S4的口径；无须人为补出低级建议，也不把两处可选措辞设为硬保护。"
+      }
+    },
+    {
+      "run_id": "after_challenges_N02_2",
+      "execution_date": "2026-10-04",
+      "issues": [
+        {
+          "issue_id": "N02-01",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "罗骁的动作停在攥住价签，读者连续两次获得已知解释后，才进入店员取另一件衣服的下一动作。",
+          "reason": "唯一PR-1明确核对后两句没有动作变化、母亲反应、语气提示或新动机层次，造成累计节奏停滞，命中N02-01并定S2；首次动机说明有功能被保留，不因心理说明或句式本身报错。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [],
+      "report_assessment": {
+        "formal_issue_count": 1,
+        "independent_s1_s2_count": 1,
+        "evidence": "同一处累计重复合并为一个问题，不将各句拆开计数。",
+        "reason": "只有PR-1一项S2，正文后的说明明确没有另列S3或S4，不把三句话虚报成三个问题。"
+      }
+    }
+  ],
+  "repairs": [],
+  "pending_run_ids": [],
+  "notes": [
+    "四份实际报告均已判分，N02两轮各命中同一条S2。",
+    "后续待工具核验通过再生成score，本表不冒充已完成工具评分。"
+  ],
+  "execution_provenance": [
+    {
+      "run_id": "after_challenges_N01_1",
+      "receipt_path": "执行凭据/after_challenges_N01_1/run-3564783c84554077a16902d79579e9a3/result.json",
+      "opening_path": "执行凭据/after_challenges_N01_1/run-3564783c84554077a16902d79579e9a3/opening.json",
+      "events_path": "执行凭据/after_challenges_N01_1/run-3564783c84554077a16902d79579e9a3/events.jsonl",
+      "started_at": "2026-10-04T09:42:13.187045+00:00",
+      "finished_at": "2026-10-04T09:44:23.057683+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a1064a-e2a4-7703-8caa-b62bb5652c3f"
+      ],
+      "report_sha256": "fc74fca09162803f7e74f242e01c66af90ba41f8056dcce8d88a8f6643652570",
+      "events_sha256": "5b920d1e4a2dce39f5621fec937726002c99e6f14d1414dfbccbac523a9bdc90",
+      "opening_sha256": "57faa0a82df4052cd35e11490303d1932cc0f75fa85ecbea92549ac712667c42",
+      "receipt_sha256": "83c68a9b9d3abde889bc01321e6ba11fd89a2dbe9913a627dc33bb3501305f2c",
+      "actual_prompt_matches_manifest": true,
+      "nested_agent_calls": 0,
+      "observed_collaboration_calls": {}
+    },
+    {
+      "run_id": "after_challenges_N02_1",
+      "receipt_path": "执行凭据/after_challenges_N02_1/run-a0e11f258cd649af8e750e5a16ce7ad2/result.json",
+      "opening_path": "执行凭据/after_challenges_N02_1/run-a0e11f258cd649af8e750e5a16ce7ad2/opening.json",
+      "events_path": "执行凭据/after_challenges_N02_1/run-a0e11f258cd649af8e750e5a16ce7ad2/events.jsonl",
+      "started_at": "2026-10-04T09:42:18.485586+00:00",
+      "finished_at": "2026-10-04T09:44:16.166124+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a1064a-f6aa-7cc1-8856-e017e5a34b5c"
+      ],
+      "report_sha256": "7c8eb53dbef8b291dcc92ece2bc4d04636227f83e3d6e80b2d2d6fc9dc48ded0",
+      "events_sha256": "65bef17e91beb08fcad27a514e751e9ca026d3b7215b7106d54237575b67c438",
+      "opening_sha256": "fa59eb062d7044611e690a65df6248a1999a7a3063bfc69f62e17719f0603449",
+      "receipt_sha256": "9d215da32370bbe205f4bf02bdade193b339bdbfe6804fd3cc3354b5f4b0f1c6",
+      "actual_prompt_matches_manifest": true,
+      "nested_agent_calls": 0,
+      "observed_collaboration_calls": {}
+    },
+    {
+      "run_id": "after_challenges_N03_1",
+      "receipt_path": "执行凭据/after_challenges_N03_1/run-c1039e28d8e443dea514f6bbe2ad6624/result.json",
+      "opening_path": "执行凭据/after_challenges_N03_1/run-c1039e28d8e443dea514f6bbe2ad6624/opening.json",
+      "events_path": "执行凭据/after_challenges_N03_1/run-c1039e28d8e443dea514f6bbe2ad6624/events.jsonl",
+      "started_at": "2026-10-04T09:42:41.964782+00:00",
+      "finished_at": "2026-10-04T09:44:35.598475+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a1064b-5272-7a51-9ac8-4884acea38a9"
+      ],
+      "report_sha256": "ce2bcd480c3dea68762d74e7a72eafbf670c975f5f780e912d90541eab924b44",
+      "events_sha256": "d09922811e38dc3d4154cc8a81f981e8e1e1dfcbe5cc16caeee0c878539f2591",
+      "opening_sha256": "9592b6c8937e4ba2e59621b065d2b5386ce04f662dd2b4295afe71b276cd6c1d",
+      "receipt_sha256": "f7cb62c3f799c03acde2bd9ce251dafbf9c6e2ad09b9e4f1141a1cf71d230621",
+      "actual_prompt_matches_manifest": true,
+      "nested_agent_calls": 0,
+      "observed_collaboration_calls": {}
+    },
+    {
+      "run_id": "after_challenges_N02_2",
+      "receipt_path": "执行凭据/after_challenges_N02_2/run-4d90e1686786476f8b982394a75cd437/result.json",
+      "opening_path": "执行凭据/after_challenges_N02_2/run-4d90e1686786476f8b982394a75cd437/opening.json",
+      "events_path": "执行凭据/after_challenges_N02_2/run-4d90e1686786476f8b982394a75cd437/events.jsonl",
+      "started_at": "2026-10-04T09:45:04.103754+00:00",
+      "finished_at": "2026-10-04T09:47:05.820442+00:00",
+      "model_id": "unknown",
+      "thread_ids": [
+        "01a1064d-7db1-7673-9010-391e0729bd9b"
+      ],
+      "report_sha256": "bd3baccfa28392ea024716ebed85e94165c50cade57004b7cf741312796064b7",
+      "events_sha256": "83d5fcbd6c70874228b879298d8ad5ba5e2eff0aa167becb0c777ff64ddbfa8a",
+      "opening_sha256": "49de0b38fc374a16f770b48f4c3aac7f2c812b2cfcfc824fc9d6e198bf126d3e",
+      "receipt_sha256": "ea655489f33ee1133ec709eb38688969bce90552513f63109d3aa8f463cb0bec",
+      "actual_prompt_matches_manifest": true,
+      "nested_agent_calls": 0,
+      "observed_collaboration_calls": {}
+    }
+  ],
+  "validation": {
+    "decision_rows_complete": true,
+    "all_evidence_present": true,
+    "verify_with_require_outputs": {
+      "ok": true,
+      "checked_at": "2026-10-04T09:58:18Z",
+      "problems": [],
+      "missing_outputs": []
+    }
+  }
+}

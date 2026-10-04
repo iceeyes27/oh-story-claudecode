@@ -1,0 +1,26 @@
+{
+  "at": "2026-10-04T09:33:50.458486+00:00",
+  "files": [
+    {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/roles/prose-reviewer.md",
+      "snapshot": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/规则版本/变更后/prose-reviewer.md",
+      "sha256": "8a270b230ebdc1078b790b84cf41eae241fab0416522deaa074de91ea544470c"
+    },
+    {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/standards/语文规格.md",
+      "snapshot": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/规则版本/变更后/语文规格.md",
+      "sha256": "232019a01049a085e36fc24d64f0922247a6c07a95722a5797a3c717d6dfaa18"
+    },
+    {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/workflows/review-loop.md",
+      "snapshot": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/规则版本/变更后/review-loop.md",
+      "sha256": "01c74b91fa59aefa41e0237d3f4adc80e334a50a57a0f42ba07ae53eadfe12bc"
+    },
+    {
+      "source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/文风样本.md",
+      "snapshot": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/规则版本/变更后/文风样本.md",
+      "sha256": "77cee0cb5db58710dd37de1347c8243979b650d38e358a63c4f3a968f01f6a13"
+    }
+  ],
+  "note": "首次查看新合成挑战正文前冻结；本次定向验证期间不再调整质量规则。"
+}

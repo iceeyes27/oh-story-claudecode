@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "quality_acceptance": "not_determined",
+  "group": "after_challenges",
+  "execution_date": "2026-10-04",
+  "status": "four_of_four_semantically_scored_pending_tool_verification",
+  "runs": [
+    {
+      "run_id": "after_challenges_N01_1",
+      "execution_date": "2026-10-04",
+      "issues": [],
+      "protected": [
+        {
+          "protected_id": "N01-protected-1",
+          "reported": false,
+          "evidence": "每次都改变当前行动安排，不能按同一动作出现三次直接合并为重复问题。",
+          "reason": "报告分别核对拦车安全、取袋等待、允许离岸的不同功能，正式问题为空；没有把有新信息的动作解释计入缺陷密度。"
+        },
+        {
+          "protected_id": "N01-protected-2",
+          "reported": false,
+          "evidence": "没有代替读者总结阿满的品性或拔高帮忙的意义。",
+          "reason": "报告将系袋和扶菜判为开船后的动作收束，未按结尾位置报总结腔或其他级别问题。"
+        }
+      ],
+      "extra_findings": [],
+      "report_assessment": {
+        "formal_issue_count": 0,
+        "independent_s1_s2_count": 0,
+        "evidence": "正文中的动作重复与简短解释均有本场功能；没有证据表明它们反复复述同一内容、明显延后行动或使声线失真",
+        "reason": "所有严重度为0；功能说明和保留项不是正式问题。"
+      }
+    },
+    {
+      "run_id": "after_challenges_N02_1",
+      "execution_date": "2026-10-04",
+      "issues": [
+        {
+          "issue_id": "N02-01",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "阅读因此连续停留在同一个已完成的藏价动作上，直到第3段店员拿来另一件，试衣过程才继续。",
+          "reason": "PR-1仅针对第2段后两句同义复述，解释其没有新动作、新顾虑或不同人物反应，明确拖延拿衣与接衣动作，构成实际节奏损失；保留首次动机说明，匹配唯一N02-01且真实级别S2。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [],
+      "report_assessment": {
+        "formal_issue_count": 1,
+        "independent_s1_s2_count": 1,
+        "evidence": "同一处累计重复合并为一项，不按句数拆报。",
+        "reason": "唯一正式问题PR-1；没有将直接写动机、特定词语或结尾形式单独定级。"
+      }
+    },
+    {
+      "run_id": "after_challenges_N03_1",
+      "execution_date": "2026-10-04",
+      "issues": [],
+      "protected": [],
+      "extra_findings": [],
+      "report_assessment": {
+        "formal_issue_count": 0,
+        "independent_s1_s2_count": 0,
+        "evidence": "两处比喻分别服务于雨中护袋的处境和剥栗子的声响，没有连续复述同一情绪或替代行动。",
+        "reason": "实际报告无正式问题，符合N03允许无问题或S3/S4的口径；无须人为补出低级建议，也不把两处可选措辞设为硬保护。"
+      }
+    },
+    {
+      "run_id": "after_challenges_N02_2",
+      "execution_date": "2026-10-04",
+      "issues": [
+        {
+          "issue_id": "N02-01",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "罗骁的动作停在攥住价签，读者连续两次获得已知解释后，才进入店员取另一件衣服的下一动作。",
+          "reason": "唯一PR-1明确核对后两句没有动作变化、母亲反应、语气提示或新动机层次，造成累计节奏停滞，命中N02-01并定S2；首次动机说明有功能被保留，不因心理说明或句式本身报错。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [],
+      "report_assessment": {
+        "formal_issue_count": 1,
+        "independent_s1_s2_count": 1,
+        "evidence": "同一处累计重复合并为一个问题，不将各句拆开计数。",
+        "reason": "只有PR-1一项S2，正文后的说明明确没有另列S3或S4，不把三句话虚报成三个问题。"
+      }
+    }
+  ],
+  "repairs": [],
+  "pending_run_ids": [],
+  "notes": [
+    "四份实际报告均已判分，N02两轮各命中同一条S2。",
+    "后续待工具核验通过再生成score，本表不冒充已完成工具评分。"
+  ]
+}

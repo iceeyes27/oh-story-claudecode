@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "runs": [
+    {
+      "run_id": "P3-01_full_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "P3-01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "记住了三下对应开闸",
+          "reason": "报告明确指出三下开闸与随后关严判断之间的认知/行动断裂，符合预置因果问题；同时没有把人物犯错本身机械定错。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "P3-01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "报告明确保留人物以为雨急的有限认知，没有再把它列独立问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-01_full_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "P3-01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "记住了三下对应开闸",
+          "reason": "报告明确指出三下开闸与随后关严判断之间的认知/行动断裂，符合预置因果问题；同时没有把人物犯错本身机械定错。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "P3-01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "报告明确保留人物以为雨急的有限认知，没有再把它列独立问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "P3-01_selected_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "P3-01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "记住了三下对应开闸",
+          "reason": "报告明确指出三下开闸与随后关严判断之间的认知/行动断裂，符合预置因果问题；同时没有把人物犯错本身机械定错。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "P3-01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "报告明确保留人物以为雨急的有限认知，没有再把它列独立问题。"
+        }
+      ],
+      "extra_findings": []
+    }
+  ],
+  "repairs": []
+}

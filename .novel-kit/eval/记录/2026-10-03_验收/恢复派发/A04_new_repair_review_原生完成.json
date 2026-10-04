@@ -1,0 +1,12 @@
+{
+  "at": "2026-10-04T00:31:59.425335+00:00",
+  "job_id": "A04_new_repair_review",
+  "task_name": "/root/repair_a04_blind_final",
+  "status": "completed",
+  "inputs_unchanged": true,
+  "output": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/本轮修正/outputs/A04_新修正盲读.md",
+  "report_sha256": "28b77f81b715063650331cdbf12aa47a205d4513ca277b9fc863a2dcbdd8e713",
+  "native_final_received": true,
+  "model_id": "unknown",
+  "note": "保留CLI超时；此项来源为新独立原生copy-editor实际返回，不补造CLI事件。"
+}

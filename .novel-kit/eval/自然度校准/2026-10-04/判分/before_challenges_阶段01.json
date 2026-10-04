@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "quality_acceptance": "not_determined",
+  "status": "awaiting_completed_reports",
+  "execution_date": "2026-10-04",
+  "group": "before_challenges",
+  "created_at": "2026-10-04T09:42:09.343412+00:00",
+  "manifest_path": "工具证据/before_challenges/manifest.json",
+  "manifest_sha256": "f8e8ad7a7cd46fa0f3fdc0e21d9f5bcd2026b6a0130f962e5e92071acf0971cf",
+  "runs": [],
+  "repairs": [],
+  "pending_run_ids": [
+    "before_challenges_N01_1",
+    "before_challenges_N02_1",
+    "before_challenges_N03_1"
+  ],
+  "answer_inventory": [
+    {
+      "sample": "N01",
+      "issue_ids": [],
+      "protected_ids": [
+        "N01-protected-1",
+        "N01-protected-2"
+      ]
+    },
+    {
+      "sample": "N02",
+      "issue_ids": [
+        "N02-01"
+      ],
+      "protected_ids": []
+    },
+    {
+      "sample": "N03",
+      "issue_ids": [],
+      "protected_ids": []
+    }
+  ],
+  "notes": [
+    "仅记录冻结计划，尚无实际报告判分；没有给未完成项填写检出、未检出或零误报。",
+    "每个正向与负向语义判断均需实际报告原句；所有答案外正式条目另记。",
+    "原分母及答案保持不变。N03允许S3/S4或无问题，不设硬性保护项；K组答案外S1/S2按既有口径记误报。",
+    "本阶段不运行score，待收到完成报告及回执后逐项补判；后续另建版本，保留本文件。"
+  ]
+}

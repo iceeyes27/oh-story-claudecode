@@ -9,3 +9,5 @@ __pycache__/
 node_modules/
 test-results/
 .trellis/
+.novel-kit/eval/**/.lock
+.novel-kit/eval/**/*.eval-runner.lock

@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "kind": "novel-kit-eval-freeze",
+  "created_at": "2026-10-04T09:54:02Z",
+  "label": "final_clarified",
+  "scope": "review_only",
+  "spec_source": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/配置/final_clarified.json",
+  "spec_sha256": "8a980aba5bbb72b6217faf1d3f9d4dce6cf2562fbc4cee143d1defd77da957fb",
+  "inputs": [
+    {
+      "id": "role",
+      "source_path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/规则版本/措辞澄清后/prose-reviewer.md",
+      "source_sha256": "3c4483311cedf035d401a27112cfb99f79d2572d4bf98842ceeb2908f70489c5",
+      "kind": "role",
+      "audience": "reviewer",
+      "range": {
+        "start_line": 1,
+        "end_line": 42
+      },
+      "snapshot": "inputs/role.md",
+      "snapshot_sha256": "3c4483311cedf035d401a27112cfb99f79d2572d4bf98842ceeb2908f70489c5"
+    },
+    {
+      "id": "language",
+      "source_path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/规则版本/措辞澄清后/语文规格.md",
+      "source_sha256": "232019a01049a085e36fc24d64f0922247a6c07a95722a5797a3c717d6dfaa18",
+      "kind": "standard",
+      "audience": "reviewer",
+      "range": {
+        "start_line": 1,
+        "end_line": 90
+      },
+      "snapshot": "inputs/language.md",
+      "snapshot_sha256": "232019a01049a085e36fc24d64f0922247a6c07a95722a5797a3c717d6dfaa18"
+    },
+    {
+      "id": "workflow",
+      "source_path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/规则版本/措辞澄清后/review-loop.md",
+      "source_sha256": "01c74b91fa59aefa41e0237d3f4adc80e334a50a57a0f42ba07ae53eadfe12bc",
+      "kind": "standard",
+      "audience": "reviewer",
+      "range": {
+        "start_line": 1,
+        "end_line": 131
+      },
+      "snapshot": "inputs/workflow.md",
+      "snapshot_sha256": "01c74b91fa59aefa41e0237d3f4adc80e334a50a57a0f42ba07ae53eadfe12bc"
+    },
+    {
+      "id": "style",
+      "source_path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/规则版本/措辞澄清后/文风样本.md",
+      "source_sha256": "77cee0cb5db58710dd37de1347c8243979b650d38e358a63c4f3a968f01f6a13",
+      "kind": "style",
+      "audience": "reviewer",
+      "range": {
+        "start_line": 1,
+        "end_line": 43
+      },
+      "snapshot": "inputs/style.md",
+      "snapshot_sha256": "77cee0cb5db58710dd37de1347c8243979b650d38e358a63c4f3a968f01f6a13"
+    },
+    {
+      "id": "body_K02",
+      "source_path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/K02/正文.md",
+      "source_sha256": "88dc189a6d850e49a64bc5a1d21613ec502e91f01307f5bfec0aa4a0e4c0167a",
+      "kind": "prose",
+      "audience": "reviewer",
+      "range": {
+        "start_line": 1,
+        "end_line": 61
+      },
+      "snapshot": "inputs/body_K02.md",
+      "snapshot_sha256": "88dc189a6d850e49a64bc5a1d21613ec502e91f01307f5bfec0aa4a0e4c0167a"
+    },
+    {
+      "id": "answer_K02",
+      "source_path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/答案/K02.json",
+      "source_sha256": "3eb332fd45cf54134bb94e9d912e9fca5112528f79cdf9afc84cb2fcad576702",
+      "kind": "answer",
+      "audience": "coordinator",
+      "range": {
+        "start_line": 1,
+        "end_line": 26
+      },
+      "snapshot": "inputs/answer_K02.json",
+      "snapshot_sha256": "3eb332fd45cf54134bb94e9d912e9fca5112528f79cdf9afc84cb2fcad576702"
+    },
+    {
+      "id": "body_N02",
+      "source_path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/样本/N02.md",
+      "source_sha256": "7f17bed800cc6847103cde98bab68f221196667a2f74a1120e67fc0854fea7bd",
+      "kind": "prose",
+      "audience": "reviewer",
+      "range": {
+        "start_line": 1,
+        "end_line": 11
+      },
+      "snapshot": "inputs/body_N02.md",
+      "snapshot_sha256": "7f17bed800cc6847103cde98bab68f221196667a2f74a1120e67fc0854fea7bd"
+    },
+    {
+      "id": "answer_N02",
+      "source_path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/答案/N02.json",
+      "source_sha256": "6e97184fb698ec3e15cc176a897c6f2e2548bea36ab510bbd0cc9f5a1e4d9a0a",
+      "kind": "answer",
+      "audience": "coordinator",
+      "range": {
+        "start_line": 1,
+        "end_line": 26
+      },
+      "snapshot": "inputs/answer_N02.json",
+      "snapshot_sha256": "6e97184fb698ec3e15cc176a897c6f2e2548bea36ab510bbd0cc9f5a1e4d9a0a"
+    }
+  ],
+  "runs": [
+    {
+      "id": "final_clarified_K02_1",
+      "sample": "K02",
+      "role": "prose-reviewer",
+      "attempt": 1,
+      "phase": "review",
+      "context": [
+        "role",
+        "language",
+        "workflow",
+        "style",
+        "body_K02"
+      ],
+      "prompt": "你在做小说工具评测（非真实小说采用）。本任务指定你本人按冻结的 prose-reviewer 角色独立审阅。完整读取以下五个冻结文件，只读这些输入：\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/role.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/language.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/workflow.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/style.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/body_K02.md\n除这五个文件外，不读取答案、其他样本、汇总、当前共享角色、旧审阅、项目状态或记忆；没有另外提供的前文或设定，不去寻找。严格按所给角色规则与问题格式审阅，完整报告实际范围、理解摘要、问题及原文依据与严重度、前文不足、保留项；如无某级问题就据实写零。模型未知时记录继承宿主、具体 ID 未提供，结论仅为模型意见。直接完成指定审阅，不再委派，不调用代理、任务、会话、等待或消息工具，不启动其他模型。仅创建新报告 /Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/outputs/final_clarified_K02_1.md，不修改任何输入、旧报告或真实小说。可用 apply_patch 或明确 UTF-8 编码写报告。其他代理在工作，不回退他人修改。完成后回复报告路径及 S1/S2 数量。",
+      "independent_context": true,
+      "model": "unknown",
+      "output": "outputs/final_clarified_K02_1.md"
+    },
+    {
+      "id": "final_clarified_N02_1",
+      "sample": "N02",
+      "role": "prose-reviewer",
+      "attempt": 1,
+      "phase": "review",
+      "context": [
+        "role",
+        "language",
+        "workflow",
+        "style",
+        "body_N02"
+      ],
+      "prompt": "你在做小说工具评测（非真实小说采用）。本任务指定你本人按冻结的 prose-reviewer 角色独立审阅。完整读取以下五个冻结文件，只读这些输入：\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/role.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/language.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/workflow.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/style.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/body_N02.md\n除这五个文件外，不读取答案、其他样本、汇总、当前共享角色、旧审阅、项目状态或记忆；没有另外提供的前文或设定，不去寻找。严格按所给角色规则与问题格式审阅，完整报告实际范围、理解摘要、问题及原文依据与严重度、前文不足、保留项；如无某级问题就据实写零。模型未知时记录继承宿主、具体 ID 未提供，结论仅为模型意见。直接完成指定审阅，不再委派，不调用代理、任务、会话、等待或消息工具，不启动其他模型。仅创建新报告 /Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/outputs/final_clarified_N02_1.md，不修改任何输入、旧报告或真实小说。可用 apply_patch 或明确 UTF-8 编码写报告。其他代理在工作，不回退他人修改。完成后回复报告路径及 S1/S2 数量。",
+      "independent_context": true,
+      "model": "unknown",
+      "output": "outputs/final_clarified_N02_1.md"
+    }
+  ]
+}

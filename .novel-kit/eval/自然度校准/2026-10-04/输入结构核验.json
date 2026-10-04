@@ -1,0 +1,49 @@
+{
+  "说明": "只对照角色来源发生变化，其余共同规则保持一致；合成答案引用逐字核对。不是模型质量判断。",
+  "rule_versions": [
+    {
+      "file": "prose-reviewer.md",
+      "before": "4cace3fbabbb9e59538e31a671373b16b7159327c9bf232435828326785c9372",
+      "after": "8a270b230ebdc1078b790b84cf41eae241fab0416522deaa074de91ea544470c",
+      "changed": true
+    },
+    {
+      "file": "语文规格.md",
+      "before": "232019a01049a085e36fc24d64f0922247a6c07a95722a5797a3c717d6dfaa18",
+      "after": "232019a01049a085e36fc24d64f0922247a6c07a95722a5797a3c717d6dfaa18",
+      "changed": false
+    },
+    {
+      "file": "review-loop.md",
+      "before": "01c74b91fa59aefa41e0237d3f4adc80e334a50a57a0f42ba07ae53eadfe12bc",
+      "after": "01c74b91fa59aefa41e0237d3f4adc80e334a50a57a0f42ba07ae53eadfe12bc",
+      "changed": false
+    },
+    {
+      "file": "文风样本.md",
+      "before": "77cee0cb5db58710dd37de1347c8243979b650d38e358a63c4f3a968f01f6a13",
+      "after": "77cee0cb5db58710dd37de1347c8243979b650d38e358a63c4f3a968f01f6a13",
+      "changed": false
+    }
+  ],
+  "synthetic_sources": [
+    {
+      "sample": "N01",
+      "all_answer_quotes_present": true,
+      "source_sha256": "b8913f9779852e0b0f32733e37b39c78ce356af4df3c29ff540f1d42116e9339",
+      "answer_sha256": "cd369383afa0d88485a3d8f0e151c3af4a33f98f739842f757d4a0d41eff7de6"
+    },
+    {
+      "sample": "N02",
+      "all_answer_quotes_present": true,
+      "source_sha256": "7f17bed800cc6847103cde98bab68f221196667a2f74a1120e67fc0854fea7bd",
+      "answer_sha256": "6e97184fb698ec3e15cc176a897c6f2e2548bea36ab510bbd0cc9f5a1e4d9a0a"
+    },
+    {
+      "sample": "N03",
+      "all_answer_quotes_present": true,
+      "source_sha256": "b9bbf7364272d1a5789ed44155225d38ffb5618039735e130a5c540b09ff389e",
+      "answer_sha256": "2d51adc1aabdb41b0dd374e1355d6deb534be64c5f083346203272722789f7d5"
+    }
+  ]
+}

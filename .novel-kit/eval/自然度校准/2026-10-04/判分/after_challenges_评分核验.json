@@ -1,0 +1,106 @@
+{
+  "group": "after_challenges",
+  "evidence_complete": true,
+  "missing": [],
+  "quality_acceptance": "not_determined",
+  "attempts": [
+    {
+      "role": "prose-reviewer",
+      "attempt": 1,
+      "detected": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    },
+    {
+      "role": "prose-reviewer",
+      "attempt": 2,
+      "detected": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    }
+  ],
+  "consistency": [
+    {
+      "role": "prose-reviewer",
+      "compared_attempts": "每样本前两次",
+      "detection_agreement": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "severity_agreement": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "positive_overlap": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      }
+    }
+  ],
+  "unions": [
+    {
+      "role": "prose-reviewer",
+      "supplemental_only": true,
+      "detected": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "severity_attainment": {
+        "numerator": 1,
+        "denominator": 1,
+        "rate": 1.0,
+        "missing": 0
+      },
+      "false_positives": {
+        "control_s1_s2": 0,
+        "protected_reported": 0,
+        "other_explicit": 0,
+        "missing": 0
+      }
+    }
+  ],
+  "verify": {
+    "ok": true,
+    "checked_at": "2026-10-04T09:58:18Z",
+    "problems": [],
+    "missing_outputs": []
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "scope": "full",
+  "label": "new_repair_A01",
+  "inputs": [
+    {
+      "id": "i1",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/roles/scene-writer.md",
+      "kind": "role"
+    },
+    {
+      "id": "i2",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/standards/语文规格.md",
+      "kind": "standard"
+    },
+    {
+      "id": "i3",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/workflows/review-loop.md",
+      "kind": "standard"
+    },
+    {
+      "id": "i4",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/文风样本.md",
+      "kind": "prose"
+    },
+    {
+      "id": "i5",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/样本/A01/正文.md",
+      "kind": "prose"
+    },
+    {
+      "id": "i6",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/本轮修正/授权问题/A01.json",
+      "kind": "prose"
+    },
+    {
+      "id": "i7",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/roles/copy-editor.md",
+      "kind": "role"
+    },
+    {
+      "id": "i8",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/standards/语文规格.md",
+      "kind": "standard"
+    },
+    {
+      "id": "i9",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/workflows/review-loop.md",
+      "kind": "standard"
+    },
+    {
+      "id": "i10",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/本轮修正/冻结候选/A01.md",
+      "kind": "prose"
+    },
+    {
+      "id": "answer_A01",
+      "path": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/答案/A01.json",
+      "kind": "answer",
+      "audience": "coordinator"
+    }
+  ],
+  "runs": [
+    {
+      "id": "A01_new_repair",
+      "sample": "A01",
+      "role": "scene-writer",
+      "attempt": 1,
+      "phase": "repair",
+      "context": [
+        "i1",
+        "i2",
+        "i3",
+        "i4",
+        "i5",
+        "i6"
+      ],
+      "prompt": "你在做novel-kit工具修正评测，不是真实小说采用。以scene-writer审阅后修正模式处理且只读如下文件：\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/roles/scene-writer.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/standards/语文规格.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/workflows/review-loop.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/文风样本.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/样本/A01/正文.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/本轮修正/授权问题/A01.json\n只修授权问题中的有证据且无分歧项。预置严重度与现行规格冲突、语义需作者选择或事实不能唯一确定时保持原句，在修正记录说明；不自行补重要事实。不要看其他报告、答案目录或小说。文风样本仅作语言约定。只创建纯正文修正副本 /Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/本轮修正/outputs/A01_新规则修正.md 和原句→改句→理由→保留/未解决问题记录 /Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/本轮修正/changes/A01_新规则修正.md。候选须是完整原正文，不要夹报告。模型宿主未提供记unknown。新记录简体；原文引用准确。其他代理在工作，不回退他人修改。",
+      "independent_context": true,
+      "output": "outputs/A01_新规则修正.md"
+    },
+    {
+      "id": "A01_new_repair_review",
+      "sample": "A01",
+      "role": "copy-editor",
+      "attempt": 1,
+      "phase": "repair_review",
+      "context": [
+        "i7",
+        "i8",
+        "i9",
+        "i4",
+        "i10"
+      ],
+      "prompt": "你是novel-kit工具验收中的独立copy-editor。仅完整阅读以下冻结文件：\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/roles/copy-editor.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/standards/语文规格.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/workflows/review-loop.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/输入/.novel-kit/eval/文风样本.md\n/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/本轮修正/冻结候选/A01.md\n以指定角色规则独立三遍通读完整候选，只按现有原文检查。不要读取任何答案、作者意图、修正意见、原稿或其他审阅。缺前文只列供给待核，不定正文错误。没有问题不凑数。完整报告须包含阅读范围、理解摘要、问题及原文依据、前文不足和保留项。只创建新报告 /Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/记录/2026-10-03_验收/本轮修正/outputs/A01_新修正盲读.md；不改任何输入或真实小说。报告简体，原文引用准确；模型ID未提供记unknown。你已经处于独立新会话，本次直接承担指定审阅角色，不再委派。其他代理在工作，不回退他人修改。",
+      "independent_context": true,
+      "output": "outputs/A01_新修正盲读.md"
+    }
+  ],
+  "note": "写手开读凭据另见恢复派发/A01_new_repair_开读.json与new_repair_write；此处在独立盲读开始前冻结，不冒充写手历史开读。"
+}

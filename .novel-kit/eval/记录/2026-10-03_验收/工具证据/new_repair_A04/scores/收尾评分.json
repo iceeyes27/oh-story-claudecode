@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "kind": "novel-kit-eval-score",
+  "created_at": "2026-10-04T00:35:22Z",
+  "quality_judgment_source": "model_comparison",
+  "quality_acceptance": "not_determined",
+  "scope": "full",
+  "evidence_complete": true,
+  "missing": [],
+  "runs": [],
+  "attempts": [],
+  "consistency": [],
+  "unions": [],
+  "repairs": [
+    {
+      "sample": "A04",
+      "repair_run_id": "A04_new_repair",
+      "review_run_id": "A04_new_repair_review",
+      "resolved": {
+        "numerator": 2,
+        "denominator": 3,
+        "rate": 0.6666666666666666,
+        "missing": 0
+      },
+      "new_errors": 0,
+      "new_s1_s2_errors": 0,
+      "protected_changed": 0,
+      "protected_missing": 0
+    }
+  ],
+  "output_hashes": {
+    "outputs/A04_新规则修正.md": "933417f84ff59db8e39cfff681d8339875e549ad45292fdc0ddb83d8db92372a",
+    "outputs/A04_新修正盲读.md": "28b77f81b715063650331cdbf12aa47a205d4513ca277b9fc863a2dcbdd8e713"
+  },
+  "judgments_snapshot": "scores/收尾评分.judgments.json",
+  "judgments_sha256": "97e742d231e1981e8a1fcb53abf06f1cf80773653a186861672d4960ba8816e9"
+}

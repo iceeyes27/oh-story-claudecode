@@ -76,7 +76,7 @@ class Book(unittest.TestCase):
         return Path(self.tmp.name).resolve() / '別的專案/正文/第001章.md'
 
     def scope_cases(self):
-        """(payload, expected exit) shared by the Python gate and the no-Python fallback."""
+        """(payload, expected exit) for the full Python path gate."""
         owned = ['追蹤/場景狀態.md', '追蹤/場景狀態.MD', '審閱/採用/s1/journal.json',
                  '審閱/修訂/fix/任務.json', '審閱/修訂/fix/任務.Json', '導入/清單.json', '導入/清單.JSON']
         return ([(self.payload(p), 2) for p in owned] +
@@ -215,29 +215,27 @@ class Launcher(Book):
         r = self.run_settings(self.payload('設定/設定.md'), [self.bin])
         self.assertEqual(r.returncode, 2)
 
-    def test_no_python_blocks_protected_paths_only(self):
-        for path in ['正文/第001章.md', '草稿/第001章/場景01.md', '導入/原稿/book.txt']:
+    def test_no_python_blocks_writes_including_unprotected_and_outside_paths(self):
+        for path in ['正文/第001章.md', '草稿/第001章/場景01.md', '導入/原稿/book.txt',
+                     '設定/設定.md', str(self.outside())]:
             r = self.run_no_python(self.payload(path))
             self.assertEqual(r.returncode, 2, path)
             self.assertIn('Python 3.9', r.stderr.decode('utf-8'))
-        outside = Path(self.tmp.name) / '別的專案/正文/第001章.md'
-        for path in ['設定/設定.md', str(outside)]:
-            r = self.run_no_python(self.payload(path))
-            self.assertEqual(r.returncode, 0, (path, r.stderr.decode('utf-8', 'replace')))
+            self.assertIn('doctor', r.stderr.decode('utf-8'))
         r = self.run_no_python(self.payload('正文/x.md', tool='Read'))
         self.assertEqual(r.returncode, 0)
 
     def test_no_python_scope_outside_tool_owned_and_notebook(self):
-        for data, code in self.scope_cases():
+        for data, _ in self.scope_cases():
             r = self.run_no_python(data)
-            self.assertEqual(r.returncode, code, (data.decode('utf-8'), r.stderr.decode('utf-8', 'replace')))
+            self.assertEqual(r.returncode, 2, (data.decode('utf-8'), r.stderr.decode('utf-8', 'replace')))
         r = self.run_no_python(self.payload('導入/清單.json'))
-        self.assertIn('novel.py 維護', r.stderr.decode('utf-8'))
+        self.assertIn('无法可靠核对写入目标', r.stderr.decode('utf-8'))
         r = self.run_no_python(self.payload('正文/x.ipynb', tool='NotebookEdit', key='path'))
         self.assertEqual(r.returncode, 2)
 
     def test_no_python_alias_back_into_project_blocks(self):
-        # Identity check ([[ -ef ]]) catches outside-looking paths that reach the book.
+        # An alias to the whole book is also blocked, including settings writes.
         link = Path(self.tmp.name) / 'alias'
         try:
             link.symlink_to(self.root, target_is_directory=True)
@@ -247,27 +245,54 @@ class Launcher(Book):
             r = self.run_no_python(self.payload(path))
             self.assertEqual(r.returncode, 2, (path, r.stderr.decode('utf-8', 'replace')))
 
+    def test_no_python_aliases_to_protected_directories_block_existing_and_new_files(self):
+        # Links to a protected subtree do not share the book root's inode. Both
+        # internal and external aliases must fail before any target is created.
+        for index, target in enumerate(['正文', '導入/原稿']):
+            protected = self.root / target
+            protected.mkdir(parents=True, exist_ok=True)
+            original = protected / 'existing.md'
+            original.write_text('保留原文', encoding='utf-8')
+            for parent in [self.root, Path(self.tmp.name)]:
+                alias = parent / f'protected-alias-{index}'
+                try:
+                    alias.symlink_to(protected, target_is_directory=True)
+                except OSError:
+                    self.skipTest('无法建立符号链接')
+                for name in ['existing.md', 'new/nested.md']:
+                    for tool in ['Write', 'Edit', 'MultiEdit', 'NotebookEdit']:
+                        key = 'notebook_path' if tool == 'NotebookEdit' else 'file_path'
+                        r = self.run_no_python(self.payload(alias / name, tool=tool, key=key))
+                        self.assertEqual(r.returncode, 2, (alias, name, tool, r.stderr.decode('utf-8', 'replace')))
+            self.assertEqual(original.read_text(encoding='utf-8'), '保留原文')
+            self.assertFalse((protected / 'new').exists())
+
+    def test_no_python_patch_blocks_and_read_only_tools_remain_available(self):
+        patch = {'tool_name': 'apply_patch', 'tool_input': {
+            'patch': '*** Begin Patch\n*** Add File: 設定/new.md\n+新设置\n*** End Patch'}}
+        r = self.run_no_python(json.dumps(patch, ensure_ascii=False).encode('utf-8'))
+        self.assertEqual(r.returncode, 2, r.stderr.decode('utf-8', 'replace'))
+        for tool in ['Read', 'Glob', 'Grep']:
+            r = self.run_no_python(self.payload('導入/原稿/book.txt', tool=tool))
+            self.assertEqual(r.returncode, 0, (tool, r.stderr.decode('utf-8', 'replace')))
+
+    def test_no_python_nested_tool_name_cannot_mask_write_tool(self):
+        # The host's tool_name can follow tool_input in a valid JSON envelope.
+        data = {'tool_input': {'tool_name': 'Read', 'file_path': str(self.root / '設定/new.md')},
+                'tool_name': 'Write'}
+        r = self.run_no_python(json.dumps(data, ensure_ascii=False).encode('utf-8'))
+        self.assertEqual(r.returncode, 2, r.stderr.decode('utf-8', 'replace'))
+
     def test_no_python_relative_and_windows_paths(self):
-        cases = [('C:\\book', 'C:\\book\\正文\\第001章.md', 2), ('C:\\book', 'c:/book/草稿/第001章/場景01.md', 2),
-                 ('C:\\book', 'C:\\book\\設定\\設定.md', 0), ('C:/book', '/c/book/正文/第001章.md', 2),
-                 ('C:\\book', 'D:\\other\\正文\\第001章.md', 0), ('/srv/book', '/srv/book2/正文/a.md', 0),
-                 ('/srv/book', '正文/第001章.md', 2), ('/srv/book', './草稿/x.md', 2), ('/srv/book', '設定/x.md', 0),
-                 ('C:\\book', '\\\\?\\C:\\book\\正文\\第001章.md', 2),
-                 ('C:\\book', 'C:\\book\\正文.\\第001章.md', 2),
-                 ('C:\\book', 'C:\\book\\正文 \\第001章.md', 2),
-                 ('C:\\book', 'C:\\book\\導入\\原稿.\\a.txt', 2),
-                 ('C:\\book', 'D:正文\\第001章.md', 2),
-                 ('C:\\book', 'C:\\book\\追蹤\\場景狀態.MD', 2), ('C:\\book', 'c:/BOOK/導入/清單.json', 2),
-                 ('C:\\book', 'C:\\book\\追蹤\\場景狀態.md::$DATA', 2),
-                 ('C:\\book', 'C:\\book\\導入\\清單.json.', 2),
-                 ('C:\\book', '\\\\localhost\\C$\\book\\正文\\第001章.md', 2),
-                 ('\\\\srv\\share\\book', '\\\\srv\\share\\book\\設定\\x.md', 0),
-                 ('\\\\srv\\share\\book', '\\\\srv\\share\\other\\x.md', 0),
-                 ('\\\\srv\\share\\book', '\\\\srv\\share\\book\\正文\\第001章.md', 2),
-                 ('/srv/book', '/srv/book/追蹤/場景狀態.md', 2), ('/srv/book', '/srv/other/追蹤/場景狀態.md', 0)]
-        for root, path, code in cases:
+        # Missing Python is a runtime failure, regardless of OS path spelling.
+        cases = [('C:\\book', 'C:\\book\\設定\\設定.md'),
+                 ('C:/book', '/c/book/正文/第001章.md'),
+                 ('C:\\book', 'D:\\other\\正文\\第001章.md'),
+                 ('/srv/book', '設定/x.md'),
+                 ('\\\\srv\\share\\book', '\\\\srv\\share\\other\\x.md')]
+        for root, path in cases:
             r = self.run_no_python(self.payload(path, raw=True), root=root)
-            self.assertEqual(r.returncode, code, (root, path, r.stderr.decode('utf-8', 'replace')))
+            self.assertEqual(r.returncode, 2, (root, path, r.stderr.decode('utf-8', 'replace')))
 
     def test_no_python_unparseable_input_blocks(self):
         ascii_escaped = json.dumps({'tool_name': 'Write', 'tool_input': {'file_path': str(self.root / '設定/x.md')}}).encode('utf-8')
@@ -280,7 +305,7 @@ class Launcher(Book):
         data = self.payload('第001章.md', raw=True, cwd=str(self.root/'正文'))
         self.assertEqual(self.run_no_python(data).returncode, 2)
         data = self.payload('setting.md', raw=True, cwd=str(self.root/'設定'))
-        self.assertEqual(self.run_no_python(data).returncode, 0)
+        self.assertEqual(self.run_no_python(data).returncode, 2)
 
 
 if __name__ == '__main__':

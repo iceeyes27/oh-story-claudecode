@@ -39,13 +39,23 @@ class CliJourney(unittest.TestCase):
                 return r
 
             def delivery(name, kind, pairs, mode, **extra):
-                write('審閱/'+name+'.md', '測試交付；不代表真人或模型審閱通過')
+                body = '隔离测试交付；不代表真人或模型审核通过\n\n'
+                for source, _ in pairs:
+                    body += '<!-- novel-candidate:' + source + ' -->\n'
+                    body += (root/source).read_text(encoding='utf-8')
+                    body += '\n<!-- /novel-candidate -->\n'
+                write('審閱/'+name+'.md', body)
                 spec = {'id': name, 'kind': kind, 'delivery': '審閱/'+name+'.md',
                         'files': [{'source': src, 'target': dst} for src, dst in pairs],
                         'review': {'mode': mode, 'completed': [], 'unresolved': ['隔離測試未執行模型審閱']}, **extra}
                 path = '審閱/'+name+'.json'
                 write(path, json.dumps(spec, ensure_ascii=False))
                 return path
+
+            def prepare(path, code=0):
+                cli('review-start', path, code=code)
+                if code == 0:
+                    cli('prepare', path)
 
             def accept(name):
                 cli('accept', name, '--approval', '隔離測試模擬採用', '--override', '僅測試機制，不代表真人授權')
@@ -58,30 +68,30 @@ class CliJourney(unittest.TestCase):
             cli('check', scene); cli('check', chapter, code=2)
             write(scene, '第一場測試正文')
             spec = delivery('scene', 'scene', [(scene, scene)], '完整', chapter=1, scene=1)
-            cli('prepare', spec); cli('check', scene, code=2); accept('scene')
+            prepare(spec); cli('check', scene, code=2); accept('scene')
             cli('begin', '1', '0')
             write('草稿/第001章/整章候選.md', '整章測試正文'); write('審閱/追蹤候選.md', '第一章完成')
             pairs = [('草稿/第001章/整章候選.md', chapter)]
             missing = delivery('missing', 'chapter', pairs, '章節', chapter=1)
-            cli('prepare', missing, code=2)
+            prepare(missing, code=2)
             self.assertFalse((root/chapter).exists())
             pairs.append(('審閱/追蹤候選.md', '追蹤/追蹤.md'))
-            cli('prepare', delivery('chapter', 'chapter', pairs, '章節', chapter=1)); accept('chapter')
+            prepare(delivery('chapter', 'chapter', pairs, '章節', chapter=1)); accept('chapter')
             self.assertEqual((root/'追蹤/追蹤.md').read_text(encoding='utf-8'), '第一章完成')
 
             cli('revision-start', 'fix', chapter)
             candidate = '審閱/修訂/fix/候選.md'; write(candidate, '初次修訂候選')
-            cli('prepare', delivery('old', 'revision', [(candidate, chapter)], '文字', revision='fix'))
+            prepare(delivery('old', 'revision', [(candidate, chapter)], '文字', revision='fix'))
             write(chapter, '作者在修訂中自行更改的版本')
             cli('revision-refresh', 'fix', chapter, '--reason', '隔離測試作者手改')
             cli('accept', 'old', '--approval', '隔離測試', '--override', '隔離測試', code=2)
             write('大綱/細綱/第002章.md', '- 狀態：已確認\n## 場景01 測試\n')
             cli('confirm-plan', '2', code=2)
             write(candidate, (root/chapter).read_text(encoding='utf-8'))
-            cli('prepare', delivery('new', 'revision', [(candidate, chapter)], '文字', revision='fix')); accept('new')
+            prepare(delivery('new', 'revision', [(candidate, chapter)], '文字', revision='fix')); accept('new')
             cli('confirm-plan', '2', code=2)
             write('審閱/追蹤候選.md', '作者手改後的事實已同步')
-            cli('prepare', delivery('finish', 'revision-finish',
+            prepare(delivery('finish', 'revision-finish',
                                    [('審閱/追蹤候選.md', '追蹤/追蹤.md')], '文字', revision='fix'))
             accept('finish'); cli('confirm-plan', '2'); cli('begin', '2', '1')
             self.assertEqual((root/chapter).read_text(encoding='utf-8'), '作者在修訂中自行更改的版本')

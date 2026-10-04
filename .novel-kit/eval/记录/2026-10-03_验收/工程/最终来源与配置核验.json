@@ -1,0 +1,42 @@
+{
+  "checked_at": "2026-10-04T00:19:18.195198+00:00",
+  "note": "检查已有生成副本与配置；不证明其他宿主实际会话通过。",
+  "checks": [
+    {
+      "args": [
+        "setup",
+        "--agent",
+        "all",
+        "--models",
+        "quality",
+        "--check-sources"
+      ],
+      "returncode": 0,
+      "stdout": "来源副本差异：无差异\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "setup",
+        "--agent",
+        "all",
+        "--models",
+        "quality",
+        "--check"
+      ],
+      "returncode": 0,
+      "stdout": "待更新：無差異\n",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "doctor",
+        "--agent",
+        "all"
+      ],
+      "returncode": 0,
+      "stdout": "claude: 配置一致；啟動命令允許設定、拒絕正式正文（未寫入檔案）\ncodex: 配置一致；啟動命令允許設定、拒絕正式正文（未寫入檔案）\n共享技能與規則：.agents/skills、AGENTS.md；Agent 內的載入與 Hook 信任仍需實際會話確認。\n",
+      "stderr": ""
+    }
+  ]
+}

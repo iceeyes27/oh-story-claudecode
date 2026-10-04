@@ -1,0 +1,205 @@
+{
+  "说明": "最终四组评分与其冻结输入、原始报告、判分快照一并核验。执行成功和证据齐全不等于文学质量通过。",
+  "groups": [
+    {
+      "group": "before_challenges",
+      "verify": {
+        "ok": true,
+        "checked_at": "2026-10-04T10:01:41Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "score_sha256": "ee8705e5ee250c5d4f7753418b7abf9a0c921dea9786a206e85d5627b35fc8ee",
+      "evidence_complete": true,
+      "quality_acceptance": "not_determined",
+      "attempts": [
+        {
+          "role": "prose-reviewer",
+          "attempt": 1,
+          "detected": {
+            "numerator": 1,
+            "denominator": 1,
+            "rate": 1.0,
+            "missing": 0
+          },
+          "severity_attainment": {
+            "numerator": 1,
+            "denominator": 1,
+            "rate": 1.0,
+            "missing": 0
+          },
+          "false_positives": {
+            "control_s1_s2": 0,
+            "protected_reported": 0,
+            "other_explicit": 0,
+            "missing": 0
+          }
+        }
+      ],
+      "missing": []
+    },
+    {
+      "group": "after_challenges",
+      "verify": {
+        "ok": true,
+        "checked_at": "2026-10-04T10:01:41Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "score_sha256": "9df083d71e551199baf71d434116e6655a9a2508cff7d032cf0afce8bd7f8c3b",
+      "evidence_complete": true,
+      "quality_acceptance": "not_determined",
+      "attempts": [
+        {
+          "role": "prose-reviewer",
+          "attempt": 1,
+          "detected": {
+            "numerator": 1,
+            "denominator": 1,
+            "rate": 1.0,
+            "missing": 0
+          },
+          "severity_attainment": {
+            "numerator": 1,
+            "denominator": 1,
+            "rate": 1.0,
+            "missing": 0
+          },
+          "false_positives": {
+            "control_s1_s2": 0,
+            "protected_reported": 0,
+            "other_explicit": 0,
+            "missing": 0
+          }
+        },
+        {
+          "role": "prose-reviewer",
+          "attempt": 2,
+          "detected": {
+            "numerator": 1,
+            "denominator": 1,
+            "rate": 1.0,
+            "missing": 0
+          },
+          "severity_attainment": {
+            "numerator": 1,
+            "denominator": 1,
+            "rate": 1.0,
+            "missing": 0
+          },
+          "false_positives": {
+            "control_s1_s2": 0,
+            "protected_reported": 0,
+            "other_explicit": 0,
+            "missing": 0
+          }
+        }
+      ],
+      "missing": []
+    },
+    {
+      "group": "after_regression",
+      "verify": {
+        "ok": true,
+        "checked_at": "2026-10-04T10:01:41Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "score_sha256": "4ff1ac10ed65b09147ad75f7317320cb2906790fb77398f9b79bc5aaf6bea6e1",
+      "evidence_complete": true,
+      "quality_acceptance": "not_determined",
+      "attempts": [
+        {
+          "role": "prose-reviewer",
+          "attempt": 1,
+          "detected": {
+            "numerator": 1,
+            "denominator": 8,
+            "rate": 0.125,
+            "missing": 0
+          },
+          "severity_attainment": {
+            "numerator": 0,
+            "denominator": 3,
+            "rate": 0.0,
+            "missing": 0
+          },
+          "false_positives": {
+            "control_s1_s2": 0,
+            "protected_reported": 0,
+            "other_explicit": 0,
+            "missing": 0
+          }
+        },
+        {
+          "role": "prose-reviewer",
+          "attempt": 2,
+          "detected": {
+            "numerator": 0,
+            "denominator": 1,
+            "rate": 0.0,
+            "missing": 0
+          },
+          "severity_attainment": {
+            "numerator": 0,
+            "denominator": 0,
+            "rate": null,
+            "missing": 0
+          },
+          "false_positives": {
+            "control_s1_s2": 0,
+            "protected_reported": 0,
+            "other_explicit": 0,
+            "missing": 0
+          }
+        }
+      ],
+      "missing": []
+    },
+    {
+      "group": "final_clarified",
+      "verify": {
+        "ok": true,
+        "checked_at": "2026-10-04T10:01:41Z",
+        "problems": [],
+        "missing_outputs": []
+      },
+      "score_sha256": "7b3bd152b1c45bfe054140e6b0cf2320e47fcbfa0c2a3b066fb6ee40c0406c2b",
+      "evidence_complete": true,
+      "quality_acceptance": "not_determined",
+      "attempts": [
+        {
+          "role": "prose-reviewer",
+          "attempt": 1,
+          "detected": {
+            "numerator": 1,
+            "denominator": 2,
+            "rate": 0.5,
+            "missing": 0
+          },
+          "severity_attainment": {
+            "numerator": 1,
+            "denominator": 1,
+            "rate": 1.0,
+            "missing": 0
+          },
+          "false_positives": {
+            "control_s1_s2": 0,
+            "protected_reported": 0,
+            "other_explicit": 0,
+            "missing": 0
+          }
+        }
+      ],
+      "missing": []
+    }
+  ],
+  "engineering": {
+    "tests": 171,
+    "passed": 168,
+    "windows_skipped": 3,
+    "failures": 0,
+    "log": "工程/最终完整回归.log"
+  },
+  "canonical_role_matches_final_snapshot": true
+}

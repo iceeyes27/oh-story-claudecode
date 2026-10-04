@@ -1,0 +1,31 @@
+{
+  "archived_at": "2026-10-04T00:49:52.235043+00:00",
+  "note": "完成后保存同源原字节，保证临时项目被清理后仍可复核；不冒充开读前冻结，实际开读哈希见原记录。",
+  "files": [
+    {
+      "original_path": "/private/tmp/novel-kit-20261004-host-book/.novel-kit/roles/scene-writer.md",
+      "archive_path": ".novel-kit/eval/记录/2026-10-03_验收/宿主验收/本轮输入归档/01_scene-writer.md",
+      "sha256": "69af0fc316eff5bcd391ade953e7caa1e12d9fa9b1e1f86e7261cf4716cc494f"
+    },
+    {
+      "original_path": "/private/tmp/novel-kit-20261004-host-book/.novel-kit/standards/语文规格.md",
+      "archive_path": ".novel-kit/eval/记录/2026-10-03_验收/宿主验收/本轮输入归档/02_语文规格.md",
+      "sha256": "232019a01049a085e36fc24d64f0922247a6c07a95722a5797a3c717d6dfaa18"
+    },
+    {
+      "original_path": "/private/tmp/novel-kit-20261004-host-book/大綱/細綱/第001章.md",
+      "archive_path": ".novel-kit/eval/记录/2026-10-03_验收/宿主验收/本轮输入归档/03_第001章.md",
+      "sha256": "9e5dc4313cfc54df6eca8d6043bd0ba4b86ca490374304dc1b170145a125a9b4"
+    },
+    {
+      "original_path": "/private/tmp/novel-kit-20261004-host-book/.novel-kit/roles/copy-editor.md",
+      "archive_path": ".novel-kit/eval/记录/2026-10-03_验收/宿主验收/本轮输入归档/04_copy-editor.md",
+      "sha256": "e7a5f440c7853013d82e54538a9ce9f4f916a32011d414b60dd6c0841dc6712b"
+    },
+    {
+      "original_path": "/private/tmp/novel-kit-20261004-host-book/草稿/第001章/場景01.md",
+      "archive_path": ".novel-kit/eval/记录/2026-10-03_验收/宿主验收/本轮输入归档/05_場景01.md",
+      "sha256": "8de989e88c995fc40e6a0b1f5604baa637b03ad3089134ada7eaff087cc87063"
+    }
+  ]
+}

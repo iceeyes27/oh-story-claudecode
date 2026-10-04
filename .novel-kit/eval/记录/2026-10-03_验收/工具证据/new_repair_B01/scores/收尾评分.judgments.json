@@ -1,0 +1,42 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "runs": [],
+  "repairs": [
+    {
+      "sample": "B01",
+      "repair_run_id": "B01_new_repair",
+      "review_run_id": "B01_new_repair_review",
+      "execution_date": "2026-10-04",
+      "issues": [
+        {
+          "issue_id": "B01-1",
+          "resolved": false,
+          "evidence": "制止与拉开的动作缺少明确的现场前因",
+          "reason": "原稿、写手完整候选和冻结候选逐字节一致。“先停下”后拉开托比的前因没有补明；新独立盲读CE-1仍定S2，并明确现有原文不足以选择正在自罚或预防性拉开。写手依授权未替作者补动作，记未解决，保留现场动作选择。"
+        },
+        {
+          "issue_id": "B01-2",
+          "resolved": false,
+          "evidence": "“被死册子折腾”的对象由刚被拉开的小精灵及其受罚台词可判定；不因省略宾语机械报 L1-1。",
+          "reason": "原句“真看着被死册子折腾成这样”未改。预置答案按缺宾语、死册子未出现定S2；写手认为对象由上文托比可定，死册子可指菜谱规矩，新独立盲读也明确保留省略。保留答案与现行审阅分歧，不把未报或认为原句可读当作修复成功；具体实体物件来历仍待原文核对。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "B01-protected-1",
+          "changed": false,
+          "evidence": "问句用句号有样本“这条巷的生意，月月是不是该有我一份。”作直接依据，不按 L1-9 改成问号。",
+          "reason": "全文字节相同；“他们禁过在大菜旁边添一碟蘸料和小配菜吗。”原样保留。独立盲读明确认可句号问句。"
+        },
+        {
+          "protected_id": "B01-protected-2",
+          "changed": false,
+          "evidence": "",
+          "reason": "原稿与完整候选逐字节相同；“托比马上给您拿新鲜的冷牛肉馅饼和烤土豆！”及第三人称自称均未改。该判断依据直接字节对照；盲读没有逐字引用这项，不伪造报告证据。"
+        }
+      ],
+      "new_errors": []
+    }
+  ]
+}

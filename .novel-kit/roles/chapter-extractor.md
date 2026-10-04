@@ -1,5 +1,6 @@
 ---
 name: chapter-extractor
+tier: standard
 description: 舊稿章節抽取（唯讀）。接手舊稿時逐章抽取場景、事件、設定、角色知情、伏筆與兌現線索，每一項都附原文。只在 /import-book 時使用。
 ---
 

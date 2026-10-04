@@ -1,0 +1,374 @@
+{
+  "说明": "审阅执行凭据与完整读取事件核验；四组冻结文件及声明输出核验。分组判分另存scores，不把执行成功等同质量通过。",
+  "planned_jobs": 14,
+  "unique_thread_count": 14,
+  "runs": [
+    {
+      "job": "before_challenges_N01_1",
+      "frozen_prompt_matches_actual": true,
+      "frozen_context_matches_actual": true,
+      "attempts": [
+        {
+          "receipt": "执行凭据/before_challenges_N01_1/run-bf8900a3c7044f57aa54c36a20e2d028/result.json",
+          "status": "completed",
+          "receipt_verified": true,
+          "nested_agent_calls": 0,
+          "thread_ids": [
+            "01a10648-ce0f-7e61-bf2f-b8531bb67e9c"
+          ],
+          "inputs_full_text_observed": {
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/role.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/language.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/workflow.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/style.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/body_N01.md": true
+          },
+          "report_sha256": "8c48b4a8a4defdce1656ef43d6e30210419c7fed6a46fc4a1298bef0a0ed8cd2"
+        }
+      ]
+    },
+    {
+      "job": "before_challenges_N02_1",
+      "frozen_prompt_matches_actual": true,
+      "frozen_context_matches_actual": true,
+      "attempts": [
+        {
+          "receipt": "执行凭据/before_challenges_N02_1/run-fc00c31cbd324027ac9306c6c77703aa/result.json",
+          "status": "completed",
+          "receipt_verified": true,
+          "nested_agent_calls": 0,
+          "thread_ids": [
+            "01a10648-ce0f-7f40-ac06-27cbabccf4c7"
+          ],
+          "inputs_full_text_observed": {
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/role.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/language.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/workflow.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/style.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/body_N02.md": true
+          },
+          "report_sha256": "ca4ac5b8a416bbeef5b01ae965d79c85fb0a31210638de49fe0f521e6ee485c9"
+        }
+      ]
+    },
+    {
+      "job": "before_challenges_N03_1",
+      "frozen_prompt_matches_actual": true,
+      "frozen_context_matches_actual": true,
+      "attempts": [
+        {
+          "receipt": "执行凭据/before_challenges_N03_1/run-f36c284837d942a6ae72b202a5a6f3a1/result.json",
+          "status": "completed",
+          "receipt_verified": true,
+          "nested_agent_calls": 0,
+          "thread_ids": [
+            "01a10648-ce0f-73d1-8b42-78716570c0c2"
+          ],
+          "inputs_full_text_observed": {
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/role.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/language.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/workflow.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/style.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/inputs/body_N03.md": true
+          },
+          "report_sha256": "52262fadbf1fddd8ce67124d92d5874edfdd3ed692a71fd4b758cc099ae1b06b"
+        }
+      ]
+    },
+    {
+      "job": "after_challenges_N01_1",
+      "frozen_prompt_matches_actual": true,
+      "frozen_context_matches_actual": true,
+      "attempts": [
+        {
+          "receipt": "执行凭据/after_challenges_N01_1/run-3564783c84554077a16902d79579e9a3/result.json",
+          "status": "completed",
+          "receipt_verified": true,
+          "nested_agent_calls": 0,
+          "thread_ids": [
+            "01a1064a-e2a4-7703-8caa-b62bb5652c3f"
+          ],
+          "inputs_full_text_observed": {
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/role.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/language.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/workflow.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/style.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/body_N01.md": true
+          },
+          "report_sha256": "fc74fca09162803f7e74f242e01c66af90ba41f8056dcce8d88a8f6643652570"
+        }
+      ]
+    },
+    {
+      "job": "after_challenges_N02_1",
+      "frozen_prompt_matches_actual": true,
+      "frozen_context_matches_actual": true,
+      "attempts": [
+        {
+          "receipt": "执行凭据/after_challenges_N02_1/run-a0e11f258cd649af8e750e5a16ce7ad2/result.json",
+          "status": "completed",
+          "receipt_verified": true,
+          "nested_agent_calls": 0,
+          "thread_ids": [
+            "01a1064a-f6aa-7cc1-8856-e017e5a34b5c"
+          ],
+          "inputs_full_text_observed": {
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/role.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/language.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/workflow.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/style.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/body_N02.md": true
+          },
+          "report_sha256": "7c8eb53dbef8b291dcc92ece2bc4d04636227f83e3d6e80b2d2d6fc9dc48ded0"
+        }
+      ]
+    },
+    {
+      "job": "after_challenges_N03_1",
+      "frozen_prompt_matches_actual": true,
+      "frozen_context_matches_actual": true,
+      "attempts": [
+        {
+          "receipt": "执行凭据/after_challenges_N03_1/run-c1039e28d8e443dea514f6bbe2ad6624/result.json",
+          "status": "completed",
+          "receipt_verified": true,
+          "nested_agent_calls": 0,
+          "thread_ids": [
+            "01a1064b-5272-7a51-9ac8-4884acea38a9"
+          ],
+          "inputs_full_text_observed": {
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/role.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/language.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/workflow.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/style.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/body_N03.md": true
+          },
+          "report_sha256": "ce2bcd480c3dea68762d74e7a72eafbf670c975f5f780e912d90541eab924b44"
+        }
+      ]
+    },
+    {
+      "job": "after_challenges_N02_2",
+      "frozen_prompt_matches_actual": true,
+      "frozen_context_matches_actual": true,
+      "attempts": [
+        {
+          "receipt": "执行凭据/after_challenges_N02_2/run-4d90e1686786476f8b982394a75cd437/result.json",
+          "status": "completed",
+          "receipt_verified": true,
+          "nested_agent_calls": 0,
+          "thread_ids": [
+            "01a1064d-7db1-7673-9010-391e0729bd9b"
+          ],
+          "inputs_full_text_observed": {
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/role.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/language.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/workflow.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/style.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/inputs/body_N02.md": true
+          },
+          "report_sha256": "bd3baccfa28392ea024716ebed85e94165c50cade57004b7cf741312796064b7"
+        }
+      ]
+    },
+    {
+      "job": "after_regression_K01_1",
+      "frozen_prompt_matches_actual": true,
+      "frozen_context_matches_actual": true,
+      "attempts": [
+        {
+          "receipt": "执行凭据/after_regression_K01_1/run-01b8fec7bc1c4938a076697cde54e47e/result.json",
+          "status": "completed",
+          "receipt_verified": true,
+          "nested_agent_calls": 0,
+          "thread_ids": [
+            "01a1064d-7da8-7b52-8208-bc8987f38884"
+          ],
+          "inputs_full_text_observed": {
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/role.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/language.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/workflow.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/style.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/body_K01.md": true
+          },
+          "report_sha256": "b281837edde0b7d910929461faf6a9e923558a25953b9e0961775e1ec555f29a"
+        }
+      ]
+    },
+    {
+      "job": "after_regression_K02_1",
+      "frozen_prompt_matches_actual": true,
+      "frozen_context_matches_actual": true,
+      "attempts": [
+        {
+          "receipt": "执行凭据/after_regression_K02_1/run-d047731d5eda4bba8c9f18617104a97b/result.json",
+          "status": "completed",
+          "receipt_verified": true,
+          "nested_agent_calls": 0,
+          "thread_ids": [
+            "01a1064d-7da8-7063-b325-56f80959660d"
+          ],
+          "inputs_full_text_observed": {
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/role.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/language.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/workflow.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/style.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/body_K02.md": true
+          },
+          "report_sha256": "9f01129d31ea2a51b5a6350a185518c4ceadb1a9bd9592af5958329a60fed1ae"
+        }
+      ]
+    },
+    {
+      "job": "after_regression_D01_1",
+      "frozen_prompt_matches_actual": true,
+      "frozen_context_matches_actual": true,
+      "attempts": [
+        {
+          "receipt": "执行凭据/after_regression_D01_1/run-1826ee14fba444e3a601b24a64917f13/result.json",
+          "status": "completed",
+          "receipt_verified": true,
+          "nested_agent_calls": 0,
+          "thread_ids": [
+            "01a1064f-5a1b-75f0-b830-8ff64f4f7ab8"
+          ],
+          "inputs_full_text_observed": {
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/role.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/language.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/workflow.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/style.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/body_D01.md": true
+          },
+          "report_sha256": "34418a37e90d84eb0eb383f0bb16cac0b1eae78f5aea1b457c731bbb1362dcd1"
+        }
+      ]
+    },
+    {
+      "job": "after_regression_D02_1",
+      "frozen_prompt_matches_actual": true,
+      "frozen_context_matches_actual": true,
+      "attempts": [
+        {
+          "receipt": "执行凭据/after_regression_D02_1/run-c423a2fc2171473eb91e37517b1ea0a0/result.json",
+          "status": "completed",
+          "receipt_verified": true,
+          "nested_agent_calls": 0,
+          "thread_ids": [
+            "01a1064f-9b24-7750-a7a7-c7a5d9851747"
+          ],
+          "inputs_full_text_observed": {
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/role.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/language.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/workflow.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/style.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/body_D02.md": true
+          },
+          "report_sha256": "64cf639eadb5c64fa4a0c54760355fd945fdabf201def3d813de627d04698aea"
+        }
+      ]
+    },
+    {
+      "job": "after_regression_K02_2",
+      "frozen_prompt_matches_actual": true,
+      "frozen_context_matches_actual": true,
+      "attempts": [
+        {
+          "receipt": "执行凭据/after_regression_K02_2/run-be8fecbbde3644b38121eff74ceb59fe/result.json",
+          "status": "completed",
+          "receipt_verified": true,
+          "nested_agent_calls": 0,
+          "thread_ids": [
+            "01a10650-91a0-7563-b6ac-6d1c20fafd42"
+          ],
+          "inputs_full_text_observed": {
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/role.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/language.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/workflow.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/style.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_regression/inputs/body_K02.md": true
+          },
+          "report_sha256": "6bb09be76e037b475259e97bfac2b41edd882acd24ecb1e758822d9c62be34cf"
+        }
+      ]
+    },
+    {
+      "job": "final_clarified_K02_1",
+      "frozen_prompt_matches_actual": true,
+      "frozen_context_matches_actual": true,
+      "attempts": [
+        {
+          "receipt": "执行凭据/final_clarified_K02_1/run-a2be3adb8cdb4ef5a3c97ad7c28476ec/result.json",
+          "status": "completed",
+          "receipt_verified": true,
+          "nested_agent_calls": 0,
+          "thread_ids": [
+            "01a10655-b70a-71a0-a761-82ba53466bf0"
+          ],
+          "inputs_full_text_observed": {
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/role.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/language.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/workflow.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/style.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/body_K02.md": true
+          },
+          "report_sha256": "243af6f32d97ba26da6d9430109957d20b738293cc6955ab9ca93f48967e8f3a"
+        }
+      ]
+    },
+    {
+      "job": "final_clarified_N02_1",
+      "frozen_prompt_matches_actual": true,
+      "frozen_context_matches_actual": true,
+      "attempts": [
+        {
+          "receipt": "执行凭据/final_clarified_N02_1/run-914b310687944d3598bf24119087c98a/result.json",
+          "status": "completed",
+          "receipt_verified": true,
+          "nested_agent_calls": 0,
+          "thread_ids": [
+            "01a10655-b70a-7812-bf38-9c6fe04562c5"
+          ],
+          "inputs_full_text_observed": {
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/role.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/language.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/workflow.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/style.md": true,
+            "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/final_clarified/inputs/body_N02.md": true
+          },
+          "report_sha256": "0868c167ec852ef4c9472d035bb26e7ccdddf3186209f189130d105a8ee7b321"
+        }
+      ]
+    }
+  ],
+  "groups": {
+    "before_challenges": {
+      "ok": true,
+      "checked_at": "2026-10-04T09:58:22Z",
+      "problems": [],
+      "missing_outputs": []
+    },
+    "after_challenges": {
+      "ok": true,
+      "checked_at": "2026-10-04T09:58:22Z",
+      "problems": [],
+      "missing_outputs": []
+    },
+    "after_regression": {
+      "ok": true,
+      "checked_at": "2026-10-04T09:58:22Z",
+      "problems": [],
+      "missing_outputs": []
+    },
+    "final_clarified": {
+      "ok": true,
+      "checked_at": "2026-10-04T09:58:22Z",
+      "problems": [],
+      "missing_outputs": []
+    }
+  },
+  "all_receipts_verified": true,
+  "tool_sha256": {
+    "eval_runner": "f8919d2b948da3bc55666ab439b31b25c96da25d0c8642017b44104d5da08e9f",
+    "eval_evidence": "595e340d7fdd6cbf5a43a0071271a11d9909370fee5e877c0ff70c0915da5811"
+  }
+}

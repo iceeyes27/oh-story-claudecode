@@ -1,0 +1,72 @@
+{
+  "说明": "对原始开读记录、输入输出摘要和事件日志逐项核验，不只以报告存在为完成依据。",
+  "runs": [
+    {
+      "job": "before_challenges_N01_1",
+      "attempts": [
+        {
+          "receipt": "执行凭据/before_challenges_N01_1/run-bf8900a3c7044f57aa54c36a20e2d028/result.json",
+          "verified": true,
+          "status": "completed",
+          "nested_agent_calls": 0
+        }
+      ]
+    },
+    {
+      "job": "before_challenges_N02_1",
+      "attempts": [
+        {
+          "receipt": "执行凭据/before_challenges_N02_1/run-fc00c31cbd324027ac9306c6c77703aa/result.json",
+          "verified": true,
+          "status": "completed",
+          "nested_agent_calls": 0
+        }
+      ]
+    },
+    {
+      "job": "before_challenges_N03_1",
+      "attempts": [
+        {
+          "receipt": "执行凭据/before_challenges_N03_1/run-f36c284837d942a6ae72b202a5a6f3a1/result.json",
+          "verified": true,
+          "status": "completed",
+          "nested_agent_calls": 0
+        }
+      ]
+    },
+    {
+      "job": "after_challenges_N01_1",
+      "attempts": [
+        {
+          "receipt": "执行凭据/after_challenges_N01_1/run-3564783c84554077a16902d79579e9a3/result.json",
+          "verified": true,
+          "status": "completed",
+          "nested_agent_calls": 0
+        }
+      ]
+    },
+    {
+      "job": "after_challenges_N02_1",
+      "attempts": [
+        {
+          "receipt": "执行凭据/after_challenges_N02_1/run-a0e11f258cd649af8e750e5a16ce7ad2/result.json",
+          "verified": true,
+          "status": "completed",
+          "nested_agent_calls": 0
+        }
+      ]
+    },
+    {
+      "job": "after_challenges_N03_1",
+      "attempts": [
+        {
+          "receipt": "执行凭据/after_challenges_N03_1/run-c1039e28d8e443dea514f6bbe2ad6624/result.json",
+          "verified": true,
+          "status": "completed",
+          "nested_agent_calls": 0
+        }
+      ]
+    }
+  ],
+  "all_verified": true
+}

@@ -1,0 +1,1510 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "runs": [
+    {
+      "run_id": "A01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "这里是同一对象在相邻句中的命名与材质不统一",
+          "reason": "报告明确指出黄纸与羊皮材质表述冲突，匹配答案。"
+        },
+        {
+          "issue_id": "A01-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "以下均不计入 S1/S2，也不据此判定正文漏写。",
+          "reason": "手机投入只列供给待核或保留，没有定级为主语/语义问题，不算检出。"
+        },
+        {
+          "issue_id": "A01-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "目前不凭供给缺口判定指代硬错",
+          "reason": "它的严格所指仅列供给待核，没有作为定级正文问题，不算检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "A01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "厨房用锅的口语被保留，未列为问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "A01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "后文继续称‘黄纸’‘那张纸’，没有统一这两种材料称呼。",
+          "reason": "报告明确指出黄纸与羊皮材质表述冲突，匹配答案。"
+        },
+        {
+          "issue_id": "A01-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "不补造资源规则，也不判因果缺失。",
+          "reason": "手机投入只列供给待核或保留，没有定级为主语/语义问题，不算检出。"
+        },
+        {
+          "issue_id": "A01-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "不将来历未展开或“它”的严格所指未定升级为正文错误。",
+          "reason": "它的严格所指仅列供给待核，没有作为定级正文问题，不算检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "A01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "厨房用锅的口语被保留，未列为问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "A02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A02-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "未造成实际误读；不只按表面名词不齐整判 S2。",
+          "reason": "报告将比较维度判为可理解并保留，未定级报病句。"
+        },
+        {
+          "issue_id": "A02-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "口语计数与实物残缺不构成必然矛盾",
+          "reason": "报告明确保留一页与半页的计数，不作为定级数量问题，意见与答案相反。"
+        },
+        {
+          "issue_id": "A02-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "耳根泛红只被理解为可见反应/合理留白，没有定级指出套话式身体反应。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "A02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "那你呢的问句句号和口语均被保留。"
+        },
+        {
+          "protected_id": "A02-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "英国混血质问句的句号被文风保护，未列问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "A02_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A02-1",
+          "detected": true,
+          "severity": "S3",
+          "evidence": "比较双方不够齐整。",
+          "reason": "CE-1明确指出起笔架构与纸张代称比较不齐整，匹配答案的比较对象错位，实际S3。"
+        },
+        {
+          "issue_id": "A02-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "残破的一页可以只剩半页纸。",
+          "reason": "报告明确保留一页与半页的计数，不作为定级数量问题，意见与答案相反。"
+        },
+        {
+          "issue_id": "A02-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "耳根泛红只被理解为可见反应/合理留白，没有定级指出套话式身体反应。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "A02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "那你呢的问句句号和口语均被保留。"
+        },
+        {
+          "protected_id": "A02-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "英国混血质问句的句号被文风保护，未列问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "A03_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A03-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "报告只定级报告触感与实物搭配，没有报告货币单位重复。"
+        },
+        {
+          "issue_id": "A03-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "却把感觉“金属的凉意”和实物“纸币”作为两个接触对象。",
+          "reason": "CE-1明确指出抽象凉意与实物纸币不能相贴，匹配答案。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "A03-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "玛莎的口语省略被明确保留；既往采购只列供给待核。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "A03-extra-grip-palm",
+          "severity": "S2",
+          "evidence": "“握紧掌心”也没有准确落到握住的钱或收拢的手上",
+          "reason": "报告在CE-1中另指出握紧掌心的动作搭配，原句确有该表达；掌心不是通常可握对象，有本句依据，暂不判误报，是否需独立S2待作者裁决。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "A03_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A03-1",
+          "detected": true,
+          "severity": "S3",
+          "evidence": "“十镑英镑”也重复表达货币单位。",
+          "reason": "CE-2明确指出十镑英镑重复，匹配答案，实际S3。"
+        },
+        {
+          "issue_id": "A03-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "句子把触感“凉意”和实物“纸币”并列为能够相贴的对象。",
+          "reason": "CE-1明确指出抽象凉意与实物纸币不能相贴，匹配答案。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "A03-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "玛莎的口语省略被明确保留；既往采购只列供给待核。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "A03-extra-inventory-syntax",
+          "severity": "S3",
+          "evidence": "“一小卷”之后接长定语，再接“六张”和面额",
+          "reason": "同句卷状、长定语、张数与面额堆叠是答案货币单位重复以外的语序建议，有具体句法证据，且限定可选S3，不判误报。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "A04_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A04-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "既有外层观察者“她”，又有内层行动者“埃德蒙”。",
+          "reason": "CE-1明确指出自己可回指姜小满或埃德蒙，匹配答案。"
+        },
+        {
+          "issue_id": "A04-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "也不因“仅有不仅、没有而且”定错",
+          "reason": "CE-2只评长句盘点节奏，并明确不因关联词缺失定错，不匹配答案病句。"
+        },
+        {
+          "issue_id": "A04-3",
+          "detected": true,
+          "severity": "S3",
+          "evidence": "右引号与“亚瑟”之间多了空格",
+          "reason": "CE-4明确指出引号后的空格，匹配答案，实际定级S3。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [
+        {
+          "id": "A04-extra-long-inventory",
+          "severity": "S3",
+          "evidence": "同一句由采购齐全切到加隆支出，再切到英镑余额和兜中西可，多个盘点对象连续更换。",
+          "reason": "原句确实串联采购、三类钱款与位置，节奏建议有文字依据；这是答案外节奏问题，不是关联词病句，暂不判误报，必要性待作者裁决。",
+          "false_positive": false
+        },
+        {
+          "id": "A04-extra-dingdang-collocation",
+          "severity": "S3",
+          "evidence": "“叮当”表达响声，紧接“揣着”这一携带状态，修饰关系略别扭。",
+          "reason": "声音词直接修饰持有状态有搭配整理空间，报告保留原意且定为可选S3；有局部证据，不判误报。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "A04_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "A04-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "没有实际误读袖口主人",
+          "reason": "报告将自己明确顺读为埃德蒙并保留，与答案的指代问题意见相反，不算检出。"
+        },
+        {
+          "issue_id": "A04-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "报告没有定级指出不仅缺后续关联词或该分句缺主语；同句的搭配及放钱动作问题不匹配答案。"
+        },
+        {
+          "issue_id": "A04-3",
+          "detected": true,
+          "severity": "S3",
+          "evidence": "后引号后有一个多余空格",
+          "reason": "CE-3明确指出引号后多余空格，实际定级S3。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [
+        {
+          "id": "A04-extra-money-on-table",
+          "severity": "S2",
+          "evidence": "再往前找，码在桌上的也是采购物品。",
+          "reason": "原文明写采购物品上桌与西可在兜内，却直接写桌上的余钱；新发现有局部位置证据，未以缺旧事为由，不判误报。展示余钱能否隐含放钱动作待作者裁决。",
+          "false_positive": false
+        },
+        {
+          "id": "A04-extra-dingdang-collocation",
+          "severity": "S3",
+          "evidence": "“叮当”直接放在“揣着”前，声音与持有状态挤在同一个短语里，表达略拗。",
+          "reason": "与第一轮同一答案外搭配整理；原句词法关系有依据，且限定可选S3，不判误报。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "B01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "B01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "缺少正在接近烤箱或准备自罚的动作",
+          "reason": "CE-1明确指出条件性受罚台词后直接制止、拉开，缺少自罚/趋近动作，匹配答案。"
+        },
+        {
+          "issue_id": "B01-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "承前省略不单独报 L1-1",
+          "reason": "报告明确保留该句受事省略；嫌难吃只是供给待核，不算答案病句检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "B01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "问句句号被明确按文风保留。"
+        },
+        {
+          "protected_id": "B01-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "托比第三人称自称的台词未列为问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "B01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "B01-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "报告将先停下和拉开按现场口语/预防理解保留，没有定级承接问题。"
+        },
+        {
+          "issue_id": "B01-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "“看着”的对象和“被死册子折腾”的受事者都没有落到句面",
+          "reason": "CE-1明确指出看着后缺受事者，匹配答案的主要病句；报告对死册子另持保留意见。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "B01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "问句句号被明确按文风保留。"
+        },
+        {
+          "protected_id": "B01-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "托比第三人称自称的台词未列为问题。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "B02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "B02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "读者无法稳定判断对峙仍在排队的礼堂长桌旁，还是已进入另一个场所。",
+          "reason": "CE-1明确指出礼堂长桌切成操作台而无空间衔接，匹配答案。"
+        },
+        {
+          "issue_id": "B02-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "紧接着的面粉袋和小精灵又强化了另一种工作空间的印象。",
+          "reason": "答案说明同B02-1；CE-1将小精灵与面粉袋作为相同空间跳接的证据，匹配同一承接问题，非仅提到原句。"
+        },
+        {
+          "issue_id": "B02-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "姜小满盛菜段未被定级报告动作串连或人群外/挤上前方位问题。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "B02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "斯内普牲口内脏的台词被保留为可能贬损，不列事实错误。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "B02-extra-paper-position",
+          "severity": "S2",
+          "evidence": "前文把同一张纸压在锅底，末段又让它从锅沿下露出",
+          "reason": "原文从锅底压纸变为锅沿下露纸，且仍弯腰看底，报告明确比较同一物件位置；实质且有原文证据的新发现，不判误报。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "B02_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "B02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "问题是当前现场无法稳定定位",
+          "reason": "CE-1明确指出礼堂长桌切成操作台而无空间衔接，匹配答案。"
+        },
+        {
+          "issue_id": "B02-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "随后的小精灵和面粉袋进一步引出另一套现场陈设。",
+          "reason": "答案说明同B02-1；CE-1将小精灵与面粉袋作为相同空间跳接的证据，匹配同一承接问题，非仅提到原句。"
+        },
+        {
+          "issue_id": "B02-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "姜小满盛菜段未被定级报告动作串连或人群外/挤上前方位问题。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "B02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "斯内普牲口内脏的台词被保留为可能贬损，不列事实错误。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "B02-extra-paper-position",
+          "severity": "S2",
+          "evidence": "锅底与锅沿是两个不同部位",
+          "reason": "原文从锅底压纸变为锅沿下露纸，且仍弯腰看底，报告明确比较同一物件位置；实质且有原文证据的新发现，不判误报。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "B03_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "B03-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "没有写她拿出魔杖、举起或指向埃德蒙。",
+          "reason": "CE-1明确指出逼近后缺持杖指人的动作、后句魔杖脱手不能补出前因，匹配答案。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "B03-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "半秒与按侧键掐断的短句节奏被明确保留。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "B03_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "B03-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "却仍没有交代举杖指人的动作。",
+          "reason": "CE-1明确指出逼近后缺持杖指人的动作、后句魔杖脱手不能补出前因，匹配答案。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "B03-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "半秒与按侧键掐断的短句节奏被明确保留。"
+        }
+      ],
+      "extra_findings": []
+    },
+    {
+      "run_id": "B04_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "B04-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "这没有使当前已写出的母子行动归属发生误读",
+          "reason": "亚瑟是否同行只列理解不确定并将转场保留，没有定级承接问题，不算检出。"
+        },
+        {
+          "issue_id": "B04-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "玛莎约铺子未被定级为搭配问题；第二轮还明确保留母子分头行动句。"
+        },
+        {
+          "issue_id": "B04-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "开篇三主语逗号串连与省略未被报告为节奏/病句。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [
+        {
+          "id": "B04-extra-sensation-object",
+          "severity": "S2",
+          "evidence": "“凉意”是感觉，“纸币”是实物，二者不能承担同一实体接触动作。",
+          "reason": "原文确把凉意和纸币作为相贴实体，新发现有本句搭配证据；B04答案未列此项，但与错误实质一致，不判误报。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "B04_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "B04-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "目前不妨碍理解玛莎与埃德蒙的分头行动。",
+          "reason": "亚瑟是否同行只列理解不确定并将转场保留，没有定级承接问题，不算检出。"
+        },
+        {
+          "issue_id": "B04-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "玛莎约铺子未被定级为搭配问题；第二轮还明确保留母子分头行动句。"
+        },
+        {
+          "issue_id": "B04-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "开篇三主语逗号串连与省略未被报告为节奏/病句。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [
+        {
+          "id": "B04-extra-sensation-object",
+          "severity": "S2",
+          "evidence": "句内仍有感觉与实物之间的搭配错位。",
+          "reason": "原文确把凉意和纸币作为相贴实体，新发现有本句搭配证据；B04答案未列此项，但与错误实质一致，不判误报。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "C01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "C01-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "未要求补读手机取得女孩姓名的全部机制",
+          "reason": "报告认为屏光送姓名足以解释本次取得信息，未定级缺少来源问题。"
+        },
+        {
+          "issue_id": "C01-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "此项不定级为正文错误。",
+          "reason": "孤儿与父母送别的疑点只列前文供给待核，未定级事实冲突。"
+        },
+        {
+          "issue_id": "C01-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "报告没有定级指出口径制定时点由母亲拥抱变成临睡前的冲突。"
+        },
+        {
+          "issue_id": "C01-4",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "第一轮未报告耗电/唤醒问题；第二轮唤醒只列供给待核，均未定级检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "C01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "哎哟我的妈的口语感叹被明确保留。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "C01-extra-phone-location",
+          "severity": "S2",
+          "evidence": "前面口袋与膝头两个位置之间的断点。",
+          "reason": "本场取出手机后又写对口袋动嘴及膝头皮套，未写位置转换；报告以连续文本位置为依据，实质新发现，不判误报。动作是否可压缩待作者裁决。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "C01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "C01-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "这是前因范围待核，不按L2-3判定本场凭空增加能力",
+          "reason": "姓名获取能力仅列供给待核，没有定级知情问题，不算检出。"
+        },
+        {
+          "issue_id": "C01-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "也不先把称谓定为事实错误。",
+          "reason": "孤儿与父母送别的疑点只列前文供给待核，未定级事实冲突。"
+        },
+        {
+          "issue_id": "C01-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "报告没有定级指出口径制定时点由母亲拥抱变成临睡前的冲突。"
+        },
+        {
+          "issue_id": "C01-4",
+          "detected": false,
+          "severity": null,
+          "evidence": "故不据此判定功耗规则错误。",
+          "reason": "第一轮未报告耗电/唤醒问题；第二轮唤醒只列供给待核，均未定级检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "C01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "哎哟我的妈的口语感叹被明确保留。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "C01-extra-wand-holder",
+          "severity": "S1",
+          "evidence": "读者可以顺着前一句把持杖者读成店主，也可能回指刚出现的父亲。",
+          "reason": "同段先后有店主与父亲，随后连续他手里/他掌心确有代词竞争；虽回忆主线可支持埃德蒙，但报告有局部语法依据，暂不判误报。S1的实际误读程度待作者裁决。",
+          "false_positive": false
+        },
+        {
+          "id": "C01-extra-cloud-drawer",
+          "severity": "S1",
+          "evidence": "首读会把“他”接成亚瑟。",
+          "reason": "皮套段先介绍玛莎与亚瑟，再写他自己描云纹，次段继续他，确有行动者交接风险；有原文依据，暂不判误报。S1是否过重待作者裁决。",
+          "false_positive": false
+        },
+        {
+          "id": "C01-extra-face-collocation",
+          "severity": "S3",
+          "evidence": "动作被拧成了脸的定语，局部表达别扭。",
+          "reason": "撞见的宾语落在脸，动作套入长定语，局部句法整理有依据且仅可选S3，不判误报；不是第一轮手机位置问题，单设稳定编号。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "C02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "C02-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "不能仅凭这一形式认定关系矛盾。",
+          "reason": "去年领入院与互报姓名只列旧关系待核，没有定级事实冲突，不算检出。"
+        },
+        {
+          "issue_id": "C02-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "连续把“尚需索回”当作当前有效问题。",
+          "reason": "CE-1比较已归还本子原文与持续索回对话，明确报告同一去向/状态冲突，匹配答案，实际S2。"
+        },
+        {
+          "issue_id": "C02-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "不据此另报本子所有权错误。",
+          "reason": "报告将教授的本子读为有笑谈/纠正标记的调侃并保留，未定级所有权语义问题。"
+        },
+        {
+          "issue_id": "C02-4",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "两次你倒好未被定级报告无功能重复。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "C02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "我顾不过来了被保留为人物忙碌处境及转话题短句，未列问题。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "C02-extra-cup-put-down",
+          "severity": "S2",
+          "evidence": "第二次“把茶杯放下”",
+          "reason": "原文两次明确放杯，中间只有低头看茶与对白，没有再次拿杯；这是答案外同一物件动作状态发现，有连续原文依据，暂不判误报。再拿杯能否由喝茶场景隐含及S2必要性待作者裁决。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "C02_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "C02-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "先列供给待核",
+          "reason": "去年领入院与互报姓名只列旧关系待核，没有定级事实冲突，不算检出。"
+        },
+        {
+          "issue_id": "C02-2",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "这是已有归还原文与当前状态的阅读冲突",
+          "reason": "CE-1比较已归还本子原文与持续索回对话，明确报告同一去向/状态冲突，匹配答案，实际S2。"
+        },
+        {
+          "issue_id": "C02-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "不因这句人物误说另判硬错。",
+          "reason": "报告将教授的本子读为有笑谈/纠正标记的调侃并保留，未定级所有权语义问题。"
+        },
+        {
+          "issue_id": "C02-4",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "两次你倒好未被定级报告无功能重复。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "C02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "我顾不过来了被保留为人物忙碌处境及转话题短句，未列问题。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "C02-extra-cup-put-down",
+          "severity": "S2",
+          "evidence": "第二次放杯所需的持杯状态没有建立。",
+          "reason": "原文两次明确放杯，中间只有低头看茶与对白，没有再次拿杯；这是答案外同一物件动作状态发现，有连续原文依据，暂不判误报。再拿杯能否由喝茶场景隐含及S2必要性待作者裁决。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "D01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "D01-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "未定级报告套话密度；第二轮还保留寂静/沸腾的现场短段，不能以引文出现算检出。"
+        },
+        {
+          "issue_id": "D01-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "无需替她补写全部心理结论",
+          "reason": "眼神彻底变了被保留为态度留白，没有定级指出解释腔。"
+        },
+        {
+          "issue_id": "D01-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "比赛后胜率提升未被定级为逻辑问题；第二轮只将计算口径列供给待核，不算检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "D01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "鲁迅错引被保留为玩笑互动，未报出处事实错。"
+        },
+        {
+          "protected_id": "D01-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "长衫喝酒隐喻被保留，不强补讥讽对象。"
+        },
+        {
+          "protected_id": "D01-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "哦/啦/嘻嘻的傻妞声线被保留；书名标点问题不指向这项保护。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "D01-extra-broom-subject",
+          "severity": "S2",
+          "evidence": "语法上继续由扫帚执行‘高高扬起了手臂’。",
+          "reason": "原句扫帚连续作滑行、犁沟主语后直接举手臂，未点明转成找球手；新发现有句内搭配依据，不判误报。",
+          "false_positive": false
+        },
+        {
+          "id": "D01-extra-title-punctuation",
+          "severity": "S3",
+          "evidence": "‘运命论’用于标示所引作品的名称，但没有书名号",
+          "reason": "出自李康的运命论在句中作作品名称，缺书名号有规范依据；只是局部标点建议，未破坏玩笑或声线保护，不判误报。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "D01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "D01-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "未定级报告套话密度；第二轮还保留寂静/沸腾的现场短段，不能以引文出现算检出。"
+        },
+        {
+          "issue_id": "D01-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "此处无需立即解释她的全部判断",
+          "reason": "眼神彻底变了被保留为态度留白，没有定级指出解释腔。"
+        },
+        {
+          "issue_id": "D01-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "比赛后胜率提升未被定级为逻辑问题；第二轮只将计算口径列供给待核，不算检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "D01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "鲁迅错引被保留为玩笑互动，未报出处事实错。"
+        },
+        {
+          "protected_id": "D01-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "长衫喝酒隐喻被保留，不强补讥讽对象。"
+        },
+        {
+          "protected_id": "D01-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "哦/啦/嘻嘻的傻妞声线被保留；书名标点问题不指向这项保护。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "D01-extra-broom-subject",
+          "severity": "S2",
+          "evidence": "句内未点明这一主体切换",
+          "reason": "原句扫帚连续作滑行、犁沟主语后直接举手臂，未点明转成找球手；新发现有句内搭配依据，不判误报。",
+          "false_positive": false
+        },
+        {
+          "id": "D01-extra-title-punctuation",
+          "severity": "S3",
+          "evidence": "未用书名号标示",
+          "reason": "出自李康的运命论在句中作作品名称，缺书名号有规范依据；只是局部标点建议，未破坏玩笑或声线保护，不判误报。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "D02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "D02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "动作结果与方位短语之间少了“出”",
+          "reason": "CE-1明确指出露后缺出，匹配答案漏字。"
+        },
+        {
+          "issue_id": "D02-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "没有定级报告冰窖等套话密度；保护部分强化句不等于检出密度问题。"
+        },
+        {
+          "issue_id": "D02-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "格里普斯内心叙述未被定级指出偏离主角视角。"
+        },
+        {
+          "issue_id": "D02-4",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "贴身母亲是否听见及雨声遮盖断言未被定级报告；第二轮反而保留遮声动作条件，未检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "D02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "格里普斯粗口被明确按角色声线保留。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "D02-extra-door-classifier",
+          "severity": "S3",
+          "evidence": "“扇”与中心词“门道”的搭配略显别扭。",
+          "reason": "原句用门扇量词修饰通道/门口，有局部搭配整理空间，报告仅列可选S3，不判误报。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "D02_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "D02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "‘露身后’漏了‘出’",
+          "reason": "CE-1明确指出露后缺出，匹配答案漏字。"
+        },
+        {
+          "issue_id": "D02-2",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "没有定级报告冰窖等套话密度；保护部分强化句不等于检出密度问题。"
+        },
+        {
+          "issue_id": "D02-3",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "格里普斯内心叙述未被定级指出偏离主角视角。"
+        },
+        {
+          "issue_id": "D02-4",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "贴身母亲是否听见及雨声遮盖断言未被定级报告；第二轮反而保留遮声动作条件，未检出。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "D02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "格里普斯粗口被明确按角色声线保留。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "D02-extra-test-fever",
+          "severity": "S2",
+          "evidence": "‘高烧退了没有’是一个待判断的问题，不能直接充当这里的动作。",
+          "reason": "试着通常后接尝试动作，原句直接接疑问补语高烧退没，摸额头判断的句法缺口有原文依据，不判误报。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "H01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "H01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "问题在叙述中的容器状态和动作关系",
+          "reason": "CE-1明确指出空墨水瓶与往领子倒的动作不合，匹配答案，未自行补墨水。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "H01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "来都来了的调侃口语被明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "你告啊的挑衅短句未被列为问题，第二轮明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "学生两次弹飞惊呼未被列为无功能重复，第二轮明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "费尔奇不走近/不出声的旁观留白未被列为问题；第二轮默念赘语指向另一句，不误配保护项。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "H01-extra-rebound-sequence",
+          "severity": "S2",
+          "evidence": "没有标明回述刚才的碰撞，也没有写他重新扑向门框。",
+          "reason": "原文明确退远不再上前，后写学生等看清撞一下弹一下；报告定位已停与连续撞的时序表达，有局部证据，暂不判误报。可否顺读为回述前两次及S2必要性待作者裁决。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "H01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "H01-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "本句给出的物件状态与动作不能直接拼合",
+          "reason": "CE-1明确指出空墨水瓶与往领子倒的动作不合，匹配答案，未自行补墨水。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "H01-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "来都来了的调侃口语被明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "你告啊的挑衅短句未被列为问题，第二轮明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "学生两次弹飞惊呼未被列为无功能重复，第二轮明确保留。"
+        },
+        {
+          "protected_id": "H01-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "费尔奇不走近/不出声的旁观留白未被列为问题；第二轮默念赘语指向另一句，不误配保护项。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "H01-extra-silent-redundancy",
+          "severity": "S3",
+          "evidence": "“无声地”和“默念”重复交代没有发出声音。",
+          "reason": "无声地与默念确有同义重叠，报告仅列可选S3；不针对费尔奇旁观保护项，不判误报。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "H02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "H02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "原件最后一次明确转交是在伍德手里",
+          "reason": "CE-2明确指出伍德持纸到查理看地上被踩脏纸缺放下/掉落承接，匹配答案，实际S2。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "H02-protected-1",
+          "reported": false,
+          "evidence": "",
+          "reason": "这啥的现场口语被明确保留。"
+        },
+        {
+          "protected_id": "H02-protected-2",
+          "reported": false,
+          "evidence": "",
+          "reason": "能抄我一份吗被明确保留为请求抄本的口语。"
+        },
+        {
+          "protected_id": "H02-protected-3",
+          "reported": false,
+          "evidence": "",
+          "reason": "压半寸到底多半寸被明确保留为新手尺度疑问。"
+        },
+        {
+          "protected_id": "H02-protected-4",
+          "reported": false,
+          "evidence": "",
+          "reason": "步骤式抬臀/重心对白未被列为电报体或病句。"
+        }
+      ],
+      "extra_findings": [
+        {
+          "id": "H02-extra-paper-return",
+          "severity": "S2",
+          "evidence": "没有写原件交回埃德蒙。",
+          "reason": "伍德抽走并举纸、拿铅笔描图之后，埃德蒙又把同纸塞进他手里，缺交回承接；这是与后续落地不同的转移点，原文支持的新发现，不判误报。持物动作是否可压缩及S2必要性待作者裁决。",
+          "false_positive": false
+        }
+      ]
+    },
+    {
+      "run_id": "K01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [],
+      "extra_findings": []
+    },
+    {
+      "run_id": "K01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [],
+      "protected": [],
+      "extra_findings": []
+    },
+    {
+      "run_id": "K02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "K02-1",
+          "detected": false,
+          "severity": null,
+          "evidence": "",
+          "reason": "母亲先往壶底添火与后来儿子架壶的先后/同壶疑点未被定级报告，不能因复述两动作就算检出。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": []
+    },
+    {
+      "run_id": "K02_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "issues": [
+        {
+          "issue_id": "K02-1",
+          "detected": true,
+          "severity": "S2",
+          "evidence": "若是另一只壶，前后没有区分两只壶。",
+          "reason": "CE-1明确指出先往壶底添火而后来重新架壶，同壶/两壶不清，匹配答案，实际S2；答案明确允许S2或S3，不计K组误报。"
+        }
+      ],
+      "protected": [],
+      "extra_findings": [
+        {
+          "id": "K02-extra-evening-modifier",
+          "severity": "S3",
+          "evidence": "“傍晚的”落在“木门”前，语法上成为木门的定语",
+          "reason": "原句将开场时间写成木门的定语，局部语序整理有依据；K组S3可接受，不计S1/S2误报，也未触及保护项。",
+          "false_positive": false
+        }
+      ]
+    }
+  ],
+  "repairs": [],
+  "missing_run_ids": [
+    "H02_copy-editor_2",
+    "H03_copy-editor_1",
+    "H03_copy-editor_2",
+    "H04_copy-editor_1",
+    "H04_copy-editor_2"
+  ],
+  "execution_provenance": [
+    {
+      "run_id": "A01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T00:16:33.813Z",
+      "source": "执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "25ee9bb40b3725c0a7536a6d138b671968e7f94310bcc7fbdc799763d660f418"
+    },
+    {
+      "run_id": "A01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T00:19:55.129Z",
+      "source": "执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "98e03c94e1a36fe54cd74e5da79280233a1a0681da530d4b4b5ef2a41692f8fb"
+    },
+    {
+      "run_id": "A02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T00:24:44.692825+00:00",
+      "source": "执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "fc7696dc5a6066e6272941fb2fb464a4d46084ec57575585f1b9360ecf99c0a8"
+    },
+    {
+      "run_id": "A02_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T00:26:40.749430+00:00",
+      "source": "执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "d9e1e481f3f071b33c211fb61e994afb56e7a1fcc6ae77f6abb5a45b155cb674"
+    },
+    {
+      "run_id": "A03_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T00:29:14.231994+00:00",
+      "source": "执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "5b29bf2850835d73a368a87eb86dce79be79cba095bdbc6d7a83f07be5e59d42"
+    },
+    {
+      "run_id": "A03_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T00:30:48.299295+00:00",
+      "source": "执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "c1e76839ed135245c0df836aa51851d67e57f03b9fa8d5dea30a78234b179537"
+    },
+    {
+      "run_id": "A04_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T00:34:27.627895+00:00",
+      "source": "执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "4f667f8d029881d48610a91691bf87d90c8d97be42991eef2c9012e9c84fbade"
+    },
+    {
+      "run_id": "A04_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T00:36:04.456769+00:00",
+      "source": "执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "5348a5de61996f240c6e41c96a35109bf9a8c19e79fabf2f2051ab28a9d35a52"
+    },
+    {
+      "run_id": "B01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T00:41:21.289230+00:00",
+      "source": "执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "699a41a40222c2b60e21058a63f4b49d3c70ae440910898dd8c1a946ec89611c"
+    },
+    {
+      "run_id": "B01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T00:42:51.467581+00:00",
+      "source": "执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "593ad4c9e2254827580511b3fe3d09e9c79eb2f6d3d33fdfb9d0c240ce540126"
+    },
+    {
+      "run_id": "B02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T00:44:45.039341+00:00",
+      "source": "执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "622a27ac343bb140c9b645bfc44e29a493abc4e7f5a2b2d9278b171da92bdeae"
+    },
+    {
+      "run_id": "B02_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T00:48:16.611343+00:00",
+      "source": "执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "ef1c5a899f9493b637707a389a90299c5b656e1a3f6eb0eefe37b99e347c9ffd"
+    },
+    {
+      "run_id": "B03_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T11:58:20.171678+00:00",
+      "source": "继续执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "ce250517a96c401e2831a402bcfc5f5c362c7abb89fda21f069902053f2159ac"
+    },
+    {
+      "run_id": "B03_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T12:03:50.665618+00:00",
+      "source": "继续执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "df834c4bdf91dfda64a2c36a7e479ceebc7bbcdfe57977bc084093ad28cfb6f8"
+    },
+    {
+      "run_id": "B04_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T12:07:59.228677+00:00",
+      "source": "继续执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "5036a91eb8f9e96bc07000d48f8fce5361b1275c38531645300df95c547e631b"
+    },
+    {
+      "run_id": "B04_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T12:12:17.527571+00:00",
+      "source": "继续执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "73f02d6e41c9872b34cfd724b4bb7ac457e5ea58cf8e4b13f812029decdc005a"
+    },
+    {
+      "run_id": "C01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T12:17:54.480630+00:00",
+      "source": "继续执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "258a3fac17bbff1b11b13ac8633c3fd29fc30ed663e005989bcecc5c22e0f20f"
+    },
+    {
+      "run_id": "C01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T12:26:25.196356+00:00",
+      "source": "继续执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "68813ba3b7627d715a6f99a1ac73df4abfaa0b8c87848976e58ab6e28013052a"
+    },
+    {
+      "run_id": "C02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T13:17:50.842127+00:00",
+      "source": "CLI执行/C02_copy-editor_1/批次1/执行结果.json",
+      "completion_status": "cli_hash_match",
+      "report_sha256": "b6277fc48793da7b42de1aa5066992a3edd9185a051d4ec302b603a4ab9a5778"
+    },
+    {
+      "run_id": "C02_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T13:17:50.840596+00:00",
+      "source": "CLI执行/C02_copy-editor_2/批次1/执行结果.json",
+      "completion_status": "cli_hash_match",
+      "report_sha256": "84d704a0bb7360c8f0abff267ef91e5f6dcde8c0d028012c76e8d06a0eb0159d"
+    },
+    {
+      "run_id": "D01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T13:55:33.219909+00:00",
+      "source": "CLI执行/D01_copy-editor_1/批次2/执行结果.json",
+      "completion_status": "cli_hash_match",
+      "report_sha256": "1c362978b32e913b36b5bff31cde316ab8f61ac02ec35e5464a17d12d8ca4f63"
+    },
+    {
+      "run_id": "D01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T13:27:06.819025+00:00",
+      "source": "CLI执行/D01_copy-editor_2/批次1/执行结果.json",
+      "completion_status": "cli_hash_match",
+      "report_sha256": "d21a5d8090aeabb44386b151bee9ebcc7a6a6c38a20449140489123a9db573df"
+    },
+    {
+      "run_id": "D02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T13:55:33.220688+00:00",
+      "source": "CLI执行/D02_copy-editor_1/批次2/执行结果.json",
+      "completion_status": "cli_hash_match",
+      "report_sha256": "9bdc4d98e4a8f0560941293913d7378d38615e4d5b7f1fe1062b561e3c8b544f"
+    },
+    {
+      "run_id": "D02_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T13:36:39.526276+00:00",
+      "source": "CLI执行/D02_copy-editor_2/批次1/执行结果.json",
+      "completion_status": "cli_hash_match",
+      "report_sha256": "51a42000ff6a0f1432de4881505d574adb48eaf18ae363105ff91851246c70d2"
+    },
+    {
+      "run_id": "K01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T13:42:21.702383+00:00",
+      "source": "CLI执行/K01_copy-editor_1/批次1/执行结果.json",
+      "completion_status": "cli_hash_match",
+      "report_sha256": "c612174d560d6328857c61341abb0a0032dec5662176fe16f662ad6a51a13b90"
+    },
+    {
+      "run_id": "K01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T13:43:38.632545+00:00",
+      "source": "CLI执行/K01_copy-editor_2/批次1/执行结果.json",
+      "completion_status": "cli_hash_match",
+      "report_sha256": "9ea1e13bd451854fe3ca50bd8b498985e85dbf49a54bfed2259987a890efb88c"
+    },
+    {
+      "run_id": "K02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T13:46:41.260619+00:00",
+      "source": "CLI执行/K02_copy-editor_1/批次1/执行结果.json",
+      "completion_status": "cli_hash_match",
+      "report_sha256": "acc6f2c33e5c32ab7de03b324ec080fdfb7e38ad4cd7abe433b63e03aa4433d9"
+    },
+    {
+      "run_id": "K02_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T14:01:40.498020+00:00",
+      "source": "CLI执行/K02_copy-editor_2/批次2/执行结果.json",
+      "completion_status": "cli_hash_match",
+      "report_sha256": "72b4c1532bca8d510aee3869e2179b3ff4cc4d8bccf348e9a89a7e31901f7140"
+    },
+    {
+      "run_id": "H01_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "unknown",
+      "source": "执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "a228dee1fd999f904ebcb4fe705d1524586c625b7c256c7e050a60ac71a1d45d"
+    },
+    {
+      "run_id": "H01_copy-editor_2",
+      "execution_date": "2026-10-03",
+      "started_utc": "unknown",
+      "source": "执行记录.jsonl",
+      "completion_status": "log_hash_match",
+      "report_sha256": "952c0f4163f2aee35db59062ba750644406ecf26b552a5d2249aa15f4270f423"
+    },
+    {
+      "run_id": "H02_copy-editor_1",
+      "execution_date": "2026-10-03",
+      "started_utc": "2026-10-03T12:19:49.577619+00:00",
+      "source": "CLI执行/H02_copy-editor_1/重试02/执行结果.json",
+      "completion_status": "cli_hash_match",
+      "report_sha256": "f0ebe42836f8edb88ed9395577ef99a90dfb754ee9da70a8bc09a8d0c05c3af6"
+    }
+  ],
+  "notes": [
+    "这是阶段一模型语义对照判分，仅含已完成且原报告哈希匹配实际执行凭据的31份报告；未读取根会话先前判分。未执行的5份不填虚假false。",
+    "判分不是独立盲读、作者核验或小说采用。答案与审阅意见分歧保留在逐项reason/evidence，不设置自动质量通过阈值。",
+    "execution_date由实际started_at或旧执行记录dispatch UTC转换Asia/Tokyo；本阶段可核对运行均为2026-10-03。原H01两轮实际派发及完成UTC未保存，日期按根协调器确认的2026-10-03保留，不把记录时间当成执行时间。",
+    "供给待核、理解不确定和保留项不算定级检出。引用同一句但诊断不同问题不算匹配。同一问题在两轮使用稳定额外编号。",
+    "额外发现按原报告实际级别转录。A03第一轮握紧掌心与主问题同列CE-1 S2，第二轮卷状/长定语/张数语序与重复单位同列CE-2 S3，各拆为答案外发现，并未自行新增严重度。",
+    "K组答案外S1/S2与保护项误报单列；本阶段K组没有答案外S1/S2。K02第二轮应抓壶接口S2由答案明确允许，不算对照组误报。",
+    "其他组额外发现都有具体原文支持，false_positive=false是模型比较判断，不能当作者通过。A04钱上桌/长盘点、A03握紧掌心定级、C01位置压缩与两项S1指代定级、C02再次拿杯可否隐含、H01连续撞门可否视为回述、H02交回纸动作可否压缩及S2必要性，均待作者裁决。",
+    "修正效果由另一路审阅处理，本表repairs=[]，不宣称完成修正验收。"
+  ]
+}

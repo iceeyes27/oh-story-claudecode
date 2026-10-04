@@ -1,0 +1,11 @@
+{
+  "说明": "第一批进程正常结束且取得非阻塞独占锁后，只清理六个空锁占位文件，以免证据核验器将它们视为未声明报告。报告、事件和执行凭据均保留。",
+  "removed": [
+    "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/outputs/.before_challenges_N01_1.md.eval-runner.lock",
+    "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/outputs/.before_challenges_N02_1.md.eval-runner.lock",
+    "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/before_challenges/outputs/.before_challenges_N03_1.md.eval-runner.lock",
+    "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/outputs/.after_challenges_N01_1.md.eval-runner.lock",
+    "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/outputs/.after_challenges_N02_1.md.eval-runner.lock",
+    "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/自然度校准/2026-10-04/工具证据/after_challenges/outputs/.after_challenges_N03_1.md.eval-runner.lock"
+  ]
+}

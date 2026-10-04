@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "quality_judgment_source": "model_comparison",
+  "runs": [],
+  "repairs": [
+    {
+      "sample": "B03",
+      "repair_run_id": "B03_new_repair",
+      "review_run_id": "B03_new_repair_review",
+      "execution_date": "2026-10-04",
+      "issues": [
+        {
+          "issue_id": "B03-1",
+          "resolved": true,
+          "evidence": "她不接受，举起魔杖，并以车上自言自语、锅底纸张等经历支持自己的怀疑",
+          "reason": "逐字对照仅将“她逼近一步。”改为“她逼近一步，举起魔杖指着埃德蒙。”原文后续女声制止尖锐木棍指人及姜小满魔杖差点脱手，已经确定持杖者和指向；改句将必要动作放在后续反应前，没有指定左右手、书本移交或道具来源。独立盲读按举杖、威胁、女声劝阻、受惊的次序复述，未再出现该持杖前提缺口，因此记已解决。盲读另报手机取出后回到袖口缺动作，该问题在原稿已经存在，未被本句修正引入，不计修正新增错误，也不代表全篇无S2。"
+        }
+      ],
+      "protected": [
+        {
+          "protected_id": "B03-protected-1",
+          "changed": false,
+          "evidence": "半秒。他按下侧键掐断。",
+          "reason": "原稿与候选保护句逐字一致，唯一变动发生在举杖句。独立盲读明确保留此短促中断，不扩写、不并句。"
+        }
+      ],
+      "new_errors": []
+    }
+  ]
+}

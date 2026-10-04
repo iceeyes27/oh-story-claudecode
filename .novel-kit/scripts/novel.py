@@ -863,7 +863,16 @@ def main(argv=None):
     p = sub.add_parser('revision-refresh'); p.add_argument('id'); p.add_argument('target'); p.add_argument('--reason', required=True)
     p = sub.add_parser('confirm-import'); p.add_argument('manifest')
     p = sub.add_parser('commit'); p.add_argument('--message', required=True); p.add_argument('paths', nargs='+')
+    p = sub.add_parser('prose-check'); p.add_argument('--json', action='store_true'); p.add_argument('paths', nargs='+')
     args = parser.parse_args(argv); root = Path(args.root).resolve()
+    if args.command == 'prose-check':
+        # Read-only; skip the writing lock so it can run beside an open work unit.
+        import prose_check
+        try:
+            return prose_check.run(root, [rel(root, inside(root, p)) for p in args.paths], args.json)
+        except (Invalid, OSError, ValueError) as e:
+            print('【寫作流程】' + str(e), file=sys.stderr)
+            return 2
     try:
         with locked(root):
             c = args.command

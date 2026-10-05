@@ -843,6 +843,38 @@ def safe_commit(root, paths, message):
     return 'committed'
 
 
+def beat_command(root, args):
+    import beats
+    if args.command == 'beat-split':
+        spec_path = inside(root, args.spec); spec = load(spec_path)
+        target = rel(root, inside(root, spec['target'])); raw = read(root/target)
+        require(raw is not None, '分幕对象不存在：' + target)
+        numbered = {'version': 1, 'target': target, 'source_hash': digest(raw),
+                    'beats': beats.split(raw.decode('utf-8'), spec['beats'])}
+        stem = spec_path.with_name(spec_path.stem + '_编号')
+        atomic(stem.with_suffix('.json'), dump(numbered))
+        atomic(stem.with_suffix('.md'), beats.numbered_markdown(target, numbered['beats']).encode('utf-8'))
+        total = sum(len(b['sentences']) for b in numbered['beats'])
+        print('%s：%d 幕，%d 句 → %s' % (target, len(numbered['beats']), total, rel(root, stem.with_suffix('.json'))))
+        return 0
+    if args.command == 'beat-remap':
+        old, new = load(inside(root, args.old)), load(inside(root, args.new))
+        require(old.get('version') == 1 and new.get('version') == 1, '分幕编号格式错误')
+        require(digest(read(root/new['target'])) == new['source_hash'], '修改后对象已再次改动，须重新 beat-split')
+        print(beats.remap_markdown(beats.remap(old, new)), end='')
+        return 0
+    numbered = load(inside(root, args.numbered))
+    require(numbered.get('version') == 1, '分幕编号格式错误')
+    require(digest(read(root/numbered['target'])) == numbered['source_hash'], '对象已在分幕后改动，须重新 beat-split')
+    report = text(inside(root, args.report))
+    missing = beats.coverage(numbered, report, args.beat, args.per_beat)
+    if missing:
+        print('覆盖不完整，缺少结论：' + '、'.join(missing))
+        return 1
+    print('覆盖完整')
+    return 0
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root', default=os.environ.get('NOVEL_KIT_ROOT', os.environ.get('CLAUDE_PROJECT_DIR', '.')))
@@ -864,7 +896,18 @@ def main(argv=None):
     p = sub.add_parser('confirm-import'); p.add_argument('manifest')
     p = sub.add_parser('commit'); p.add_argument('--message', required=True); p.add_argument('paths', nargs='+')
     p = sub.add_parser('prose-check'); p.add_argument('--json', action='store_true'); p.add_argument('paths', nargs='+')
+    p = sub.add_parser('beat-split'); p.add_argument('spec')
+    p = sub.add_parser('beat-coverage'); p.add_argument('numbered'); p.add_argument('report')
+    p.add_argument('--beat', type=int, action='append'); p.add_argument('--per-beat', action='store_true')
+    p = sub.add_parser('beat-remap'); p.add_argument('old'); p.add_argument('new')
     args = parser.parse_args(argv); root = Path(args.root).resolve()
+    if args.command in {'beat-split', 'beat-coverage', 'beat-remap'}:
+        # Review aids only: they write beside the spec, never touch state, so no writing lock.
+        try:
+            return beat_command(root, args)
+        except (Invalid, OSError, ValueError, KeyError, TypeError) as e:
+            print('【寫作流程】' + str(e), file=sys.stderr)
+            return 2
     if args.command == 'prose-check':
         # Read-only; skip the writing lock so it can run beside an open work unit.
         import prose_check

@@ -27,7 +27,7 @@ def source_contract(root, agents):
     paths = ['AGENTS.md', 'novel.py', 'novel', 'novel.cmd',
              '.novel-kit/workflows/adoption.md', '.novel-kit/workflows/review-loop.md',
              '.novel-kit/workflows/progressive-disclosure.md',
-             '.novel-kit/scripts/novel.py', '.novel-kit/scripts/prose_check.py', '.novel-kit/scripts/py.sh', '.novel-kit/scripts/py.cmd',
+             '.novel-kit/scripts/novel.py', '.novel-kit/scripts/prose_check.py', '.novel-kit/scripts/beats.py', '.novel-kit/scripts/py.sh', '.novel-kit/scripts/py.cmd',
              '.novel-kit/hooks/scene_gate.py', '.novel-kit/hooks/scene_gate.sh', '.novel-kit/hooks/scene_gate.cmd']
     paths += ['.agents/skills/'+name+'/SKILL.md' for name in SKILLS]
     paths += ['.novel-kit/roles/'+name+'.md' for name in ROLES]

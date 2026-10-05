@@ -1,0 +1,40 @@
+{
+  "冻结时间": "2026-10-05T11:17:07.762461+00:00",
+  "目的": "只改语文规格两处（新增 L1-11、L1-12；加“语法不成立定 S2”下限），其余与 Claude 基线完全相同，测定级偏轻能否靠规则修正",
+  "对照": "记录/2026-10-04_Claude基线（同宿主、同角色档、同样本、同提示，三轮）",
+  "宿主": "Claude Code copy-editor 子代理（setup quality：opus）",
+  "轮数": 3,
+  "与基线的差异": "仅 .novel-kit/standards/语文规格.md；新增例句不取自任何测试样本",
+  "输入哈希": {
+    ".novel-kit/roles/copy-editor.md": "e7a5f440c7853013d82e54538a9ce9f4f916a32011d414b60dd6c0841dc6712b",
+    ".novel-kit/standards/语文规格.md": "3f21dff6f54e8aa3c9f26ee9b05000609e6a2312cf782d622f588031f6eb0878",
+    ".novel-kit/workflows/review-loop.md": "c2151e6794a324b84d6503ad3cdfa1d94a14209cb4980423706bef6512b59a33",
+    ".novel-kit/eval/文风样本.md": "77cee0cb5db58710dd37de1347c8243979b650d38e358a63c4f3a968f01f6a13",
+    ".novel-kit/eval/样本/A01/正文.md": "5814fd130f1a6ce78ce2ca019210e2bb2f59f2b9be2c2f41cc959a9ace0c4c10",
+    ".novel-kit/eval/样本/A02/正文.md": "a4bad6d8bcbd411db95f63a9f28e5f7a1d0c78d946646cf36775f4d48722c97d",
+    ".novel-kit/eval/样本/A03/正文.md": "bceb60aaaeac3e08072d6d0185b035d44abcb2f93a191193a3780de2221591bf",
+    ".novel-kit/eval/样本/A04/正文.md": "7ff49362993d89c2618669a701f3630ef7499bc80976a10a0030d281ae1dcf8d",
+    ".novel-kit/eval/样本/B01/正文.md": "66fd13a7a67f89e94d6eee66a64fa1a4176a647b218dd9d6817dda5c75d6477f",
+    ".novel-kit/eval/样本/B02/正文.md": "0c9554d97b8cc712d2293fa4d386a9079eb2047a484bd440a62fa322c31d3579",
+    ".novel-kit/eval/样本/B03/正文.md": "ee11d53476ebcf3c1ab2b03fd9155b719f8b17c2847a6cb382b2983a4b3350b4",
+    ".novel-kit/eval/样本/B04/正文.md": "ac9165764128cff94e37a976e3168e204238efaf2c8375d905e04af0ec3fc0af",
+    ".novel-kit/eval/样本/C01/前文.md": "c8d68f2a60e771cbc0ad44c8032881f081f591efc45ed673e1d2f66283ad49b1",
+    ".novel-kit/eval/样本/C01/正文.md": "0a92d3c15cdc4ac2bf13c6a0c6a5812360fc0f5785a4c2c413fff0d446c39c4c",
+    ".novel-kit/eval/样本/C02/前文.md": "3af7e1d6623a04bc1111c8a2f5631d8952d1dd89cd46bd6e655321a8eee3df94",
+    ".novel-kit/eval/样本/C02/正文.md": "1a189dbff7c403c50723526ab47951f6a3f7877d422bc09deaad1e5af71de20d",
+    ".novel-kit/eval/样本/D01/正文.md": "eab6c3dc4f2cc7dc39864d96eb7d1e9eeb5206120bb73cf8e56cb277e389eed8",
+    ".novel-kit/eval/样本/D02/正文.md": "1d68edd30e1cb4e66be6072b4a752988a21514b15223258a48f5514dbdebba6c",
+    ".novel-kit/eval/样本/E01/正文.md": "07d91edb1358501b6c0e89186f2b39abeba1c6d4cb552884b5ec840e7dae550c",
+    ".novel-kit/eval/样本/K01/正文.md": "68bc3dfcea62896bc45b1f5691051914f8397ad760b0b71fbc485de4f8e380e1",
+    ".novel-kit/eval/样本/K02/正文.md": "88dc189a6d850e49a64bc5a1d21613ec502e91f01307f5bfec0aa4a0e4c0167a"
+  },
+  "预注册门槛（三轮都要达到）": {
+    "S1S2定级达标": "每轮 ≥ 14/21，且三轮合计高于基线（37/63）",
+    "回归集检出": "每轮 ≥ 25/36（不低于基线最低轮）",
+    "保护项误报": "每轮 ≤ 1",
+    "K组答案外S1S2": "每轮 0",
+    "E01-1": "三轮中至少两轮定 S2 或以上"
+  },
+  "同时报告（不设门槛）": "预期 S3 被报成 S1/S2 的次数（定级抬高的副作用）；答案外新增 S1/S2 数",
+  "评分": "沿用基线评分口径与 2026-10-05 冻结答案；补录后另算一套"
+}

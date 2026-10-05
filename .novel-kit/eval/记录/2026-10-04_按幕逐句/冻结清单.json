@@ -1,0 +1,104 @@
+{
+  "冻结时间": "2026-10-04T13:50:58.737764+00:00",
+  "目的": "按幕逐句两段式审阅实验（规则冻结后才运行，运行中不改规则）",
+  "宿主": "Claude Code general-purpose 子代理，model=opus",
+  "分幕规则": "机械切分：按段落边界，每幕不超过 8 段、约 900 字；不由协调器按内容挑选",
+  "规则哈希": {
+    ".novel-kit/eval/实验/按幕逐句/sentence-reader.md": "ad1d086a024382255d0c885efe205ec41e0ddd04743d6d03b3ec6aebb7cbe757",
+    ".novel-kit/eval/实验/按幕逐句/staging-reader.md": "dc3e602b3358b1789778649c7db3f7d7792ed680c4b90758d903f6eee11def14",
+    ".novel-kit/eval/实验/按幕逐句/adjudicator.md": "69f64473d88b907f9be9e5b9576984c9f73197944b7ed7753ecb68fd3e10ae39",
+    ".novel-kit/eval/实验/按幕逐句/语文规格_补充.md": "4381a3cc48b2b2ac1f7e4a0b1800e783cb5e736f334c79e2385d00afade9b245",
+    ".novel-kit/standards/语文规格.md": "232019a01049a085e36fc24d64f0922247a6c07a95722a5797a3c717d6dfaa18",
+    ".novel-kit/eval/文风样本.md": "77cee0cb5db58710dd37de1347c8243979b650d38e358a63c4f3a968f01f6a13"
+  },
+  "样本": {
+    "A01": {
+      "beats": 2,
+      "sentences": 13,
+      "正文sha256": "5814fd130f1a6ce78ce2ca019210e2bb2f59f2b9be2c2f41cc959a9ace0c4c10"
+    },
+    "A02": {
+      "beats": 3,
+      "sentences": 24,
+      "正文sha256": "a4bad6d8bcbd411db95f63a9f28e5f7a1d0c78d946646cf36775f4d48722c97d"
+    },
+    "A03": {
+      "beats": 2,
+      "sentences": 13,
+      "正文sha256": "bceb60aaaeac3e08072d6d0185b035d44abcb2f93a191193a3780de2221591bf"
+    },
+    "A04": {
+      "beats": 2,
+      "sentences": 12,
+      "正文sha256": "7ff49362993d89c2618669a701f3630ef7499bc80976a10a0030d281ae1dcf8d"
+    },
+    "B01": {
+      "beats": 2,
+      "sentences": 21,
+      "正文sha256": "66fd13a7a67f89e94d6eee66a64fa1a4176a647b218dd9d6817dda5c75d6477f"
+    },
+    "B02": {
+      "beats": 5,
+      "sentences": 45,
+      "正文sha256": "0c9554d97b8cc712d2293fa4d386a9079eb2047a484bd440a62fa322c31d3579"
+    },
+    "B03": {
+      "beats": 3,
+      "sentences": 31,
+      "正文sha256": "ee11d53476ebcf3c1ab2b03fd9155b719f8b17c2847a6cb382b2983a4b3350b4"
+    },
+    "B04": {
+      "beats": 3,
+      "sentences": 25,
+      "正文sha256": "ac9165764128cff94e37a976e3168e204238efaf2c8375d905e04af0ec3fc0af"
+    },
+    "C01": {
+      "beats": 7,
+      "sentences": 65,
+      "正文sha256": "0a92d3c15cdc4ac2bf13c6a0c6a5812360fc0f5785a4c2c413fff0d446c39c4c"
+    },
+    "C02": {
+      "beats": 7,
+      "sentences": 59,
+      "正文sha256": "1a189dbff7c403c50723526ab47951f6a3f7877d422bc09deaad1e5af71de20d"
+    },
+    "D01": {
+      "beats": 5,
+      "sentences": 40,
+      "正文sha256": "eab6c3dc4f2cc7dc39864d96eb7d1e9eeb5206120bb73cf8e56cb277e389eed8"
+    },
+    "D02": {
+      "beats": 3,
+      "sentences": 37,
+      "正文sha256": "1d68edd30e1cb4e66be6072b4a752988a21514b15223258a48f5514dbdebba6c"
+    },
+    "E01": {
+      "beats": 3,
+      "sentences": 34,
+      "正文sha256": "07d91edb1358501b6c0e89186f2b39abeba1c6d4cb552884b5ec840e7dae550c"
+    },
+    "K01": {
+      "beats": 5,
+      "sentences": 34,
+      "正文sha256": "68bc3dfcea62896bc45b1f5691051914f8397ad760b0b71fbc485de4f8e380e1"
+    },
+    "K02": {
+      "beats": 4,
+      "sentences": 30,
+      "正文sha256": "88dc189a6d850e49a64bc5a1d21613ec502e91f01307f5bfec0aa4a0e4c0167a"
+    }
+  },
+  "预注册门槛": {
+    "回归集检出": "两轮各 ≥ 24/36（A–D 组应抓，任何严重度）",
+    "S1S2达标": "两轮各 ≥ 14/21",
+    "保护项误报": "每轮 ≤ 1/14",
+    "K组S1S2误报": "0",
+    "E01": "两轮都抓到 E01-1",
+    "对照": "同时报告 Claude 现行基线的同口径数字；新流程须不低于基线"
+  },
+  "任务说明哈希": {
+    "任务说明_逐句.md": "3c4f51cc33510829d63c210cd0b402a7b57f2a7f61cf292dff639b3769652150",
+    "任务说明_情境.md": "4ee7bbb090e63b2d7f664800470c7bfc340cf526c595742ed638ccb270655581",
+    "任务说明_裁决.md": "fd02eef574c181a38899456ad598abc7f16f7f6c9df2b01a37164896eeed956a"
+  }
+}

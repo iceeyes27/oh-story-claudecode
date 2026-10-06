@@ -1,0 +1,101 @@
+{
+  "冻结时间": "2026-10-04T14:11:20.273967+00:00",
+  "目的": "按幕逐句两段式审阅实验第二版：移除与测试题同句或同情境的示范后重跑；规则冻结后才运行，运行中不改规则",
+  "取代": "记录/2026-10-04_按幕逐句（含洩题示范，作废不计分）",
+  "方案": ".novel-kit/eval/实验/按幕逐句/方案.md",
+  "宿主": "Claude Code general-purpose 子代理，model=opus",
+  "分幕规则": "机械切分：按段落边界，每幕不超过 8 段、约 900 字；不由协调器按内容挑选；沿用第一版的分幕结果，正文哈希已核对未变",
+  "轮数": 3,
+  "每轮调用": "逐句读者每幕一次、情境推演读者每场一次、裁决者每场一次，各用新上下文",
+  "预注册门槛": "见方案第四节",
+  "规则哈希": {
+    "sentence-reader.md": "06ea3794f5b1073848e308afab0af85c4e9e6ed08379685c2ab550ad95e8f5e3",
+    "staging-reader.md": "cc03a8ffe5c1131870364d1a85da0e63d08e848534039abdfc0877fd3425e39e",
+    "adjudicator.md": "69f64473d88b907f9be9e5b9576984c9f73197944b7ed7753ecb68fd3e10ae39",
+    "语文规格_补充.md": "63137e010e5fd36995156bb0b044e8da86e333b439e804b450480b035f6f8176",
+    "语文规格.md": "232019a01049a085e36fc24d64f0922247a6c07a95722a5797a3c717d6dfaa18",
+    "文风样本.md": "77cee0cb5db58710dd37de1347c8243979b650d38e358a63c4f3a968f01f6a13"
+  },
+  "任务说明哈希": {
+    "任务说明_逐句.md": "e78deea5aab83bc22a45756ed6cd9c97bc1fa44f09287acee05520ee55c6a65b",
+    "任务说明_情境.md": "0bfd240fc6eb0fc1d416195d85ab6997d49c13748e3cf68ac40c554a53ea9486",
+    "任务说明_裁决.md": "5f0371f11aace5d88b73a3622cf2731bb1c1fd7ad22d19130fdb9ae286b7f9af"
+  },
+  "样本": {
+    "A01": {
+      "beats": 2,
+      "sentences": 13,
+      "正文sha256": "5814fd130f1a6ce78ce2ca019210e2bb2f59f2b9be2c2f41cc959a9ace0c4c10"
+    },
+    "A02": {
+      "beats": 3,
+      "sentences": 24,
+      "正文sha256": "a4bad6d8bcbd411db95f63a9f28e5f7a1d0c78d946646cf36775f4d48722c97d"
+    },
+    "A03": {
+      "beats": 2,
+      "sentences": 13,
+      "正文sha256": "bceb60aaaeac3e08072d6d0185b035d44abcb2f93a191193a3780de2221591bf"
+    },
+    "A04": {
+      "beats": 2,
+      "sentences": 12,
+      "正文sha256": "7ff49362993d89c2618669a701f3630ef7499bc80976a10a0030d281ae1dcf8d"
+    },
+    "B01": {
+      "beats": 2,
+      "sentences": 21,
+      "正文sha256": "66fd13a7a67f89e94d6eee66a64fa1a4176a647b218dd9d6817dda5c75d6477f"
+    },
+    "B02": {
+      "beats": 5,
+      "sentences": 45,
+      "正文sha256": "0c9554d97b8cc712d2293fa4d386a9079eb2047a484bd440a62fa322c31d3579"
+    },
+    "B03": {
+      "beats": 3,
+      "sentences": 31,
+      "正文sha256": "ee11d53476ebcf3c1ab2b03fd9155b719f8b17c2847a6cb382b2983a4b3350b4"
+    },
+    "B04": {
+      "beats": 3,
+      "sentences": 25,
+      "正文sha256": "ac9165764128cff94e37a976e3168e204238efaf2c8375d905e04af0ec3fc0af"
+    },
+    "C01": {
+      "beats": 7,
+      "sentences": 65,
+      "正文sha256": "0a92d3c15cdc4ac2bf13c6a0c6a5812360fc0f5785a4c2c413fff0d446c39c4c"
+    },
+    "C02": {
+      "beats": 7,
+      "sentences": 59,
+      "正文sha256": "1a189dbff7c403c50723526ab47951f6a3f7877d422bc09deaad1e5af71de20d"
+    },
+    "D01": {
+      "beats": 5,
+      "sentences": 40,
+      "正文sha256": "eab6c3dc4f2cc7dc39864d96eb7d1e9eeb5206120bb73cf8e56cb277e389eed8"
+    },
+    "D02": {
+      "beats": 3,
+      "sentences": 37,
+      "正文sha256": "1d68edd30e1cb4e66be6072b4a752988a21514b15223258a48f5514dbdebba6c"
+    },
+    "E01": {
+      "beats": 3,
+      "sentences": 34,
+      "正文sha256": "07d91edb1358501b6c0e89186f2b39abeba1c6d4cb552884b5ec840e7dae550c"
+    },
+    "K01": {
+      "beats": 5,
+      "sentences": 34,
+      "正文sha256": "68bc3dfcea62896bc45b1f5691051914f8397ad760b0b71fbc485de4f8e380e1"
+    },
+    "K02": {
+      "beats": 4,
+      "sentences": 30,
+      "正文sha256": "88dc189a6d850e49a64bc5a1d21613ec502e91f01307f5bfec0aa4a0e4c0167a"
+    }
+  }
+}

@@ -1,0 +1,422 @@
+[
+ {
+  "id": "A01-1",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A01/正文.md",
+  "证据": "纸是练字用的次等羊皮",
+  "问题说明": "前句写“黄纸”，此句又说纸是羊皮，同一物件材质自相矛盾，读者无法确定是纸还是羊皮。"
+ },
+ {
+  "id": "A01-2",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A01/正文.md",
+  "证据": "一点都没进手机",
+  "问题说明": "“功夫……没进手机”主语与语义不清：没进手机的是魔力还是精力，未点明。"
+ },
+ {
+  "id": "A01-3",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A01/正文.md",
+  "证据": "它不吃咒，吃的是空气里散漫的那股魔力",
+  "问题说明": "“它”可指符纸、铜锅或暖意，指代不明。"
+ },
+ {
+  "id": "A01-R29",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A01/正文.md",
+  "证据": "魔药课槽里舀的",
+  "问题说明": "“魔药课槽”断词费力。"
+ },
+ {
+  "id": "A02-1",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A02/正文.md",
+  "证据": "那个起笔的架构，和他贴在锅底那张出自同一种画法",
+  "问题说明": "比较对象错位：“起笔的架构”与“那张（纸）”不同类，且“那张”后缺中心语。"
+ },
+ {
+  "id": "A02-2",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A02/正文.md",
+  "证据": "就剩这一页",
+  "问题说明": "“这一页”与后文“这半页纸”数量不一致。"
+ },
+ {
+  "id": "A03-1",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A03/正文.md",
+  "证据": "六张十镑英镑纸币",
+  "问题说明": "“十镑英镑”重复，应作“十英镑纸币”或“十镑纸币”。"
+ },
+ {
+  "id": "A03-2",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A03/正文.md",
+  "证据": "金属的凉意与粗糙纸币贴在一起",
+  "问题说明": "搭配不当：抽象的“凉意”与实物“纸币”并列“贴在一起”。"
+ },
+ {
+  "id": "A03-R04",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A03/正文.md",
+  "证据": "这是你下学期要补的耗材钱",
+  "问题说明": "“这”指哪笔钱不清（与 B04 同句同判）。"
+ },
+ {
+  "id": "A04-1",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A04/正文.md",
+  "证据": "对着自己的左边袖口轻声说了一句什么",
+  "问题说明": "“自己”可指姜小满或埃德蒙，读者需回推。"
+ },
+ {
+  "id": "A04-2",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A04/正文.md",
+  "证据": "不仅无一遗漏，兑来的加隆",
+  "问题说明": "“不仅”缺后续关联词，主语也缺失。"
+ },
+ {
+  "id": "A04-3",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A04/正文.md",
+  "证据": "“这孩子从小把钱攥得紧。” 亚瑟",
+  "问题说明": "引号后多一个空格，标点误用。"
+ },
+ {
+  "id": "A04-R30",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A04/正文.md",
+  "证据": "收拢伞沿",
+  "问题说明": "作者原意是压低伞沿；“收拢伞沿”读成收伞，与随后撑伞走入雪幕不清。"
+ },
+ {
+  "id": "A04-R33",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A04/正文.md",
+  "证据": "兑来的加隆连同母亲给的两枚花得见了底",
+  "问题说明": "逗号串起多个主语，信息挤在一句；与 A04-2 同句但问题不同（A04-2 为“不仅”缺关联词与主语）。"
+ },
+ {
+  "id": "A04-R34",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A04/正文.md",
+  "证据": "服装店檐下，一道瘦小的身影撑着油纸伞立在雪里",
+  "问题说明": "既在檐下，又撑伞立在雪里，位置矛盾。"
+ },
+ {
+  "id": "A04-R35",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/A04/正文.md",
+  "证据": "看着桌上的余钱",
+  "问题说明": "余钱何时摆上桌未写。"
+ },
+ {
+  "id": "B01-1",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B01/正文.md",
+  "证据": "“行了，先停下，没让你改规矩。”",
+  "问题说明": "“先停下”“拉开”暗示托比正在自罚，但前文只说改规矩“就要”受罚，自罚动作没有写出。"
+ },
+ {
+  "id": "B01-2",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B01/正文.md",
+  "证据": "真看着被死册子折腾成这样",
+  "问题说明": "“看着”后缺宾语（被折腾的是谁），且“死册子”此前未出现。"
+ },
+ {
+  "id": "B02-1",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B02/正文.md",
+  "证据": "目光落在操作台中央那口冒着热汽的小坩埚上",
+  "问题说明": "场景是“傍晚，大礼堂”，此处却出现操作台、小精灵与面粉袋，像回到厨房；空间无过渡地跳转。"
+ },
+ {
+  "id": "B02-2",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B02/正文.md",
+  "证据": "小精灵们缩到面粉袋后面去了",
+  "问题说明": "同 B02-1，礼堂里不应有面粉袋与小精灵。"
+ },
+ {
+  "id": "B02-3",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B02/正文.md",
+  "证据": "人群外，姜小满挤上前盛了一勺菜",
+  "问题说明": "一句以逗号串连四个动作，且“人群外”与“挤上前”方位矛盾。"
+ },
+ {
+  "id": "B02-R19",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B02/正文.md",
+  "证据": "端着一小碗鸡肉慢慢走了",
+  "问题说明": "前文从托盘拈鸡肉又放回盘子，此处碗凭空出现，容器前后不一。"
+ },
+ {
+  "id": "B03-1",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B03/正文.md",
+  "证据": "近距离用尖锐木棍指着他人是很不礼貌的行为",
+  "问题说明": "前文只写“她逼近一步”，没写她拔出魔杖指人；后文“魔杖差点脱手”也缺前因。"
+ },
+ {
+  "id": "B04-1",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B04/正文.md",
+  "证据": "穿过破釜酒吧后院的天井，砖墙向两侧裂开。",
+  "问题说明": "对话结束后直接换场，未交代谁同行；亚瑟从此消失，读者不知父亲是否同去对角巷。"
+ },
+ {
+  "id": "B04-2",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B04/正文.md",
+  "证据": "玛莎约了侧巷相熟的铺子",
+  "问题说明": "“约了……铺子”搭配不当，宜作“约好”“跟……说好”。"
+ },
+ {
+  "id": "B04-3",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B04/正文.md",
+  "证据": "一个学期熬到头，九又四分之三站台的蒸汽还未散尽，伦敦落下了初冬的湿雪。",
+  "问题说明": "三个不同主语以逗号串连，首分句缺主语。"
+ },
+ {
+  "id": "B04-R01",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B04/正文.md",
+  "证据": "六张十镑英镑纸币",
+  "问题说明": "与 A03-1 同段同句：“十镑英镑”重复。B04 含 A03 同一段落，原答案漏列。"
+ },
+ {
+  "id": "B04-R02",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B04/正文.md",
+  "证据": "金属的凉意与粗糙纸币贴在一起",
+  "问题说明": "与 A03-2 同句：抽象“凉意”与实物“纸币”并列“贴在一起”，搭配不当。"
+ },
+ {
+  "id": "B04-R03",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B04/正文.md",
+  "证据": "这是你下学期要补的耗材钱",
+  "问题说明": "“这”指哪笔钱不清（与 A03 同句同判）。"
+ },
+ {
+  "id": "B04-R15",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/B04/正文.md",
+  "证据": "亚瑟・霍尔特",
+  "问题说明": "间隔号误用日文“・”，应为“·”。"
+ },
+ {
+  "id": "C01-R06",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/C01/正文.md",
+  "证据": "皮面上那圈云纹是他自己描的",
+  "问题说明": "“他自己”就近会读成刚出现的亚瑟，实指埃德蒙。"
+ },
+ {
+  "id": "C01-R07",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/C01/正文.md",
+  "证据": "父亲淘的那根旧货一进他手里",
+  "问题说明": "“他”紧跟“老头”，试杖的人是谁不明。"
+ },
+ {
+  "id": "C01-R08",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/C01/正文.md",
+  "证据": "白胡子老头捏着杖身追到门口",
+  "问题说明": "杖此时在谁手里、“他自己挑的，说它认主”中谁挑谁不清。"
+ },
+ {
+  "id": "C01-R09",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/C01/正文.md",
+  "证据": "对着口袋动嘴皮子",
+  "问题说明": "手机此前已在膝上，却写成对着口袋说话。"
+ },
+ {
+  "id": "C01-R10",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/C01/正文.md",
+  "证据": "手停在半空，没松开",
+  "问题说明": "药包已塞进内袋，手却停在半空；“没松开”缺宾语。"
+ },
+ {
+  "id": "C01-R21",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/C01/正文.md",
+  "证据": "那天夜里之后",
+  "问题说明": "“那天夜里”读来像隔了多日，实际只隔一夜。"
+ },
+ {
+  "id": "C01-R24",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/C01/正文.md",
+  "证据": "又给他别回腰间",
+  "问题说明": "“魔杖收好，别磕碰”后说话人换了未标；魔杖原在衣襟里，“别回腰间”无着落。"
+ },
+ {
+  "id": "C01-R36",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/C01/正文.md",
+  "证据": "电池图标标着",
+  "问题说明": "“图标标着”字面重复；同句唤醒方式问题已在 C01-4。"
+ },
+ {
+  "id": "C02-3",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/C02/正文.md",
+  "证据": "连教授的本子都敢乱涂",
+  "问题说明": "本子是埃德蒙自己的，“教授的本子”语义错误。"
+ },
+ {
+  "id": "C02-R25",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/C02/正文.md",
+  "证据": "比尔把茶杯放下",
+  "问题说明": "前文已“放下茶杯”，此处又放下一次。"
+ },
+ {
+  "id": "C02-R38",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/C02/正文.md",
+  "证据": "他下学年还要兼队长",
+  "问题说明": "前说“下学期”，此说“下学年”，学期与学年混用。"
+ },
+ {
+  "id": "D01-R05",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/D01/正文.md",
+  "证据": "随后高高扬起了手臂",
+  "问题说明": "全句主语是“扫帚”，后半成了扫帚扬起手臂；行动者偷换。"
+ },
+ {
+  "id": "D01-R16",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/D01/正文.md",
+  "证据": "查理・韦斯莱",
+  "问题说明": "间隔号误用日文“・”（奥利弗・伍德同）。"
+ },
+ {
+  "id": "D01-R17",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/D01/正文.md",
+  "证据": "李康的运命论",
+  "问题说明": "篇名缺书名号，应为《运命论》。"
+ },
+ {
+  "id": "D02-1",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/D02/正文.md",
+  "证据": "露身后那扇空荡荡",
+  "问题说明": "缺字：应为“露出”。"
+ },
+ {
+  "id": "D02-R11",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/D02/正文.md",
+  "证据": "别说藏在翻倒巷的全部积蓄",
+  "问题说明": "“别说”分句缺谓语。"
+ },
+ {
+  "id": "D02-R12",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/D02/正文.md",
+  "证据": "试着高烧退了没有",
+  "问题说明": "“试着”直接接小句，搭配不当（应为“试试”“探一探”之类）。"
+ },
+ {
+  "id": "D02-R13",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/D02/正文.md",
+  "证据": "将掌心里的黑色机身贴在胸口",
+  "问题说明": "前文把金加隆一枚枚拢进掌心，此处掌心里只剩机身，金币去向消失。"
+ },
+ {
+  "id": "D02-R14",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/D02/正文.md",
+  "证据": "枯瘦的爪子抖得几乎握不住钱袋",
+  "问题说明": "手里握着钱袋，下一句却从腰间摸出金加隆。"
+ },
+ {
+  "id": "D02-R39",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/D02/正文.md",
+  "证据": "冷风裹着雨沫顺着门缝往屋里飘",
+  "问题说明": "前文门已被踹坏、只剩空荡门道，此处又有“门缝”。"
+ },
+ {
+  "id": "E01-1",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/E01/正文.md",
+  "证据": "枕头底下忽然硌着硬物。",
+  "问题说明": "“忽然”表突发，与持续态“硌着”冲突；没写被硌的是谁、哪个部位；人从醒来一直躺着，没写此刻为何才被硌到（翻身、偏头等触发）。"
+ },
+ {
+  "id": "E01-2",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/E01/正文.md",
+  "证据": "男人的嗓音粗重嘶哑，急得直拍桌子。",
+  "问题说明": "主语是“嗓音”，后半句“急得直拍桌子”的行动者却是男人，主语中途偷换；读者能猜出，但句子不通。"
+ },
+ {
+  "id": "E01-3",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/E01/正文.md",
+  "证据": "险些把命给彻底熬干",
+  "问题说明": "同一长句的话题先是“积蓄”，再到“谁也不敢动”“靠母亲熬药硬灌硬顶”，最后“险些把命熬干”的是埃德蒙，主语切换没有点明。"
+ },
+ {
+  "id": "E01-4",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/E01/正文.md",
+  "证据": "暗青色的外壳，触手冰冷而坚硬",
+  "问题说明": "上一句手还探在枕下，没写把东西取出来，就看见“暗青色”；同句又说闭着眼也摸得出，视觉与触觉的先后不清。"
+ },
+ {
+  "id": "E01-5",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/E01/正文.md",
+  "证据": "视线里伸出来的，根本不是成年人的手。",
+  "问题说明": "手是伸进视线，不是从视线里伸出来；方向搭配不当，读者顺读稍顿。"
+ },
+ {
+  "id": "E01-6",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/E01/正文.md",
+  "证据": "他按着侧键与虚拟屏，逐位敲完了那一串数字。",
+  "问题说明": "下一句屏幕才“泛起一层微弱的亮光”，本句却已在虚拟屏上输入；先输入后亮屏，动作顺序颠倒。"
+ },
+ {
+  "id": "E01-7",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/E01/正文.md",
+  "证据": "逐位敲完了那一串数字",
+  "问题说明": "“那一串数字”前文从未出现，读者只能猜是开机密码；“那”找不到所指。"
+ },
+ {
+  "id": "E01-8",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/E01/正文.md",
+  "证据": "“亚瑟·霍尔特！给老子开门！”",
+  "问题说明": "有人在楼下拍门叫骂，随后只写夫妻二人争执，拍门者是谁、有没有人应门都没交代，像是消失了。【待确认】作者可能有意让夫妻隔门争吵。"
+ },
+ {
+  "id": "E01-R26",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/E01/正文.md",
+  "证据": "露出凸起的锁骨与细瘦的颈子",
+  "问题说明": "主角仰卧看不见自己的颈子，描写跳出其视角。"
+ },
+ {
+  "id": "E01-R40",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/E01/正文.md",
+  "证据": "还有些不听使唤",
+  "问题说明": "前文“倒还听使唤”，此处“还有些不听使唤”，前后说法相反。"
+ },
+ {
+  "id": "K01-R27",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/K01/正文.md",
+  "证据": "埃德蒙伸手摸了摸那件旧校袍",
+  "问题说明": "“那件”指哪一件不清。"
+ },
+ {
+  "id": "K01-R28",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/K01/正文.md",
+  "证据": "底栏滑过一行小字",
+  "问题说明": "只说“一行小字”，随后却是两段引语。"
+ },
+ {
+  "id": "K02-1",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/K02/正文.md",
+  "证据": "母亲往壶底添了把火",
+  "问题说明": "先说往“壶底”添火，后文埃德蒙才把水倒进铜壶架上灶；是否同一把壶不清楚。评分时报 S2 或 S3 都不算误报。"
+ },
+ {
+  "id": "K02-R18",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/K02/正文.md",
+  "证据": "话没说完，他嘶地抽了口气",
+  "问题说明": "前句以句号收住，又说“话没说完”；应改省略号或破折号。"
+ },
+ {
+  "id": "K02-R22",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/样本/K02/正文.md",
+  "证据": "回来啦",
+  "问题说明": "“回来啦”谁说的未标，读者需从下一句回推是母亲。严重度为协调器建议。"
+ },
+ {
+  "id": "H05-1",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/保留集/2026-10-04/样本/H05/正文.md",
+  "证据": "跟加文打过招呼，他换上睡袍躺下，把床幔拉起来一半。",
+  "问题说明": "前一段主语是加文，本句“跟加文打过招呼”的行动者没写，紧接的“他”既可能是加文也可能是埃德蒙；下文“埃德蒙拉严床幔”才倒推出是埃德蒙，读者需回读。"
+ },
+ {
+  "id": "H05-2",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/保留集/2026-10-04/样本/H05/正文.md",
+  "证据": "公共休息室里，同届的爱丽丝·韦尔登正把草药苗往窗台上挪",
+  "问题说明": "宿舍→公共休息室→又回宿舍（跟加文打招呼、躺下），两次换地点都没有过渡；顺读能跟上，但画面跳。"
+ },
+ {
+  "id": "H05-3",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/保留集/2026-10-04/样本/H05/正文.md",
+  "证据": "埃德蒙坐在床沿没动。",
+  "问题说明": "前文他在拉严的床幔里盘腿坐着，后又“脱力倚在床头”，结尾却“坐在床沿”，中间没写挪动。"
+ },
+ {
+  "id": "H05-4",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/保留集/2026-10-04/样本/H05/正文.md",
+  "证据": "指尖传来一阵刺骨的锐痛。",
+  "问题说明": "上一句贴到屏上的是“右掌”，痛感却出在“指尖”；读者稍顿，可能是有意（指尖也贴着），作者确认。"
+ },
+ {
+  "id": "H05-5",
+  "原文文件": "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/保留集/2026-10-04/样本/H05/正文.md",
+  "证据": "电池图标从暗红跳成饱满的莹白。",
+  "问题说明": "电量只到 2.1%，“饱满”与极低电量相矛盾；若指颜色饱满，句子也容易读成电量满格。"
+ }
+]

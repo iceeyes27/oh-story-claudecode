@@ -23,6 +23,14 @@ class Split(unittest.TestCase):
         self.assertEqual([s['text'] for s in out[1]['sentences']], ['“走吧。”', '他说。', '门开了……'])
         self.assertEqual(out[0]['sentences'][1]['line'], 5)
 
+    def test_numbered_text_keeps_paragraphs_and_original_spacing(self):
+        text = '# x\n\n“这孩子从小把钱攥得紧。” 亚瑟乐呵呵摸着脑袋。\n\n玛莎愣住。她没说话。\n'
+        out = beats.split(text, [{'start_line': 1, 'end_line': 5, 'label': '饭桌'}])
+        self.assertEqual(out[0]['sentences'][1], {'id': '1-02', 'line': 3, 'text': '亚瑟乐呵呵摸着脑袋。', 'lead': ' '})
+        self.assertNotIn('lead', out[0]['sentences'][2])
+        md = beats.numbered_markdown('t', out)
+        self.assertIn('\n[1-01]“这孩子从小把钱攥得紧。” [1-02]亚瑟乐呵呵摸着脑袋。\n\n[1-03]玛莎愣住。[1-04]她没说话。\n', md)
+
     def test_unterminated_line_is_one_sentence(self):
         self.assertEqual(beats.sentences('震得天花板落下一层轻灰：'), ['震得天花板落下一层轻灰：'])
         self.assertEqual(beats.sentences('她问：“谁？”他没答。'), ['她问：“谁？”', '他没答。'])
@@ -94,7 +102,7 @@ class Cli(unittest.TestCase):
             run = lambda *a: novel.main(['--root', str(root), *a])
             self.assertEqual(run('beat-split', '審閱/第001章/場景01_分幕.json'), 0)
             numbered = '審閱/第001章/場景01_分幕_编号.json'
-            self.assertIn('[1-02] 陈放睁开眼。', (root/'審閱/第001章/場景01_分幕_编号.md').read_text(encoding='utf-8'))
+            self.assertIn('[1-02]陈放睁开眼。[1-03]指尖刚一抬起', (root/'審閱/第001章/場景01_分幕_编号.md').read_text(encoding='utf-8'))
             report = root/'審閱/第001章/报告.md'
             report.write_text('1-01 通过\n1-02 通过\n', encoding='utf-8')
             self.assertEqual(run('beat-coverage', numbered, '審閱/第001章/报告.md', '--beat', '1'), 1)

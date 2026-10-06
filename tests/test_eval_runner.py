@@ -55,6 +55,36 @@ sys.exit(7 if mode == 'nonzero' else 0)
 '''
 
 
+FAKE_CLAUDE = r'''
+import json
+from pathlib import Path
+import sys
+
+job = json.loads(sys.stdin.read())
+Path(job['arguments']).write_text(json.dumps(sys.argv[1:]), encoding='utf-8')
+mode = job.get('mode', 'success')
+print(json.dumps({'type': 'system', 'subtype': 'init', 'model': 'claude-fake-1', 'tools': ['Read', 'Write']}), flush=True)
+
+
+def tool(name, **args):
+    block = {'type': 'tool_use', 'id': 'tu-' + name + str(len(args)), 'name': name, 'input': args}
+    print(json.dumps({'type': 'assistant', 'message': {'content': [block]}}), flush=True)
+
+
+tool('Read', file_path=job['input'])
+if mode == 'outside_read':
+    tool('Read', file_path=job['other'])
+if mode == 'nested':
+    tool('Agent', prompt='x')
+Path(job['output']).write_text('独立审阅报告。', encoding='utf-8')
+if mode == 'auth':
+    print(json.dumps({'type': 'result', 'subtype': 'success', 'is_error': True, 'result': 'Not logged in'}), flush=True)
+else:
+    print(json.dumps({'type': 'result', 'subtype': 'success', 'is_error': False, 'num_turns': 3,
+                      'total_cost_usd': 0.25, 'duration_ms': 1200, 'usage': {'input_tokens': 10}}), flush=True)
+'''
+
+
 @unittest.skipUnless(os.name == 'posix', '假执行器使用 POSIX 可执行脚本')
 class EvalRunner(unittest.TestCase):
     def setUp(self):
@@ -339,3 +369,73 @@ class EvalRunner(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+@unittest.skipUnless(os.name == 'posix', '假执行器使用 POSIX 可执行脚本')
+class EvalRunnerClaudeHost(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.evidence = self.root / '执行证据'
+        self.input = self.root / '输入.md'
+        self.input.write_text('冻结正文。', encoding='utf-8')
+        self.other = self.root / '答案.md'
+        self.other.write_text('不得读取。', encoding='utf-8')
+        self.output = self.root / '报告.md'
+        bin_dir = self.root / 'bin'
+        bin_dir.mkdir()
+        fake = bin_dir / 'claude'
+        fake.write_text('#!' + sys.executable + '\n' + FAKE_CLAUDE, encoding='utf-8')
+        fake.chmod(0o755)
+        env = patch.dict(os.environ, {'PATH': str(bin_dir) + os.pathsep + os.environ.get('PATH', '')})
+        env.start()
+        self.addCleanup(env.stop)
+
+    def job(self, mode='success'):
+        control = {'output': str(self.output), 'input': str(self.input), 'other': str(self.other),
+                   'arguments': str(self.root / '参数.json'), 'mode': mode}
+        return {'id': 'C01_V3_1', 'dataset': 'v3', 'prompt': json.dumps(control, ensure_ascii=False),
+                'output': str(self.output), 'allowed_inputs': [str(self.input)],
+                'input_hashes': {str(self.input): hashlib.sha256(self.input.read_bytes()).hexdigest()}}
+
+    def execute(self, job):
+        return r.execute(job, self.root, self.evidence, timeout=5, host='claude', model='fake-model')
+
+    def test_success_records_model_cost_and_reads_then_resumes(self):
+        job = self.job()
+        first = self.execute(job)
+        self.assertEqual(first['status'], 'completed', first)
+        self.assertEqual(first['host'], 'claude')
+        self.assertEqual(first['model_id'], 'claude-fake-1')
+        self.assertEqual(first['usage']['total_cost_usd'], 0.25)
+        self.assertEqual([x['tool'] for x in first['tool_reads']], ['Read'])
+        arguments = json.loads((self.root / '参数.json').read_text(encoding='utf-8'))
+        self.assertEqual(arguments[arguments.index('--model') + 1], 'fake-model')
+        self.assertEqual(arguments[arguments.index('--tools') + 1], 'Read,Write,Glob,Grep')
+        self.assertIn('--no-session-persistence', arguments)
+        self.assertEqual(arguments[arguments.index('--permission-mode') + 1], 'dontAsk')
+        self.assertNotIn('Bash', ' '.join(arguments))
+        (self.root / '参数.json').unlink()
+        second = self.execute(job)
+        self.assertEqual(second['status'], 'resumed', second)
+        self.assertFalse((self.root / '参数.json').exists(), '已完成项不应再次启动模型')
+
+    def test_login_failure_is_not_completed_even_if_report_exists(self):
+        result = self.execute(self.job('auth'))
+        self.assertEqual(result['status'], 'needs_review', result)
+        self.assertFalse(result['turn_completed'])
+
+    def test_read_outside_frozen_inputs_blocks_completion(self):
+        result = self.execute(self.job('outside_read'))
+        self.assertEqual(result['status'], 'needs_review', result)
+        self.assertEqual([x['path'] for x in result['outside_reads']], [str(self.other)])
+
+    def test_nested_agent_call_blocks_completion(self):
+        result = self.execute(self.job('nested'))
+        self.assertEqual(result['status'], 'needs_review', result)
+        self.assertEqual(result['nested_agent_calls'], 1)
+
+    def test_unknown_host_is_rejected(self):
+        with self.assertRaises(ValueError):
+            r.execute(self.job(), self.root, self.evidence, host='other')

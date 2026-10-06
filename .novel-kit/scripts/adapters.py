@@ -16,8 +16,8 @@ MANIFEST = '.novel-kit/adapters.json'
 MATCHER = 'Write|Edit|MultiEdit|NotebookEdit|apply_patch'
 SKILLS = ('new-book', 'import-book', 'plan-chapter', 'write-scene', 'revise', 'fiction-scene-polishing')
 ROLES = ('scene-writer', 'copy-editor', 'consistency-checker', 'character-reviewer',
-         'prose-reviewer', 'structure-reviewer', 'chapter-extractor')
-# Claude-only model policy. 'quality' pins the writer and blind copy-editor to the strongest
+         'prose-reviewer', 'structure-reviewer', 'chapter-extractor', 'adjudicator')
+# Claude-only model policy. 'quality' pins the writer, blind copy-editor and adjudicator to the strongest
 # tier; 'inherit' leaves every role on the session model. Codex and generic always inherit.
 MODEL_POLICIES = ('quality', 'inherit')
 CLAUDE_MODELS = {'quality': {'strong': 'opus', 'standard': 'sonnet'}, 'inherit': {}}

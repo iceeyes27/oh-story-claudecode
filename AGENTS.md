@@ -11,7 +11,8 @@
 - 主会话是协调器：安排流程、调用 subagent、汇总结果、维护状态。有独立子代理时，正文交给明确指定的 scene-writer，角色来源为 `.novel-kit/roles/`；不假设各 Agent API 相同。
 - 用户是作者与最终审稿人：题材、情节、重要设定、修改范围和版本采用由作者决定。
 - 子代理只有协调器提供的资料；写手与 copy-editor 获取同范围冻结前文原文，copy-editor 不收设定、累计事实、出口状态或作者意图。
-- Claude Code 依 setup --models 选择 quality（写手、copy-editor 用 opus，其余角色用 sonnet）或 inherit；Codex 与通用 Agent 继承宿主设定，共享流程不写死其他供应商模型。
+- copy-editor 之后由 adjudicator（独立新上下文，唯读）裁决其 L1/L2 候选，判性质（错误／别扭）与严重度；自动修只含 S1/S2 与“错误”性质，别扭的 S3/S4 和对白措辞交作者。裁决者缺席时退回只修 S1/S2，交付标“裁决缺席”。
+- Claude Code 依 setup --models 选择 quality（写手、copy-editor、adjudicator 用 opus，其余角色用 sonnet）或 inherit；Codex 与通用 Agent 继承宿主设定，共享流程不写死其他供应商模型。
 - 无并行能力时按顺序使用独立上下文。无独立子代理时可按写手规则生成候选，但自审不算独立盲读；completed 只列真正完成者，其余标缺席，交付“审阅不完整”，由作者明确裁决。
 - 无本地文件或命令能力时只提供规划和候选，不能宣称状态已登记、已采用或完成工程验证。
 

@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import shutil
 import signal
 import subprocess
 import threading
@@ -15,7 +16,9 @@ import time
 import uuid
 
 
-RUNNER_SCHEMA_VERSION = 3
+RUNNER_SCHEMA_VERSION = 4
+HOSTS = ("codex", "claude")
+CLAUDE_AGENT_TOOLS = {"Agent", "Task", "SendMessage", "TeamCreate", "TaskCreate"}
 RUNNER_SHA256 = hashlib.sha256(Path(__file__).read_bytes()).hexdigest()
 _signal_scope_depth = 0
 _signal_number = 0
@@ -154,6 +157,59 @@ def nested_calls(events):
     return list(found.values())
 
 
+def claude_binary(explicit=None):
+    """优先显式路径或 PATH；桌面应用内置的 CLI 取最新版本目录。"""
+    if explicit:
+        return str(explicit)
+    found = shutil.which('claude')
+    if found:
+        return found
+    base = Path.home() / 'Library/Application Support/Claude/claude-code'
+    candidates = sorted(base.glob('*/*/claude.app/Contents/MacOS/claude'),
+                        key=lambda path: [int(x) if x.isdigit() else 0 for x in path.parts[-6].split('.')])
+    if candidates:
+        return str(candidates[-1])
+    raise FileNotFoundError('找不到 claude 命令；用 --claude-bin 指定')
+
+
+def claude_command(binary, root, model):
+    """只开放读写所需工具；dontAsk 把未列入的一律拒绝，不会卡在授权提示。"""
+    return [binary, '-p', '--output-format', 'stream-json', '--verbose', '--model', model,
+            '--no-session-persistence', '--permission-mode', 'dontAsk',
+            '--tools', 'Read,Write,Glob,Grep', '--allowedTools', 'Read', 'Write', 'Glob', 'Grep',
+            '--disable-slash-commands', '--strict-mcp-config', '--add-dir', str(root)]
+
+
+def claude_analysis(events, allowed, output):
+    """从 stream-json 取完成标记、嵌套代理调用、越权读取和成本；返回字段并入结果。"""
+    allowed = {str(Path(p).resolve()) for p in allowed} | {str(Path(output).resolve())}
+    nested, outside, reads = {}, [], []
+    init = next((e for e in events if e.get('type') == 'system' and e.get('subtype') == 'init'), {})
+    final = next((e for e in reversed(events) if e.get('type') == 'result'), None)
+    for index, event in enumerate(events):
+        if event.get('type') != 'assistant':
+            continue
+        content = (event.get('message') or {}).get('content')
+        for block in content if isinstance(content, list) else []:
+            if not isinstance(block, dict) or block.get('type') != 'tool_use':
+                continue
+            tool, args = str(block.get('name', 'unknown')), block.get('input') or {}
+            if tool in CLAUDE_AGENT_TOOLS:
+                key = block.get('id') or 'event-' + str(index)
+                nested[key] = {'item_id': key, 'type': 'tool_use', 'tool': tool}
+            target = args.get('file_path') or args.get('path')
+            if tool in ('Read', 'Glob', 'Grep') and target:
+                resolved = str(Path(target).resolve())
+                reads.append({'tool': tool, 'path': target})
+                # Read 只能读冻结输入；Glob/Grep 只记录，供事后核对读取范围。
+                if tool == 'Read' and resolved not in allowed:
+                    outside.append({'tool': tool, 'path': target})
+    return {'turn_completed': bool(final) and final.get('is_error') is False and final.get('subtype') == 'success',
+            'nested': list(nested.values()), 'outside_reads': outside, 'tool_reads': reads,
+            'model_id': init.get('model', 'unknown'),
+            'usage': {k: final.get(k) for k in ('num_turns', 'duration_ms', 'total_cost_usd', 'usage') if final and k in final}}
+
+
 def terminate(process):
     if os.name == 'nt':
         subprocess.run(['taskkill', '/PID', str(process.pid), '/T', '/F'],
@@ -183,12 +239,14 @@ def terminate(process):
                 pass
 
 
-def execute(job, root, evidence_dir, timeout=180, command=None):
+def execute(job, root, evidence_dir, timeout=180, command=None, host='codex', model='opus', claude_bin=None):
+    if host not in HOSTS:
+        raise ValueError('host 只能是 ' + '／'.join(HOSTS))
     with signal_cleanup():
-        return _locked_execute(job, root, evidence_dir, timeout, command)
+        return _locked_execute(job, root, evidence_dir, timeout, command, host, model, claude_bin)
 
 
-def _locked_execute(job, root, evidence_dir, timeout, command):
+def _locked_execute(job, root, evidence_dir, timeout, command, host, model, claude_bin):
     root, evidence_dir = Path(root).resolve(), Path(evidence_dir).resolve()
     job_id = job.get('id', '')
     if not job_id or '..' in job_id or job_id == '.' or any(c in job_id for c in '/\\\r\n'):
@@ -206,18 +264,19 @@ def _locked_execute(job, root, evidence_dir, timeout, command):
     output_lock = output.with_name('.' + output.name + '.eval-runner.lock')
     try:
         with job_lock(output_lock), job_lock(job_dir / '.lock'):
-            return _execute(job, root, job_dir, output, timeout, command)
+            return _execute(job, root, job_dir, output, timeout, command, host, model, claude_bin)
     except BlockingIOError:
         return {'job_id': job_id, 'status': 'busy'}
 
 
-def _execute(job, root, job_dir, output, timeout, command):
+def _execute(job, root, job_dir, output, timeout, command, host='codex', model='opus', claude_bin=None):
     attempt = job_dir / ('run-' + uuid.uuid4().hex)
     attempt.mkdir()
     checks = input_checks(job)
-    metadata = {'job_id': job['id'], 'started_at': stamp(), 'engine': 'codex exec --ephemeral',
+    metadata = {'job_id': job['id'], 'started_at': stamp(), 'engine': 'codex exec --ephemeral' if host == 'codex' else 'claude -p --no-session-persistence',
+                'host': host,
                 'runner_schema_version': RUNNER_SCHEMA_VERSION, 'runner_sha256': RUNNER_SHA256,
-                'model_id': 'unknown', 'independent_context': True,
+                'model_id': model if host == 'claude' else 'unknown', 'independent_context': True,
                 'nested_agents_requested_disabled': True, 'memory_requested_disabled': True,
                 'prompt': job['prompt'], 'input_hashes': job['input_hashes'],
                 'output': str(output), 'checks_before': checks, 'timeout_seconds': timeout,
@@ -247,13 +306,24 @@ def _execute(job, root, job_dir, output, timeout, command):
                               nested_agent_calls=0, nested_agent_call_details=[])
         return finish('unverified_output', note='保留未通过凭据核验的已有报告。旧执行器缺开读记录哈希也须另行核验，不事后补造，不覆盖或冒认成功。')
     output.parent.mkdir(parents=True, exist_ok=True)
-    args = command or ['codex', 'exec', '--ephemeral', '--json', '--sandbox', 'workspace-write',
-                       '--disable', 'multi_agent', '--disable', 'memories', '-C', str(root), '-']
+    if command:
+        args, cwd = command, root
+    elif host == 'claude':
+        try:
+            args = claude_command(claude_binary(claude_bin), root, model)
+        except FileNotFoundError as error:
+            return finish('execution_error', error=str(error))
+        # 在证据目录运行，避免加载书稿的 CLAUDE.md、本地 Hook 与记忆，保持独立上下文。
+        cwd = attempt
+    else:
+        args = ['codex', 'exec', '--ephemeral', '--json', '--sandbox', 'workspace-write',
+                '--disable', 'multi_agent', '--disable', 'memories', '-C', str(root), '-']
+        cwd = root
     timed_out = False
     try:
         with (attempt / 'events.jsonl').open('xb') as stdout, (attempt / 'stderr.log').open('xb') as stderr:
             process = subprocess.Popen(args, stdin=subprocess.PIPE, stdout=stdout, stderr=stderr,
-                                       cwd=root, start_new_session=os.name != 'nt')
+                                       cwd=cwd, start_new_session=os.name != 'nt')
             try:
                 deadline = time.monotonic() + timeout
                 payload = job['prompt'].encode('utf-8')
@@ -287,17 +357,26 @@ def _execute(job, root, job_dir, output, timeout, command):
         except ValueError:
             malformed += 1
     after = input_checks(job)
-    completed = any(e.get('type') == 'turn.completed' for e in events)
     present = report_present(output)
-    nested = nested_calls(events)
-    successful = not _signal_number and not timed_out and process.returncode == 0 and completed and present and all(after.values()) and not malformed and not nested
+    extra = {}
+    if host == 'claude' and not command:
+        analysis = claude_analysis(events, job['allowed_inputs'], output)
+        completed, nested = analysis['turn_completed'], analysis['nested']
+        extra = {'model_id': analysis['model_id'], 'outside_reads': analysis['outside_reads'],
+                 'tool_reads': analysis['tool_reads'], 'usage': analysis['usage']}
+    else:
+        completed = any(e.get('type') == 'turn.completed' for e in events)
+        nested = nested_calls(events)
+    successful = (not _signal_number and not timed_out and process.returncode == 0 and completed and present
+                  and all(after.values()) and not malformed and not nested and not extra.get('outside_reads'))
     return finish('interrupted' if _signal_number else 'completed' if successful else 'timeout' if timed_out else 'needs_review',
                   signal_number=_signal_number or None,
                   returncode=process.returncode, turn_completed=completed, checks_after=after,
                   report_exists=present, report_sha256=digest(output) if present else None,
                   events_sha256=digest(attempt / 'events.jsonl'), malformed_event_lines=malformed,
                   nested_agent_calls=len(nested), nested_agent_call_details=nested,
-                  thread_ids=[e['thread_id'] for e in events if e.get('type') == 'thread.started' and 'thread_id' in e])
+                  thread_ids=[e['thread_id'] for e in events if e.get('type') == 'thread.started' and 'thread_id' in e],
+                  **extra)
 
 
 def validate_task_targets(jobs):
@@ -325,6 +404,9 @@ def main():
     parser.add_argument('--budget', type=float, default=600)
     parser.add_argument('--datasets', nargs='*')
     parser.add_argument('--skip', nargs='*', default=[])
+    parser.add_argument('--host', choices=HOSTS, default='codex', help='codex 沿用 codex exec；claude 用 claude -p，写入成本与读取记录')
+    parser.add_argument('--model', default='opus', help='仅 --host claude：模型别名或完整名称')
+    parser.add_argument('--claude-bin', type=Path, default=None, help='仅 --host claude：claude 可执行文件；默认取 PATH 或桌面应用内置版本')
     args = parser.parse_args()
     if args.limit < 1 or args.budget <= 0:
         parser.error('limit 和 budget 必须为正数')
@@ -345,7 +427,8 @@ def main():
         if remaining <= 0:
             return {'job_id': job['id'], 'status': 'budget_exhausted'}
         try:
-            return execute(job, args.root, args.evidence_dir, min(args.timeout, remaining))
+            return execute(job, args.root, args.evidence_dir, min(args.timeout, remaining),
+                           host=args.host, model=args.model, claude_bin=args.claude_bin)
         except Exception as error:
             return {'job_id': job['id'], 'status': 'execution_error', 'error': str(error)}
 

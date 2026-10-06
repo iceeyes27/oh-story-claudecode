@@ -114,7 +114,8 @@ class AdapterOwnership(PortableBook):
         quality = models()
         self.assertEqual(quality['scene-writer'], 'opus')
         self.assertEqual(quality['copy-editor'], 'opus')
-        self.assertEqual({quality[n] for n in quality if n not in {'scene-writer', 'copy-editor'}}, {'sonnet'})
+        self.assertEqual(quality['adjudicator'], 'opus')
+        self.assertEqual({quality[n] for n in quality if n not in {'scene-writer', 'copy-editor', 'adjudicator'}}, {'sonnet'})
         adapters.synchronize(self.root, {'claude', 'codex'}, models='inherit')
         self.assertEqual(set(models().values()), {None})
         # check and doctor reuse the remembered policy instead of reverting to the default.
@@ -122,6 +123,16 @@ class AdapterOwnership(PortableBook):
         self.assertEqual(adapters.doctor(self.root, {'claude', 'codex'}), 0)
         for path in (self.root/'.codex/agents').glob('*.toml'):
             self.assertNotIn('\nmodel =', path.read_text(encoding='utf-8'))
+
+    def test_adjudicator_is_generated_read_only_and_not_a_gate_role(self):
+        # The adjudicator post-processes the copy-editor report; absence degrades to S1/S2-only rather than blocking prepare.
+        import novel
+        adapters.synchronize(self.root, {'claude', 'codex'})
+        claude = (self.root/'.claude/agents/adjudicator.md').read_text(encoding='utf-8')
+        self.assertIn('tools: Read, Glob, Grep', claude)
+        self.assertIn('sandbox_mode = "read-only"', (self.root/'.codex/agents/adjudicator.toml').read_text(encoding='utf-8'))
+        for mode in novel.REVIEWERS.values():
+            self.assertNotIn('adjudicator', mode)
 
     def test_custom_adapters_are_not_overwritten_and_replacement_is_backed_up(self):
         path = self.put('.claude/skills/revise/SKILL.md', '作者自訂版本')

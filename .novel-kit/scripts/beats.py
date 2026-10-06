@@ -19,9 +19,18 @@ def is_prose(line):
     return bool(stripped) and not stripped.startswith('#') and not re.fullmatch(r'-{3,}', stripped)
 
 
+def pieces(paragraph):
+    """Sentences of one paragraph as (leading whitespace, text); the whitespace is kept verbatim."""
+    out = []
+    for s in SENTENCE.findall(paragraph.strip()):
+        text = s.lstrip()
+        if text.strip():
+            out.append((s[:len(s) - len(text)], text.rstrip()))
+    return out
+
+
 def sentences(paragraph):
-    paragraph = paragraph.strip()
-    return [s.strip() for s in SENTENCE.findall(paragraph) if s.strip()]
+    return [text for _, text in pieces(paragraph)]
 
 
 def split(text, beats):
@@ -45,9 +54,12 @@ def split(text, beats):
             raise ValueError('第%d幕没有正文段落' % no)
         items, count = [], 0
         for n in covered:
-            for s in sentences(lines[n - 1]):
+            for lead, s in pieces(lines[n - 1]):
                 count += 1
-                items.append({'id': '%d-%02d' % (no, count), 'line': n, 'text': s})
+                item = {'id': '%d-%02d' % (no, count), 'line': n, 'text': s}
+                if lead and items and items[-1]['line'] == n:
+                    item['lead'] = lead
+                items.append(item)
         label = str(beat.get('label', '')).strip()
         if not label:
             raise ValueError('第%d幕须写明动作单元名称' % no)
@@ -60,10 +72,18 @@ def split(text, beats):
 
 
 def numbered_markdown(target, beats):
-    parts = ['# %s 分幕编号\n' % target]
+    """One original paragraph per line; each sentence is prefixed by its [幕-句] mark with no added space,
+    so any whitespace between two sentences is the manuscript's own."""
+    parts = ['# %s 分幕编号\n\n每行是原文一段；[幕-句] 标记紧贴句首，标记前后若有空白，均为原文自带。\n' % target]
     for beat in beats:
-        parts.append('\n## 第%d幕：%s（第%d–%d行）\n\n' % (beat['no'], beat['label'], beat['start_line'], beat['end_line']))
-        parts.extend('[%s] %s\n' % (s['id'], s['text']) for s in beat['sentences'])
+        parts.append('\n## 第%d幕：%s（第%d–%d行）\n' % (beat['no'], beat['label'], beat['start_line'], beat['end_line']))
+        line = None
+        for s in beat['sentences']:
+            if s['line'] != line:
+                parts.append('\n\n' if line is not None else '\n')
+                line = s['line']
+            parts.append('%s[%s]%s' % (s.get('lead', ''), s['id'], s['text']))
+        parts.append('\n')
     return ''.join(parts)
 
 

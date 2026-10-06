@@ -1,0 +1,55 @@
+{
+  "来源变更": [
+    "AGENTS.md",
+    ".agents/skills/write-scene/SKILL.md",
+    ".agents/skills/plan-chapter/SKILL.md",
+    ".agents/skills/revise/SKILL.md",
+    ".novel-kit/roles/scene-writer.md",
+    ".novel-kit/roles/structure-reviewer.md",
+    ".novel-kit/roles/adjudicator.md",
+    ".novel-kit/workflows/review-loop.md",
+    ".novel-kit/workflows/progressive-disclosure.md",
+    ".novel-kit/workflows/adoption.md",
+    ".novel-kit/standards/语文规格.md",
+    "大綱/細綱/_模板.md",
+    "docs/novel-kit-使用指引.md",
+    ".novel-kit/scripts/prose_check.py",
+    ".novel-kit/standards/创作护栏.md",
+    "tests/test_prose_check.py"
+  ],
+  "来源文件哈希": {
+    "AGENTS.md": "35cd57930006dcbe2f97d6e3780685125f81d545d3dd679dbc3097a3f1499d8c",
+    ".agents/skills/write-scene/SKILL.md": "bb8286a4efc2d100b0196343d3c5057fc4bc9b4b6de2b92d4933482501617d22",
+    ".agents/skills/plan-chapter/SKILL.md": "a9389c92aaef3e123c1e3854805e14b67cf1d28dc0781eabfecf6049d346e0b4",
+    ".agents/skills/revise/SKILL.md": "f11b90fa2ede8668c9b0d164e2c85bf21b946eb8cc1cfadb16de74854ed91cd9",
+    ".novel-kit/roles/scene-writer.md": "b2de779915e7b5c22966dbef750dd1277bee73e3ae984b48b3c0a8446b24cb66",
+    ".novel-kit/roles/structure-reviewer.md": "743a9c115a3dee7c6e8719d9a38a6c2e29fa68af17d0edb7b82555993b62ede7",
+    ".novel-kit/roles/adjudicator.md": "08d731bd2bb01c5fe5fb1dcfcde97d18f3a5c5b114c585491ae3c7095685885a",
+    ".novel-kit/workflows/review-loop.md": "af9d2bf138fef9210b31768f83a6ab2d4e6a61c5f70b04dddad9b8e5c3339336",
+    ".novel-kit/workflows/progressive-disclosure.md": "d8c2a31e046efa3ce39426ffd67e65254dc243cfba47ea50b2c237f078457f2c",
+    ".novel-kit/workflows/adoption.md": "43d177d80375f152b71aced4f465bb78ddb793823717108430eead5ccc8ecab1",
+    ".novel-kit/standards/语文规格.md": "f77ef8e4461bff3fb46b12d538722c2f0aa8ffd8b8f024defe75cc506d8cfc6c",
+    "大綱/細綱/_模板.md": "93231b44b4100c4a78bfd47ed27e6d4e8be71bd0328b432eae9561af193cac02",
+    "docs/novel-kit-使用指引.md": "9f3b8a353c96fcc21f240200d121d38575957448c569649e25ca4eeca3a00269",
+    ".novel-kit/scripts/prose_check.py": "f0eb6e3efbd45f0220e782d154858b5439794741a412312c2651f3c9e92ded36",
+    ".novel-kit/standards/创作护栏.md": "27c3ec0716d7adfcf7db9c6075f015084c86a18dd0e31df335e6e9e5b23ceb65",
+    "tests/test_prose_check.py": "23efe8833bdf6654bacd6dd07fb945e98aafb8a7f3b92f0e78fe3d3aaf4af8fa"
+  },
+  "原有文件保持": {
+    "README.md": true,
+    "docs/新手指引.md": true,
+    ".novel-kit/eval/.DS_Store": true
+  },
+  "生成副本变更": [
+    ".claude/agents/adjudicator.md",
+    ".claude/agents/scene-writer.md",
+    ".claude/agents/structure-reviewer.md",
+    ".claude/skills/plan-chapter/SKILL.md",
+    ".claude/skills/revise/SKILL.md",
+    ".claude/skills/write-scene/SKILL.md",
+    ".codex/agents/adjudicator.toml",
+    ".codex/agents/scene-writer.toml",
+    ".codex/agents/structure-reviewer.toml"
+  ],
+  "运行状态": "规则实施、工程验证及首场独立审阅完成；本场未显示新版优势，作者满意度待判断。"
+}

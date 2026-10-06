@@ -54,6 +54,13 @@ class ProseCheck(unittest.TestCase):
         self.assertEqual(kinds('“这段细纲还得改。”编辑说。\n'), [('advisory', 'meta-leak')])
         self.assertEqual(kinds('《预言家日报》的读者来信堆满了桌子。\n'), [('advisory', 'meta-leak')])
 
+    def test_creation_guidance_leak_is_blocking_but_in_story_quote_is_advisory(self):
+        for term in ('创作护栏', '創作護欄'):
+            with self.subTest(term=term):
+                self.assertIn(('blocking', 'meta-leak'), kinds('按照' + term + '，他该停在这里。\n'))
+                self.assertEqual(kinds('“我给这份编辑笔记起名叫' + term + '。”她说。\n'),
+                                 [('advisory', 'meta-leak')])
+
     def test_headings_fences_and_front_matter_are_skipped(self):
         text = ('---\ntitle: 场景\n---\n### 第1章 开机密码\n\n```\n细纲 TODO\n```\n\n'
                 '雨停了。\n')

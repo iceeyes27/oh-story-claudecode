@@ -1,0 +1,8 @@
+{
+  "时间": "2026-10-06T14:15:01.073782+00:00",
+  "输入哈希": {
+    "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/P0首稿/2026-10-06/输入/甲_裁决候选_v2.md": "34025970d6b02c0c2457e25b7b8ca9a8e668fb6b2e681e9562bec86c4066a19d",
+    "/Users/yolandahao/code/oh-story-claudecode/.novel-kit/eval/P0首稿/2026-10-06/输入/乙_裁决候选_v2.md": "ea782504da90f62dcc41a3d313cd5e9456cb829686280b8ae27e41e0c5980019"
+  },
+  "说明": "开读前修正清单残留的空严重度计数行；原 v1 记录保留，未用于派发。"
+}

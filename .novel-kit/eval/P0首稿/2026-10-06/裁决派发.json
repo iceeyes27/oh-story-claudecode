@@ -1,0 +1,17 @@
+{
+  "派发后记录时间": "2026-10-06T15:11:36.294105+00:00",
+  "任务": "p0_adjudicator",
+  "限时秒": 180,
+  "输入哈希": {
+    "规则版本/变更后/.novel-kit/roles/adjudicator.md": "08d731bd2bb01c5fe5fb1dcfcde97d18f3a5c5b114c585491ae3c7095685885a",
+    "规则版本/变更后/.novel-kit/standards/语文规格.md": "f77ef8e4461bff3fb46b12d538722c2f0aa8ffd8b8f024defe75cc506d8cfc6c",
+    "规则版本/变更后/.novel-kit/standards/语文规格_补充.md": "3c8d3cb515a3266c108bbda27dab06f9a6ed90d9acaa8220b59b4ef4efe11b73",
+    "输入/文风样本.md": "77cee0cb5db58710dd37de1347c8243979b650d38e358a63c4f3a968f01f6a13",
+    "输入/前文.md": "4b21202f690f68a9619d3603556010228cb7383b9d8e9fd2f09c743975432bad",
+    "阅读版/甲.md": "62c2ba678b30308ca4e1369462283df6877654e1da93d392669d3326d0882c0c",
+    "阅读版/乙.md": "c41f3cd6e0d74aa27cde101e162414dd11c03bcf0f8db59656f31a31d24f3b6f",
+    "输入/甲_裁决候选_v2.md": "34025970d6b02c0c2457e25b7b8ca9a8e668fb6b2e681e9562bec86c4066a19d",
+    "输入/乙_裁决候选_v2.md": "ea782504da90f62dcc41a3d313cd5e9456cb829686280b8ae27e41e0c5980019"
+  },
+  "输出方式": "唯读裁决，最终文本由协调器保存。"
+}

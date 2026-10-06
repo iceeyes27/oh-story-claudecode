@@ -1,0 +1,30 @@
+{
+  "说明": "本次开读前冻结；不追认缺失历史证据。",
+  "输入哈希": {
+    "规则版本/变更后/AGENTS.md": "35cd57930006dcbe2f97d6e3780685125f81d545d3dd679dbc3097a3f1499d8c",
+    "规则版本/变更后/.agents/skills/write-scene/SKILL.md": "bb8286a4efc2d100b0196343d3c5057fc4bc9b4b6de2b92d4933482501617d22",
+    "规则版本/变更后/.agents/skills/plan-chapter/SKILL.md": "a9389c92aaef3e123c1e3854805e14b67cf1d28dc0781eabfecf6049d346e0b4",
+    "规则版本/变更后/.agents/skills/revise/SKILL.md": "f11b90fa2ede8668c9b0d164e2c85bf21b946eb8cc1cfadb16de74854ed91cd9",
+    "规则版本/变更后/.novel-kit/roles/scene-writer.md": "b2de779915e7b5c22966dbef750dd1277bee73e3ae984b48b3c0a8446b24cb66",
+    "规则版本/变更后/.novel-kit/roles/structure-reviewer.md": "743a9c115a3dee7c6e8719d9a38a6c2e29fa68af17d0edb7b82555993b62ede7",
+    "规则版本/变更后/.novel-kit/roles/adjudicator.md": "08d731bd2bb01c5fe5fb1dcfcde97d18f3a5c5b114c585491ae3c7095685885a",
+    "规则版本/变更后/.novel-kit/roles/copy-editor.md": "1a28660e9cfca49fb317daec311ffb3b52e0f160f80da7bdd17e13abec2a497d",
+    "规则版本/变更后/.novel-kit/roles/consistency-checker.md": "0f762991ad00de7612bfa43c1111b73d09962a70336ded217d64ce363d155bb2",
+    "规则版本/变更后/.novel-kit/roles/character-reviewer.md": "774db1b7ac920c4bca33077ee3af91268b7aac26ea17a60c5e1808e97560a8f2",
+    "规则版本/变更后/.novel-kit/roles/prose-reviewer.md": "bf82dbba472d0048a9dbcb2b683b7b0df32b8e88123ab760cba4650b5923a880",
+    "规则版本/变更后/.novel-kit/workflows/review-loop.md": "af9d2bf138fef9210b31768f83a6ab2d4e6a61c5f70b04dddad9b8e5c3339336",
+    "规则版本/变更后/.novel-kit/workflows/progressive-disclosure.md": "d8c2a31e046efa3ce39426ffd67e65254dc243cfba47ea50b2c237f078457f2c",
+    "规则版本/变更后/.novel-kit/workflows/adoption.md": "43d177d80375f152b71aced4f465bb78ddb793823717108430eead5ccc8ecab1",
+    "规则版本/变更后/.novel-kit/standards/语文规格.md": "f77ef8e4461bff3fb46b12d538722c2f0aa8ffd8b8f024defe75cc506d8cfc6c",
+    "规则版本/变更后/.novel-kit/standards/语文规格_补充.md": "3c8d3cb515a3266c108bbda27dab06f9a6ed90d9acaa8220b59b4ef4efe11b73",
+    "规则版本/变更后/大綱/細綱/_模板.md": "93231b44b4100c4a78bfd47ed27e6d4e8be71bd0328b432eae9561af193cac02",
+    "规则版本/变更后/docs/novel-kit-使用指引.md": "9f3b8a353c96fcc21f240200d121d38575957448c569649e25ca4eeca3a00269",
+    "规则版本/变更后/.novel-kit/scripts/prose_check.py": "f0eb6e3efbd45f0220e782d154858b5439794741a412312c2651f3c9e92ded36",
+    "规则版本/变更后/.novel-kit/standards/创作护栏.md": "27c3ec0716d7adfcf7db9c6075f015084c86a18dd0e31df335e6e9e5b23ceb65",
+    "输入/共同事实.md": "8ebe48c646a670862f225e67c38cac1e150bfaa13be97854753b973a5ded5e2e",
+    "输入/旧细纲.md": "221fd961f9f77abf17278e5f215d5255168ae0e45b6235c2c702d5a65e0c42ef",
+    "输入/文风样本.md": "77cee0cb5db58710dd37de1347c8243979b650d38e358a63c4f3a968f01f6a13",
+    "输入/三层细纲.md": "dbf0f3325308301c8930609443539ca57729f7311571a46026f86f75563d6abc",
+    "输入/前文.md": "4b21202f690f68a9619d3603556010228cb7383b9d8e9fd2f09c743975432bad"
+  }
+}

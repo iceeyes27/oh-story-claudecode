@@ -1,0 +1,14 @@
+{
+  "记录时间": "2026-10-06T14:12:25.942420+00:00",
+  "任务": [
+    "/root/p0_boundary_retry",
+    "/root/p0_consistency",
+    "/root/p0_character"
+  ],
+  "限时秒": {
+    "p0_boundary_retry": 180,
+    "p0_consistency": 240,
+    "p0_character": 240
+  },
+  "说明": "紧随本批派发保存计时；原始提示与派发事件保存在当前对话工具记录。"
+}

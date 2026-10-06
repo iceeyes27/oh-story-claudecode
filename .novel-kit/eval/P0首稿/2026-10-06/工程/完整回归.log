@@ -1,0 +1,239 @@
+test_split_then_coverage_and_staleness (test_beats.Cli) ... 【寫作流程】对象已在分幕后改动，须重新 beat-split
+ok
+test_every_sentence_needs_a_verdict_line (test_beats.Coverage) ... ok
+test_ids_inside_numbers_do_not_count (test_beats.Coverage) ... ok
+test_per_beat_mode (test_beats.Coverage) ... ok
+test_unknown_beat_number (test_beats.Coverage) ... ok
+test_split_merge_and_unchanged_sentences (test_beats.Remap) ... ok
+test_numbered_text_keeps_paragraphs_and_original_spacing (test_beats.Split) ... ok
+test_numbers_sentences_per_beat (test_beats.Split) ... ok
+test_rejects_gap_overlap_tail_and_unnamed_beats (test_beats.Split) ... ok
+test_unterminated_line_is_one_sentence (test_beats.Split) ... ok
+test_scene_chapter_author_edit_and_revision_finish (test_cli_journey.CliJourney) ... ok
+test_changed_fact_delivery_stops_supply (test_context_packets.ContextPackets) ... ok
+test_crosschapter_uses_latest_formal_and_fullchapter_fallback (test_context_packets.ContextPackets) ... ok
+test_empty_fact_section_is_pending_supply (test_context_packets.ContextPackets) ... ok
+test_future_prose_and_drift_are_denied (test_context_packets.ContextPackets) ... ok
+test_import_backup_and_manifest_are_bound (test_context_packets.ContextPackets) ... ok
+test_nonadjacent_cause_requires_adopted_original_and_reason (test_context_packets.ContextPackets) ... ok
+test_outputs_have_explicit_ranges_and_hashes (test_context_packets.ContextPackets) ... ok
+test_same_source_prose_and_facts_are_isolated (test_context_packets.ContextPackets) ... ok
+test_unknown_legacy_fact_identity_is_not_guessed (test_context_packets.ContextPackets) ... ok
+test_unresolved_prerequisites_and_companion_collision_do_not_write (test_context_packets.ContextPackets) ... ok
+test_guard_detects_bare_calls (test_encoding.EncodingGuard) ... ok
+test_text_io_names_encoding (test_encoding.EncodingGuard) ... ok
+test_complete_repair_evidence_still_does_not_claim_quality_pass (test_eval_evidence.EvalEvidence) ... ok
+test_declared_lock_shaped_report_remains_hash_checked (test_eval_evidence.EvalEvidence) ... ok
+test_each_attempt_is_separate_from_supplemental_union (test_eval_evidence.EvalEvidence) ... ok
+test_freeze_collision_does_not_delete_another_process_directory (test_eval_evidence.EvalEvidence) ... ok
+test_freeze_keeps_actual_range_unknown_model_and_readonly_inputs (test_eval_evidence.EvalEvidence) ... ok
+test_freeze_never_overwrites_existing_directory (test_eval_evidence.EvalEvidence) ... ok
+test_human_attribution_is_not_invented (test_eval_evidence.EvalEvidence) ... ok
+test_known_runner_locks_allow_scoring_and_preserve_files (test_eval_evidence.EvalEvidence) ... ok
+test_missing_rows_do_not_become_clean_or_complete (test_eval_evidence.EvalEvidence) ... ok
+test_output_directory_symlink_cannot_grant_lock_exception (test_eval_evidence.EvalEvidence) ... ok
+test_output_escape_and_answer_context_are_rejected_before_writing (test_eval_evidence.EvalEvidence) ... ok
+test_protection_and_false_positives_remain_separate (test_eval_evidence.EvalEvidence) ... ok
+test_repair_missing_is_listed_even_when_review_tables_complete (test_eval_evidence.EvalEvidence) ... ok
+test_review_only_scope_can_complete_without_claiming_quality_pass (test_eval_evidence.EvalEvidence) ... ok
+test_runner_lock_name_is_bound_to_exact_declared_parent (test_eval_evidence.EvalEvidence) ... ok
+test_runner_lock_replacement_during_open_is_rejected (test_eval_evidence.EvalEvidence) ... ok
+test_runner_lock_symlinks_and_directories_are_rejected (test_eval_evidence.EvalEvidence) ... ok
+test_runner_locks_do_not_satisfy_missing_outputs (test_eval_evidence.EvalEvidence) ... ok
+test_runner_locks_require_exact_supported_contents (test_eval_evidence.EvalEvidence) ... ok
+test_score_never_overwrites_and_verify_binds_raw_outputs (test_eval_evidence.EvalEvidence) ... ok
+test_two_run_consistency_is_explicit_not_union_success (test_eval_evidence.EvalEvidence) ... ok
+test_unbacked_and_duplicate_judgments_are_rejected (test_eval_evidence.EvalEvidence) ... ok
+test_unknown_locks_and_extra_reports_still_block_scoring (test_eval_evidence.EvalEvidence) ... ok
+test_verify_checks_declared_output_range_and_missing_outputs (test_eval_evidence.EvalEvidence) ... ok
+test_verify_detects_source_and_snapshot_drift (test_eval_evidence.EvalEvidence) ... ok
+test_zero_denominator_is_not_perfect_score (test_eval_evidence.EvalEvidence) ... ok
+test_bad_input_never_launches (test_eval_runner.EvalRunner) ... ok
+test_changed_opening_or_events_cannot_resume (test_eval_runner.EvalRunner) ... ok
+test_changed_prompt_cannot_reuse_other_report (test_eval_runner.EvalRunner) ... ok
+test_changed_report_cannot_resume (test_eval_runner.EvalRunner) ... ok
+test_cli_budget_and_unique_durable_batch_ledgers (test_eval_runner.EvalRunner) ... ok
+test_cli_rejects_duplicate_ids_and_outputs_before_limit_or_launch (test_eval_runner.EvalRunner) ... ok
+test_completion_requires_exit_event_and_nonempty_report (test_eval_runner.EvalRunner) ... ok
+test_existing_output_without_credential_is_preserved (test_eval_runner.EvalRunner) ... ok
+test_external_thread_execution_requires_main_signal_scope_and_restores_handlers (test_eval_runner.EvalRunner) ... ok
+test_job_id_rejects_path_components (test_eval_runner.EvalRunner) ... ok
+test_legacy_receipt_is_preserved_as_unverified (test_eval_runner.EvalRunner) ... ok
+test_missing_input_is_recorded_without_launch (test_eval_runner.EvalRunner) ... ok
+test_nested_call_is_observed_and_blocks_completion (test_eval_runner.EvalRunner) ... ok
+test_opening_records_loaded_runner_version (test_eval_runner.EvalRunner) ... ok
+test_retry_uses_distinct_evidence_without_overwrite (test_eval_runner.EvalRunner) ... ok
+test_same_output_is_locked_across_job_ids_evidence_dirs_and_symlink_alias (test_eval_runner.EvalRunner) ... ok
+test_sigterm_cleans_cli_and_direct_execute_without_killing_other_processes (test_eval_runner.EvalRunner) ... ok
+test_success_and_resume_preserve_report_and_exact_prompt (test_eval_runner.EvalRunner) ... ok
+test_thread_tool_calls_are_counted (test_eval_runner.EvalRunner) ... ok
+test_timeout_terminates_process_group (test_eval_runner.EvalRunner) ... ok
+test_login_failure_is_not_completed_even_if_report_exists (test_eval_runner.EvalRunnerClaudeHost) ... ok
+test_nested_agent_call_blocks_completion (test_eval_runner.EvalRunnerClaudeHost) ... ok
+test_read_outside_frozen_inputs_blocks_completion (test_eval_runner.EvalRunnerClaudeHost) ... ok
+test_success_records_model_cost_and_reads_then_resumes (test_eval_runner.EvalRunnerClaudeHost) ... ok
+test_unknown_host_is_rejected (test_eval_runner.EvalRunnerClaudeHost) ... ok
+test_answer_keys_are_well_formed (test_eval_samples.EvalSamples) ... ok
+test_every_sample_has_answer_key (test_eval_samples.EvalSamples) ... ok
+test_evidence_is_verbatim (test_eval_samples.EvalSamples) ... ok
+test_sample_text_carries_no_answers (test_eval_samples.EvalSamples) ... ok
+test_launcher_exports_utf8 (test_hook_encoding.Launcher) ... ok
+test_launcher_without_python_exits_127 (test_hook_encoding.Launcher) ... ok
+test_no_python_alias_back_into_project_blocks (test_hook_encoding.Launcher) ... ok
+test_no_python_aliases_to_protected_directories_block_existing_and_new_files (test_hook_encoding.Launcher) ... ok
+test_no_python_blocks_writes_including_unprotected_and_outside_paths (test_hook_encoding.Launcher) ... ok
+test_no_python_nested_tool_name_cannot_mask_write_tool (test_hook_encoding.Launcher) ... ok
+test_no_python_patch_blocks_and_read_only_tools_remain_available (test_hook_encoding.Launcher) ... ok
+test_no_python_relative_and_windows_paths (test_hook_encoding.Launcher) ... ok
+test_no_python_relative_path_under_protected_cwd_blocks (test_hook_encoding.Launcher) ... ok
+test_no_python_scope_outside_tool_owned_and_notebook (test_hook_encoding.Launcher) ... ok
+test_no_python_unparseable_input_blocks (test_hook_encoding.Launcher) ... ok
+test_settings_uses_bash_launcher (test_hook_encoding.Launcher) ... ok
+test_store_stub_python3_is_skipped (test_hook_encoding.Launcher) ... ok
+test_store_stub_scope_through_settings (test_hook_encoding.Launcher) ... ok
+test_unexpected_python_failure_blocks (test_hook_encoding.Launcher) ... ok
+test_invalid_utf8_is_rejected (test_hook_encoding.PythonHook) ... ok
+test_scope_outside_tool_owned_and_notebook (test_hook_encoding.PythonHook) ... ok
+test_utf8_bytes_are_decoded_regardless_of_locale (test_hook_encoding.PythonHook) ... ok
+test_adjudicator_is_generated_read_only_and_not_a_gate_role (test_portability.AdapterOwnership) ... ok
+test_claude_model_policy_is_tiered_and_remembered (test_portability.AdapterOwnership) ... ok
+test_custom_adapters_are_not_overwritten_and_replacement_is_backed_up (test_portability.AdapterOwnership) ... ok
+test_foreign_settings_and_hooks_are_preserved (test_portability.AdapterOwnership) ... ok
+test_generic_mode_does_not_install_other_agent_configuration (test_portability.AdapterOwnership) ... ok
+test_setup_check_and_doctor_for_both_agents (test_portability.AdapterOwnership) ... ok
+test_shared_source_changes_propagate_but_local_edit_conflicts (test_portability.AdapterOwnership) ... ok
+test_source_check_detects_missing_and_stale_adapters_without_deployment (test_portability.AdapterOwnership) ... ok
+test_unknown_symlink_target_and_missing_sources_fail_closed (test_portability.AdapterOwnership) ... ok
+test_windows_hook_configuration_handles_space_and_apostrophe_paths (test_portability.AdapterOwnership) ... ok
+test_bad_patch_is_denied_and_patch_like_prose_does_not_add_targets (test_portability.PatchGuard) ... ok
+test_multiple_files_and_move_source_destination_are_all_checked (test_portability.PatchGuard) ... ok
+test_relative_paths_use_tool_cwd_not_project_root (test_portability.PatchGuard) ... ok
+test_missing_python_blocks_hook (test_portability.WindowsLauncher) ... skipped '原生 Windows cmd.exe 啟動器'
+test_native_python_hook_and_cli_without_git_bash (test_portability.WindowsLauncher) ... skipped '原生 Windows cmd.exe 啟動器'
+test_adjacent_and_long_sentence_repetition (test_prose_check.ProseCheck) ... ok
+test_clean_scene_has_no_findings (test_prose_check.ProseCheck) ... ok
+test_cli_is_read_only_and_exit_code_tracks_blocking (test_prose_check.ProseCheck) ... 【寫作流程】不接受含 .. 的路徑
+ok
+test_creation_guidance_leak_is_blocking_but_in_story_quote_is_advisory (test_prose_check.ProseCheck) ... ok
+test_eval_samples_stay_clean (test_prose_check.ProseCheck) ... ok
+test_headings_fences_and_front_matter_are_skipped (test_prose_check.ProseCheck) ... ok
+test_in_story_speech_and_first_person_are_not_refusals (test_prose_check.ProseCheck) ... ok
+test_pipeline_terms_block_but_quoted_or_structural_words_advise (test_prose_check.ProseCheck) ... ok
+test_placeholders_and_refusals (test_prose_check.ProseCheck) ... ok
+test_quoted_refrain_is_a_genre_device (test_prose_check.ProseCheck) ... ok
+test_truncation_needs_closing_punctuation (test_prose_check.ProseCheck) ... ok
+test_commit_brackets_are_literal (test_recovery.Recovery) ... ok
+test_context_ranges_cannot_change_while_sources_stay_same (test_recovery.Recovery) ... ok
+test_delivery_full_text_must_equal_frozen_candidate (test_recovery.Recovery) ... ok
+test_old_applying_journal_can_only_resume_existing_adoption (test_recovery.Recovery) ... ok
+test_old_prepared_journal_cannot_authorize_first_adoption (test_recovery.Recovery) ... ok
+test_packet_blind_writer_tampering_rejected_before_review_start (test_recovery.Recovery) ... ok
+test_packet_dependencies_are_automatically_frozen_and_must_be_current (test_recovery.Recovery) ... ok
+test_prepare_does_not_publish_state_or_author_text_on_mismatched_delivery (test_recovery.Recovery) ... ok
+test_prepare_requires_review_start (test_recovery.Recovery) ... ok
+test_rebind_keeps_adopted_identity_and_registers_new_scenes (test_recovery.Recovery) ... ok
+test_rebind_rejects_removing_started_scene_and_hand_edited_adoption (test_recovery.Recovery) ... ok
+test_rebinding_completed_chapter_retains_historical_scene_identity (test_recovery.Recovery) ... ok
+test_rebinding_has_legal_path_after_revision_finish (test_recovery.Recovery) ... ok
+test_review_freeze_rejects_changed_candidate_before_prepare (test_recovery.Recovery) ... ok
+test_review_freeze_rejects_changed_context_or_spec (test_recovery.Recovery) ... ok
+test_review_freezes_adoption_identity_journal (test_recovery.Recovery) ... ok
+test_review_snapshot_preserves_trailing_newlines_and_exact_delivery (test_recovery.Recovery) ... ok
+test_review_start_crash_resumes_without_refreezing_changed_input (test_recovery.Recovery) ... ok
+test_revision_extend_requires_identity_but_accepts_author_hand_edit (test_recovery.Recovery) ... ok
+test_revision_updates_delivery_identity_and_preserves_old_history (test_recovery.Recovery) ... ok
+test_simplified_outline_and_conflicting_status (test_recovery.Recovery) ... ok
+test_simplified_state_output_and_legacy_state_input_normalize (test_recovery.Recovery) ... ok
+test_unregistered_chapter_cannot_be_revision_target (test_recovery.Recovery) ... ok
+test_unstarted_existing_file_cannot_be_revision_target (test_recovery.Recovery) ... ok
+test_withdraw_preserves_candidate_and_unblocks_predecessor_revision (test_recovery.Recovery) ... ok
+test_withdraw_rejects_adopted_and_requires_reason_authorization (test_recovery.Recovery) ... ok
+test_withdraw_without_journal_and_interruption_resumes (test_recovery.Recovery) ... ok
+test_withdrawn_started_scene_cannot_be_deleted_by_rebinding (test_recovery.Recovery) ... ok
+test_absolute_paths_outside_project_skip_gate (test_workflow.Workflow) ... ok
+test_adopted_predecessor_edit_blocks_next (test_workflow.Workflow) ... ok
+test_cancel_preserves_prose_and_cannot_cancel_partial_adoption (test_workflow.Workflow) ... ok
+test_changed_candidate_cannot_use_old_review (test_workflow.Workflow) ... ok
+test_changed_delivery_is_stale (test_workflow.Workflow) ... ok
+test_chapter_acceptance_allows_next_plan (test_workflow.Workflow) ... ok
+test_chapter_is_not_published_before_acceptance (test_workflow.Workflow) ... ok
+test_chapter_requires_tracking_before_any_delivery_side_effect (test_workflow.Workflow) ... ok
+test_chapter_tracking_interruption_blocks_next_until_recovery (test_workflow.Workflow) ... ok
+test_cli_works_without_git (test_workflow.Workflow) ... ok
+test_commit_does_not_touch_existing_staged_content (test_workflow.Workflow) ... ok
+test_commit_failure_leaves_real_index_unchanged (test_workflow.Workflow) ... ok
+test_commit_only_named_files_and_keeps_unrelated_dirty (test_workflow.Workflow) ... ok
+test_draft_outline_rejected (test_workflow.Workflow) ... ok
+test_existing_chapter_without_confirmed_import_is_insufficient (test_workflow.Workflow) ... ok
+test_hand_edit_after_revision_start_is_preserved (test_workflow.Workflow) ... ok
+test_historical_scenes_cannot_replace_adopted_chapter (test_workflow.Workflow) ... ok
+test_hook_rejects_wrong_json_shapes (test_workflow.Workflow) ... ok
+test_hook_write_edit_and_malformed_input (test_workflow.Workflow) ... ok
+test_import_duplicate_and_changed_chapter (test_workflow.Workflow) ... ok
+test_interrupted_adoption_stops_on_external_edit (test_workflow.Workflow) ... ok
+test_interruption_resumes_without_overwriting_external_edits (test_workflow.Workflow) ... ok
+test_last_revision_adoption_still_blocks_until_finalize (test_workflow.Workflow) ... ok
+test_missing_review_and_severe_issue_need_explicit_decision (test_workflow.Workflow) ... ok
+test_new_scene_cannot_silently_use_text_mode (test_workflow.Workflow) ... ok
+test_old_prepared_chapter_without_tracking_is_rejected (test_workflow.Workflow) ... ok
+test_other_chapter_pending_blocks_write (test_workflow.Workflow) ... ok
+test_outline_changed_after_confirmation (test_workflow.Workflow) ... ok
+test_outside_alias_back_into_project_is_gated (test_workflow.Workflow) ... ok
+test_path_escape_symlink_and_official_write_rejected (test_workflow.Workflow) ... ok
+test_pending_delivery_blocks_other_scene (test_workflow.Workflow) ... ok
+test_reconfirm_only_unstarted_outline (test_workflow.Workflow) ... ok
+test_refresh_atomic_failure_retains_previous_baseline_and_author_text (test_workflow.Workflow) ... ok
+test_refresh_cannot_skip_interrupted_adoption_or_closed_task (test_workflow.Workflow) ... ok
+test_refresh_preserves_hand_edit_and_invalidates_prepared_revision (test_workflow.Workflow) ... ok
+test_refresh_preserves_other_adoptions_and_stales_finish (test_workflow.Workflow) ... ok
+test_refresh_rejects_invalid_scope_empty_unchanged_and_reason (test_workflow.Workflow) ... ok
+test_registered_import_requires_previous_chapter_without_gap (test_workflow.Workflow) ... ok
+test_reopen_invalidates_old_delivery (test_workflow.Workflow) ... ok
+test_revision_candidate_preserves_official_text (test_workflow.Workflow) ... ok
+test_revision_invalidates_adopted_dependent_scenes (test_workflow.Workflow) ... ok
+test_rollback_removes_only_new_official_candidate (test_workflow.Workflow) ... ok
+test_rollback_restores_interrupted_revision (test_workflow.Workflow) ... ok
+test_scene_adoption_does_not_update_global_tracking (test_workflow.Workflow) ... ok
+test_skip_scene_and_existing_file_do_not_bypass (test_workflow.Workflow) ... ok
+test_tool_owned_files_rejected (test_workflow.Workflow) ... ok
+test_unknown_and_duplicate_rows_rejected (test_workflow.Workflow) ... ok
+test_windows_device_and_unc_aliases_are_gated (test_workflow.Workflow) ... skipped 'Windows 路徑別名'
+
+----------------------------------------------------------------------
+Ran 198 tests in 58.447s
+
+OK (skipped=3)
+草稿/第001章/場景01.md：2 幕，6 句 → 審閱/第001章/場景01_分幕_编号.json
+覆盖不完整，缺少结论：1-03
+覆盖完整
+claude: 配置一致；啟動命令允許設定、拒絕正式正文（未寫入檔案）
+codex: 配置一致；啟動命令允許設定、拒絕正式正文（未寫入檔案）
+共享技能與規則：.agents/skills、AGENTS.md；Agent 內的載入與 Hook 信任仍需實際會話確認。
+共享技能與規則：.agents/skills、AGENTS.md；Agent 內的載入與 Hook 信任仍需實際會話確認。
+claude: 配置一致；啟動命令允許設定、拒絕正式正文（未寫入檔案）
+codex: 配置一致；啟動命令允許設定、拒絕正式正文（未寫入檔案）
+共享技能與規則：.agents/skills、AGENTS.md；Agent 內的載入與 Hook 信任仍需實際會話確認。
+草稿/第001章/場景01.md:1:9: [advisory] meta-leak: 章节结构词「读者」疑似混入正文；故事内真实阅读、讨论或称呼时保留。（言家日报》的读者来信堆满了桌子。）
+prose-check：blocking 0，advisory 1
+{
+  "findings": [
+    {
+      "file": "草稿/第001章/場景01.md",
+      "line": 1,
+      "column": 2,
+      "type": "meta-leak",
+      "severity": "blocking",
+      "message": "流程术语「细纲」混入正文。",
+      "excerpt": "按细纲，他走了"
+    },
+    {
+      "file": "草稿/第001章/場景01.md",
+      "line": 1,
+      "column": 7,
+      "type": "truncated",
+      "severity": "blocking",
+      "message": "末尾没有句末或收尾标点，疑似生成中断；补完或重写结尾。",
+      "excerpt": "按细纲，他走了"
+    }
+  ]
+}

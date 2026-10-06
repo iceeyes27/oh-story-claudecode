@@ -1,0 +1,31 @@
+{
+  "日期": "2026-10-06",
+  "授权": "按建议实行。",
+  "基准提交": "1e29e2280ac9ac65dc6b04d17329d11aa2ed134f",
+  "变更前": {
+    "AGENTS.md": "215c365c05717059a4b3bf8368136886746895dfd4943c3c70376f1752c7fca2",
+    ".agents/skills/write-scene/SKILL.md": "123967ac6141bbabe92429ae804e38d6f75abcc8d370cb3a05dcbaa9ca0af52e",
+    ".agents/skills/plan-chapter/SKILL.md": "cd485063eb9003fe8601819554d5a072ac482c9453b45a4f40e1e2b194a7f06d",
+    ".agents/skills/revise/SKILL.md": "fa8a701cd8ee2abc617708a5c1cd799040dc1c65eddb3d96a74dce064d5b99c6",
+    ".novel-kit/roles/scene-writer.md": "69af0fc316eff5bcd391ade953e7caa1e12d9fa9b1e1f86e7261cf4716cc494f",
+    ".novel-kit/roles/structure-reviewer.md": "08ec6eb99a236ba7c7e1253b7c63b1b8df67c61368f4a2b78a165e1e1285e109",
+    ".novel-kit/roles/adjudicator.md": "db47f05cd92f296a9bc56554e061941aa38c85d6d9c4fdc97f038c48721f9626",
+    ".novel-kit/roles/copy-editor.md": "1a28660e9cfca49fb317daec311ffb3b52e0f160f80da7bdd17e13abec2a497d",
+    ".novel-kit/roles/consistency-checker.md": "0f762991ad00de7612bfa43c1111b73d09962a70336ded217d64ce363d155bb2",
+    ".novel-kit/roles/character-reviewer.md": "774db1b7ac920c4bca33077ee3af91268b7aac26ea17a60c5e1808e97560a8f2",
+    ".novel-kit/roles/prose-reviewer.md": "bf82dbba472d0048a9dbcb2b683b7b0df32b8e88123ab760cba4650b5923a880",
+    ".novel-kit/workflows/review-loop.md": "66f8bad438a07d9ed6f3821ff23a7c1f88bfe22e16d52a0d0963f5aabf0a1420",
+    ".novel-kit/workflows/progressive-disclosure.md": "e0cabde9611cc4bbeab4e3bb9adcd0b9a91e0e241a40213763a372ac27051ede",
+    ".novel-kit/workflows/adoption.md": "93946f8ed59fc2f7f78f75625f237d9c5aa13108b0e6ad531f2f93abc87677ca",
+    ".novel-kit/standards/语文规格.md": "75b9e25d85a00586c2ea6a69ec45ecd46e686db1ca1accfa5e7b1e422f142ea5",
+    ".novel-kit/standards/语文规格_补充.md": "3c8d3cb515a3266c108bbda27dab06f9a6ed90d9acaa8220b59b4ef4efe11b73",
+    "大綱/細綱/_模板.md": "e88ce10612db150c37272032e1d8535203500cade2fd9e46daa81ae5e7e4adbc",
+    "docs/novel-kit-使用指引.md": "21ec8b4b752f1afcc777a72963ca069c23f0e81864529c5d8b9fdc90cd34e7ec",
+    ".novel-kit/scripts/prose_check.py": "ac800cc701db20c75c22eedb827132d400fce6c25e29dbbbc2a4218461863f0a"
+  },
+  "原有未提交文件": {
+    "README.md": "0d83f6978be69d5ec7eb3436296db772bd132a92a25b4645a2fd89f5564cfd6f",
+    "docs/新手指引.md": "17961a9981c9fe50dfa3c5947054a67517d3e692f3e78f38b819267f2f38523e",
+    ".novel-kit/eval/.DS_Store": "7e724240116b7d174e7780bb20942d282e68ceec2a4a45683cfa0fbec83f3f91"
+  }
+}

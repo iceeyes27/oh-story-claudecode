@@ -48,6 +48,12 @@ META_TIER2 = re.compile(
     r'第[一二三四五六七八九十百千万萬两兩0-9]+章|本章|这一章|這一章|上一章|下一章|上章|下章|前一章|'
     r'后一章|後一章|前文|后文|後文|伏笔|伏筆|读者|讀者|任务描述|任務描述')
 
+AI_ISMS_PATTERNS = [
+    (re.compile(r'寸影随行|心绪微漾|神情冷凝'), '伪成语/生造词', 'blocking', '正文疑似使用生造伪成语或杂糅拼凑词；改为规范汉语词汇。'),
+    (re.compile(r'神经末梢|大脑皮层|多巴胺分泌'), '解剖生理术语穿越', 'advisory', '非现代医学解剖视角疑似混入专业解剖术语；核对时代语境。'),
+]
+DEMONSTRATIVE_TELL = re.compile(r'^[这是|那是|這是一|這是一|这是一个|那是一个]')
+
 
 def mask_quoted(text):
     """Blank paired quotes with spaces of equal length so columns stay accurate."""
@@ -160,9 +166,30 @@ def find_meta_leak(body):
     return found
 
 
+def find_ai_isms(body):
+    found = []
+    tell_counts = 0
+    for no, line in body:
+        outside = mask_quoted(line)
+        for pattern, label, severity, message in AI_ISMS_PATTERNS:
+            m = pattern.search(line if severity == 'blocking' else outside)
+            if m:
+                found.append(finding(no, m.start() + 1, 'ai-ism', severity,
+                                     label + '：' + message, line[max(0, m.start() - 4):m.start() + 20]))
+                break
+        stripped = outside.strip()
+        if DEMONSTRATIVE_TELL.match(stripped):
+            tell_counts += 1
+            if tell_counts >= 2:
+                found.append(finding(no, 1, 'ai-ism', 'advisory',
+                                     '指认说明腔：多处以「这是/那是」指示词下定义，改为直接呈现物理属性与感官。', stripped[:24]))
+    return found
+
+
 def scan(text):
     body = body_lines(text)
-    found = find_repetition(body) + find_truncation(body) + find_placeholders(body) + find_meta_leak(body)
+    found = (find_repetition(body) + find_truncation(body) +
+             find_placeholders(body) + find_meta_leak(body) + find_ai_isms(body))
     return sorted(found, key=lambda f: (f['line'], f['column']))
 
 

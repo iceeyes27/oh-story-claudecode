@@ -61,6 +61,32 @@ class ProseCheck(unittest.TestCase):
                 self.assertEqual(kinds('“我给这份编辑笔记起名叫' + term + '。”她说。\n'),
                                  [('advisory', 'meta-leak')])
 
+    def test_ordinary_openings_do_not_trigger_demonstrative_advice(self):
+        text = '这辆车停在街角。\n\n是父亲回来了。\n\n一个孩子走进门。\n\n那辆车开走了。\n'
+        self.assertEqual(kinds(text), [])
+
+    def test_repeated_demonstratives_are_advisory_and_preserve_positions(self):
+        text = '这是他留下的信。\n\n那是她的书。\n'
+        findings = prose_check.scan(text)
+        self.assertEqual([(f['line'], f['column'], f['severity'], f['type']) for f in findings],
+                         [(3, 1, 'advisory', 'ai-ism')])
+        self.assertEqual(kinds('這是他的信。\n\n那是她的书。\n'), [('advisory', 'ai-ism')])
+
+    def test_quoted_style_terms_do_not_trigger_narration_checks(self):
+        text = '“这是一个词，寸影随行。”他读道。\n\n“那是他写错的，神情冷凝。”她说。\n'
+        self.assertEqual(kinds(text), [])
+
+    def test_style_advice_does_not_block_or_rewrite_a_candidate(self):
+        with tempfile.TemporaryDirectory(prefix='novel-style-') as tmp:
+            root = Path(tmp).resolve()
+            draft = root/'候选.md'
+            draft.write_text('寸影随行写在笔记上。\n\n医生解释了神经末梢的作用。\n', encoding='utf-8')
+            before = draft.read_bytes()
+            self.assertEqual(kinds(draft.read_text(encoding='utf-8')),
+                             [('advisory', 'ai-ism'), ('advisory', 'ai-ism')])
+            self.assertEqual(novel.main(['--root', str(root), 'prose-check', '候选.md']), 0)
+            self.assertEqual(draft.read_bytes(), before)
+
     def test_headings_fences_and_front_matter_are_skipped(self):
         text = ('---\ntitle: 场景\n---\n### 第1章 开机密码\n\n```\n细纲 TODO\n```\n\n'
                 '雨停了。\n')
